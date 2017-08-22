@@ -1,10 +1,12 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System;
+﻿using System;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportElementTypeDto
     {
+        #region public properties
+
         public int? ReportElementTypeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -15,5 +17,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int OrganizationRegulatoryProgramId { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
+
+        #endregion
     }
 }

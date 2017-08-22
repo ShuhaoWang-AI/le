@@ -5,6 +5,8 @@ namespace Linko.LinkoExchange.Web.Mapping
 {
     public class MapHelper : IMapHelper
     {
+        #region interface implementations
+
         public UserDto GetUserDtoFromUserProfileViewModel(UserProfileViewModel viewModel, UserDto dto = null)
         {
             if (dto == null)
@@ -23,6 +25,7 @@ namespace Linko.LinkoExchange.Web.Mapping
             dto.ZipCode = viewModel.ZipCode;
             dto.JurisdictionId = viewModel.JurisdictionId;
             dto.PhoneExt = viewModel.PhoneExt;
+
             //IGNORE IsAccountLocked
             //IGNORE IsAccountResetRequired
             //IGNORE IsIdentityProofed 
@@ -30,10 +33,12 @@ namespace Linko.LinkoExchange.Web.Mapping
             //IGNORE CreationDateTimeUtc
             //IGNORE LastModificationDateTimeUtc
             dto.Email = viewModel.Email;
+
             //IGNORE OldEmailAddress
             //IGNORE EmailConfirmed
             //IGNORE PasswordHash
             dto.PhoneNumber = viewModel.PhoneNumber;
+
             //IGNORE LockoutEndDateUtc
             //IGNORE LockoutEnabled
             //IGNORE Password
@@ -49,6 +54,7 @@ namespace Linko.LinkoExchange.Web.Mapping
                 viewModel = new UserProfileViewModel();
             }
             viewModel.UserProfileId = userDto.UserProfileId;
+
             //IGNORE Role
             //IGNORE HasSigntory
             //IGNORE HasSigntoryText
@@ -56,6 +62,7 @@ namespace Linko.LinkoExchange.Web.Mapping
             viewModel.FirstName = userDto.FirstName;
             viewModel.LastName = userDto.LastName;
             viewModel.BusinessName = userDto.BusinessName;
+
             //IGNORE OrganizationId
             viewModel.AddressLine1 = userDto.AddressLine1;
             viewModel.AddressLine2 = userDto.AddressLine2;
@@ -67,6 +74,7 @@ namespace Linko.LinkoExchange.Web.Mapping
             viewModel.Email = userDto.Email;
             viewModel.UserName = userDto.UserName;
             viewModel.Password = userDto.Password;
+
             //IGNORE StateList
 
             return viewModel;
@@ -77,13 +85,13 @@ namespace Linko.LinkoExchange.Web.Mapping
             if (viewModel == null)
             {
                 viewModel = new QuestionAnswerPairViewModel();
-                viewModel.Question = this.GetQuestionViewModelFromQuestionDto(dto.Question);
-                viewModel.Answer = this.GetAnswerViewModelFromAnswerDto(dto.Answer);
+                viewModel.Question = GetQuestionViewModelFromQuestionDto(dto:dto.Question);
+                viewModel.Answer = GetAnswerViewModelFromAnswerDto(dto:dto.Answer);
             }
             else
             {
-                viewModel.Question = this.GetQuestionViewModelFromQuestionDto(dto.Question, viewModel.Question);
-                viewModel.Answer = this.GetAnswerViewModelFromAnswerDto(dto.Answer, viewModel.Answer);
+                viewModel.Question = GetQuestionViewModelFromQuestionDto(dto:dto.Question, viewModel:viewModel.Question);
+                viewModel.Answer = GetAnswerViewModelFromAnswerDto(dto:dto.Answer, viewModel:viewModel.Answer);
             }
 
             return viewModel;
@@ -102,6 +110,8 @@ namespace Linko.LinkoExchange.Web.Mapping
 
             return viewModel;
         }
+
+        #endregion
 
         private AnswerViewModel GetAnswerViewModelFromAnswerDto(AnswerDto dto, AnswerViewModel viewModel = null)
         {

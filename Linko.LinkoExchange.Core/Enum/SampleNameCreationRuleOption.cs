@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Core.Enum
 {
-     public enum SampleNameCreationRuleOption
+    public enum SampleNameCreationRuleOption
     {
         SampleEventType,
         SampleEventTypeCollectionMethod

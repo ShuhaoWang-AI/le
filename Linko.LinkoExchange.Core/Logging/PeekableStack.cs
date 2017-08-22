@@ -16,8 +16,7 @@ namespace Linko.LinkoExchange.Core.Logging
 
         #endregion
 
-
-        #region constructor and destructor
+        #region constructors and destructor
 
         /// <summary>
         /// </summary>
@@ -32,36 +31,22 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public PeekableStack(IEnumerable<T> initialItems)
         {
-            _list = new List<T>(initialItems);
+            _list = new List<T>(collection:initialItems);
         }
 
         #endregion
-
 
         #region public properties
 
         /// <summary>
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return _list.Count;
-            }
-        }
+        public int Count => _list.Count;
 
         /// <summary>
         /// </summary>
-        public IEnumerable<T> Items
-        {
-            get
-            {
-                return _list.ToArray();
-            }
-        }
+        public IEnumerable<T> Items => _list.ToArray();
 
         #endregion
-
 
         #region public methods and operators
 
@@ -73,8 +58,8 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </returns>
         public T Peek(int depth)
         {
-            int index = _list.Count - 1 - depth;
-            return _list[index];
+            var index = _list.Count - 1 - depth;
+            return _list[index:index];
         }
 
         /// <summary>
@@ -83,9 +68,9 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </returns>
         public T Pop()
         {
-            int index = _list.Count - 1;
-            T ret = _list[index];
-            _list.RemoveAt(index);
+            var index = _list.Count - 1;
+            var ret = _list[index:index];
+            _list.RemoveAt(index:index);
             return ret;
         }
 
@@ -95,7 +80,7 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public void Push(T obj)
         {
-            _list.Add(obj);
+            _list.Add(item:obj);
         }
 
         #endregion

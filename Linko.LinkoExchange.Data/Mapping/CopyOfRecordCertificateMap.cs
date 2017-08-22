@@ -1,21 +1,23 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class CopyOfRecordCertificateMap : EntityTypeConfiguration<CopyOfRecordCertificate>
+    public class CopyOfRecordCertificateMap : EntityTypeConfiguration<CopyOfRecordCertificate>
     {
+        #region constructors and destructor
+
         public CopyOfRecordCertificateMap()
         {
-            ToTable("tCopyOfRecordCertificate");
+            ToTable(tableName:"tCopyOfRecordCertificate");
 
             HasKey(x => x.CopyOfRecordCertificateId);
 
-            Property(x => x.PhysicalPath).IsRequired().HasMaxLength(256);
+            Property(x => x.PhysicalPath).IsRequired().HasMaxLength(value:256);
 
-            Property(x => x.FileName).IsRequired().HasMaxLength(256);
+            Property(x => x.FileName).IsRequired().HasMaxLength(value:256);
 
-            Property(x => x.Password).IsRequired().HasMaxLength(50);
+            Property(x => x.Password).IsRequired().HasMaxLength(value:50);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
@@ -23,5 +25,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Copy of Record Certificate used in the creation of the digital signature.
+    ///     Represents a Copy of Record Certificate used in the creation of the digital signature.
     /// </summary>
-    public partial class CopyOfRecordCertificate
+    public class CopyOfRecordCertificate
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int CopyOfRecordCertificateId { get; set; }
 
@@ -23,6 +25,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

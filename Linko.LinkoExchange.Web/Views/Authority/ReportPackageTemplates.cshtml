@@ -31,12 +31,12 @@
         <div>
             @{
                 var vm = new ConfirmationMessageViewModal
-                {
-                    ShowMessage = TempData["ReportPackageTemplateDeleteSucceed"] != null && (bool)TempData["ReportPackageTemplateDeleteSucceed"],
-                    Messaage =  "Report package template has been deleted successfully."
-                };
+                         {
+                             ShowMessage = TempData[key:"ReportPackageTemplateDeleteSucceed"] != null && (bool) TempData[key:"ReportPackageTemplateDeleteSucceed"],
+                             Messaage = "Report package template has been deleted successfully."
+                         };
 
-                @Html.Partial("_ConfirmationMessageView", vm);
+                @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
             }
         </div>
         <div class="form-group">
@@ -88,6 +88,7 @@
                                       selectable.Type(type:GridSelectionType.Row);
                                   })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))

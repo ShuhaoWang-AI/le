@@ -1,17 +1,20 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class OrganizationRegulatoryProgramUserMap : EntityTypeConfiguration<OrganizationRegulatoryProgramUser>
+    public class OrganizationRegulatoryProgramUserMap : EntityTypeConfiguration<OrganizationRegulatoryProgramUser>
     {
+        #region constructors and destructor
+
         public OrganizationRegulatoryProgramUserMap()
         {
-            ToTable("tOrganizationRegulatoryProgramUser");
+            ToTable(tableName:"tOrganizationRegulatoryProgramUser");
 
             HasKey(x => x.OrganizationRegulatoryProgramUserId);
 
             Property(x => x.UserProfileId).IsRequired();
+
             //HasRequired(a => a.UserProfile)
             //    .WithMany()
             //    .HasForeignKey(c => c.UserProfileId)
@@ -20,17 +23,17 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.OrganizationRegulatoryProgramUsers)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(a => a.InviterOrganizationRegulatoryProgram)
                 .WithMany(b => b.InviterOrganizationRegulatoryProgramUsers)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             HasOptional(a => a.PermissionGroup)
                 .WithMany(b => b.OrganizationRegulatoryProgramUsers)
                 .HasForeignKey(c => c.PermissionGroupId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.RegistrationDateTimeUtc).IsRequired();
 
@@ -50,5 +53,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

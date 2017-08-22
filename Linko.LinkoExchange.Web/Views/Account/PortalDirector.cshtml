@@ -25,7 +25,7 @@
                     {
                         <li>
                             @Ajax.ActionLink(linkText:item.Text, actionName:"PortalDirector", controllerName:"Account"
-                                , routeValues:new { id = item.Value }
+                                , routeValues:new {id = item.Value}
                                 , ajaxOptions:new AjaxOptions {HttpMethod = "POST", OnSuccess = "OnAjaxSuccess"})
                         </li>
                     }
@@ -62,13 +62,12 @@
         OnAjaxSuccess = function(data)
         {
             setTimeout(function()
+            {
+                if (data.redirect)
                 {
-                    if (data.redirect)
-                    {
-                        window.location.replace(data.newurl);
-                    }
+                    window.location.replace(data.newurl);
                 }
-                , 500);
+            }, 500);
         }
     </script>
 }

@@ -3,19 +3,21 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents an Event Type in LinkoCTS.
-    /// Anything marked as Event Category name = "Sample" will be used in Sample creation.
-    /// Anything marked as Event Category name != “Sample” will be used in Report Package or Element creation.
+    ///     Represents an Event Type in LinkoCTS.
+    ///     Anything marked as Event Category name = "Sample" will be used in Sample creation.
+    ///     Anything marked as Event Category name != "Sample" will be used in Report Package or Element creation.
     /// </summary>
-    public partial class CtsEventType
+    public class CtsEventType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int CtsEventTypeId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId and CTS Event Category.
+        ///     Unique within a particular OrganizationRegulatoryProgramId and CTS Event Category.
         /// </summary>
         public string Name { get; set; }
 
@@ -24,13 +26,14 @@ namespace Linko.LinkoExchange.Core.Domain
         public string CtsEventCategoryName { get; set; }
 
         /// <summary>
-        /// Typical value: Authority Regulatory Program id.
+        ///     Typical value: Authority Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         /// <summary>
-        /// True: CTS Event Type is visible to the Industry. False, otherwise.
+        ///     True: CTS Event Type is visible to the Industry. False, otherwise.
         /// </summary>
         public bool IsEnabled { get; set; }
 
@@ -41,6 +44,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

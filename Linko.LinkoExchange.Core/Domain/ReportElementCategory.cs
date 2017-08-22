@@ -3,17 +3,19 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Report Element Category within a Report Package or Report Package template.
+    ///     Represents a Report Element Category within a Report Package or Report Package template.
     /// </summary>
-    public partial class ReportElementCategory
+    public class ReportElementCategory
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportElementCategoryId { get; set; }
 
         /// <summary>
-        /// Unique.
+        ///     Unique.
         /// </summary>
         public string Name { get; set; }
 
@@ -24,5 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

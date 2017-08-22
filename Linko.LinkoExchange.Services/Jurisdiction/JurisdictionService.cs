@@ -1,18 +1,24 @@
-﻿using Linko.LinkoExchange.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Jurisdiction
 {
     public class JurisdictionService : IJurisdictionService
     {
+        #region fields
+
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapHelper _mapHelper;
         private readonly ILogger _logService;
+        private readonly IMapHelper _mapHelper;
+
+        #endregion
+
+        #region constructors and destructor
 
         public JurisdictionService(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logService)
         {
@@ -21,48 +27,54 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
             _logService = logService;
         }
 
+        #endregion
+
+        #region interface implementations
+
         public ICollection<JurisdictionDto> GetStateProvs(int countryId)
         {
-            _logService.Info($"Entering GetStateProvs. countryId={countryId}");
+            _logService.Info(message:$"Entering GetStateProvs. countryId={countryId}");
 
-            List<JurisdictionDto> dtos = new List<JurisdictionDto>();
+            var dtos = new List<JurisdictionDto>();
             var states = _dbContext.Jurisdictions
-                .Where(j => j.CountryId == countryId);
+                                   .Where(j => j.CountryId == countryId);
 
             if (states != null)
             {
                 foreach (var state in states)
                 {
-                    dtos.Add(_mapHelper.GetJurisdictionDtoFromJurisdiction(state));
+                    dtos.Add(item:_mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction:state));
                 }
             }
 
-            _logService.Info($"Exiting GetStateProvs. countryId={countryId}");
+            _logService.Info(message:$"Exiting GetStateProvs. countryId={countryId}");
 
             return dtos;
         }
 
         public JurisdictionDto GetJurisdictionById(int? jurisdictionId)
         {
-            if(jurisdictionId.HasValue == false)
+            if (jurisdictionId.HasValue == false)
             {
-                return null; 
+                return null;
             }
 
             var jurisdiction = _dbContext.Jurisdictions
-                .SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
+                                         .SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
 
             if (jurisdiction != null)
             {
-                JurisdictionDto dto = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction);
+                var dto = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction:jurisdiction);
                 return dto;
             }
             else
             {
                 var errorMessage = $"GetJurisdictionById. Could not find Jurisdiction associated with JurisdictionId={jurisdictionId}.";
-                _logService.Info(errorMessage);
-                throw new Exception(errorMessage);
+                _logService.Info(message:errorMessage);
+                throw new Exception(message:errorMessage);
             }
         }
+
+        #endregion
     }
 }

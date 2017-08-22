@@ -5,88 +5,71 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
     public class IndustryViewModel
     {
-        [ScaffoldColumn(false)]
+        #region fields
+
+        private string address;
+
+        #endregion
+
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Id")]
-        public int Id
-        {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry No.")]
-        public int IndustryNo
-        {
-            get; set;
-        }
+        public int IndustryNo { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry No.")]
         public string ReferenceNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry Name")]
-        public string IndustryName
-        {
-            get; set;
-        }
+        public string IndustryName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 1")]
-        public string AddressLine1
-        {
-            get; set;
-        }
+        public string AddressLine1 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 2")]
-        public string AddressLine2
-        {
-            get; set;
-        }
+        public string AddressLine2 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "City")]
-        public string CityName
-        {
-            get; set;
-        }
+        public string CityName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "State")]
-        public string State
-        {
-            get; set;
-        }
+        public string State { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Zip Code")]
-        public string ZipCode
-        {
-            get; set;
-        }
+        public string ZipCode { get; set; }
 
-        private string address;
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address")]
         public string Address
         {
             get
             {
-                if (string.IsNullOrEmpty(address))
+                if (string.IsNullOrEmpty(value:address))
                 {
-                    string formattedAddress = string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
-                    formattedAddress = formattedAddress.Replace(" , , ", "");
-                    formattedAddress = formattedAddress.Replace(", ,", ",");
-                    formattedAddress = formattedAddress.Replace(" , ", ", ").Trim();
-                    if (formattedAddress.Length > 0 && formattedAddress[0] == ',')
+                    var formattedAddress = string.Format(format:"{0} {1}, {2}, {3} {4}", args:new object[] {AddressLine1, AddressLine2, CityName, State, ZipCode});
+                    formattedAddress = formattedAddress.Replace(oldValue:" , , ", newValue:"");
+                    formattedAddress = formattedAddress.Replace(oldValue:", ,", newValue:",");
+                    formattedAddress = formattedAddress.Replace(oldValue:" , ", newValue:", ").Trim();
+                    if (formattedAddress.Length > 0 && formattedAddress[index:0] == ',')
                     {
                         //trim leading comma
-                        formattedAddress = formattedAddress.Substring(1);
+                        formattedAddress = formattedAddress.Substring(startIndex:1);
                     }
-                    if (formattedAddress.Length > 0 && formattedAddress[formattedAddress.Length - 1] == ',')
+                    if (formattedAddress.Length > 0 && formattedAddress[index:formattedAddress.Length - 1] == ',')
                     {
                         //trim trailing comma
-                        formattedAddress = formattedAddress.Substring(0, formattedAddress.Length - 1);
+                        formattedAddress = formattedAddress.Substring(startIndex:0, length:formattedAddress.Length - 1);
                     }
 
                     return formattedAddress.Trim();
@@ -96,100 +79,58 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
                     return address;
                 }
             }
-            set {
-                address = value;
-            }
+            set { address = value; }
         }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Phone Number")]
         [Phone]
-        public string PhoneNumber
-        {
-            get; set;
-        }
+        public string PhoneNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Ext")]
-        public string PhoneExt
-        {
-            get; set;
-        }
+        public string PhoneExt { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Fax Number")]
         [Phone]
-        public string FaxNumber
-        {
-            get; set;
-        }
+        public string FaxNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Website URL")]
-        public string WebsiteUrl
-        {
-            get; set;
-        }
+        public string WebsiteUrl { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Classification")]
-        public string Classification
-        {
-            get; set;
-        }
+        public string Classification { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Enabled")]
-        public bool IsEnabled
-        {
-            get; set;
-        }
+        public bool IsEnabled { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Enabled")]
-        public string IsEnabledText
-        {
-            get
-            {
-                return IsEnabled ? "Yes" : "No";
-            }
-        }
+        public string IsEnabledText => IsEnabled ? "Yes" : "No";
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Has Signatory")]
-        public bool HasSignatory
-        {
-            get; set;
-        }
+        public bool HasSignatory { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Has Signatory")]
-        public string HasSignatoryText
-        {
-            get
-            {
-                return HasSignatory ? "Yes" : "No";
-            }
-        }
+        public string HasSignatoryText => HasSignatory ? "Yes" : "No";
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Assigned To")]
-        public string AssignedTo
-        {
-            get; set;
-        }
-                
-        [Editable(false)]
-        [Display(Name = "Last Submission")]
-        public DateTime? LastSubmission
-        {
-            get; set;
-        }
+        public string AssignedTo { get; set; }
 
-        [Editable(false)]
-        public bool HasPermissionForEnableDisable
-        {
-            get; set;
-        }
+        [Editable(allowEdit:false)]
+        [Display(Name = "Last Submission")]
+        public DateTime? LastSubmission { get; set; }
+
+        [Editable(allowEdit:false)]
+        public bool HasPermissionForEnableDisable { get; set; }
+
+        #endregion
     }
 }

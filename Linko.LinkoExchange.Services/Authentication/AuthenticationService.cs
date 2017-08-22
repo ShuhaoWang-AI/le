@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,93 +14,155 @@ using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TermCondition;
 using Linko.LinkoExchange.Services.User;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.TermCondition;
-using System.Data.Entity;
-using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly LinkoExchangeContext _dbContext;
+        #region fields
 
-        private readonly ApplicationSignInManager _signInManager;
-        private readonly ApplicationUserManager _userManager;
-
-        private readonly ISettingService _settingService;
-        private readonly IOrganizationService _organizationService;
-        private readonly IProgramService _programService;
-        private readonly IInvitationService _invitationService;
         private readonly IAuthenticationManager _authenticationManager;
-        private readonly IPermissionService _permissionService; 
-        private readonly IUserService _userService;
-        private readonly ISessionCache _sessionCache;
-        private readonly IRequestCache _requestCache;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly LinkoExchangeContext _dbContext;
 
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IHttpContextService _httpContext;
-        private readonly ILogger _logger;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly IMapHelper _mapHelper;
-        private readonly ICromerrAuditLogService _crommerAuditLogService;
-        private readonly ITermConditionService _termConditionService;
+        private readonly IInvitationService _invitationService;
         private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
+        private readonly ILogger _logger;
+        private readonly IMapHelper _mapHelper;
+        private readonly IOrganizationService _organizationService;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IPermissionService _permissionService;
+        private readonly IProgramService _programService;
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IRequestCache _requestCache;
+        private readonly ISessionCache _sessionCache;
+
+        private readonly ISettingService _settingService;
+
+        private readonly ApplicationSignInManager _signInManager;
+        private readonly ITermConditionService _termConditionService;
+        private readonly ApplicationUserManager _userManager;
+        private readonly IUserService _userService;
+
+        #endregion
+
+        #region constructors and destructor
 
         public AuthenticationService(ApplicationUserManager userManager,
-            ApplicationSignInManager signInManager
-           ,IAuthenticationManager authenticationManager
-           ,ISettingService settingService
-           ,IOrganizationService organizationService
-           ,IProgramService programService
-           ,IInvitationService invitationService
-           ,IPermissionService permissionService
-           ,LinkoExchangeContext linkoExchangeContext
-           ,IUserService userService
-           , ISessionCache sessionCache
-           , IRequestCache requestCache
-           , IPasswordHasher passwordHasher
-           , IHttpContextService httpContext
-           , ILogger logger
-           , IQuestionAnswerService questionAnswerService
-           , IMapHelper mapHelper
-           , ICromerrAuditLogService crommerAuditLogService
-           , ITermConditionService termConditionService
-           , ILinkoExchangeEmailService linkoExchangeEmailService
-            )
+                                     ApplicationSignInManager signInManager
+                                     , IAuthenticationManager authenticationManager
+                                     , ISettingService settingService
+                                     , IOrganizationService organizationService
+                                     , IProgramService programService
+                                     , IInvitationService invitationService
+                                     , IPermissionService permissionService
+                                     , LinkoExchangeContext linkoExchangeContext
+                                     , IUserService userService
+                                     , ISessionCache sessionCache
+                                     , IRequestCache requestCache
+                                     , IPasswordHasher passwordHasher
+                                     , IHttpContextService httpContext
+                                     , ILogger logger
+                                     , IQuestionAnswerService questionAnswerService
+                                     , IMapHelper mapHelper
+                                     , ICromerrAuditLogService crommerAuditLogService
+                                     , ITermConditionService termConditionService
+                                     , ILinkoExchangeEmailService linkoExchangeEmailService
+        )
         {
-            if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
-            if (userManager == null) throw new ArgumentNullException(paramName: "userManager");
-            if (signInManager == null) throw new ArgumentNullException(paramName: "signInManager");
-            if (authenticationManager == null) throw new ArgumentNullException(paramName: "authenticationManager");
-            if (settingService == null) throw new ArgumentNullException(paramName: "settingService");
-            if (organizationService == null) throw new ArgumentNullException(paramName: "organizationService");
-            if (programService == null) throw new ArgumentNullException(paramName: "programService");
-            if (invitationService == null) throw new ArgumentNullException(paramName: "invitationService");
-            
-            if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (sessionCache == null) throw new ArgumentNullException("sessionCache");
-            if (requestCache == null) throw new ArgumentNullException("requestCache");
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (questionAnswerService == null) throw new ArgumentNullException("questionAnswerService");
-            if (mapHelper == null) throw new ArgumentNullException("mapHelper");
-            if (crommerAuditLogService == null) throw new ArgumentNullException("crommerAuditLogService");
-            if (termConditionService == null) throw new ArgumentNullException("termConditionService");
-            if (linkoExchangeEmailService == null) throw new ArgumentNullException("linkoExchangeEmailService");
+            if (linkoExchangeContext == null)
+            {
+                throw new ArgumentNullException(paramName:"linkoExchangeContext");
+            }
+            if (userManager == null)
+            {
+                throw new ArgumentNullException(paramName:"userManager");
+            }
+            if (signInManager == null)
+            {
+                throw new ArgumentNullException(paramName:"signInManager");
+            }
+            if (authenticationManager == null)
+            {
+                throw new ArgumentNullException(paramName:"authenticationManager");
+            }
+            if (settingService == null)
+            {
+                throw new ArgumentNullException(paramName:"settingService");
+            }
+            if (organizationService == null)
+            {
+                throw new ArgumentNullException(paramName:"organizationService");
+            }
+            if (programService == null)
+            {
+                throw new ArgumentNullException(paramName:"programService");
+            }
+            if (invitationService == null)
+            {
+                throw new ArgumentNullException(paramName:"invitationService");
+            }
+
+            if (permissionService == null)
+            {
+                throw new ArgumentNullException(paramName:"permissionService");
+            }
+            if (userService == null)
+            {
+                throw new ArgumentNullException(paramName:"userService");
+            }
+            if (sessionCache == null)
+            {
+                throw new ArgumentNullException(paramName:"sessionCache");
+            }
+            if (requestCache == null)
+            {
+                throw new ArgumentNullException(paramName:"requestCache");
+            }
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(paramName:"httpContext");
+            }
+            if (logger == null)
+            {
+                throw new ArgumentNullException(paramName:"logger");
+            }
+            if (questionAnswerService == null)
+            {
+                throw new ArgumentNullException(paramName:"questionAnswerService");
+            }
+            if (mapHelper == null)
+            {
+                throw new ArgumentNullException(paramName:"mapHelper");
+            }
+            if (crommerAuditLogService == null)
+            {
+                throw new ArgumentNullException(paramName:"crommerAuditLogService");
+            }
+            if (termConditionService == null)
+            {
+                throw new ArgumentNullException(paramName:"termConditionService");
+            }
+            if (linkoExchangeEmailService == null)
+            {
+                throw new ArgumentNullException(paramName:"linkoExchangeEmailService");
+            }
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -124,6 +187,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
+        #endregion
+
+        #region interface implementations
+
         public IList<Claim> GetClaims()
         {
             if (_httpContext.Current.User.Identity.IsAuthenticated)
@@ -140,9 +207,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 foreach (var claim in claims)
                 {
-                    if (!uClaims.ContainsKey(claim.Type))
+                    if (!uClaims.ContainsKey(key:claim.Type))
                     {
-                        uClaims.Add(claim.Type, claim);
+                        uClaims.Add(key:claim.Type, value:claim);
                     }
                 }
 
@@ -155,13 +222,15 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         /// <summary>
-        /// Set current user's additional claims, such as current organizationId, current authorityId, current programId
+        ///     Set current user's additional claims, such as current organizationId, current authorityId, current programId
         /// </summary>
-        /// <param name="claims">The claims to set</param>
+        /// <param name="claims"> The claims to set </param>
         public void SetCurrentUserClaims(IDictionary<string, string> claims)
         {
             if (claims == null || claims.Count < 1)
+            {
                 return;
+            }
 
             var currentClaims = GetClaims();
             if (currentClaims != null)
@@ -171,117 +240,120 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 while (itor.MoveNext())
                 {
-                    currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value));
+                    currentClaims.Add(item:new Claim(type:itor.Current.Key, value:itor.Current.Value));
                 }
 
-                ClearClaims(owinUserId);
-                SaveClaims(owinUserId, currentClaims);
+                ClearClaims(userId:owinUserId);
+                SaveClaims(userId:owinUserId, claims:currentClaims);
             }
         }
 
         // Change or reset password
         /// <summary>
-        /// Change password happens after a user login, and change his password.
-        /// New password must meet the following criteria
-        /// 1. Meet the strictest password policies when the user have multiple access to organizations and programs 
-        /// 2. Cannot be the same as the last X number of passwords saved in UserPasswordHistory table.
+        ///     Change password happens after a user login, and change his password.
+        ///     New password must meet the following criteria
+        ///     1. Meet the strictest password policies when the user have multiple access to organizations and programs
+        ///     2. Cannot be the same as the last X number of passwords saved in UserPasswordHistory table.
         /// </summary>
-        /// <param name="userId">User Id</param>
-        /// <param name="newPassword">The new password</param>
-        /// <returns></returns>
+        /// <param name="userId"> User Id </param>
+        /// <param name="newPassword"> The new password </param>
+        /// <returns> </returns>
         public Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword)
         {
-            var emailEntries= new List<EmailEntry>(); 
+            var emailEntries = new List<EmailEntry>();
             var authenticationResult = new AuthenticationResultDto();
             try
             {
-                var applicationUser = _userManager.FindById(userId);
+                var applicationUser = _userManager.FindById(userId:userId);
                 if (applicationUser == null)
                 {
                     authenticationResult.Success = false;
                     authenticationResult.Result = AuthenticationResult.UserNotFound;
-                    return Task.FromResult(authenticationResult);
+                    return Task.FromResult(result:authenticationResult);
                 }
 
-                var authorityOrganizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
-                var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+                var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
+                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
-                SetPasswordPolicy(organizationSettings);
+                SetPasswordPolicy(organizationSettings:organizationSettings);
+
                 // Use PasswordValidator
-                var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
+                var validateResult = _userManager.PasswordValidator.ValidateAsync(item:newPassword).Result;
                 if (validateResult.Succeeded == false)
                 {
                     authenticationResult.Success = false;
                     authenticationResult.Errors = validateResult.Errors;
-                    return Task.FromResult(authenticationResult);
+                    return Task.FromResult(result:authenticationResult);
                 }
 
                 // Check if the new password is one of the password used last # numbers
-                if (!IsValidPasswordCheckInHistory(newPassword, applicationUser.UserProfileId, organizationSettings))
+                if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId, organizationSettings:organizationSettings))
                 {
-                    var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
+                    var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
                     authenticationResult.Success = false;
                     authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                    authenticationResult.Errors = new[] { $"You cannot use the last {numberOfPasswordsInHistory} passwords." };
-                    return Task.FromResult(authenticationResult);
+                    authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
+                    return Task.FromResult(result:authenticationResult);
                 }
 
-                _userManager.RemovePassword(userId);
-                _userManager.AddPassword(userId, newPassword);
+                _userManager.RemovePassword(userId:userId);
+                _userManager.AddPassword(userId:userId, password:newPassword);
 
                 //create history record
-                UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
+                var history = _dbContext.UserPasswordHistories.Create();
                 history.UserProfileId = applicationUser.UserProfileId;
-                history.PasswordHash = _passwordHasher.HashPassword(newPassword);
+                history.PasswordHash = _passwordHasher.HashPassword(password:newPassword);
                 history.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                _dbContext.UserPasswordHistories.Add(history);
+                _dbContext.UserPasswordHistories.Add(entity:history);
                 _dbContext.SaveChanges();
 
                 //Send Email
                 var contentReplacements = new Dictionary<string, string>();
-                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+                var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
+                var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
-                var authorityList = _organizationService.GetUserAuthorityListForEmailContent(applicationUser.UserProfileId);
-                contentReplacements.Add("firstName", applicationUser.FirstName);
-                contentReplacements.Add("lastName", applicationUser.LastName);
-                contentReplacements.Add("authorityList", authorityList);
-                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-                contentReplacements.Add("supportEmail", supportEmail);
-                
+                var authorityList = _organizationService.GetUserAuthorityListForEmailContent(userProfileId:applicationUser.UserProfileId);
+                contentReplacements.Add(key:"firstName", value:applicationUser.FirstName);
+                contentReplacements.Add(key:"lastName", value:applicationUser.LastName);
+                contentReplacements.Add(key:"authorityList", value:authorityList);
+                contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
+                contentReplacements.Add(key:"supportEmail", value:supportEmail);
+
                 var emailEntry = new EmailEntry
-                {
-                    EmailType = EmailType.Profile_PasswordChanged, 
-                    ContentReplacements = contentReplacements, 
-                    RecipientEmailAddress = applicationUser.Email,
-                    RecipientFirstName = applicationUser.FirstName,
-                    RecipientLastName = applicationUser.LastName
-                }; 
-                
-                var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId);
+                                 {
+                                     EmailType = EmailType.Profile_PasswordChanged,
+                                     ContentReplacements = contentReplacements,
+                                     RecipientEmailAddress = applicationUser.Email,
+                                     RecipientFirstName = applicationUser.FirstName,
+                                     RecipientLastName = applicationUser.LastName
+                                 };
+
+                var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
                 if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
                 {
-                    var currentOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(int.Parse(currentOrganizationRegulatoryProgramId));
-                    emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId; 
-                    emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId; 
-                    emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId; 
-                }  
+                    var currentOrganizationRegulatoryProgram =
+                        _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:int.Parse(s:currentOrganizationRegulatoryProgramId));
+                    emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId;
+                    emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
+                    emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId;
+                }
 
-                emailEntries.Add(emailEntry); 
+                emailEntries.Add(item:emailEntry);
 
                 //Cromerr
                 //Need to log for all associated regulatory program orgs
                 var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
-                                        .Include("OrganizationRegulatoryProgram")
-                                        .Where(u => u.UserProfileId == applicationUser.UserProfileId).ToList();
+                                                .Include(path:"OrganizationRegulatoryProgram")
+                                                .Where(u => u.UserProfileId == applicationUser.UserProfileId).ToList();
                 foreach (var actorProgramUser in orgRegProgUsers)
                 {
-                    _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+                    _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
 
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                     cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
                     cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
+                                                                      ?? cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = applicationUser.UserName;
                     cromerrAuditLogEntryDto.UserFirstName = applicationUser.FirstName;
@@ -290,67 +362,66 @@ namespace Linko.LinkoExchange.Services.Authentication
                     cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                     cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
                     contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("firstName", applicationUser.FirstName);
-                    contentReplacements.Add("lastName", applicationUser.LastName);
-                    contentReplacements.Add("userName", applicationUser.UserName);
-                    contentReplacements.Add("emailAddress", applicationUser.Email);
+                    contentReplacements.Add(key:"firstName", value:applicationUser.FirstName);
+                    contentReplacements.Add(key:"lastName", value:applicationUser.LastName);
+                    contentReplacements.Add(key:"userName", value:applicationUser.UserName);
+                    contentReplacements.Add(key:"emailAddress", value:applicationUser.Email);
 
-                    _crommerAuditLogService.Log(CromerrEvent.Profile_PasswordChanged, cromerrAuditLogEntryDto, contentReplacements);
+                    _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_PasswordChanged, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
                 }
-
             }
             catch (Exception ex)
             {
                 authenticationResult.Success = false;
-                var errors = new List<string> { ex.Message };
+                var errors = new List<string> {ex.Message};
                 authenticationResult.Errors = errors;
             }
-            
+
             // Send emails.
-            _linkoExchangeEmailService.SendEmails(emailEntries); 
-            return Task.FromResult(authenticationResult);
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+            return Task.FromResult(result:authenticationResult);
         }
 
         public ICollection<RegistrationResult> ValidateUserProfileForRegistration(UserDto userInfo, RegistrationType registrationType)
         {
-            List<RegistrationResult> inValidUserProfileMessages = new List<RegistrationResult>();  
+            var inValidUserProfileMessages = new List<RegistrationResult>();
 
-            var result = _userService.ValidateUserProfileData(userInfo);
+            var result = _userService.ValidateUserProfileData(userProfile:userInfo);
             if (result != RegistrationResult.Success)
             {
-                inValidUserProfileMessages.Add(RegistrationResult.BadUserProfileData);
+                inValidUserProfileMessages.Add(item:RegistrationResult.BadUserProfileData);
             }
 
             if (userInfo == null)
             {
-                inValidUserProfileMessages.Add(RegistrationResult.BadUserProfileData);
+                inValidUserProfileMessages.Add(item:RegistrationResult.BadUserProfileData);
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(userInfo.UserName))
+                if (string.IsNullOrWhiteSpace(value:userInfo.UserName))
                 {
-                  inValidUserProfileMessages.Add(RegistrationResult.MissingUserName);
+                    inValidUserProfileMessages.Add(item:RegistrationResult.MissingUserName);
                 }
 
-                if(string.IsNullOrWhiteSpace(userInfo.Email))
-                { 
-                  inValidUserProfileMessages.Add(RegistrationResult.MissingEmailAddress); 
+                if (string.IsNullOrWhiteSpace(value:userInfo.Email))
+                {
+                    inValidUserProfileMessages.Add(item:RegistrationResult.MissingEmailAddress);
                 }
             }
 
-            return inValidUserProfileMessages; 
+            return inValidUserProfileMessages;
         }
 
         /// <summary>
-        /// Create a new user for registration
-        /// Confirmed: No possible for one user being invited to a program that he is in already. 
+        ///     Create a new user for registration
+        ///     Confirmed: No possible for one user being invited to a program that he is in already.
         /// </summary>
-        /// <param name="userInfo">The registration user information.</param>
-        /// <param name="registrationToken">Registration token</param>
-        /// <param name="securityQuestions">Security questions</param>
-        /// <param name="kbqQuestions">KBQ questions</param>
-        /// <param name="registrationType">Registration type</param>
-        /// <returns>Registration results.</returns>
+        /// <param name="userInfo"> The registration user information. </param>
+        /// <param name="registrationToken"> Registration token </param>
+        /// <param name="securityQuestions"> Security questions </param>
+        /// <param name="kbqQuestions"> KBQ questions </param>
+        /// <param name="registrationType"> Registration type </param>
+        /// <returns> Registration results. </returns>
         public RegistrationResultDto Register(
             UserDto userInfo,
             string registrationToken,
@@ -367,15 +438,17 @@ namespace Linko.LinkoExchange.Services.Authentication
                     registrationResult.Result = RegistrationResult.BadUserProfileData;
                     return registrationResult;
                 }
-                if (string.IsNullOrWhiteSpace(userInfo.UserName))
+
+                if (string.IsNullOrWhiteSpace(value:userInfo.UserName))
                 {
                     var errText = "User name cannot be null or whitespace.";
-                    _logger.Error(errText);
-                    throw new Exception(errText);
+                    _logger.Error(message:errText);
+                    throw new Exception(message:errText);
                 }
+
                 userInfo.UserName = userInfo.UserName.Trim();
-                
-                var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
+
+                var validatResult = ValidateRegistrationData(userProfile:userInfo, securityQuestions:securityQuestions, kbqQuestions:kbqQuestions);
                 if (validatResult != RegistrationResult.Success)
                 {
                     registrationResult.Result = validatResult;
@@ -383,15 +456,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(registrationToken))
+            if (string.IsNullOrWhiteSpace(value:registrationToken))
             {
                 registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
                 return registrationResult;
             }
- 
+
             _logger.Info(message:$"Register. userName={userInfo.UserName}, registrationToken={registrationToken}");
 
-            var invitationDto = _invitationService.GetInvitation(registrationToken);
+            var invitationDto = _invitationService.GetInvitation(invitationId:registrationToken);
 
             if (invitationDto == null)
             {
@@ -404,18 +477,21 @@ namespace Linko.LinkoExchange.Services.Authentication
             // UC-42 1.a 
             // Check token is expired or not? from organization settings
             var invitationRecipientProgram =
-                _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+                _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
-                _settingService.GetOrganizationSettingsById(invitationRecipientProgram.RegulatorOrganizationId ?? invitationRecipientProgram.OrganizationId); // always get the authority settings as currently industry don't have settings 
+                _settingService.GetOrganizationSettingsById(organizationId:invitationRecipientProgram.RegulatorOrganizationId
+                                                                           ?? invitationRecipientProgram
+                                                                               .OrganizationId); // always get the authority settings as currently industry don't have settings 
 
-            var invitationExpirationHours = ValueParser.TryParseInt(ConfigurationManager.AppSettings["DefaultInviteExpirationHours"], 72);
+            var invitationExpirationHours = ValueParser.TryParseInt(value:ConfigurationManager.AppSettings[name:"DefaultInviteExpirationHours"], defaultValue:72);
             if (inivitationRecipintOrganizationSettings.Settings.Any())
             {
-                invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
-                  .Settings.Single(i => i.TemplateName == SettingType.InvitationExpiredHours).Value, invitationExpirationHours);
+                invitationExpirationHours = ValueParser.TryParseInt(value:inivitationRecipintOrganizationSettings
+                                                                        .Settings.Single(i => i.TemplateName == SettingType.InvitationExpiredHours).Value,
+                                                                    defaultValue:invitationExpirationHours);
             }
 
-            if (DateTimeOffset.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
+            if (DateTimeOffset.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(hours:invitationExpirationHours))
             {
                 registrationResult.Result = RegistrationResult.InvitationExpired;
                 return registrationResult;
@@ -426,7 +502,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             // TODO: Need to check invitation email address same as user info email address. Otherwise, in future if user can update email address then it might update wrong user info
 
             // Email should be unique.
-            UserProfile applicationUser = _userManager.FindByEmail(userInfo.Email);
+            var applicationUser = _userManager.FindByEmail(email:userInfo.Email);
 
             // 2.a  Actor is already registration with LinkoExchange  
 
@@ -442,7 +518,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 if (registrationType == RegistrationType.NewRegistration)
                 {
-                    var testUser = _userManager.FindByName(userInfo.UserName);
+                    var testUser = _userManager.FindByName(userName:userInfo.UserName);
                     if (testUser != null)
                     {
                         registrationResult.Result = RegistrationResult.UserNameIsUsed;
@@ -461,7 +537,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if (registrationType == RegistrationType.NewRegistration)
                     {
-                        applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
+                        applicationUser = AssignUser(userName:userInfo.UserName, email:userInfo.Email);
 
                         #region Update the new user profile  
 
@@ -491,23 +567,24 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         #endregion
 
-                        var result = _userManager.Create(applicationUser, userInfo.Password);
+                        var result = _userManager.Create(user:applicationUser, password:userInfo.Password);
                         if (result == IdentityResult.Success)
                         {
                             // Retrieve user again to get userProfile Id. 
-                            applicationUser = _userManager.FindById(applicationUser.Id);
+                            applicationUser = _userManager.FindById(userId:applicationUser.Id);
                         }
                         else
                         {
                             var errText = $"Creating user failed. Email={userInfo.Email}, userName={userInfo.UserName}";
-                            _logger.Error(errText);
-                            throw new Exception(errText);
+                            _logger.Error(message:errText);
+                            throw new Exception(message:errText);
                         }
                     }
 
                     #endregion
 
                     #region User is from re-registration 
+
                     if (registrationType == RegistrationType.ReRegistration && applicationUser.TermConditionId != termConditionId)
                     {
                         applicationUser.TermConditionAgreedDateTimeUtc = DateTimeOffset.Now;
@@ -518,18 +595,19 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // Check if the password has been in # password in history
                     if (registrationType == RegistrationType.ResetRegistration)
                     {
-                        string passwordHash = _passwordHasher.HashPassword(userInfo.Password);
+                        var passwordHash = _passwordHasher.HashPassword(password:userInfo.Password);
 
-                        var authorityOrganizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
-                        var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+                        var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
+                        var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
-                        if (!IsValidPasswordCheckInHistory(userInfo.Password, applicationUser.UserProfileId, organizationSettings))
+                        if (!IsValidPasswordCheckInHistory(password:userInfo.Password, userProfileId:applicationUser.UserProfileId, organizationSettings:organizationSettings))
                         {
-                            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
+                            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords;
-                            registrationResult.Errors = new string[] {
-                                                                         $"You cannot use the last {numberOfPasswordsInHistory} passwords."
-                                                                     };
+                            registrationResult.Errors = new[]
+                                                        {
+                                                            $"You cannot use the last {numberOfPasswordsInHistory} passwords."
+                                                        };
                             return registrationResult;
                         }
 
@@ -548,7 +626,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.EmailConfirmed = true;
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
-                        _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);
+                        _questionAnswerService.DeleteUserQuestionAndAnswers(userProfileId:applicationUser.UserProfileId);
 
                         // Set IsRestRequired to be false  
                         applicationUser.IsAccountResetRequired = false;
@@ -563,28 +641,33 @@ namespace Linko.LinkoExchange.Services.Authentication
                     if (registrationType == RegistrationType.NewRegistration || registrationType == RegistrationType.ResetRegistration)
                     {
                         // Create a new row in userProfile password history table 
-                        _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
-                        {
-                            LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
-                            PasswordHash = applicationUser.PasswordHash,
-                            UserProfileId = applicationUser.UserProfileId
-                        });
+                        _dbContext.UserPasswordHistories.Add(entity:new UserPasswordHistory
+                                                                    {
+                                                                        LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
+                                                                        PasswordHash = applicationUser.PasswordHash,
+                                                                        UserProfileId = applicationUser.UserProfileId
+                                                                    });
 
                         // Save Security questions and kbq questions
-                        var combined = securityQuestions.Concat(kbqQuestions);
-                        _questionAnswerService.CreateUserQuestionAnswers(applicationUser.UserProfileId, combined);
+                        var combined = securityQuestions.Concat(second:kbqQuestions);
+                        _questionAnswerService.CreateUserQuestionAnswers(userProfileId:applicationUser.UserProfileId, questionAnswers:combined);
                     }
 
                     #endregion
 
-                    var inviterOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
+                    var inviterOrganizationRegulatoryProgram =
+                        _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitationDto.SenderOrganizationRegulatoryProgramId);
 
-                    var recipientOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+                    var recipientOrganizationRegulatoryProgram =
+                        _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitationDto.RecipientOrganizationRegulatoryProgramId);
+
                     //  Program is disabled or not found
                     //  UC-42 2.c, 2.d, 2.e
-                    if (recipientOrganizationRegulatoryProgram == null || inviterOrganizationRegulatoryProgram == null ||
-                        !recipientOrganizationRegulatoryProgram.IsEnabled || !inviterOrganizationRegulatoryProgram.IsEnabled ||
-                        recipientOrganizationRegulatoryProgram.OrganizationDto == null
+                    if (recipientOrganizationRegulatoryProgram == null
+                        || inviterOrganizationRegulatoryProgram == null
+                        || !recipientOrganizationRegulatoryProgram.IsEnabled
+                        || !inviterOrganizationRegulatoryProgram.IsEnabled
+                        || recipientOrganizationRegulatoryProgram.OrganizationDto == null
                     )
                     {
                         registrationResult.Result = RegistrationResult.Failed;
@@ -600,30 +683,34 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // UC-42 6
                     // 2 Create organization regulatory program user, and set the approved statue to false  
-                    var emailEntries = CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(applicationUser, recipientOrganizationRegulatoryProgram, inviterOrganizationRegulatoryProgram, registrationType);
+                    var emailEntries =
+                        CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(registeredUser:applicationUser,
+                                                                                          registeredOrganizationRegulatoryProgram:recipientOrganizationRegulatoryProgram,
+                                                                                          inviterOrganizationRegulatoryProgram:inviterOrganizationRegulatoryProgram,
+                                                                                          registrationType:registrationType);
 
                     // All succeed
                     // 4 Remove the invitation from table 
-                    _invitationService.DeleteInvitation(invitationDto.InvitationId, true);
+                    _invitationService.DeleteInvitation(invitationId:invitationDto.InvitationId, isSystemAction:true);
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
                     registrationResult.Result = RegistrationResult.Success;
 
                     //Send pending registration emails  
-                    _linkoExchangeEmailService.SendEmails(emailEntries);
+                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
                 }
                 catch (Exception ex)
                 {
-                    var errors = new List<string>() { ex.Message };
+                    var errors = new List<string> {ex.Message};
 
                     while (ex.InnerException != null)
                     {
                         ex = ex.InnerException;
-                        errors.Add(ex.Message);
+                        errors.Add(item:ex.Message);
                     }
 
-                    _logger.Error("Error happens {0} ", argument: string.Join("," + Environment.NewLine, errors));
+                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
@@ -636,18 +723,590 @@ namespace Linko.LinkoExchange.Services.Authentication
             return registrationResult;
         }
 
-        private List<EmailEntry> CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
-                                                                                             OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, RegistrationType registrationType)
+        public bool CheckPasswordResetUrlNotExpired(string token)
         {
-            var emailEntries = new List<EmailEntry>(); 
+            bool isNotExpiredYet;
+            var resetPasswordTokenValidateInterval = Convert.ToInt32(value:ConfigurationManager.AppSettings[name:"ResetPasswordTokenValidateInterval"]);
+            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
+            if (emailAuditLog == null)
+            {
+                return false;
+
+                //throw new Exception($"ERROR: Cannot find email audit log associated with token={token}");
+            }
+
+            var tokenCreated = emailAuditLog.SentDateTimeUtc;
+            if (DateTimeOffset.Now.AddHours(hours:-resetPasswordTokenValidateInterval) > tokenCreated)
+            {
+                //Check token expiry (5.1.a)
+                isNotExpiredYet = false;
+                if (emailAuditLog.RecipientUserProfileId.HasValue)
+                {
+                    var userProfileId = emailAuditLog.RecipientUserProfileId.Value;
+                    foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                    {
+                        var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
+                        _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgram:orgRegProgDto, user:userDto);
+                    }
+                }
+            }
+            else
+            {
+                isNotExpiredYet = true;
+            }
+
+            return isNotExpiredYet;
+        }
+
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
+                                                                      string answer, int failedCount, string newPassword)
+        {
+            var authenticationResult = new AuthenticationResultDto();
+
+            // Use PasswordValidator
+            var validateResult = _userManager.PasswordValidator.ValidateAsync(item:newPassword).Result;
+            if (validateResult.Succeeded == false)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.PasswordRequirementsNotMet;
+                authenticationResult.Errors = validateResult.Errors;
+                return authenticationResult;
+            }
+
+            var resetPasswordTokenValidateInterval = Convert.ToInt32(value:ConfigurationManager.AppSettings[name:"ResetPasswordTokenValidateInterval"]);
+
+            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == resetPasswordToken);
+
+            if (emailAuditLog == null)
+            {
+                throw new Exception(message:$"ERROR: Cannot find email audit log associated with token={resetPasswordToken}");
+            }
+
+            var tokenCreated = emailAuditLog.SentDateTimeUtc;
+
+            if (DateTimeOffset.Now.AddHours(hours:-resetPasswordTokenValidateInterval) > tokenCreated)
+            {
+                //Check token expiry (5.1.a)
+
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
+                authenticationResult.Errors = new[] {"The password reset link has expired. Please use Forgot Password."};
+
+                var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                {
+                    var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
+                    await _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgram:orgRegProgDto, user:userDto);
+                }
+
+                return authenticationResult;
+            }
+
+            var resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId:userQuestionAnswerId, answer:answer, failedCount:failedCount, newPassword:newPassword);
+            if (resetPasswordResult.Result == AuthenticationResult.Success)
+            {
+                emailAuditLog.Token = string.Empty;
+            }
+            _dbContext.SaveChanges();
+            return resetPasswordResult;
+        }
+
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
+                                                                      string answer, int failedCount, string newPassword)
+        {
+            var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+            var passwordHash = _passwordHasher.HashPassword(password:newPassword);
+            var correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+
+            var authenticationResult = new AuthenticationResultDto();
+
+            //KBQ ANSWERS ARE CASE-INSENSITIVE; PERSISTED AS ALL LOWER CASE
+            if (_userManager.PasswordHasher.VerifyHashedPassword(hashedPassword:correctSavedHashedAnswer, providedPassword:answer.Trim().ToLower())
+                != PasswordVerificationResult.Success)
+            {
+                //Check hashed answer (5.3.a)
+
+                authenticationResult.Success = false;
+
+                //3rd incorrect attempt (5.3.b) => lockout
+                var maxAnswerAttempts =
+                    Convert.ToInt32(value:_settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
+                                                                                              isChooseMin:true, isChooseMax:null));
+                if (failedCount + 1 >= maxAnswerAttempts) // from web.config
+                {
+                    _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+
+                    //Get all associated authorities
+                    var userOrgs = _organizationService.GetUserRegulators(userId:userProfileId).ToList();
+                    authenticationResult.RegulatoryList = userOrgs;
+
+                    var errorString = "<div class=\"table - responsive\">";
+                    errorString += "<table class=\"table no-margin\">";
+                    errorString += "<tbody>";
+
+                    foreach (var org in userOrgs)
+                    {
+                        errorString += "<tr><td>"
+                                       + org.EmailContactInfoName
+                                       + "</td><td>"
+                                       + org.EmailContactInfoEmailAddress
+                                       + "</td><td>"
+                                       + org.EmailContactInfoPhone
+                                       + " </td></tr>";
+                    }
+
+                    errorString += "</tbody>";
+                    errorString += "</table>";
+                    errorString += "</div>";
+                    errorString += "</table>";
+
+                    authenticationResult.Result = AuthenticationResult.UserIsLocked;
+                    authenticationResult.Errors = new[] {errorString};
+                }
+                else
+                {
+                    authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
+                    authenticationResult.Errors = new[] {"The answer is incorrect.  Please try again."};
+                }
+            }
+            else if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:userProfileId, organizationSettings:organizationSettings))
+            {
+                //Password used before (6.a)
+                var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
+
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
+                authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
+            }
+            else
+            {
+                //create history record
+                var history = _dbContext.UserPasswordHistories.Create();
+                history.UserProfileId = userProfileId;
+                history.PasswordHash = passwordHash;
+                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                _dbContext.UserPasswordHistories.Add(entity:history);
+                _dbContext.SaveChanges();
+
+                //Set new password
+                _userService.SetHashedPassword(userProfileId:userProfileId, passwordHash:passwordHash);
+
+                //Unlock user
+                var userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
+                await _userManager.UnlockUserAccount(userId:userOwinId);
+
+                authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
+
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                {
+                    var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
+                    await _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto);
+                }
+            }
+
+            return authenticationResult;
+        }
+
+        /// <summary>
+        ///     To request a password reset. This will do follow:
+        ///     1. generate a reset password token
+        ///     2. send a reset password email
+        ///     3. log to system
+        /// </summary>
+        /// <param name="username"> The user name </param>
+        /// <returns> </returns>
+        public async Task<AuthenticationResultDto> RequestResetPassword(string username)
+        {
+            var authenticationResult = new AuthenticationResultDto();
+
+            var user = _dbContext.Users.SingleOrDefault(u => u.UserName == username);
+            if (user == null)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.UserNotFound;
+                authenticationResult.Errors = new[] {"UserNotFound"};
+            }
+            else if (!await _userManager.IsEmailConfirmedAsync(userId:user.Id))
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
+                authenticationResult.Errors = new[] {"EmailIsNotConfirmed"};
+            }
+            else
+            {
+                authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
+                SendResetPasswordConfirmationEmail(userProfile:user);
+            }
+
+            return authenticationResult;
+        }
+
+        public async Task<AuthenticationResultDto> RequestUsernameEmail(string email)
+        {
+            var authenticationResult = new AuthenticationResultDto();
+
+            var user = _userManager.FindByEmail(email:email);
+            if (user == null)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.UserNotFound;
+                authenticationResult.Errors = new[] {"UserNotFound"};
+            }
+            else if (!await _userManager.IsEmailConfirmedAsync(userId:user.Id))
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
+                authenticationResult.Errors = new[] {"EmailIsNotConfirmed"};
+            }
+            else
+            {
+                authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
+                SendRequestUsernameEmail(userProfile:user);
+            }
+
+            return authenticationResult;
+        }
+
+        /// <summary>
+        ///     Sign in by user name and password.  "isPersistent" indicates to keep the cookie or now.
+        /// </summary>
+        /// <param name="userName"> The user name used when sign in </param>
+        /// <param name="password"> The password used when sign in </param>
+        /// <param name="isPersistent"> The flag indicates persistent the sign or not </param>
+        /// <returns> </returns>
+        public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
+        {
+            _logger.Info(message:"SignInByUserName. userName={0}", argument:userName);
+
+            var signInResultDto = new SignInResultDto();
+
+            var applicationUser = _userManager.FindByName(userName:userName);
+            if (applicationUser == null)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.UserNotFound;
+                return Task.FromResult(result:signInResultDto);
+            }
+
+            signInResultDto.RegulatoryList = _organizationService.GetUserRegulators(userId:applicationUser.UserProfileId, isIncludeRemoved:true).ToList();
+
+            // clear claims from db if there are   
+            ClearClaims(userId:applicationUser.Id);
+            applicationUser.Claims.Clear();
+
+            var userId = applicationUser.UserProfileId;
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:userId);
+
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+
+            SetPasswordPolicy(organizationSettings:organizationSettings);
+
+            _signInManager.UserManager = _userManager;
+
+            // UC-29, 2.c
+            // Check if the user is in 'password lock' status
+            if (_userManager.IsLockedOut(userId:applicationUser.Id))
+            {
+                LogProhibitedSignInActivityToCromerr(user:applicationUser, cromerrEvent:CromerrEvent.Login_AccountLocked);
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+                return Task.FromResult(result:signInResultDto);
+            }
+
+            var signInStatus = _signInManager.PasswordSignIn(userName:userName, password:password, isPersistent:isPersistent, shouldLockout:true);
+
+            if (signInStatus == SignInStatus.Success)
+            {
+                var claims = GetUserIdentity(userProfile:applicationUser);
+
+                // Save claim
+                SaveClaims(userId:applicationUser.Id, claims:claims);
+
+                var identity = new ClaimsIdentity(identity:_httpContext.Current.User.Identity);
+                identity.AddClaims(claims:claims);
+                _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
+                    (identity:identity, properties:new AuthenticationProperties {IsPersistent = isPersistent});
+
+                _authenticationManager.SignOut();
+
+                if (applicationUser.IsAccountResetRequired)
+                {
+                    LogProhibitedSignInActivityToCromerr(user:applicationUser, cromerrEvent:CromerrEvent.Login_AccountResetRequired);
+
+                    signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
+                    return Task.FromResult(result:signInResultDto);
+                }
+
+                // UC-29, 3.a
+                // Check if the user has been locked "Account Lockout"  by an authority
+                if (applicationUser.IsAccountLocked)
+                {
+                    LogProhibitedSignInActivityToCromerr(user:applicationUser, cromerrEvent:CromerrEvent.Login_AccountLocked);
+
+                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+                    return Task.FromResult(result:signInResultDto);
+                }
+
+                // UC-29, 4.a, 5.a, 6.a
+                if (!ValidateUserAccess(userProfile:applicationUser, signInResultDto:signInResultDto))
+                {
+                    return Task.FromResult(result:signInResultDto);
+                }
+
+                // UC-29 7.a
+                // Check if user's password is expired or not   
+                if (IsUserPasswordExpired(userProfileId:userId, organizationSettings:organizationSettings))
+                {
+                    // Put user profile Id into session, to request user change their password. 
+                    //_sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
+                    signInResultDto.OwinUserId = applicationUser.Id;
+                    signInResultDto.UserProfileId = applicationUser.UserProfileId;
+                    signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
+                    return Task.FromResult(result:signInResultDto);
+                }
+
+                signInResultDto.AutehticationResult = AuthenticationResult.Success;
+
+                _sessionCache.SetValue(key:CacheKey.UserProfileId, value:applicationUser.UserProfileId);
+                _sessionCache.SetValue(key:CacheKey.OwinUserId, value:applicationUser.Id);
+
+                _authenticationManager.SignIn(new AuthenticationProperties {IsPersistent = isPersistent}, identity);
+                _signInManager.PasswordSignIn(userName:userName, password:password, isPersistent:isPersistent, shouldLockout:true);
+            }
+            else if (signInStatus == SignInStatus.Failure)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.InvalidUserNameOrPassword;
+            }
+            else if (signInStatus == SignInStatus.LockedOut)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+
+                //Log to Cromerr
+                LogProhibitedSignInActivityToCromerr(user:applicationUser, cromerrEvent:CromerrEvent.Login_PasswordLockout);
+            }
+
+            _logger.Info(message:"SignInByUserName. signInStatus={0}", argument:signInStatus);
+            return Task.FromResult(result:signInResultDto);
+        }
+
+        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
+                                                                     ReportOperation reportOperation, int? reportPackageId = null)
+        {
+            _logger.Info(message:"Enter AuthenticationService.PasswordAndKbqValidationResult");
+
+            var userProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
+            var orgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var authority = _settingService.GetAuthority(orgRegProgramId:orgRegProgramId);
+            var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId:authority.OrganizationId).Settings;
+            var failedPasswordAttemptMaxCount =
+                ValueParser.TryParseInt(value:authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.FailedPasswordAttemptMaxCount)).Select(s => s.Value).First(),
+                                        defaultValue:3);
+            var failedKbqAttemptMaxCount =
+                ValueParser.TryParseInt(value:authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.FailedKBQAttemptMaxCount)).Select(s => s.Value).First(),
+                                        defaultValue:3);
+
+            if (failedPasswordAttemptMaxCount <= failedPasswordCount)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.InvalidPassword;
+            }
+
+            if (failedKbqAttemptMaxCount <= failedKbqCount)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+            }
+
+            var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
+
+            // check if user is a valid user
+            // 1: IsAccountLocked = false, IsAccountResetRequired = false 
+            if (userProfile.IsAccountLocked)
+            {
+                ThrowUserStatusRuleValiation(message:"User is locked");
+            }
+
+            if (userProfile.IsAccountResetRequired)
+            {
+                ThrowUserStatusRuleValiation(message:"User is required to reset account");
+            }
+
+            // Check to see if password matches. 
+            if (!IsValidPassword(passwordHash:userProfile.PasswordHash, password:password))
+            {
+                if (failedPasswordAttemptMaxCount <= failedPasswordCount + 1)
+                {
+                    SignOff();
+
+                    if (reportOperation == ReportOperation.SignAndSubmit)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true,
+                                                           reason:AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony, reportPackageId:reportPackageId);
+                    }
+                    else if (reportOperation == ReportOperation.Repudiation)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true,
+                                                           reason:AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony, reportPackageId:reportPackageId);
+                    }
+
+                    return PasswordAndKbqValidationResult.UserLocked_Password;
+                }
+
+                return PasswordAndKbqValidationResult.InvalidPassword;
+            }
+
+            // Check to see if KBQ answer matches
+            if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:userQuestionAnswerId, answer:kbqAnswer.ToLower()))
+            {
+                if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
+                {
+                    SignOff();
+                    if (reportOperation == ReportOperation.SignAndSubmit)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true,
+                                                           reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony, reportPackageId:reportPackageId);
+                    }
+                    else if (reportOperation == ReportOperation.Repudiation)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true,
+                                                           reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony, reportPackageId:reportPackageId);
+                    }
+
+                    return PasswordAndKbqValidationResult.UserLocked_KBQ;
+                }
+
+                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+            }
+
+            // Check user is validate user or not
+            // 2: is not disabled, 
+            // 3: have access to the regulatory program
+            var programUser = _dbContext.OrganizationRegulatoryProgramUsers
+                                        .FirstOrDefault(i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            if (programUser == null || programUser.IsRegistrationApproved == false || programUser.IsRegistrationDenied || programUser.IsRemoved)
+            {
+                ThrowUserStatusRuleValiation(message:"User does not have access to current program");
+            }
+            else if (!programUser.IsEnabled)
+            {
+                ThrowUserStatusRuleValiation(message:"User is disabled");
+            }
+
+            return PasswordAndKbqValidationResult.Success;
+        }
+
+        public string GetClaimsValue(string claimType)
+        {
+            string claimsValue = null;
+
+            var claims = GetClaims();
+
+            //return claims?.ToList();
+            var claim = claims?.FirstOrDefault(c => c.Type == claimType);
+            if (claim != null)
+            {
+                claimsValue = claim.Value;
+            }
+
+            return claimsValue;
+        }
+
+        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId)
+        {
+            //We already have: UserId, UserProfileId, UserFullName,
+            var userProfileId = Convert.ToInt32(value:GetClaimsValue(claimType:CacheKey.UserProfileId));
+
+            //Now we set UserRole, OrganizationRegulatoryProgramId, OrganizationName, OrgRegProgUserId, PortalName
+            //UserRole <=> PermissionGroup.Name
+            //PortalName <=> OrganizationType.Name
+
+            var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers
+                                           .Include(path:"OrganizationRegulatoryProgram.RegulatoryProgram")
+                                           .SingleOrDefault(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId);
+            if (orgRegProgUser == null)
+            {
+                throw new Exception(message:string.Format(format:"ERROR: UserProfileId={0} does not have access to Organization Regulatory Program={1}.", arg0:userProfileId,
+                                                          arg1:orgRegProgId));
+            }
+
+            var permissionGroupId = orgRegProgUser.PermissionGroupId;
+            var orgRegProgUserId = orgRegProgUser.OrganizationRegulatoryProgramUserId;
+            var regProgramName = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgram.Name;
+            var userRole = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId).Name;
+            var organization = _dbContext.OrganizationRegulatoryPrograms.Include(path:"Organization.OrganizationType")
+                                         .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId).Organization;
+            var organizationName = organization.Name;
+            var organizationId = organization.OrganizationId;
+            var portalName = organization.OrganizationType.Name;
+
+            var claims = new Dictionary<string, string>();
+            claims.Add(key:CacheKey.UserRole, value:userRole);
+            claims.Add(key:CacheKey.RegulatoryProgramName, value:regProgramName);
+            claims.Add(key:CacheKey.OrganizationRegulatoryProgramUserId, value:orgRegProgUserId.ToString());
+            claims.Add(key:CacheKey.OrganizationRegulatoryProgramId, value:orgRegProgId.ToString());
+            claims.Add(key:CacheKey.OrganizationName, value:organizationName);
+            claims.Add(key:CacheKey.OrganizationId, value:organizationId.ToString());
+            claims.Add(key:CacheKey.PortalName, value:portalName);
+
+            SetCurrentUserClaims(claims:claims);
+
+            //Log to Cromerr
+
+            var programUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:orgRegProgUser);
+            var user = _userService.GetUserProfileById(userProfileId:programUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = orgRegProgUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add(key:"organizationName", value:programUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add(key:"firstName", value:user.FirstName);
+            contentReplacements.Add(key:"lastName", value:user.LastName);
+            contentReplacements.Add(key:"userName", value:user.UserName);
+            contentReplacements.Add(key:"emailAddress", value:user.Email);
+
+            _crommerAuditLogService.Log(eventType:CromerrEvent.Login_Success, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
+        }
+
+        public void SignOff()
+        {
+            var owinUserId = _sessionCache.GetValue(key:CacheKey.OwinUserId) != null ? _sessionCache.GetValue(key:CacheKey.OwinUserId).ToString() : "";
+            ClearClaims(userId:owinUserId);
+            _sessionCache.Clear();
+            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+        }
+
+        #endregion
+
+        private List<EmailEntry> CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser,
+                                                                                                   OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+                                                                                                   OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram,
+                                                                                                   RegistrationType registrationType)
+        {
+            var emailEntries = new List<EmailEntry>();
 
             if (registrationType == RegistrationType.ResetRegistration)
             {
                 // Set IsRegistrationApproved value as false to enforce all the users need to be approved again for the all programs where they were approved before.
                 // Only Authority can approve again 
                 var orpus = _dbContext.OrganizationRegulatoryProgramUsers.Include(o => o.OrganizationRegulatoryProgram)
-                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved &&
-                                        i.InviterOrganizationRegulatoryProgram.IsRemoved == false && i.OrganizationRegulatoryProgram.IsEnabled)
+                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId
+                                                  && i.IsRemoved == false
+                                                  && i.IsRegistrationApproved
+                                                  && i.InviterOrganizationRegulatoryProgram.IsRemoved == false
+                                                  && i.OrganizationRegulatoryProgram.IsEnabled)
                                       .ToList();
 
                 foreach (var orpu in orpus)
@@ -659,12 +1318,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // Update old InviterOrganizationRegulatoryProgramId with authority OrganizationRegulatoryProgramId to show registration approval pending in 
                     // the authority portal as only Authority User can approve
-                     
-                    var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(orpu.OrganizationRegulatoryProgramId);
-                    var authorityOrgRegProg  = _organizationService.GetAuthority(prevRegisteredOrgRegProg.OrganizationRegulatoryProgramId);
+
+                    var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:orpu.OrganizationRegulatoryProgramId);
+                    var authorityOrgRegProg = _organizationService.GetAuthority(orgRegProgramId:prevRegisteredOrgRegProg.OrganizationRegulatoryProgramId);
                     orpu.InviterOrganizationRegulatoryProgramId = authorityOrgRegProg.OrganizationRegulatoryProgramId;
                     orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                    
+
                     _dbContext.SaveChanges();
 
                     if (!orpu.OrganizationRegulatoryProgram.IsEnabled || orpu.OrganizationRegulatoryProgram.IsRemoved)
@@ -673,13 +1332,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     // Prepare Registration Approval Emails
-                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
-                                                           inviterOrganizationRegulatoryProgram: authorityOrgRegProg,
-                                                           authorityOrg: authorityOrgRegProg.OrganizationDto);
+                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
+                                                                       inviterOrganizationRegulatoryProgram:authorityOrgRegProg,
+                                                                       authorityOrg:authorityOrgRegProg.OrganizationDto);
 
                     // Do COMERR Log
-                    DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
-                                                     authorityOrg: authorityOrgRegProg.OrganizationDto).Wait();
+                    DoComerrLogForRegistration(registrationType:registrationType, registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
+                                               authorityOrg:authorityOrgRegProg.OrganizationDto).Wait();
                 }
             }
             else
@@ -705,7 +1364,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId
                            };
 
-                    _dbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
+                    _dbContext.OrganizationRegulatoryProgramUsers.Add(entity:orpu);
                 }
                 else // re-register after removed
                 {
@@ -722,39 +1381,45 @@ namespace Linko.LinkoExchange.Services.Authentication
                     orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
                     orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 }
-                
+
                 if (orpu.OrganizationRegulatoryProgram.IsEnabled && !orpu.OrganizationRegulatoryProgram.IsRemoved)
                 {
                     var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
 
                     // Prepare Registration Approval Emails
-                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
-                                                           inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
+                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser:registeredUser,
+                                                                       registeredOrganizationRegulatoryProgram:registeredOrganizationRegulatoryProgram,
+                                                                       inviterOrganizationRegulatoryProgram:inviterOrganizationRegulatoryProgram, authorityOrg:authorityOrg);
 
                     // Do COMERR Log
-                    DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser,
-                                                     registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
-                                                     authorityOrg: authorityOrg).Wait();
-                } 
+                    DoComerrLogForRegistration(registrationType:registrationType, registeredUser:registeredUser,
+                                               registeredOrganizationRegulatoryProgram:registeredOrganizationRegulatoryProgram,
+                                               authorityOrg:authorityOrg).Wait();
+                }
             }
-            _dbContext.SaveChanges(); 
+
+            _dbContext.SaveChanges();
             return emailEntries;
         }
 
         private List<EmailEntry> PrepareApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
-                                                            OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, OrganizationDto authorityOrg)
+                                                                     OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, OrganizationDto authorityOrg)
         {
             //  Determine if user is authority user or is industry user;
             //  To change here when we have multiple level authorities
-            bool isInvitedToIndustry = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
+            var isInvitedToIndustry = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
 
             // UC-42 7, 8
             // Find out who have approval permission    
-            var approvalPeople = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).ToList();
+            var approvalPeople = _permissionService.GetApprovalPeople(organizationRegulatoryProgram:inviterOrganizationRegulatoryProgram, isInvitedToIndustry:isInvitedToIndustry)
+                                                   .ToList();
 
-            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
-            var authorityName = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoName);
+            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                                                   settingType:SettingType.EmailContactInfoEmailAddress);
+            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                                                  settingType:SettingType.EmailContactInfoPhone);
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                                             settingType:SettingType.EmailContactInfoName);
 
             var emailContentReplacements = new Dictionary<string, string>
                                            {
@@ -769,54 +1434,59 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (!approvalPeople.Any())
             {
-                var support = _dbContext.Users.SingleOrDefault(i=>i.Email == emailAddressOnEmail && i.IsAccountResetRequired == false);
-                if(support == null)
+                var support = _dbContext.Users.SingleOrDefault(i => i.Email == emailAddressOnEmail && i.IsAccountResetRequired == false);
+                if (support == null)
                 {
                     support = new UserProfile
-                    {
-                        Email = emailAddressOnEmail 
-                    };
+                              {
+                                  Email = emailAddressOnEmail
+                              };
                 }
 
-                approvalPeople.Add(_mapHelper.GetUserDtoFromUserProfile(support)); // send email to authority support email when no approval email found
+                approvalPeople.Add(item:_mapHelper.GetUserDtoFromUserProfile(userProfile:support)); // send email to authority support email when no approval email found
             }
 
             if (isInvitedToIndustry)
             {
-                var receipientOrg = _organizationService.GetOrganization(registeredOrganizationRegulatoryProgram.OrganizationId);
+                var receipientOrg = _organizationService.GetOrganization(organizationId:registeredOrganizationRegulatoryProgram.OrganizationId);
 
-                emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
-                emailContentReplacements.Add("cityName", receipientOrg.CityName);
-                emailContentReplacements.Add("stateName", receipientOrg.State);
+                emailContentReplacements.Add(key:"addressLine1", value:receipientOrg.AddressLine1);
+                emailContentReplacements.Add(key:"cityName", value:receipientOrg.CityName);
+                emailContentReplacements.Add(key:"stateName", value:receipientOrg.State);
             }
 
-            return approvalPeople.Select(i=> {
-                var emailEntry = new EmailEntry
-                {
-                    RecipientEmailAddress = i.Email,
-                    RecipientUserProfileId = i.UserProfileId,
-                    RecipientFirstName = i.FirstName,
-                    RecipientLastName = i.LastName,
-                    RecipientUserName = i.UserName,
-                    ContentReplacements = emailContentReplacements,
-                    RecipientOrgulatoryProgramId= inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
-                    RecipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
-                    RecipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId,
-                    EmailType = isInvitedToIndustry ? EmailType.Registration_IndustryUserRegistrationPendingToApprovers : EmailType.Registration_AuthorityUserRegistrationPendingToApprovers
-                }; 
+            return approvalPeople.Select(i =>
+                                         {
+                                             var emailEntry = new EmailEntry
+                                                              {
+                                                                  RecipientEmailAddress = i.Email,
+                                                                  RecipientUserProfileId = i.UserProfileId,
+                                                                  RecipientFirstName = i.FirstName,
+                                                                  RecipientLastName = i.LastName,
+                                                                  RecipientUserName = i.UserName,
+                                                                  ContentReplacements = emailContentReplacements,
+                                                                  RecipientOrgulatoryProgramId = inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                                  RecipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
+                                                                  RecipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId,
+                                                                  EmailType = isInvitedToIndustry
+                                                                                  ? EmailType.Registration_IndustryUserRegistrationPendingToApprovers
+                                                                                  : EmailType.Registration_AuthorityUserRegistrationPendingToApprovers
+                                                              };
 
-                return emailEntry;
-            }).ToList(); 
+                                             return emailEntry;
+                                         }).ToList();
         }
 
-        private async Task DoComerrLogForRegistration(RegistrationType registrationType, UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+        private async Task DoComerrLogForRegistration(RegistrationType registrationType, UserProfile registeredUser,
+                                                      OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
                                                       OrganizationDto authorityOrg)
         {
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
                                           {
                                               RegulatoryProgramId = registeredOrganizationRegulatoryProgram.RegulatoryProgramId,
                                               OrganizationId = registeredOrganizationRegulatoryProgram.OrganizationId,
-                                              RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId ?? registeredOrganizationRegulatoryProgram.OrganizationId,
+                                              RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId
+                                                                        ?? registeredOrganizationRegulatoryProgram.OrganizationId,
                                               UserProfileId = registeredUser.UserProfileId,
                                               UserName = registeredUser.UserName,
                                               UserFirstName = registeredUser.FirstName,
@@ -825,7 +1495,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                               IPAddress = _httpContext.CurrentUserIPAddress(),
                                               HostName = _httpContext.CurrentUserHostName()
                                           };
-             
+
             var contentReplacements = new Dictionary<string, string>
                                       {
                                           {"authorityName", authorityOrg.OrganizationName},
@@ -841,497 +1511,42 @@ namespace Linko.LinkoExchange.Services.Authentication
                                           {"actorEmailAddress", registeredUser.Email}
                                       };
 
-            await _crommerAuditLogService.Log(eventType: CromerrEvent.Registration_RegistrationPending, dto: cromerrAuditLogEntryDto, contentReplacements: contentReplacements);
+            await _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_RegistrationPending, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
 
             if (registrationType == RegistrationType.ResetRegistration)
             {
                 cromerrAuditLogEntryDto.RegulatoryProgramId = registeredOrganizationRegulatoryProgram.RegulatoryProgramId;
                 cromerrAuditLogEntryDto.OrganizationId = registeredOrganizationRegulatoryProgram.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId ?? registeredOrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId
+                                                                  ?? registeredOrganizationRegulatoryProgram.OrganizationId;
 
-                await _crommerAuditLogService.Log(eventType: CromerrEvent.UserAccess_AccountResetSuccessful, dto: cromerrAuditLogEntryDto, contentReplacements: contentReplacements);
+                await _crommerAuditLogService.Log(eventType:CromerrEvent.UserAccess_AccountResetSuccessful, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
-        }
-
-        public bool CheckPasswordResetUrlNotExpired(string token)
-        {
-            bool isNotExpiredYet;
-            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
-            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
-            if (emailAuditLog == null)
-            {
-                return false;
-                //throw new Exception($"ERROR: Cannot find email audit log associated with token={token}");
-            }
-
-            DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
-            if (DateTimeOffset.Now.AddHours(-resetPasswordTokenValidateInterval) > tokenCreated)
-            {
-                //Check token expiry (5.1.a)
-                isNotExpiredYet = false;
-                if (emailAuditLog.RecipientUserProfileId.HasValue)
-                {
-                    var userProfileId = emailAuditLog.RecipientUserProfileId.Value;
-                    foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
-                    {
-                        var userDto = _userService.GetUserProfileById(userProfileId);
-                        _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
-                    }
-                }
-            }
-            else
-            {
-                isNotExpiredYet = true;
-            }
-
-            return isNotExpiredYet;
-        }
-
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
-            string answer, int failedCount, string newPassword)
-        {
-            var authenticationResult = new AuthenticationResultDto();
-
-            // Use PasswordValidator
-            var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
-            if (validateResult.Succeeded == false)
-            {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.PasswordRequirementsNotMet;
-                authenticationResult.Errors = validateResult.Errors;
-                return authenticationResult;
-            }
-
-            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
-
-            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == resetPasswordToken);
-
-            if (emailAuditLog == null)
-            {
-                throw new Exception($"ERROR: Cannot find email audit log associated with token={resetPasswordToken}");
-            }
-
-            DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
-
-            if (DateTimeOffset.Now.AddHours(-resetPasswordTokenValidateInterval) > tokenCreated)
-            {
-                //Check token expiry (5.1.a)
-
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
-                authenticationResult.Errors = new[] { "The password reset link has expired. Please use Forgot Password." };
-
-                int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
-                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
-                {
-                    var userDto = _userService.GetUserProfileById(userProfileId);
-                    await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
-                }
-
-                return authenticationResult;
-            }
-            
-            AuthenticationResultDto resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId, answer, failedCount, newPassword); 
-            if(resetPasswordResult.Result == AuthenticationResult.Success)
-            {
-                emailAuditLog.Token = string.Empty; 
-            }
-            _dbContext.SaveChanges();
-            return resetPasswordResult; 
-        }
-
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
-            string answer, int failedCount, string newPassword)
-        {
-            int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
-            string passwordHash = _passwordHasher.HashPassword(newPassword);
-            string correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
-            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userProfileId);
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
-
-            var authenticationResult = new AuthenticationResultDto();
-
-            //KBQ ANSWERS ARE CASE-INSENSITIVE; PERSISTED AS ALL LOWER CASE
-            if (_userManager.PasswordHasher.VerifyHashedPassword(correctSavedHashedAnswer, answer.Trim().ToLower()) != PasswordVerificationResult.Success)
-            {
-                //Check hashed answer (5.3.a)
-
-                authenticationResult.Success = false;
-
-                //3rd incorrect attempt (5.3.b) => lockout
-                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
-                if ((failedCount + 1) >= maxAnswerAttempts) // from web.config
-                {
-                    _userService.LockUnlockUserAccount(userProfileId: userProfileId, isAttemptingLock: true, reason: AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
-                    //Get all associated authorities
-                    var userOrgs = _organizationService.GetUserRegulators(userProfileId).ToList();
-                    authenticationResult.RegulatoryList = userOrgs;
-
-                    string errorString = "<div class=\"table - responsive\">";
-                    errorString += "<table class=\"table no-margin\">";
-                    errorString += "<tbody>";
-
-                    foreach (var org in userOrgs)
-                    {
-                        errorString += "<tr><td>" + org.EmailContactInfoName + "</td><td>" + org.EmailContactInfoEmailAddress + "</td><td>" + org.EmailContactInfoPhone + " </td></tr>";
-                    }
-
-                    errorString += "</tbody>";
-                    errorString += "</table>";
-                    errorString += "</div>";
-                    errorString += "</table>";
-
-                    authenticationResult.Result = AuthenticationResult.UserIsLocked;
-                    authenticationResult.Errors = new[] { errorString };
-
-                }
-                else
-                {
-                    authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
-                    authenticationResult.Errors = new[] { "The answer is incorrect.  Please try again." };
-                }
-            }
-            else if (!IsValidPasswordCheckInHistory(newPassword, userProfileId, organizationSettings))
-            {
-                //Password used before (6.a)
-                var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
-
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                authenticationResult.Errors = new[] { $"You cannot use the last {numberOfPasswordsInHistory} passwords." };
-            }
-            else
-            {
-                //create history record
-                UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
-                history.UserProfileId = userProfileId;
-                history.PasswordHash = passwordHash;
-                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                _dbContext.UserPasswordHistories.Add(history);
-                _dbContext.SaveChanges();
-
-                //Set new password
-                _userService.SetHashedPassword(userProfileId, passwordHash);
-
-                //Unlock user
-                string userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
-                await _userManager.UnlockUserAccount(userOwinId);
-
-                authenticationResult.Success = true;
-                authenticationResult.Result = AuthenticationResult.Success;
-
-                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
-                {
-                    var userDto = _userService.GetUserProfileById(userProfileId);
-                    await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);
-                }
-            }
-
-            return authenticationResult;
-        }
-
-        /// <summary>
-        /// To request a password reset. This will do follow:
-        /// 1. generate a reset password token
-        /// 2. send a reset password email
-        /// 3. log to system 
-        /// </summary>
-        /// <param name="username">The user name </param>
-        /// <returns></returns>
-        public async Task<AuthenticationResultDto> RequestResetPassword(string username)
-        {
-            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
-
-            var user = _dbContext.Users.SingleOrDefault(u => u.UserName == username);
-            if (user == null)
-            {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.UserNotFound;
-                authenticationResult.Errors = new[] { "UserNotFound" };
-            }
-            else if (!await _userManager.IsEmailConfirmedAsync(user.Id))
-            {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
-                authenticationResult.Errors = new[] { "EmailIsNotConfirmed" };
-            }
-            else
-            {
-                authenticationResult.Success = true;
-                authenticationResult.Result = AuthenticationResult.Success;
-                SendResetPasswordConfirmationEmail(user);
-            }
-
-            return authenticationResult;
-        }
-
-        public async Task<AuthenticationResultDto> RequestUsernameEmail(string email)
-        {
-            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
-
-            var user = _userManager.FindByEmail(email);
-            if (user == null)
-            {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.UserNotFound;
-                authenticationResult.Errors = new[] { "UserNotFound" };
-            }
-            else if (!await _userManager.IsEmailConfirmedAsync(user.Id))
-            {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
-                authenticationResult.Errors = new[] { "EmailIsNotConfirmed" };
-            }
-            else
-            {
-                authenticationResult.Success = true;
-                authenticationResult.Result = AuthenticationResult.Success;
-                SendRequestUsernameEmail(user);
-            }
-
-            return authenticationResult;
-        }
-
-        /// <summary>
-        /// Sign in by user name and password.  "isPersistent" indicates to keep the cookie or now. 
-        /// </summary>
-        /// <param name="userName">The user name used when sign in</param>
-        /// <param name="password">The password used when sign in</param>
-        /// <param name="isPersistent">The flag indicates persistent the sign or not</param>
-        /// <returns></returns>
-        public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
-        {
-            _logger.Info(message: "SignInByUserName. userName={0}", argument: userName);
-
-            SignInResultDto signInResultDto = new SignInResultDto();
-
-            var applicationUser = _userManager.FindByName(userName);
-            if (applicationUser == null)
-            {
-                signInResultDto.AutehticationResult = AuthenticationResult.UserNotFound;
-                return Task.FromResult(signInResultDto);
-            }
-
-            signInResultDto.RegulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId, true).ToList();
-
-            // clear claims from db if there are   
-            ClearClaims(applicationUser.Id);
-            applicationUser.Claims.Clear();
-
-            var userId = applicationUser.UserProfileId;
-            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userId);
-
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
-
-            SetPasswordPolicy(organizationSettings);
-
-            _signInManager.UserManager = _userManager;
-            
-            // UC-29, 2.c
-            // Check if the user is in 'password lock' status
-            if (_userManager.IsLockedOut(applicationUser.Id))
-            {
-                LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
-                return Task.FromResult(signInResultDto);
-            }
-
-            var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
-
-            if (signInStatus == SignInStatus.Success)
-            {
-                var claims = GetUserIdentity(applicationUser);
-
-                // Save claim
-                SaveClaims(applicationUser.Id, claims);
-
-                var identity = new ClaimsIdentity(_httpContext.Current.User.Identity);
-                identity.AddClaims(claims);
-                _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
-                    (identity, new AuthenticationProperties { IsPersistent = isPersistent });
-
-                _authenticationManager.SignOut();
-
-                if (applicationUser.IsAccountResetRequired)
-                {
-                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountResetRequired);
-
-                    signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
-                    return Task.FromResult(signInResultDto);
-                }
-
-                // UC-29, 3.a
-                // Check if the user has been locked "Account Lockout"  by an authority
-                if (applicationUser.IsAccountLocked)
-                {
-                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
-
-                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
-                    return Task.FromResult(signInResultDto);
-                }
-
-                // UC-29, 4.a, 5.a, 6.a
-                if (!ValidateUserAccess(applicationUser, signInResultDto))
-                {
-                    return Task.FromResult(signInResultDto);
-                }
-
-                // UC-29 7.a
-                // Check if user's password is expired or not   
-                if (IsUserPasswordExpired(userId, organizationSettings))
-                {
-                    // Put user profile Id into session, to request user change their password. 
-                    //_sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
-                    signInResultDto.OwinUserId = applicationUser.Id;
-                    signInResultDto.UserProfileId = applicationUser.UserProfileId;
-                    signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
-                    return Task.FromResult(signInResultDto);
-                }
-
-                signInResultDto.AutehticationResult = AuthenticationResult.Success;
-
-                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
-                _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
-
-                _authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
-                _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
-            }
-            else if (signInStatus == SignInStatus.Failure)
-            {
-                signInResultDto.AutehticationResult = AuthenticationResult.InvalidUserNameOrPassword;
-            }
-            else if (signInStatus == SignInStatus.LockedOut)
-            {
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
-
-                //Log to Cromerr
-                LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
-            }
-
-            _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
-            return Task.FromResult(signInResultDto);
-        }
-
-        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation, int? reportPackageId = null)
-        {
-            _logger.Info("Enter AuthenticationService.PasswordAndKbqValidationResult");
-
-            var userProfileId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.UserProfileId));
-            var orgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var authority = _settingService.GetAuthority(orgRegProgramId: orgRegProgramId);
-            var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId: authority.OrganizationId).Settings;
-            var failedPasswordAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedPasswordAttemptMaxCount)).Select(s => s.Value).First(), 3);
-            var failedKbqAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedKBQAttemptMaxCount)).Select(s => s.Value).First(), 3);
-            
-            if (failedPasswordAttemptMaxCount <= failedPasswordCount)
-            {
-                SignOff();
-                return PasswordAndKbqValidationResult.InvalidPassword;
-            }
-
-            if (failedKbqAttemptMaxCount <= failedKbqCount)
-            {
-                SignOff();
-                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
-            }
-
-            var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
-            // check if user is a valid user
-            // 1: IsAccountLocked = false, IsAccountResetRequired = false 
-            if (userProfile.IsAccountLocked)
-            {
-                ThrowUserStatusRuleValiation("User is locked");
-            }
-
-            if (userProfile.IsAccountResetRequired)
-            {
-                ThrowUserStatusRuleValiation("User is required to reset account");
-            }
-
-            // Check to see if password matches. 
-            if (!IsValidPassword(userProfile.PasswordHash, password))
-            {
-                if (failedPasswordAttemptMaxCount <= failedPasswordCount + 1)
-                {
-                    SignOff();  
-
-                    if(reportOperation == ReportOperation.SignAndSubmit)
-                    {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony, reportPackageId);
-                    }
-                    else if(reportOperation == ReportOperation.Repudiation)
-                    {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony, reportPackageId);
-                    }
-
-                    return PasswordAndKbqValidationResult.UserLocked_Password;
-                }
-
-                return PasswordAndKbqValidationResult.InvalidPassword;
-            }
-
-            // Check to see if KBQ answer matches
-            if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId, kbqAnswer.ToLower()))
-            {
-                if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
-                {
-                    SignOff(); 
-                    if(reportOperation == ReportOperation.SignAndSubmit)
-                    {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony, reportPackageId);
-                    }
-                    else if(reportOperation == ReportOperation.Repudiation)
-                    {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony, reportPackageId);
-                    }
-
-                    return PasswordAndKbqValidationResult.UserLocked_KBQ;
-                }
-
-                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
-            }
-
-            // Check user is validate user or not
-            // 2: is not disabled, 
-            // 3: have access to the regulatory program
-            var programUser = _dbContext.OrganizationRegulatoryProgramUsers
-                             .FirstOrDefault(i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId == orgRegProgramId);
-
-            if (programUser == null || programUser.IsRegistrationApproved == false || programUser.IsRegistrationDenied || programUser.IsRemoved)
-            {
-                ThrowUserStatusRuleValiation("User does not have access to current program");
-            }
-            else if (!programUser.IsEnabled)
-            {
-                ThrowUserStatusRuleValiation("User is disabled");
-            }
-
-            return PasswordAndKbqValidationResult.Success;
         }
 
         private void ThrowUserStatusRuleValiation(string message)
         {
             SignOff();
-            List<RuleViolation> validationIssues = new List<RuleViolation>();
-            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-        } 
+            var validationIssues = new List<RuleViolation>();
+            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+            throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+        }
 
         /// <summary>
-        /// Log to Cromerr events: 
-        /// 1) attempting to log into an account that is password locked
-        /// 2) attempting to log into an account that is manually locked by Authority
-        /// 3) getting locked out due to too many password attempts
-        /// 4) attempting to log into an account that has been reset
+        ///     Log to Cromerr events:
+        ///     1) attempting to log into an account that is password locked
+        ///     2) attempting to log into an account that is manually locked by Authority
+        ///     3) getting locked out due to too many password attempts
+        ///     4) attempting to log into an account that has been reset
         /// </summary>
-        /// <param name="user">Actor attempting the signin activity</param>
-        /// <param name="cromerrEvent">Used to determine if user just got locked out OR they were previously locked out, or reset</param>
+        /// <param name="user"> Actor attempting the signin activity </param>
+        /// <param name="cromerrEvent"> Used to determine if user just got locked out OR they were previously locked out, or reset </param>
         private void LogProhibitedSignInActivityToCromerr(UserProfile user, CromerrEvent cromerrEvent)
         {
             //Need to log for all associated regulatory program orgs
             var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
-                                    .Include("OrganizationRegulatoryProgram")
-                                    .Where(u => u.UserProfileId == user.UserProfileId).ToList();
+                                            .Include(path:"OrganizationRegulatoryProgram")
+                                            .Where(u => u.UserProfileId == user.UserProfileId).ToList();
             foreach (var orgRegProgUser in orgRegProgUsers)
             {
                 var orgRegProgram = orgRegProgUser.OrganizationRegulatoryProgram;
@@ -1348,55 +1563,52 @@ namespace Linko.LinkoExchange.Services.Authentication
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
                 var contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("userName", user.UserName);
-                contentReplacements.Add("emailAddress", user.Email);
+                contentReplacements.Add(key:"firstName", value:user.FirstName);
+                contentReplacements.Add(key:"lastName", value:user.LastName);
+                contentReplacements.Add(key:"userName", value:user.UserName);
+                contentReplacements.Add(key:"emailAddress", value:user.Email);
 
-                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
-
+                _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
         }
 
         // Validate user access for UC-29(4.a, 5.a, 6.a)
         private bool ValidateUserAccess(UserProfile userProfile, SignInResultDto signInResultDto)
         {
-            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email, true, true).ToList();
+            var orpus = _programService.GetUserRegulatoryPrograms(email:userProfile.Email, isIncludeRemoved:true, isIncludeDisabled:true).ToList();
             if (orpus.Any())
             {
                 // User at least has one approved program
-                if(orpus.Any(i=>i.IsRegistrationApproved && i.IsRegistrationDenied == false && i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                if (orpus.Any(i => i.IsRegistrationApproved && i.IsRegistrationDenied == false && i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     return true;
                 }
-                
+
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
                 if (orpus.Any(i => i.IsRegistrationApproved == false && i.IsRegistrationDenied == false && i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
-                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_RegistrationPending);
+                    LogToCromerrThisEvent(programUsers:orpus, cromerrEvent:CromerrEvent.Login_RegistrationPending);
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
                     return false;
                 }
 
                 // UC-29 5.a, User account is disabled for all industry, or authority or application administrator
                 // If the user is disabled for all programs
-                if (orpus.All(u => u.IsEnabled == false && u.IsRemoved == false) &&  //--- user is disabled for all industry and authority 
-                    userProfile.IsInternalAccount == false   //--- user is disabled for Application administrator.
+                if (orpus.All(u => u.IsEnabled == false && u.IsRemoved == false)
+                    && //--- user is disabled for all industry and authority 
+                    userProfile.IsInternalAccount == false //--- user is disabled for Application administrator.
                 )
                 {
-                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_UserDisabled);
+                    LogToCromerrThisEvent(programUsers:orpus, cromerrEvent:CromerrEvent.Login_UserDisabled);
                     signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
                     return false;
                 }
 
                 // 6.a determine user doesn't have access to any enabled industry or authority 
-                if (orpus.Any(i => i.IsRegistrationApproved &&
-                                   i.IsEnabled && 
-                                   !i.IsRemoved &&
-                                   i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
+                if (orpus.Any(i => i.IsRegistrationApproved && i.IsEnabled && !i.IsRemoved && i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
                 {
-                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
+                    LogToCromerrThisEvent(programUsers:orpus, cromerrEvent:CromerrEvent.Login_NoAssociation);
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                     return false;
                 }
@@ -1406,10 +1618,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             else
             {
                 // If user doesn't have any program, return below message
-                LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
+                LogToCromerrThisEvent(programUsers:orpus, cromerrEvent:CromerrEvent.Login_NoAssociation);
                 signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                 return false;
             }
+
             return true;
         }
 
@@ -1430,99 +1643,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
                 var contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("userName", user.UserName);
-                contentReplacements.Add("emailAddress", user.Email);
+                contentReplacements.Add(key:"firstName", value:user.FirstName);
+                contentReplacements.Add(key:"lastName", value:user.LastName);
+                contentReplacements.Add(key:"userName", value:user.UserName);
+                contentReplacements.Add(key:"emailAddress", value:user.Email);
 
-                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
-
+                _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
-        }
-
-        public string GetClaimsValue(string claimType)
-        {
-            string claimsValue = null;
-
-            var claims = GetClaims();
-
-            //return claims?.ToList();
-            var claim = claims?.FirstOrDefault(c => c.Type == claimType);
-            if (claim != null)
-                claimsValue = claim.Value;
-
-            return claimsValue;
-        }
-
-        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId)
-        {
-            //We already have: UserId, UserProfileId, UserFullName,
-            var userProfileId = Convert.ToInt32(GetClaimsValue(CacheKey.UserProfileId));
-
-            //Now we set UserRole, OrganizationRegulatoryProgramId, OrganizationName, OrgRegProgUserId, PortalName
-            //UserRole <=> PermissionGroup.Name
-            //PortalName <=> OrganizationType.Name
-
-            var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Include("OrganizationRegulatoryProgram.RegulatoryProgram")
-                .SingleOrDefault(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId);
-            if (orgRegProgUser == null)
-                throw new Exception(string.Format("ERROR: UserProfileId={0} does not have access to Organization Regulatory Program={1}.", userProfileId, orgRegProgId));
-
-            var permissionGroupId = orgRegProgUser.PermissionGroupId;
-            var orgRegProgUserId = orgRegProgUser.OrganizationRegulatoryProgramUserId;
-            var regProgramName = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgram.Name;
-            var userRole = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId).Name;
-            var organization = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
-                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId).Organization;
-            var organizationName = organization.Name;
-            var organizationId = organization.OrganizationId;
-            var portalName = organization.OrganizationType.Name;
-
-            var claims = new Dictionary<string, string>();
-            claims.Add(CacheKey.UserRole, userRole);
-            claims.Add(CacheKey.RegulatoryProgramName, regProgramName);
-            claims.Add(CacheKey.OrganizationRegulatoryProgramUserId, orgRegProgUserId.ToString());
-            claims.Add(CacheKey.OrganizationRegulatoryProgramId, orgRegProgId.ToString());
-            claims.Add(CacheKey.OrganizationName, organizationName);
-            claims.Add(CacheKey.OrganizationId, organizationId.ToString());
-            claims.Add(CacheKey.PortalName, portalName);
-
-            SetCurrentUserClaims(claims);
-
-            //Log to Cromerr
-
-            var programUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(orgRegProgUser);
-            var user = _userService.GetUserProfileById(programUserDto.UserProfileId);
-
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = orgRegProgUser.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = user.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = user.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("organizationName", programUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
-            contentReplacements.Add("firstName", user.FirstName);
-            contentReplacements.Add("lastName", user.LastName);
-            contentReplacements.Add("userName", user.UserName);
-            contentReplacements.Add("emailAddress", user.Email);
-
-            _crommerAuditLogService.Log(CromerrEvent.Login_Success, cromerrAuditLogEntryDto, contentReplacements);
-
-        }
-
-        public void SignOff()
-        {
-            var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) != null ? _sessionCache.GetValue(CacheKey.OwinUserId).ToString() : "";
-            ClearClaims(owinUserId);
-            _sessionCache.Clear();
-            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }
 
         #region private section
@@ -1532,14 +1659,14 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Return true means the new password is validate to use
         private bool IsValidPasswordCheckInHistory(string password, int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
-            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
+            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
-                .Where(i => i.UserProfileId == userProfileId)
-                .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory)
-                .ToList();
+                                                        .Where(i => i.UserProfileId == userProfileId)
+                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count:numberOfPasswordsInHistory)
+                                                        .ToList();
 
-            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(i.PasswordHash, password)))
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash:i.PasswordHash, password:password)))
             {
                 return false;
             }
@@ -1549,14 +1676,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private bool IsValidPassword(string passwordHash, string password)
         {
-            return _userManager.PasswordHasher.VerifyHashedPassword(passwordHash, password) == PasswordVerificationResult.Success;
+            return _userManager.PasswordHasher.VerifyHashedPassword(hashedPassword:passwordHash, providedPassword:password) == PasswordVerificationResult.Success;
         }
 
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
             var lastestUserPassword = _dbContext.UserPasswordHistories
-                .Where(i => i.UserProfileId == userProfileId)
-                .OrderByDescending(i => i.LastModificationDateTimeUtc).FirstOrDefault();
+                                                .Where(i => i.UserProfileId == userProfileId)
+                                                .OrderByDescending(i => i.LastModificationDateTimeUtc).FirstOrDefault();
 
             if (lastestUserPassword == null || lastestUserPassword.UserProfileId == 0)
             {
@@ -1564,8 +1691,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // Get password expiration setting
-            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings, null);
-            if (DateTimeOffset.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(passwordExpiredDays))
+            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings:organizationSettings, orgTypeName:null);
+            if (DateTimeOffset.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(days:passwordExpiredDays))
             {
                 return true;
             }
@@ -1575,27 +1702,31 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private void ClearClaims(string userId)
         {
-            if (string.IsNullOrWhiteSpace(userId)) return;
-            var user = _userManager.FindById(userId);
+            if (string.IsNullOrWhiteSpace(value:userId))
+            {
+                return;
+            }
+
+            var user = _userManager.FindById(userId:userId);
             if (user == null)
             {
                 return;
             }
 
-            var claims = _userManager.GetClaims(userId).ToList();
+            var claims = _userManager.GetClaims(userId:userId).ToList();
             foreach (var claim in claims)
             {
-                _userManager.RemoveClaim(userId, claim);
+                _userManager.RemoveClaim(userId:userId, claim:claim);
             }
         }
 
         private UserProfile AssignUser(string userName, string email)
         {
             return new UserProfile
-            {
-                UserName = userName,
-                Email = email
-            };
+                   {
+                       UserName = userName,
+                       Email = email
+                   };
         }
 
         private List<Claim> GetUserIdentity(UserProfile userProfile)
@@ -1603,31 +1734,31 @@ namespace Linko.LinkoExchange.Services.Authentication
             // get userDto's role, organizations, programs, current organization, current program.....
 
             var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, userProfile.Id));
-            claims.Add(new Claim(CacheKey.OwinUserId, userProfile.Id));
-            claims.Add(new Claim(CacheKey.UserProfileId, userProfile.UserProfileId.ToString()));
-            claims.Add(new Claim(CacheKey.FirstName, userProfile.FirstName));
-            claims.Add(new Claim(CacheKey.LastName, userProfile.LastName));
-            claims.Add(new Claim(CacheKey.UserName, userProfile.UserName));
-            claims.Add(new Claim(CacheKey.Email, userProfile.Email));
-            claims.Add(new Claim(CacheKey.SessionId, _httpContext.Current.Session.SessionID));
+            claims.Add(item:new Claim(type:ClaimTypes.NameIdentifier, value:userProfile.Id));
+            claims.Add(item:new Claim(type:CacheKey.OwinUserId, value:userProfile.Id));
+            claims.Add(item:new Claim(type:CacheKey.UserProfileId, value:userProfile.UserProfileId.ToString()));
+            claims.Add(item:new Claim(type:CacheKey.FirstName, value:userProfile.FirstName));
+            claims.Add(item:new Claim(type:CacheKey.LastName, value:userProfile.LastName));
+            claims.Add(item:new Claim(type:CacheKey.UserName, value:userProfile.UserName));
+            claims.Add(item:new Claim(type:CacheKey.Email, value:userProfile.Email));
+            claims.Add(item:new Claim(type:CacheKey.SessionId, value:_httpContext.Current.Session.SessionID));
 
             return claims;
         }
 
         private void SaveClaims(string userId, IList<Claim> claims)
         {
-            var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+            var identity = new ClaimsIdentity(claims:claims, authenticationType:DefaultAuthenticationTypes.ApplicationCookie);
 
             var authProperties = new AuthenticationProperties();
 
-            var existingClaims = _userManager.GetClaims(userId);
+            var existingClaims = _userManager.GetClaims(userId:userId);
 
             foreach (var claim in claims)
             {
-                if (!IsHavingClaim(existingClaims, claim))
+                if (!IsHavingClaim(claims:existingClaims, claim:claim))
                 {
-                    _userManager.AddClaim(userId, claim);
+                    _userManager.AddClaim(userId:userId, claim:claim);
                 }
             }
 
@@ -1639,7 +1770,10 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             foreach (var cl in claims)
             {
-                if (cl.Type.Equals(claim.Type)) return true;
+                if (cl.Type.Equals(value:claim.Type))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -1652,37 +1786,36 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // If one setting has multiple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
-            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
+            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(value:_settingService.PasswordLockoutHours());
 
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings, orgTypeName: null);
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings:organizationSettings, orgTypeName:null);
         }
-
 
         #region organization setting;
 
         private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettingsValue, OrganizationTypeName? orgTypeName, bool isMax = true)
         {
-            var defaultValueStr = _settingService.GetSettingTemplateValue(settingType, orgTypeName);
-            var defaultValue = ValueParser.TryParseInt(defaultValueStr, 0);
+            var defaultValueStr = _settingService.GetSettingTemplateValue(settingType:settingType, orgType:orgTypeName);
+            var defaultValue = ValueParser.TryParseInt(value:defaultValueStr, defaultValue:0);
             var organizationSettings = organizationSettingsValue.ToList();
             if (organizationSettings.Any())
             {
                 if (orgTypeName != null)
                 {
                     defaultValue = isMax
-                        ? organizationSettings
-                            .Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
-                        : organizationSettings.Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
-                            .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                                       ? organizationSettings
+                                           .Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
+                                           .Max(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue))
+                                       : organizationSettings.Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
+                                                             .Min(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
                 }
                 else
                 {
                     defaultValue = isMax
-                        ? organizationSettings
-                            .Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
-                        : organizationSettings.Where(i => i.TemplateName == settingType)
-                            .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
-
+                                       ? organizationSettings
+                                           .Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue))
+                                       : organizationSettings.Where(i => i.TemplateName == settingType)
+                                                             .Min(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
                 }
             }
 
@@ -1691,28 +1824,28 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.PasswordHistoryMaxCount, organizationSettings, orgTypeName, isMax: false);
+            return GetSettingIntValue(settingType:SettingType.PasswordHistoryMaxCount, organizationSettingsValue:organizationSettings, orgTypeName:orgTypeName, isMax:false);
         }
 
         private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, orgTypeName, isMax: false);
+            return GetSettingIntValue(settingType:SettingType.PasswordChangeRequiredDays, organizationSettingsValue:organizationSettings, orgTypeName:orgTypeName, isMax:false);
         }
 
         private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.FailedPasswordAttemptMaxCount, organizationSettings, orgTypeName, isMax: false);
+            return GetSettingIntValue(settingType:SettingType.FailedPasswordAttemptMaxCount, organizationSettingsValue:organizationSettings, orgTypeName:orgTypeName, isMax:false);
         }
 
-        #endregion 
+        #endregion
 
         private IEnumerable<int> GetUserAuthorityOrganizationIds(int userid)
         {
             var authorityOrgIds = new List<int>();
-            var orgRegPrograms = _organizationService.GetUserOrganizations(userid);
+            var orgRegPrograms = _organizationService.GetUserOrganizations(userId:userid);
             foreach (var orgRegProgram in orgRegPrograms)
             {
-                authorityOrgIds.Add(orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId);
+                authorityOrgIds.Add(item:orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId);
             }
 
             return authorityOrgIds;
@@ -1723,42 +1856,46 @@ namespace Linko.LinkoExchange.Services.Authentication
             //var token = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
             var token = Guid.NewGuid().ToString();
 
-            string baseUrl = _httpContext.GetRequestBaseUrl();
-            string link = baseUrl + "Account/ResetPassword/?token=" + token;
+            var baseUrl = _httpContext.GetRequestBaseUrl();
+            var link = baseUrl + "Account/ResetPassword/?token=" + token;
 
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+            var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
+            var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
             var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("link", link);
-            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-            contentReplacements.Add("supportEmail", supportEmail);
+            contentReplacements.Add(key:"link", value:link);
+            contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
+            contentReplacements.Add(key:"supportEmail", value:supportEmail);
 
-            _requestCache.SetValue(CacheKey.Token, token);
+            _requestCache.SetValue(key:CacheKey.Token, value:token);
 
             //ForgotPassword_ForgotPassword: Email Audit logs to all programs  
-            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile,EmailType.ForgotPassword_ForgotPassword, contentReplacements); 
+            var emailEntries =
+                _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.ForgotPassword_ForgotPassword,
+                                                                            contentReplacements:contentReplacements);
 
-            _linkoExchangeEmailService.SendEmails(emailEntries); 
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
-        
+
         private void SendRequestUsernameEmail(UserProfile userProfile)
         {
-            string baseUrl = _httpContext.GetRequestBaseUrl();
-            string link = baseUrl + "Account/SignIn";
+            var baseUrl = _httpContext.GetRequestBaseUrl();
+            var link = baseUrl + "Account/SignIn";
 
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+            var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
+            var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
             var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("userName", userProfile.UserName);
-            contentReplacements.Add("link", link);
-            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-            contentReplacements.Add("supportEmail", supportEmail);
+            contentReplacements.Add(key:"userName", value:userProfile.UserName);
+            contentReplacements.Add(key:"link", value:link);
+            contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
+            contentReplacements.Add(key:"supportEmail", value:supportEmail);
 
             // ForgotUserName_ForgotUserName email logs for all programs
-            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile, EmailType.ForgotUserName_ForgotUserName, contentReplacements); 
-            _linkoExchangeEmailService.SendEmails(emailEntries); 
+            var emailEntries =
+                _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.ForgotUserName_ForgotUserName,
+                                                                            contentReplacements:contentReplacements);
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 
         private RegistrationResult ValidateRegistrationData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
@@ -1769,24 +1906,25 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // To verify user's password  
-            var passwordRequiredLengthFromWebConfig = ValueParser.TryParseInt(ConfigurationManager.AppSettings["PasswordRequiredLength"], defaultValue: 8);
-            var passwordRequiredLength = ValueParser.TryParseInt(_globalSettings[SystemSettingType.PasswordRequiredLength], defaultValue: passwordRequiredLengthFromWebConfig);
-            var passwordRequiredMaxLength = ValueParser.TryParseInt(_globalSettings[SystemSettingType.PasswordRequiredMaxLength], defaultValue: 16);
+            var passwordRequiredLengthFromWebConfig = ValueParser.TryParseInt(value:ConfigurationManager.AppSettings[name:"PasswordRequiredLength"], defaultValue:8);
+            var passwordRequiredLength = ValueParser.TryParseInt(value:_globalSettings[key:SystemSettingType.PasswordRequiredLength],
+                                                                 defaultValue:passwordRequiredLengthFromWebConfig);
+            var passwordRequiredMaxLength = ValueParser.TryParseInt(value:_globalSettings[key:SystemSettingType.PasswordRequiredMaxLength], defaultValue:16);
 
             if (userProfile.Password.Length < passwordRequiredLength || userProfile.Password.Length > passwordRequiredMaxLength)
             {
                 return RegistrationResult.BadPassword;
             }
 
-            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result;
+            var validPassword = _userManager.PasswordValidator.ValidateAsync(item:userProfile.Password).Result;
             if (validPassword.Succeeded == false)
             {
                 return RegistrationResult.BadPassword;
             }
 
-            return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
+            return _userService.ValidateRegistrationUserData(userProfile:userProfile, securityQuestions:securityQuestions, kbqQuestions:kbqQuestions);
         }
-        
+
         public void UpdateClaim(string key, string value)
         {
             var currentClaims = GetClaims();
@@ -1795,16 +1933,16 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var claim = currentClaims.FirstOrDefault(i => i.Type == key);
                 if (claim != null)
                 {
-                    currentClaims.Remove(claim);
+                    currentClaims.Remove(item:claim);
                 }
 
-                currentClaims.Add(new Claim(key, value));
+                currentClaims.Add(item:new Claim(type:key, value:value));
             }
 
-            var owinUserId = GetClaimsValue(CacheKey.OwinUserId);
+            var owinUserId = GetClaimsValue(claimType:CacheKey.OwinUserId);
 
-            ClearClaims(owinUserId);
-            SaveClaims(owinUserId, currentClaims);
+            ClearClaims(userId:owinUserId);
+            SaveClaims(userId:owinUserId, claims:currentClaims);
         }
 
         #endregion

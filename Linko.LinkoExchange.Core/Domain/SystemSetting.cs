@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a global setting for the system.
+    ///     Represents a global setting for the system.
     /// </summary>
-    public partial class SystemSetting
+    public class SystemSetting
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int SystemSettingId { get; set; }
 
@@ -23,5 +25,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -17,27 +15,34 @@ using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    [PortalAuthorize("authority","industry")]
-    public class InviteController:BaseController
+    [PortalAuthorize("authority", "industry")]
+    public class InviteController : BaseController
     {
+        #region fields
+
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
 
+        #endregion
+
+        #region constructors and destructor
+
         public InviteController(
-            IInvitationService invitationService, 
-            ILogger logger, 
+            IInvitationService invitationService,
+            ILogger logger,
             IHttpContextService httpContextService,
             IUserService userService,
-            IReportPackageService reportPackageService, 
+            IReportPackageService reportPackageService,
             ISampleService sampleService)
-            :base(httpContextService,userService,reportPackageService, sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _invitationService = invitationService;
             _logger = logger;
             _httpContextService = httpContextService;
         }
-        
+
+        #endregion
 
         public ActionResult Invite(string industryOrgRegProgramId, string invitationType)
         {
@@ -64,7 +69,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 orgRegProgramId = int.Parse(s:orgRegProgramIdString);
             }
-            
+
             var result = _invitationService.CheckEmailAddress(orgRegProgramId:orgRegProgramId, email:emailAddress);
 
             var viewModel = new InviteViewModel
@@ -106,7 +111,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(model:viewModel);
             }
-            
+
             if (viewModel.OrgRegProgramId == 0)
             {
                 //Inviting to current organization
@@ -114,17 +119,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                 viewModel.OrgRegProgramId = orgRegProgramId;
             }
 
-
             try
             {
                 _invitationService.SendUserInvite(orgRegProgramId:viewModel.OrgRegProgramId, email:viewModel.EmailAddress, firstName:viewModel.FirstName,
                                                   lastName:viewModel.LastName, invitationType:viewModel.InvitationType);
                 _logger.Info(message:string.Format(format:"Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
                                                    arg0:viewModel.EmailAddress, arg1:viewModel.FirstName, arg2:viewModel.LastName));
-                TempData["InivteSendSucceed"] = true;
+                TempData[key:"InivteSendSucceed"] = true;
 
                 var redirectUrl = GetRedirectUrl(invitationType:viewModel.InvitationType, orgRegProgramId:viewModel.OrgRegProgramId);
-                return Redirect(redirectUrl); 
+                return Redirect(url:redirectUrl);
             }
             catch (RuleViolationException rve)
             {
@@ -134,7 +138,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model:viewModel);
         }
 
-        private string GetRedirectUrl(InvitationType invitationType, int orgRegProgramId )
+        private string GetRedirectUrl(InvitationType invitationType, int orgRegProgramId)
         {
             switch (invitationType)
             {
@@ -143,6 +147,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case InvitationType.AuthorityToIndustry: return string.Format(format:"/Authority/Industry/{0}/Users", arg0:orgRegProgramId);
                 default: return @"../";
             }
-        } 
+        }
     }
 }

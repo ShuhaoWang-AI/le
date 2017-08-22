@@ -3,9 +3,11 @@ using System.Xml.Serialization;
 
 namespace Linko.LinkoExchange.Services.Report.DataXML
 {
-    [XmlRoot("Cor")]
+    [XmlRoot(elementName:"Cor")]
     public class CopyOfRecordDataXml
     {
+        #region public properties
+
         public XmlFileVersion XmlFileVersion { get; set; }
         public ReportHeader ReportHeader { get; set; }
         public SubmittedTo SubmittedTo { get; set; }
@@ -15,5 +17,7 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public List<Certification> Certifications { get; set; }
         public string Comment { get; set; }
         public List<SampleNode> Samples { get; set; }
+
+        #endregion
     }
 }

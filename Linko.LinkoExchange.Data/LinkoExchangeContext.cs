@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration;
+using System.Linq;
+using System.Reflection;
 using Linko.LinkoExchange.Core.Domain;
 using Microsoft.AspNet.Identity.EntityFramework;
-using System.Reflection;
-using System.Linq;
-using System.Data.Entity.ModelConfiguration;
+using Module = Linko.LinkoExchange.Core.Domain.Module;
+using TimeZone = Linko.LinkoExchange.Core.Domain.TimeZone;
 
 namespace Linko.LinkoExchange.Data
 {
     public class LinkoExchangeContext : IdentityDbContext<UserProfile>
     {
-        #region constructor
+        #region constructors and destructor
 
         public LinkoExchangeContext(string nameOrConnectionString)
-            : base(nameOrConnectionString)
+            : base(nameOrConnectionString:nameOrConnectionString)
         {
             // Disable database initialization when the DB is not found
-            Database.SetInitializer<LinkoExchangeContext>(null);
+            Database.SetInitializer<LinkoExchangeContext>(strategy:null);
         }
 
         #endregion
-
 
         #region DbSets
 
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<EmailAuditLog> EmailAuditLogs { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Jurisdiction> Jurisdictions { get; set; }
-        public DbSet<Core.Domain.Module> Modules { get; set; }
+        public DbSet<Module> Modules { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
         public DbSet<OrganizationRegulatoryProgramModule> OrganizationRegulatoryProgramModules { get; set; }
@@ -50,7 +51,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<SignatoryRequest> SignatoryRequests { get; set; }
         public DbSet<SignatoryRequestStatus> SignatoryRequestStatuses { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
-        public DbSet<Core.Domain.TimeZone> TimeZones { get; set; }
+        public DbSet<TimeZone> TimeZones { get; set; }
         public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
 
@@ -98,26 +99,27 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportSample> ReportSamples { get; set; }
         public DbSet<TermCondition> TermConditions { get; set; }
         public DbSet<PrivacyPolicy> PrivacyPolicies { get; set; }
-        #endregion
 
+        #endregion
 
         #region utilities
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             var typesToRegister = Assembly.GetExecutingAssembly().GetTypes()
-                                                                .Where(type => !String.IsNullOrEmpty(type.Namespace))
-                                                                .Where(type => type.BaseType != null && type.BaseType.IsGenericType &&
-                                                                               type.BaseType.GetGenericTypeDefinition() == typeof(EntityTypeConfiguration<>));
+                                          .Where(type => !string.IsNullOrEmpty(value:type.Namespace))
+                                          .Where(type => type.BaseType != null
+                                                         && type.BaseType.IsGenericType
+                                                         && type.BaseType.GetGenericTypeDefinition() == typeof(EntityTypeConfiguration<>));
             foreach (var type in typesToRegister)
             {
-                dynamic configurationInstance = Activator.CreateInstance(type);
+                dynamic configurationInstance = Activator.CreateInstance(type:type);
                 modelBuilder.Configurations.Add(configurationInstance);
             }
 
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder:modelBuilder);
 
-            modelBuilder.Entity<UserProfile>().ToTable("tUserProfile");
+            modelBuilder.Entity<UserProfile>().ToTable(tableName:"tUserProfile");
         }
 
         public virtual DbContextTransaction BeginTransaction()
@@ -127,14 +129,12 @@ namespace Linko.LinkoExchange.Data
 
         public void Commit(DbContextTransaction transaction)
         {
-            if (transaction != null)
-                transaction.Commit();
+            transaction?.Commit();
         }
 
         public void Rollback(DbContextTransaction transaction)
         {
-            if (transaction != null)
-                transaction.Commit();
+            transaction?.Commit();
         }
 
         #endregion

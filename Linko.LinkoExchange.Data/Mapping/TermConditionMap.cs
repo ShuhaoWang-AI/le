@@ -6,11 +6,13 @@ namespace Linko.LinkoExchange.Data.Mapping
 {
     public class TermConditionMap : EntityTypeConfiguration<TermCondition>
     {
+        #region constructors and destructor
+
         public TermConditionMap()
         {
-            ToTable("tTermCondition");
+            ToTable(tableName:"tTermCondition");
 
-            Property(x => x.TermConditionId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.TermConditionId).IsRequired().HasDatabaseGeneratedOption(databaseGeneratedOption:DatabaseGeneratedOption.Identity);
 
             Property(x => x.Content).IsRequired();
 
@@ -18,5 +20,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

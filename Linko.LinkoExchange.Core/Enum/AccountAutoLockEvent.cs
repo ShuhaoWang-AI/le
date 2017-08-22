@@ -6,7 +6,7 @@
         ExceededKBQMaxAnswerAttemptsDuringPasswordReset,
         ExceededKBQMaxAnswerAttemptsDuringProfileAccess,
         ExceededPasswordMaxAttemptsDuringSignatureCeremony,
-        ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony, 
+        ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony,
 
         ExceededPasswordMaxAttemptsDuringRepudiationCeremony,
         ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony

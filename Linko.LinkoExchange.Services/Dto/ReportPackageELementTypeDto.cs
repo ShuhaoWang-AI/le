@@ -4,12 +4,14 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageElementTypeDto
     {
+        #region public properties
+
         public int ReportPackageElementTypeId { get; set; }
         public int ReportPackageElementCategoryId { get; set; }
         public int ReportElementTypeId { get; set; }
         public string ReportElementTypeName { get; set; }
         public string ReportElementTypeContent { get; set; }
-        
+
         public bool ReportElementTypeIsContentProvided { get; set; }
         public int? CtsEventTypeId { get; set; }
         public string CtsEventTypeName { get; set; }
@@ -19,5 +21,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public List<SampleDto> Samples { get; set; }
         public List<FileStoreDto> FileStores { get; set; }
+
+        #endregion
     }
 }

@@ -1,5 +1,4 @@
-﻿
-namespace Linko.LinkoExchange.Services.Config
+﻿namespace Linko.LinkoExchange.Services.Config
 {
     public interface IConfigSettingService
     {

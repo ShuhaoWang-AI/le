@@ -14,15 +14,11 @@ namespace Linko.LinkoExchange.Core.Logging
 
         #endregion
 
-
-        #region public properties
+        #region interface implementations
 
         /// <summary>
         /// </summary>
-        public PeekableStack<Type> TypeStack
-        {
-            get { return _typeStack; }
-        }
+        public PeekableStack<Type> TypeStack => _typeStack;
 
         #endregion
     }

@@ -1,14 +1,16 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Core.Enum;
 
-[assembly: InternalsVisibleTo("Linko.LinkoExchange.Test")]
+[assembly:InternalsVisibleTo(assemblyName:"Linko.LinkoExchange.Test")]
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class SampleDto
     {
+        #region public properties
+
         public int? SampleId { get; set; }
         public string Name { get; set; } //UI should only read this as it is automatically set based on settings
         public int MonitoringPointId { get; set; }
@@ -45,6 +47,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
 
         public DateTime? LastSubmissionDateTimeLocal { get; internal set; }
+
+        #endregion
     }
 }
-

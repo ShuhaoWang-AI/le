@@ -7,12 +7,12 @@ namespace Linko.LinkoExchange.Web.Extensions
     {
         /// <summary>
         /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="controllers"></param>
-        /// <param name="actions"></param>
-        /// <param name="routeValueTag"></param>
-        /// <param name="cssClass"></param>
-        /// <returns></returns>
+        /// <param name="htmlHelper"> </param>
+        /// <param name="controllers"> </param>
+        /// <param name="actions"> </param>
+        /// <param name="routeValueTag"> </param>
+        /// <param name="cssClass"> </param>
+        /// <returns> </returns>
         public static string IsActive(this HtmlHelper htmlHelper, string controllers = "", string actions = "", string routeValueTag = null, string cssClass = "active")
         {
             var viewContext = htmlHelper.ViewContext;

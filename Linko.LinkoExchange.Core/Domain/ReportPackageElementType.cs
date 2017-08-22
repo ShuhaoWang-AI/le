@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a specific Report Element Type for a Report Element Category within a Report Package.
+    ///     Represents a specific Report Element Type for a Report Element Category within a Report Package.
     /// </summary>
-    public partial class ReportPackageElementType
+    public class ReportPackageElementType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportPackageElementTypeId { get; set; }
 
@@ -18,32 +20,32 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ReportElementTypeId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string ReportElementTypeName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string ReportElementTypeContent { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public bool ReportElementTypeIsContentProvided { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public int? CtsEventTypeId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string CtsEventTypeName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string CtsEventCategoryName { get; set; }
 
@@ -51,10 +53,11 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int SortOrder { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<ReportSample> ReportSamples { get; set; }
 
         public virtual ICollection<ReportFile> ReportFiles { get; set; }
+
+        #endregion
     }
 }

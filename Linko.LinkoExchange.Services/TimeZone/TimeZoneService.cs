@@ -1,22 +1,28 @@
-﻿using Linko.LinkoExchange.Core.Enum;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Settings;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 
 namespace Linko.LinkoExchange.Services.TimeZone
 {
     public class TimeZoneService : ITimeZoneService
     {
-        private readonly LinkoExchangeContext _dbContext;
-        private readonly ISettingService _settings;
-        private readonly IMapHelper _mapHelper;
+        #region fields
+
         private readonly IApplicationCache _appCache;
+        private readonly LinkoExchangeContext _dbContext;
+        private readonly IMapHelper _mapHelper;
+        private readonly ISettingService _settings;
+
+        #endregion
+
+        #region constructors and destructor
 
         public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper, IApplicationCache appCache)
         {
@@ -26,108 +32,115 @@ namespace Linko.LinkoExchange.Services.TimeZone
             _appCache = appCache;
         }
 
+        #endregion
+
+        #region interface implementations
+
         public string GetTimeZoneName(int timeZoneId)
         {
-            string cacheKey = $"TimeZoneId-{timeZoneId}";
-            if (_appCache.Get(cacheKey) == null)
+            var cacheKey = $"TimeZoneId-{timeZoneId}";
+            if (_appCache.Get(key:cacheKey) == null)
             {
                 var cacheItem = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId).Name;
-                int cacheDurationHours = int.Parse(ConfigurationManager.AppSettings[name: "TimeZoneNameCacheDurationHours"]);
-                _appCache.Insert(cacheKey, cacheItem, cacheDurationHours);
+                var cacheDurationHours = int.Parse(s:ConfigurationManager.AppSettings[name:"TimeZoneNameCacheDurationHours"]);
+                _appCache.Insert(key:cacheKey, item:cacheItem, hours:cacheDurationHours);
             }
 
-            return (string)_appCache.Get(cacheKey);
+            return (string) _appCache.Get(key:cacheKey);
         }
 
         public TimeZoneDto GetTimeZone(int timeZoneId)
         {
             var timeZone = _dbContext.TimeZones
-                .Single(t => t.TimeZoneId == timeZoneId);
+                                     .Single(t => t.TimeZoneId == timeZoneId);
 
-            var timeZoneDto = new TimeZoneDto() {
-                Name = timeZone.Name,
-                StandardAbbreviation = timeZone.StandardAbbreviation,
-                DaylightAbbreviation = timeZone.DaylightAbbreviation
-            };
+            var timeZoneDto = new TimeZoneDto
+                              {
+                                  Name = timeZone.Name,
+                                  StandardAbbreviation = timeZone.StandardAbbreviation,
+                                  DaylightAbbreviation = timeZone.DaylightAbbreviation
+                              };
 
-            return (timeZoneDto);
+            return timeZoneDto;
         }
 
         public ICollection<TimeZoneDto> GetTimeZones()
         {
             var dtos = new List<TimeZoneDto>();
-            foreach (Core.Domain.TimeZone timeZone in _dbContext.TimeZones)
+            foreach (var timeZone in _dbContext.TimeZones)
             {
-                dtos.Add(_mapHelper.GetTimeZoneDtoFromTimeZone(timeZone));
+                dtos.Add(item:_mapHelper.GetTimeZoneDtoFromTimeZone(timeZone:timeZone));
             }
-            dtos = dtos.OrderBy(t => TimeZoneInfo.FindSystemTimeZoneById(t.Name).BaseUtcOffset).ToList();
+
+            dtos = dtos.OrderBy(t => TimeZoneInfo.FindSystemTimeZoneById(id:t.Name).BaseUtcOffset).ToList();
             return dtos;
         }
 
         public DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgId, int regProgramId)
         {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgId, regProgramId, SettingType.TimeZone));
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
+            var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(organizationId:orgId, regProgramId:regProgramId, settingType:SettingType.TimeZone));
+            var authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(id:GetTimeZoneName(timeZoneId:timeZoneId));
+            return TimeZoneInfo.ConvertTimeFromUtc(dateTime:utcDateTime, destinationTimeZone:authorityLocalZone);
         }
 
         public DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId)
         {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
+            var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:orgRegProgramId, settingType:SettingType.TimeZone));
+            var authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(id:GetTimeZoneName(timeZoneId:timeZoneId));
+            return TimeZoneInfo.ConvertTimeFromUtc(dateTime:utcDateTime, destinationTimeZone:authorityLocalZone);
         }
 
         public string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, DateTime datetime, bool abbreviationName)
         {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
+            var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:orgRegProgramId, settingType:SettingType.TimeZone));
 
             var leTimeZone = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId);
 
-            return GetTimeZoneNameUsingThisTimeZone(leTimeZone, datetime, abbreviationName);
+            return GetTimeZoneNameUsingThisTimeZone(leTimeZone:leTimeZone, datetime:datetime, abbreviationName:abbreviationName);
         }
 
         public string GetTimeZoneNameUsingThisTimeZone(Core.Domain.TimeZone leTimeZone, DateTime datetime, bool abbreviationName)
         {
             if (abbreviationName)
             {
-                if (TimeZoneInfo.Local.IsAmbiguousTime(datetime) || TimeZoneInfo.Local.IsDaylightSavingTime(datetime))
+                if (TimeZoneInfo.Local.IsAmbiguousTime(dateTime:datetime) || TimeZoneInfo.Local.IsDaylightSavingTime(dateTime:datetime))
                 {
                     return leTimeZone.DaylightAbbreviation;
                 }
+
                 return leTimeZone.StandardAbbreviation;
             }
 
-            var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(leTimeZone.Name);
-            return timezoneInfo.DisplayName.Substring(timezoneInfo.DisplayName.IndexOf(" ") + 1);
+            var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(id:leTimeZone.Name);
+            return timezoneInfo.DisplayName.Substring(startIndex:timezoneInfo.DisplayName.IndexOf(value:" ") + 1);
         }
 
         public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
         {
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
+            var authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(id:GetTimeZoneName(timeZoneId:timeZoneId));
+            return TimeZoneInfo.ConvertTimeFromUtc(dateTime:utcDateTime, destinationTimeZone:authorityLocalZone);
         }
 
         public DateTimeOffset GetDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
         {
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            TimeZoneInfo serverTimeZone = TimeZoneInfo.Local;
+            var authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(id:GetTimeZoneName(timeZoneId:timeZoneId));
+            var serverTimeZone = TimeZoneInfo.Local;
 
-            while (authorityLocalZone.IsAmbiguousTime(localDateTime) || authorityLocalZone.IsInvalidTime(localDateTime))
+            while (authorityLocalZone.IsAmbiguousTime(dateTime:localDateTime) || authorityLocalZone.IsInvalidTime(dateTime:localDateTime))
             {
-                localDateTime = localDateTime.AddHours(1);
+                localDateTime = localDateTime.AddHours(value:1);
             }
 
-            var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(localDateTime, authorityLocalZone);
-            return (new DateTimeOffset(utcDateTime).ToOffset(serverTimeZone.GetUtcOffset(utcDateTime)));
-
+            var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime:localDateTime, sourceTimeZone:authorityLocalZone);
+            return new DateTimeOffset(dateTime:utcDateTime).ToOffset(offset:serverTimeZone.GetUtcOffset(dateTime:utcDateTime));
         }
 
         public DateTimeOffset GetDateTimeOffsetFromLocalUsingThisOrg(DateTime localDateTime, int orgRegProgramId)
         {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            return (GetDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
+            var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:orgRegProgramId, settingType:SettingType.TimeZone));
+            return GetDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime:localDateTime, timeZoneId:timeZoneId);
         }
 
+        #endregion
     }
 }

@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a type of a limit.
+    ///     Represents a type of a limit.
     /// </summary>
     public class LimitType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int LimitTypeId { get; set; }
 
@@ -21,5 +23,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

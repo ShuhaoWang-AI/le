@@ -11,6 +11,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     [Validator(validatorType:typeof(ReportElementTypeViewModelValidator))]
     public class ReportElementTypeViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
@@ -35,8 +37,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "CTS Event Type")]
         public string CtsEventTypeName { get; set; }
+
         public IList<SelectListItem> AvailableCtsEventTypes { get; set; }
-        
+
         [Display(Name = "CTS Event Type Category")]
         public string CtsCategoryName { get; set; }
 
@@ -46,16 +49,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
 
+        #endregion
     }
 
-    public partial class ReportElementTypeViewModelValidator:AbstractValidator<ReportElementTypeViewModel>
+    public class ReportElementTypeViewModelValidator : AbstractValidator<ReportElementTypeViewModel>
     {
+        #region constructors and destructor
+
         public ReportElementTypeViewModelValidator()
         {
             //Name
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+
             //Content for Certification
-            RuleFor(x => x.Content).NotEmpty().When(x => x.CategoryName == ReportElementCategoryName.Certifications).WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.Content).NotEmpty().When(x => x.CategoryName == ReportElementCategoryName.Certifications).WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }

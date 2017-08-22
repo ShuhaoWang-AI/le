@@ -3,17 +3,19 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a report status.
+    ///     Represents a report status.
     /// </summary>
-    public partial class ReportStatus
+    public class ReportStatus
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportStatusId { get; set; }
 
         /// <summary>
-        /// Unique.
+        ///     Unique.
         /// </summary>
         public string Name { get; set; }
 
@@ -24,6 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

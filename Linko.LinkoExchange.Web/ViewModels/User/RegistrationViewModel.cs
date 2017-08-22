@@ -1,13 +1,15 @@
-﻿using FluentValidation;
+﻿using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
-using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.ViewModels.User
 {
-    [Validator(typeof(RegistrationValidator))]
+    [Validator(validatorType:typeof(RegistrationValidator))]
     public class RegistrationViewModel : UserViewModel
     {
+        #region public properties
+
         public string Token { get; set; }
 
         [Display(Name = "Agree To Terms And Conditions")]
@@ -24,15 +26,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Display(Name = "Facility")]
         public string IndustryName { get; set; }
+
         public RegistrationType RegistrationType { get; set; }
+
+        #endregion
     }
 
-    public partial class RegistrationValidator : AbstractValidator<RegistrationViewModel>
+    public class RegistrationValidator : AbstractValidator<RegistrationViewModel>
     {
+        #region constructors and destructor
+
         public RegistrationValidator()
         {
-            RuleFor(x => x.Token).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
-            RuleFor(x => x.AgreeTermsAndConditions).NotEqual(false).WithMessage(errorMessage: "You must agree terms and conditions.");
+            RuleFor(x => x.Token).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            RuleFor(x => x.AgreeTermsAndConditions).NotEqual(toCompare:false).WithMessage(errorMessage:"You must agree terms and conditions.");
         }
+
+        #endregion
     }
 }

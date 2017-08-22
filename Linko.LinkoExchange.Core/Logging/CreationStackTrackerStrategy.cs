@@ -18,11 +18,10 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </returns>
         private object ReportStack(PeekableStack<Type> typeStack)
         {
-            return string.Join (separator: ", ", values: typeStack.Items.Select(s => s.Name));
+            return string.Join(separator:", ", values:typeStack.Items.Select(s => s.Name));
         }
 
         #endregion
-
 
         #region public methods and operators
 
@@ -32,14 +31,14 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public override void PostBuildUp(IBuilderContext context)
         {
-            ICreationStackTrackerPolicy policy = context.Policies.Get<ICreationStackTrackerPolicy> (buildKey: null, localOnly: true);
+            var policy = context.Policies.Get<ICreationStackTrackerPolicy>(buildKey:null, localOnly:true);
 
             if (policy.TypeStack.Count > 0)
             {
-                policy.TypeStack.Pop ();
+                policy.TypeStack.Pop();
             }
 
-            base.PostBuildUp (context);
+            base.PostBuildUp(context:context);
         }
 
         /// <summary>
@@ -48,16 +47,16 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public override void PreBuildUp(IBuilderContext context)
         {
-            ICreationStackTrackerPolicy policy = context.Policies.Get<ICreationStackTrackerPolicy> (buildKey: null, localOnly: true);
+            var policy = context.Policies.Get<ICreationStackTrackerPolicy>(buildKey:null, localOnly:true);
             if (policy == null)
             {
-                context.Policies.Set (typeof(ICreationStackTrackerPolicy), new CreationStackTrackerPolicy(), buildKey: null);
-                policy = context.Policies.Get<ICreationStackTrackerPolicy> (buildKey: null, localOnly: true);
+                context.Policies.Set(policyInterface:typeof(ICreationStackTrackerPolicy), policy:new CreationStackTrackerPolicy(), buildKey:null);
+                policy = context.Policies.Get<ICreationStackTrackerPolicy>(buildKey:null, localOnly:true);
             }
 
-            policy.TypeStack.Push (context.BuildKey.Type);
+            policy.TypeStack.Push(obj:context.BuildKey.Type);
 
-            base.PreBuildUp (context);
+            base.PreBuildUp(context:context);
         }
 
         #endregion

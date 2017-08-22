@@ -3,11 +3,15 @@ using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class CommonController:Controller
+    public class CommonController : Controller
     {
+        #region fields
+
         private readonly ILogger _logger;
 
-        #region constructor
+        #endregion
+
+        #region constructors and destructor
 
         public CommonController(ILogger logger)
         {

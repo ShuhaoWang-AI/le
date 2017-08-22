@@ -1,27 +1,29 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class OrganizationSettingMap : EntityTypeConfiguration<OrganizationSetting>
     {
+        #region constructors and destructor
+
         public OrganizationSettingMap()
         {
-            ToTable("tOrganizationSetting");
+            ToTable(tableName:"tOrganizationSetting");
 
             HasKey(x => x.OrganizationSettingId);
 
             HasRequired(a => a.Organization)
                 .WithMany(b => b.OrganizationSettings)
                 .HasForeignKey(c => c.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(a => a.SettingTemplate)
                 .WithMany(b => b.OrganizationSettings)
                 .HasForeignKey(c => c.SettingTemplateId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
-            Property(x => x.Value).IsRequired().HasMaxLength(500);
+            Property(x => x.Value).IsRequired().HasMaxLength(value:500);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
@@ -29,5 +31,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

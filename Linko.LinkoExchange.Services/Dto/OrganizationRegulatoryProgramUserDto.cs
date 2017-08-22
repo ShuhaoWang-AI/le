@@ -4,6 +4,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class OrganizationRegulatoryProgramUserDto
     {
+        #region public properties
+
         public int OrganizationRegulatoryProgramUserId { get; set; }
         public int UserProfileId { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
@@ -18,5 +20,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public UserDto UserProfileDto { get; set; }
         public virtual OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
         public virtual OrganizationRegulatoryProgramDto InviterOrganizationRegulatoryProgramDto { get; set; }
+
+        #endregion
     }
 }

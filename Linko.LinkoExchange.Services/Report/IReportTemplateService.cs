@@ -12,18 +12,18 @@ namespace Linko.LinkoExchange.Services.Report
         int SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
 
         /// <summary>
-        /// Returns a collection of CTS event types associated with the authority of the current regulatory program.
-        /// Can optionally filter for event types in the "sample" category.
+        ///     Returns a collection of CTS event types associated with the authority of the current regulatory program.
+        ///     Can optionally filter for event types in the "sample" category.
         /// </summary>
-        /// <param name="isForSample"></param>
-        /// <returns></returns>
+        /// <param name="isForSample"> </param>
+        /// <returns> </returns>
         IEnumerable<CtsEventTypeDto> GetCtsEventTypes(bool isForSample);
 
         /// <summary>
-        /// Gets a specific CTS event type with its date/time fields localized to the current regulatory program's authority.
+        ///     Gets a specific CTS event type with its date/time fields localized to the current regulatory program's authority.
         /// </summary>
-        /// <param name="ctsEventTypeId"></param>
-        /// <returns></returns>
+        /// <param name="ctsEventTypeId"> </param>
+        /// <returns> </returns>
         CtsEventTypeDto GetCtsEventType(int ctsEventTypeId);
 
         IEnumerable<ReportElementTypeDto> GetCertificationTypes();
@@ -31,6 +31,5 @@ namespace Linko.LinkoExchange.Services.Report
         IEnumerable<ReportElementTypeDto> GetSampleAndResultTypes();
         IEnumerable<ReportElementCategoryDto> GetReportElementCategories();
         IEnumerable<ReportElementCategoryName> GetReportElementCategoryNames();
-        
     }
 }

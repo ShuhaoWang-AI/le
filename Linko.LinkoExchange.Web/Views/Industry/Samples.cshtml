@@ -7,19 +7,19 @@
 <section>
     <ol class="breadcrumb">
         <li>
-            <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
         </li>
-        <li class="active">Samples - @Label.ResourceManager.GetString(name: ViewBag.SampleStatusName.ToString())</li>
+        <li class="active">Samples - @Label.ResourceManager.GetString(name:ViewBag.SampleStatusName.ToString())</li>
     </ol>
 </section>
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Samples - @Label.ResourceManager.GetString(name: ViewBag.SampleStatusName.ToString())</h3>
+        <h3 class="box-title">Samples - @Label.ResourceManager.GetString(name:ViewBag.SampleStatusName.ToString())</h3>
         <div class="box-tools pull-right">
             @if (ViewBag.SampleStatusName == SampleStatusName.Draft)
             {
-                <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName: "NewSampleDetailsStep1", controllerName: "Industry")'">
+                <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")'">
                     Create New
                 </button>
             }
@@ -28,16 +28,16 @@
             </button>
         </div>
     </div>
-    
+
     <div>
         @{
             var vm = new ConfirmationMessageViewModal
-            {
-                ShowMessage = TempData["SampleDeleteSucceed"] != null,
-                Messaage = "Sample deleted successfully."
-            };
+                     {
+                         ShowMessage = TempData[key:"SampleDeleteSucceed"] != null,
+                         Messaage = "Sample deleted successfully."
+                     };
 
-            @Html.Partial("_ConfirmationMessageView", vm);
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
     </div>
 
@@ -46,153 +46,153 @@
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<SampleViewModel>()
-                      .Name(componentName: "gridSample")
+                      .Name(componentName:"gridSample")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.MonitoringPointName)
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                       .SuggestionOperator(filterType: FilterType.Contains));
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.CtsEventTypeName)
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                       .SuggestionOperator(filterType: FilterType.Contains));
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.CollectionMethodName)
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                       .SuggestionOperator(filterType: FilterType.Contains));
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.StartDateTimeLocal)
-                                 .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Enabled(value: true).Extra(value: true);
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.EndDateTimeLocal)
-                                 .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Enabled(value: true).Extra(value: true);
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Enabled(value: true).Extra(value: true);
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Filterable(ftb =>
-                                 {
-                                     if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                     {
-                                         ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                       .SuggestionOperator(filterType: FilterType.Contains));
-                                     }
-                                     else
-                                     {
-                                         ftb.Enabled(value: false);
-                                     }
-                                 });
-                          columns.Template(m => { })
-                                 .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth: 60);
-                      })
+                               {
+                                   columns.Bound(c => c.MonitoringPointName)
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                   .SuggestionOperator(filterType:FilterType.Contains));
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.CtsEventTypeName)
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                   .SuggestionOperator(filterType:FilterType.Contains));
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.CollectionMethodName)
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                   .SuggestionOperator(filterType:FilterType.Contains));
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.StartDateTimeLocal)
+                                          .ClientTemplate(value:"#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Enabled(value:true).Extra(value:true);
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.EndDateTimeLocal)
+                                          .ClientTemplate(value:"#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Enabled(value:true).Extra(value:true);
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Enabled(value:true).Extra(value:true);
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Filterable(ftb =>
+                                                      {
+                                                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                          {
+                                                              ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                   .SuggestionOperator(filterType:FilterType.Contains));
+                                                          }
+                                                          else
+                                                          {
+                                                              ftb.Enabled(value:false);
+                                                          }
+                                                      });
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
-                                                .PageSizes(pageSizes: new List<object> {"all", 15, 25, 50, 75})
-                                                .Refresh(enabled: true)
-                                                .Input(enabled: true)
-                                                .Numeric(enabled: false)
+                                                .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode: GridSelectionMode.Single);
-                          selectable.Type(type: GridSelectionType.Row);
-                      })
-                      .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable =>
-                      {
-                          if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                          {
-                              filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
-                          }
-                          else
-                          {
-                              filterable.Enabled(value: false);
-                          }
-                      })
-                      .Resizable(resizable => resizable.Columns(value: true))
-                      .Scrollable(s => s.Height(value: "auto"))
-                      .NoRecords(text: "No sample exists.")
-                      .Events(events => { events.Change(handler: "gotoNextPageSample"); })
+                                  {
+                                      if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                      {
+                                          filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
+                                      }
+                                      else
+                                      {
+                                          filterable.Enabled(value:false);
+                                      }
+                                  })
+                      .Resizable(resizable => resizable.Columns(value:true))
+                      .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text:"No sample exists.")
+                      .Events(events => { events.Change(handler:"gotoNextPageSample"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled: true)
-                                                    .Batch(enabled: true)
+                                                    .ServerOperation(enabled:true)
+                                                    .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                    {
-                                                        if (ViewBag.SampleStatusName == SampleStatusName.Reported)
-                                                        {
-                                                            sort.Add(memberName: "StartDateTimeLocal").Descending();
-                                                        }
-                                                        else
-                                                        {
-                                                            sort.Add(memberName: "StartDateTimeLocal").Ascending();
-                                                        }
-                                                        sort.Add(memberName: "MonitoringPointName").Ascending();
-                                                        sort.Add(memberName: "CollectionMethodName").Ascending();
-                                                    }) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName: "Samples_Read", controllerName: "Industry", routeValues: new
-                                                    {
-                                                        sampleStatus = ViewBag.SampleStatusName
-                                                    }))
-                                                    .PageSize(pageSize: 15)
-                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridSample'})"))
+                                                          {
+                                                              if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                              {
+                                                                  sort.Add(memberName:"StartDateTimeLocal").Descending();
+                                                              }
+                                                              else
+                                                              {
+                                                                  sort.Add(memberName:"StartDateTimeLocal").Ascending();
+                                                              }
+                                                              sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                              sort.Add(memberName:"CollectionMethodName").Ascending();
+                                                          }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"Samples_Read", controllerName:"Industry", routeValues:new
+                                                                                                                                                {
+                                                                                                                                                    sampleStatus = ViewBag.SampleStatusName
+                                                                                                                                                }))
+                                                    .PageSize(pageSize:15)
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridSample'})"))
                       )
                       )
             </div>
@@ -205,7 +205,7 @@
         gotoNextPageSample = function()
         {
             var grid = $("#gridSample").data("kendoGrid");
-            var postUrl = "@Url.Action(actionName: "Samples_Select", controllerName: "Industry")";
+            var postUrl = "@Url.Action(actionName:"Samples_Select", controllerName:"Industry")";
 
             doAjaxAction(grid, postUrl, "", "Select a samples");
         }

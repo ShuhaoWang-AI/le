@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
-using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
@@ -23,13 +22,14 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
-    public class InvitationService:IInvitationService
+    public class InvitationService : IInvitationService
     {
         #region fields
 
         private readonly ICromerrAuditLogService _crommerAuditLogService;
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
+        private readonly IJurisdictionService _jurisdictionService;
         private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly ISettingService _settingService;
         private readonly ITimeZoneService _timeZones;
         private readonly IUserService _userService;
-        private readonly IJurisdictionService _jurisdictionService;
+
         #endregion
 
         #region constructors and destructor
@@ -111,8 +111,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                     cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
                     cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ??
-                                                                      cromerrAuditLogEntryDto.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = user.UserName;
                     cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
@@ -165,7 +164,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             return invitationDto;
         }
-        
+
         public ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int senderOrgRegProgramId, int targetOrgRegProgramId)
         {
             var dtos = new List<InvitationDto>();
@@ -181,26 +180,24 @@ namespace Linko.LinkoExchange.Services.Invitation
                                     .Where(i => i.SenderOrganizationRegulatoryProgramId == senderOrgRegProgramId
                                                 && i.RecipientOrganizationRegulatoryProgramId == targetOrgRegProgramId);
 
-   
-                foreach (var invite in invites)
-                {
-                    var dto = _mapHelper.GetInvitationDtoFromInvitation(invitation:invite);
+            foreach (var invite in invites)
+            {
+                var dto = _mapHelper.GetInvitationDtoFromInvitation(invitation:invite);
 
-                    //Get expiry
-                    var addExpiryHours =
-                        Convert.ToInt32(value:
-                                        _settingService.GetOrganizationSettingValue(organizationId:authority.OrganizationId, regProgramId:org.RegulatoryProgramId,
-                                                                                    settingType:SettingType.InvitationExpiredHours));
+                //Get expiry
+                var addExpiryHours =
+                    Convert.ToInt32(value:
+                                    _settingService.GetOrganizationSettingValue(organizationId:authority.OrganizationId, regProgramId:org.RegulatoryProgramId,
+                                                                                settingType:SettingType.InvitationExpiredHours));
 
-                    //Need to modify date time to local
-                    dto.InvitationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(
-                                                                                                      utcDateTime:dto.InvitationDateTimeUtc.UtcDateTime,
-                                                                                                      orgId:authority.OrganizationId, regProgramId:org.RegulatoryProgramId);
-                    dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(hours:addExpiryHours);
+                //Need to modify date time to local
+                dto.InvitationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(
+                                                                                                  utcDateTime:dto.InvitationDateTimeUtc.UtcDateTime,
+                                                                                                  orgId:authority.OrganizationId, regProgramId:org.RegulatoryProgramId);
+                dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(hours:addExpiryHours);
 
-                    dtos.Add(item:dto);
-                }
-      
+                dtos.Add(item:dto);
+            }
 
             return dtos;
         }
@@ -210,7 +207,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _logger.Info(message:$"Enter InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
 
             OrganizationRegulatoryProgramUserDto existingUser;
-            
+
             //See if any existing users belong to this program
             var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress:email);
             if (existingProgramUsers.Any())
@@ -230,8 +227,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                         var validationIssues = new List<RuleViolation>();
                         var message = $"Invite failed to send. User with email={email} is already associated with this account";
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-                        throw new RuleViolationException("Validation errors", validationIssues);
+                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                        throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                     }
                     else
                     {
@@ -272,8 +269,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     var validationIssues = new List<RuleViolation>();
                     var message = "Invite failed to send. This industry already has an Administrator User.";
-                    validationIssues.Add(new RuleViolation(string.Empty, null, message));
-                    throw new RuleViolationException("Validation errors", validationIssues);
+                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                 }
             }
 
@@ -286,8 +283,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                 var validationIssues = new List<RuleViolation>();
                 var message = "No more User Licenses are available for this organization. Disable another User and try again.";
-                validationIssues.Add(new RuleViolation(string.Empty, null, message));
-                throw new RuleViolationException("Validation errors", validationIssues);
+                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }
 
             var invitationId = Guid.NewGuid().ToString();
@@ -315,12 +312,12 @@ namespace Linko.LinkoExchange.Services.Invitation
             //Send invite with link
             var contentReplacements = new Dictionary<string, string>();
             var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
-            var authority = _organizationService.GetAuthority(targetOrgRegProgramId);
+            var authority = _organizationService.GetAuthority(orgRegProgramId:targetOrgRegProgramId);
             contentReplacements.Add(key:"firstName", value:firstName);
             contentReplacements.Add(key:"lastName", value:lastName);
-            
 
-            var authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId, settingType:SettingType.EmailContactInfoName);
+            var authorityName =
+                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId, settingType:SettingType.EmailContactInfoName);
             var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
                                                                               settingType:SettingType.EmailContactInfoEmailAddress);
             var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
@@ -338,8 +335,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 contentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
                 contentReplacements.Add(key:"addressLine1", value:targetOrgRegProgram.Organization.AddressLine1);
-                contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName); 
-                contentReplacements.Add(key:"stateName", value: _jurisdictionService.GetJurisdictionById(targetOrgRegProgram.Organization.JurisdictionId)?.Code ?? "");
+                contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName);
+                contentReplacements.Add(key:"stateName",
+                                        value:_jurisdictionService.GetJurisdictionById(jurisdictionId:targetOrgRegProgram.Organization.JurisdictionId)?.Code ?? "");
             }
 
             var baseUrl = _httpContextService.GetRequestBaseUrl();
@@ -357,7 +355,6 @@ namespace Linko.LinkoExchange.Services.Invitation
             cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
 
             cromerrContentReplacements.Add(key:"userName", value:existingUser.UserProfileDto.UserName);
-            
 
             cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
@@ -395,8 +392,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 case InvitationType.IndustryToIndustry:
                     emailType = EmailType.Registration_IndustryInviteIndustryUser;
                     break;
-                default:
-                    throw new Exception(message:"ERROR: unknown EmailType");
+                default: throw new Exception(message:"ERROR: unknown EmailType");
             }
 
             var emailEntry = _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:existingUser, emailType:emailType, contentReplacements:contentReplacements);
@@ -434,7 +430,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     foreach (var subItem in item.ValidationErrors)
                     {
-                        string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
+                        var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                         validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
                     }
                 }

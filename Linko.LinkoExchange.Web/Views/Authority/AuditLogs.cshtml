@@ -99,8 +99,8 @@
                                               .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
                                        columns.Template(m => { })
-                                              .ClientTemplate(value: "<div class='fa fa-chevron-down pull-right'></div>")
-                                              .Width(pixelWidth: 60);
+                                              .ClientTemplate(value:"<div class='fa fa-chevron-down pull-right'></div>")
+                                              .Width(pixelWidth:60);
                                    })
                           .ToolBar(tools => tools.Excel())
                           .Pageable(pageable => pageable
@@ -118,6 +118,7 @@
                           .Filterable(filterable => filterable.Enabled(value:true).Mode(value:GridFilterMode.Row))
                           .Resizable(resizable => resizable.Columns(value:true))
                           .Scrollable(s => s.Height(value:"auto"))
+
                           //.Groupable()
                           .HtmlAttributes(attributes:new
                                                      {
@@ -126,7 +127,7 @@
                           .Excel(excel => excel
                                               .FileName(fileName:"Audit Logs Grid Export.xlsx")
                                               .Filterable(filterable:true)
-                                              .AllPages(true)
+                                              .AllPages(allPages:true)
                                               .ProxyURL(url:Url.Action(actionName:"AuditLogs_Excel_Export_Save", controllerName:"Authority"))
                           )
                           .Events(events => { events.Change(handler:"getLogEntryDetails"); })
@@ -161,7 +162,7 @@
                         <th class="col-md-2">
                             <span class="pull-right">Comment</span>
                         </th>
-                        <td class="col-md-10" colspan="3" id="details-cell-comment" style="white-space: pre-wrap;word-wrap: break-word;max-width: 160px;"></td>
+                        <td class="col-md-10" colspan="3" id="details-cell-comment" style="max-width: 160px; white-space: pre-wrap; word-wrap: break-word;"></td>
                     </tr>
                     <tr>
                         <th class="col-md-2">

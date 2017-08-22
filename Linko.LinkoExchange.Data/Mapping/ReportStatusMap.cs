@@ -1,19 +1,21 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class ReportStatusMap : EntityTypeConfiguration<ReportStatus>
+    public class ReportStatusMap : EntityTypeConfiguration<ReportStatus>
     {
+        #region constructors and destructor
+
         public ReportStatusMap()
         {
-            ToTable("tReportStatus");
+            ToTable(tableName:"tReportStatus");
 
             HasKey(x => x.ReportStatusId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
@@ -21,5 +23,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

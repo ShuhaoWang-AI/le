@@ -8,6 +8,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     [Validator(validatorType:typeof(SampleResultViewModelValidator))]
     public class SampleResultViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Sample Result Id")]
         public int? Id { get; set; }
@@ -41,15 +43,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "EPA Method")]
         public bool IsApprovedEPAMethod { get; set; }
+
         [Display(Name = "EPA Method")]
         public string IsApprovedEPAMethodText => IsApprovedEPAMethod ? "Yes" : "No";
 
         [Display(Name = "Calculate Loading")]
         public bool IsCalcMassLoading { get; set; }
-        
+
         [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Mass Loading Sample Result Id")]
         public int? MassLoadingSampleResultId { get; set; }
+
         public string MassLoadingQualifier { get; set; }
 
         [Display(Name = "Mass Loading Result")]
@@ -57,7 +61,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
+
+        #endregion
     }
 
-    public class SampleResultViewModelValidator:AbstractValidator<SampleResultViewModel> {}
+    public class SampleResultViewModelValidator : AbstractValidator<SampleResultViewModel> { }
 }

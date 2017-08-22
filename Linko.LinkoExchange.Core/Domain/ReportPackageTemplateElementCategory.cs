@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a specific Report Element Category within a Report Package Template.
+    ///     Represents a specific Report Element Category within a Report Package Template.
     /// </summary>
-    public partial class ReportPackageTemplateElementCategory
+    public class ReportPackageTemplateElementCategory
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportPackageTemplateElementCategoryId { get; set; }
 
@@ -16,15 +18,17 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ReportPackageTemplate ReportPackageTemplate { get; set; }
 
         /// <summary>
-        /// Unique within a particular ReportPackageTemplateId.
+        ///     Unique within a particular ReportPackageTemplateId.
         /// </summary>
         public int ReportElementCategoryId { get; set; }
+
         public virtual ReportElementCategory ReportElementCategory { get; set; }
 
         public int SortOrder { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
+
+        #endregion
     }
 }

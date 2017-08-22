@@ -4,26 +4,29 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a static Parameter Group.
+    ///     Represents a static Parameter Group.
     /// </summary>
-    public partial class ParameterGroup
+    public class ParameterGroup
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ParameterGroupId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        ///     Unique within a particular OrganizationRegulatoryProgramId.
         /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// Typical value: Authority Organization Regulatory Program id.
+        ///     Typical value: Authority Organization Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         public bool IsActive { get; set; }
@@ -34,8 +37,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<ParameterGroupParameter> ParameterGroupParameters { get; set; }
+
+        #endregion
     }
 }

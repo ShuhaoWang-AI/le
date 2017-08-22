@@ -1,20 +1,22 @@
-﻿
-namespace Linko.LinkoExchange.Core.Domain
+﻿namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a limit for a certain Parameter in a Monitoring Point.
+    ///     Represents a limit for a certain Parameter in a Monitoring Point.
     /// </summary>
     public class MonitoringPointParameterLimit
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int MonitoringPointParameterLimitId { get; set; }
 
         /// <summary>
-        /// Unique for a certain Limit Type and Limit Basis.
+        ///     Unique for a certain Limit Type and Limit Basis.
         /// </summary>
         public int MonitoringPointParameterId { get; set; }
+
         public virtual MonitoringPointParameter MonitoringPointParameter { get; set; }
 
         public string Name { get; set; }
@@ -22,12 +24,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Description { get; set; }
 
         /// <summary>
-        /// The lower range of a limit, i.e. pH range is 5.5 - 10.5. This would be 5.5.
+        ///     The lower range of a limit, i.e. pH range is 5.5 - 10.5. This would be 5.5.
         /// </summary>
         public double? MinimumValue { get; set; }
 
         /// <summary>
-        /// The upper range of a range or just the limit.
+        ///     The upper range of a range or just the limit.
         /// </summary>
         public double MaximumValue { get; set; }
 
@@ -44,6 +46,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual LimitBasis LimitBasis { get; set; }
 
         public bool IsAlertsOnly { get; set; }
-    }
 
+        #endregion
+    }
 }

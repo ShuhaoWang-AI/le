@@ -1,6 +1,5 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Industry
-@using Linko.LinkoExchange.Web.ViewModels.Shared 
-
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 <section>
     <ol class="breadcrumb">
         <li>
@@ -23,12 +22,12 @@
         <div>
             @{
                 var vm = new ConfirmationMessageViewModal
-                {
-                    ShowMessage = TempData["DeleteUserSucceed"] != null && (bool)TempData["DeleteUserSucceed"] ,
-                    Messaage =  "User Removed!"
-                };
+                         {
+                             ShowMessage = TempData[key:"DeleteUserSucceed"] != null && (bool) TempData[key:"DeleteUserSucceed"],
+                             Messaage = "User Removed!"
+                         };
 
-                @Html.Partial("_ConfirmationMessageView", vm);
+                @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
             }
         </div>
         <div class="form-group">
@@ -68,6 +67,7 @@
                                       selectable.Type(type:GridSelectionType.Row);
                                   })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
@@ -108,76 +108,76 @@
     </div> @*.box-header*@
     <section class="box-body form-horizontal">
         @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-info"})
-        <div> 
+        <div>
             @{
                 vm = new ConfirmationMessageViewModal
-                {
-                    ShowMessage = TempData["InivteSendSucceed"] != null && (bool)TempData["InivteSendSucceed"] ,
-                    Messaage =  "An invitation has been sent."
-                };
+                     {
+                         ShowMessage = TempData[key:"InivteSendSucceed"] != null && (bool) TempData[key:"InivteSendSucceed"],
+                         Messaage = "An invitation has been sent."
+                     };
 
-                @Html.Partial("_ConfirmationMessageView", vm);
+                @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
             }
         </div>
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<PendingInvitationViewModel>()
-                      .Name(componentName: "gridPendingInvitation")
+                      .Name(componentName:"gridPendingInvitation")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.FirstName);
-                          columns.Bound(c => c.LastName);
-                          columns.Bound(c => c.Email);
-                          columns.Bound(c => c.DateInvited).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
-                          columns.Bound(c => c.InviteExpires).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
-                          columns.Command(c =>
-                          {
-                              c.Custom(" ").HtmlAttributes(new
-                              {
-                                  @class = "k-grid-destroy k-icon k-i-close k-delete k-button ",
-                                  type = "text"
-                              })
-                              .Click("confirmDelete");
-                          }).Width(pixelWidth: 100);
-                      })
+                               {
+                                   columns.Bound(c => c.FirstName);
+                                   columns.Bound(c => c.LastName);
+                                   columns.Bound(c => c.Email);
+                                   columns.Bound(c => c.DateInvited).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                                   columns.Bound(c => c.InviteExpires).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                                   columns.Command(c =>
+                                                   {
+                                                       c.Custom(name:" ").HtmlAttributes(attributes:new
+                                                                                                    {
+                                                                                                        @class = "k-grid-destroy k-icon k-i-close k-delete k-button ",
+                                                                                                        type = "text"
+                                                                                                    })
+                                                        .Click(handler:"confirmDelete");
+                                                   }).Width(pixelWidth:100);
+                               })
                       .Pageable(pageable => pageable
-                                                .PageSizes(enabled: true)
-                                                .Refresh(enabled: true)
-                                                .Input(enabled: true)
-                                                .Numeric(enabled: false)
+                                                .PageSizes(enabled:true)
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
                       )
-                      .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false))
-                      .Resizable(resizable => resizable.Columns(value: true))
-                      .Scrollable(s => s.Height(value: "auto"))
-                      .NoRecords(text: "No pending invitation exists.")
-                      .Editable(s=> s.DisplayDeleteConfirmation(false))
+                      .Resizable(resizable => resizable.Columns(value:true))
+                      .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text:"No pending invitation exists.")
+                      .Editable(s => s.DisplayDeleteConfirmation(value:false))
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled: false)
-                                                    .Batch(enabled: true)
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:true)
                                                     .Model(model =>
-                                                    {
-                                                        model.Id(m => m.Id);
-                                                        model.Field(m => m.FirstName);
-                                                        model.Field(m => m.LastName);
-                                                        model.Field(m => m.Email);
-                                                        model.Field(m => m.DateInvited);
-                                                        model.Field(m => m.InviteExpires);
-                                                    })
-                                                    .Sort(sort => sort.Add(memberName: "DateInvited").Ascending()) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Industry"))
-                                                    .Destroy(d => d.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Industry"))
-                                                    .PageSize(pageSize: 10)
-                                                     .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridPendingInvitation'})").RequestEnd(handler: "onRequestEnd"))
+                                                           {
+                                                               model.Id(m => m.Id);
+                                                               model.Field(m => m.FirstName);
+                                                               model.Field(m => m.LastName);
+                                                               model.Field(m => m.Email);
+                                                               model.Field(m => m.DateInvited);
+                                                               model.Field(m => m.InviteExpires);
+                                                           })
+                                                    .Sort(sort => sort.Add(memberName:"DateInvited").Ascending()) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"IndustryUsers_PendingInvitations_Read", controllerName:"Industry"))
+                                                    .Destroy(d => d.Action(actionName:"IndustryUsers_PendingInvitations_Delete", controllerName:"Industry"))
+                                                    .PageSize(pageSize:10)
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridPendingInvitation'})").RequestEnd(handler:"onRequestEnd"))
                       )
-                )
+                      )
             </div>
         </div>
     </section>
 </div>
-
 
 <div aria-labelledby="Delete Pending Invitation" class="col-md-12 fade modal modal-info" id="DeletePendingInvitationModal" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
@@ -190,18 +190,17 @@
                 </p>
                 <div class="form-group">
                     <div class="pull-right">
-                        <button aria-label="Yes" class="btn btn-primary btn-sm" value="Yes" id="YesDelete" type="button">Yes</button>
-                        <button aria-label="Close" class="btn btn-primary btn-sm" id="CancelDelete" data-dismiss="modal" type="button">No</button>
+                        <button aria-label="Yes" class="btn btn-primary btn-sm" id="YesDelete" type="button" value="Yes">Yes</button>
+                        <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" id="CancelDelete" type="button">No</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
- 
 
-@section Scripts { 
-    @Scripts.Render(paths: "~/bundles/pendingInvitations") 
+@section Scripts {
+    @Scripts.Render(paths:"~/bundles/pendingInvitations")
     <script type="text/javascript">
         gotoNextPage = function()
         {
@@ -210,6 +209,6 @@
 
             doAjaxAction(grid, postUrl, "", "Select an user");
         };
- 
+
     </script>
 }

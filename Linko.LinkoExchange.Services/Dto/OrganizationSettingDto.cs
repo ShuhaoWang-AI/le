@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic; 
+﻿using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -17,7 +17,11 @@ namespace Linko.LinkoExchange.Services.Dto
 
     public class OrganizationSettingDto
     {
+        #region public properties
+
         public ICollection<SettingDto> Settings { get; set; }
         public int OrganizationId { get; set; }
+
+        #endregion
     }
 }

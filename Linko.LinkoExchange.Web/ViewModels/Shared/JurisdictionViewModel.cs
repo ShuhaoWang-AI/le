@@ -2,9 +2,13 @@
 {
     public class JurisdictionViewModel
     {
-        public int JurisdictionId { get; set; } 
+        #region public properties
+
+        public int JurisdictionId { get; set; }
         public int CoutnryId { get; set; }
         public string Code { get; set; }
         public string StateName { get; set; }
+
+        #endregion
     }
 }

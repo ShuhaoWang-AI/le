@@ -7,30 +7,30 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
         <title> Unauthorized </title>
 
-        @Styles.Render(paths: "~/Bundles/font-awesome")
-        @Styles.Render(paths: "~/Bundles/css")
+        @Styles.Render(paths:"~/Bundles/font-awesome")
+        @Styles.Render(paths:"~/Bundles/css")
 
         <link href="~/Content/AdminLTE/css/AdminLTE.min.css" rel="stylesheet" />
         <link href="~/Content/AdminLTE/css/skins/skin-blue-light.min.css" rel="stylesheet" />
 
         <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
 
     </head>
-    <body class="hold-transition skin-blue-light fixed sidebar-collapse">
+    <body class="fixed hold-transition sidebar-collapse skin-blue-light">
         <header class="main-header">
-            <div class="logo hidden-xs">&nbsp;</div>
+            <div class="hidden-xs logo">&nbsp;</div>
             <nav class="navbar navbar-static-top" role="navigation">
                 @* BEGIN Logo *@
                 <span>
-                    <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
+                    <a href="@Url.Action(actionName:"Index", controllerName:"Home")">
                         <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
                     </a>
                 </span>
@@ -40,11 +40,11 @@
         <div class="wrapper">
             <div class="content-wrapper">
                 <section class="content">
-                    <div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6 alert alert-error">
+                    <div class="alert alert-error col-lg-6 col-lg-offset-3 col-md-8 col-md-offset-2">
                         <h5>
-                            <i class="icon fa fa-times"></i>
+                            <i class="fa fa-times icon"></i>
                             <span>
-                                Sorry but you do not have permission to access this page.  Please contact your Administrator for assistance.
+                                Sorry but you do not have permission to access this page. Please contact your Administrator for assistance.
                             </span>
                         </h5>
                     </div>
@@ -53,4 +53,3 @@
         </div>
     </body>
 </html>
-

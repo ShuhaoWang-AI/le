@@ -16,7 +16,7 @@
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">@Label.ResourceManager.GetString(name: "Breadcrumb_" + ViewBag.ReportStatusName.ToString())</h3>
+        <h3 class="box-title">@Label.ResourceManager.GetString(name:"Breadcrumb_" + ViewBag.ReportStatusName.ToString())</h3>
         <div class="box-tools pull-right">
             @if (ViewBag.ReportStatusName == ReportStatusName.Draft)
             {
@@ -33,14 +33,14 @@
                                                                                                                         {
                                                                                                                             @class = "alert alert-info"
                                                                                                                         })
-        @{ 
+        @{
             var vm = new ConfirmationMessageViewModal
-            {
-                ShowMessage = TempData["ReportPackageDeletedSucceed"] != null,
-                Messaage =  "Report package deleted successfully."
-            };
+                     {
+                         ShowMessage = TempData[key:"ReportPackageDeletedSucceed"] != null,
+                         Messaage = "Report package deleted successfully."
+                     };
 
-            @Html.Partial("_ConfirmationMessageView", vm);
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
         <div class="form-group">
             <div class="col-md-12">
@@ -48,32 +48,32 @@
                 @(Html.Kendo().Grid<ReportPackageViewModel>()
                       .Name(componentName:"gridReportPackage")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.OrganizationReferenceNumber)
-                                .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.OrganizationName)
-                                .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.Name);
-                          columns.Bound(c => c.PeriodStartDateTimeLocal).Format(value:"{0:MM-dd-yyyy}");
-                          columns.Bound(c => c.PeriodEndDateTimeLocal).Format(value:"{0:MM-dd-yyyy}");
-                          columns.Bound(c => c.SubmissionDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
-                                 .Hidden(value:new[] {"Draft", "ReadyToSubmit"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.Submitter)
-                                 .Hidden(value:new[] {"Draft", "ReadyToSubmit", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.RepudiationDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
-                                 .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "SubmittedPendingReview"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.Repudiator)
-                                 .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
-                                 .Hidden(value:new[] {"Submitted", "Repudiated", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Hidden(value:new[] {"Submitted", "Repudiated", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
-                          columns.Bound(c => c.LastSentDateTimeLocal).Format(value: "{0:MM-dd-yyyy}")
-                                .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated", "SubmittedPendingReview" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
-                          columns.Template(m => { })
-                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:30);
-                      })
+                               {
+                                   columns.Bound(c => c.OrganizationReferenceNumber)
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "Repudiated"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.OrganizationName)
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "Repudiated"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.Name);
+                                   columns.Bound(c => c.PeriodStartDateTimeLocal).Format(value:"{0:MM-dd-yyyy}");
+                                   columns.Bound(c => c.PeriodEndDateTimeLocal).Format(value:"{0:MM-dd-yyyy}");
+                                   columns.Bound(c => c.SubmissionDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.Submitter)
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "SubmittedPendingReview", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.RepudiationDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "SubmittedPendingReview"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.Repudiator)
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "SubmittedPendingReview", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
+                                          .Hidden(value:new[] {"Submitted", "Repudiated", "SubmittedPendingReview", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Hidden(value:new[] {"Submitted", "Repudiated", "SubmittedPendingReview", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Bound(c => c.LastSentDateTimeLocal).Format(value:"{0:MM-dd-yyyy}")
+                                          .Hidden(value:new[] {"Draft", "ReadyToSubmit", "Submitted", "Repudiated", "SubmittedPendingReview"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:30);
+                               })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -81,10 +81,10 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode:GridSelectionMode.Single);
-                          selectable.Type(type:GridSelectionType.Row);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable =>
                       {
@@ -103,29 +103,29 @@
                       .Events(events => { events.Change(handler:"gotoNextPage"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled: true)
+                                                    .ServerOperation(enabled:true)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                    {
-                                                        if (new[] { "Repudiated", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()))
-                                                        {
-                                                            sort.Add(memberName:"RepudiationDateTimeLocal").Descending();
-                                                        }
+                                                          {
+                                                              if (new[] {"Repudiated", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()))
+                                                              {
+                                                                  sort.Add(memberName:"RepudiationDateTimeLocal").Descending();
+                                                              }
 
-                                                        if (new[] {"Submitted", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()))
-                                                        {
-                                                            sort.Add(memberName:"SubmissionDateTimeLocal").Descending();
-                                                        }
-                                                        sort.Add(memberName:"Name").Ascending();
-                                                        sort.Add(memberName:"PeriodStartDateTimeLocal").Ascending();
-                                                        sort.Add(memberName:"PeriodEndDateTimeLocal").Ascending();
-                                                    }) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName: "ReportPackages_Read", controllerName:"ReportPackage", routeValues: new
-                                                    {
-                                                        reportStatus = ViewBag.ReportStatusName
-                                                    }))
+                                                              if (new[] {"Submitted", "SubmittedPendingReview", "RepudiatedPendingReview", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()))
+                                                              {
+                                                                  sort.Add(memberName:"SubmissionDateTimeLocal").Descending();
+                                                              }
+                                                              sort.Add(memberName:"Name").Ascending();
+                                                              sort.Add(memberName:"PeriodStartDateTimeLocal").Ascending();
+                                                              sort.Add(memberName:"PeriodEndDateTimeLocal").Ascending();
+                                                          }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"ReportPackages_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                            {
+                                                                                                                                                                reportStatus = ViewBag.ReportStatusName
+                                                                                                                                                            }))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridReportPackage'})"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridReportPackage'})"))
                       )
                       )
             </div>

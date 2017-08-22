@@ -1,14 +1,23 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class SignInResultDto
     {
-        public string OwinUserId { get;set;}
-        public int UserProfileId { get;set;}
-        public string Token { get; set; }
+        #region fields
+
         public AuthenticationResult AutehticationResult;
-        public IEnumerable<AuthorityDto> RegulatoryList { get; set; } 
+
+        #endregion
+
+        #region public properties
+
+        public string OwinUserId { get; set; }
+        public int UserProfileId { get; set; }
+        public string Token { get; set; }
+        public IEnumerable<AuthorityDto> RegulatoryList { get; set; }
+
+        #endregion
     }
 }

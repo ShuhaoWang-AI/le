@@ -4,104 +4,66 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
     public class IndustryViewModel
     {
-        [ScaffoldColumn(false)]
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Id")]
-        public int Id
-        {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry Number")]
-        public int IndustryNo
-        {
-            get; set;
-        }
+        public int IndustryNo { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry No.")]
         public string ReferenceNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Industry Name")]
-        public string IndustryName
-        {
-            get; set;
-        }
+        public string IndustryName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 1")]
-        public string AddressLine1
-        {
-            get; set;
-        }
+        public string AddressLine1 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 2")]
-        public string AddressLine2
-        {
-            get; set;
-        }
+        public string AddressLine2 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "City")]
-        public string CityName
-        {
-            get; set;
-        }
+        public string CityName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "State")]
-        public string State
-        {
-            get; set;
-        }
+        public string State { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Zip Code")]
-        public string ZipCode
-        {
-            get; set;
-        }
+        public string ZipCode { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address")]
-        public string Address
-        {
-            get
-            {
-                return string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
-            }
-        }
+        public string Address => string.Format(format:"{0} {1}, {2}, {3} {4}", args:new object[] {AddressLine1, AddressLine2, CityName, State, ZipCode});
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Phone Number")]
         [Phone]
-        public string PhoneNumber
-        {
-            get; set;
-        }
+        public string PhoneNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Ext")]
-        public string PhoneExt
-        {
-            get; set;
-        }
+        public string PhoneExt { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Fax Number")]
         [Phone]
-        public string FaxNumber
-        {
-            get; set;
-        }
+        public string FaxNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Website URL")]
-        public string WebsiteUrl
-        {
-            get; set;
-        }       
+        public string WebsiteUrl { get; set; }
+
+        #endregion
     }
 }

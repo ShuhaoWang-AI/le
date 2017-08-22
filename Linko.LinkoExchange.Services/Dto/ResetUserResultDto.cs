@@ -1,5 +1,4 @@
-﻿
-namespace Linko.LinkoExchange.Services.Dto
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public enum ResetUserFailureReason
     {
@@ -10,7 +9,11 @@ namespace Linko.LinkoExchange.Services.Dto
 
     public class ResetUserResultDto
     {
+        #region public properties
+
         public bool IsSuccess { get; set; }
         public ResetUserFailureReason FailureReason { get; set; }
+
+        #endregion
     }
 }

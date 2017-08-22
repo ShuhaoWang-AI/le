@@ -2,14 +2,15 @@
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-
     /// <summary>
-    /// Represents an audit log for Cromerr.
+    ///     Represents an audit log for Cromerr.
     /// </summary>
-    public partial class CromerrAuditLog
+    public class CromerrAuditLog
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int CromerrAuditLogId { get; set; }
 
@@ -39,6 +40,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Comment { get; set; }
 
         public DateTimeOffset LogDateTimeUtc { get; set; }
-    }
 
+        #endregion
+    }
 }

@@ -4,13 +4,15 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a report package.
-    /// It contains a snapshot of most objects contained in this report and hence, they are denormalized.
+    ///     Represents a report package.
+    ///     It contains a snapshot of most objects contained in this report and hence, they are denormalized.
     /// </summary>
-    public partial class ReportPackage
+    public class ReportPackage
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportPackageId { get; set; }
 
@@ -25,12 +27,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? CtsEventTypeId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string CtsEventTypeName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string CtsEventCategoryName { get; set; }
 
@@ -44,73 +46,74 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ReportStatus ReportStatus { get; set; }
 
         /// <summary>
-        /// Typical value: Industry Regulatory Program id.
+        ///     Typical value: Industry Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationReferenceNumber { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationAddressLine1 { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationAddressLine2 { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationCityName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationJurisdictionName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string OrganizationZipCode { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationAddressLine1 { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationAddressLine2 { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationCityName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationJurisdictionName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RecipientOrganizationZipCode { get; set; }
 
@@ -119,24 +122,24 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? SubmitterUserId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmitterFirstName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmitterLastName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmitterTitleRole { get; set; }
 
         public string SubmitterIPAddress { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmitterUserName { get; set; }
 
@@ -145,17 +148,17 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? SubmissionReviewerUserId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmissionReviewerFirstName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmissionReviewerLastName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string SubmissionReviewerTitleRole { get; set; }
 
@@ -166,24 +169,24 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? RepudiatorUserId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiatorFirstName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiatorLastName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiatorTitleRole { get; set; }
 
         public int? RepudiationReasonId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiationReasonName { get; set; }
 
@@ -194,17 +197,17 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? RepudiationReviewerUserId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiationReviewerFirstName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiationReviewerLastName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string RepudiationReviewerTitleRole { get; set; }
 
@@ -215,12 +218,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? LastSenderUserId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string LastSenderFirstName { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     Denormalized data.
         /// </summary>
         public string LastSenderLastName { get; set; }
 
@@ -230,11 +233,11 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<ReportPackageElementCategory> ReportPackageElementCategories { get; set; }
 
         public virtual CopyOfRecord CopyOfRecord { get; set; }
+
+        #endregion
     }
 }
-

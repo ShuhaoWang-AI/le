@@ -1,25 +1,29 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class ParameterGroupParameterMap : EntityTypeConfiguration<ParameterGroupParameter>
     {
+        #region constructors and destructor
+
         public ParameterGroupParameterMap()
         {
-            ToTable("tParameterGroupParameter");
+            ToTable(tableName:"tParameterGroupParameter");
 
             HasKey(x => x.ParameterGroupParameterId);
 
             HasRequired(a => a.ParameterGroup)
                 .WithMany(b => b.ParameterGroupParameters)
                 .HasForeignKey(c => c.ParameterGroupId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(a => a.Parameter)
                 .WithMany()
                 .HasForeignKey(c => c.ParameterId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
         }
+
+        #endregion
     }
 }

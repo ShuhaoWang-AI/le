@@ -9,8 +9,13 @@ namespace Linko.LinkoExchange.Services.Mapping
         AuthorityDto GetAuthorityDtoFromOrganization(Core.Domain.Organization organization, AuthorityDto dto = null);
         UserDto GetUserDtoFromUserProfile(UserProfile userProfile, UserDto dto = null);
         UserProfile GetUserProfileFromUserDto(UserDto dto, UserProfile userProfile = null);
-        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(OrganizationRegulatoryProgramUser user, OrganizationRegulatoryProgramUserDto dto = null);
-        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(OrganizationRegulatoryProgram orgRegProgram, OrganizationRegulatoryProgramDto dto = null);
+
+        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(
+            OrganizationRegulatoryProgramUser user, OrganizationRegulatoryProgramUserDto dto = null);
+
+        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
+            OrganizationRegulatoryProgram orgRegProgram, OrganizationRegulatoryProgramDto dto = null);
+
         SettingDto GetSettingDtoFromOrganizationRegulatoryProgramSetting(OrganizationRegulatoryProgramSetting setting, SettingDto dto = null);
         SettingDto GetSettingDtoFromOrganizationSetting(OrganizationSetting setting, SettingDto dto = null);
         InvitationDto GetInvitationDtoFromInvitation(Core.Domain.Invitation invitation, InvitationDto dto = null);
@@ -24,8 +29,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
         UnitDto GetUnitDtoFromUnit(Core.Domain.Unit unit);
-        Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
-        ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat);
+        ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
+        ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat);
 
         ReportPackageTemplateElementCategoryDto GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(ReportPackageTemplateElementCategory cat);
         ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat);

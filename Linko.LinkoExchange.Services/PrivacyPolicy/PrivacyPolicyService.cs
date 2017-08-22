@@ -6,8 +6,12 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
 {
     public class PrivacyPolicyService : IPrivacyPolicyService
     {
+        #region fields
+
         private readonly LinkoExchangeContext _dbContext;
         private readonly ILogger _logger;
+
+        #endregion
 
         #region Implementation of IPrivacyPolicyService
 
@@ -18,16 +22,16 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
         }
 
         /// <summary>
-        /// Always get the latest privacy policy
+        ///     Always get the latest privacy policy
         /// </summary>
-        /// <returns></returns>
+        /// <returns> </returns>
         public string GetPrivacyPolicyContent()
-        { 
-            _logger.Info($"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
+        {
+            _logger.Info(message:$"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 
             var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i=>i.EffectiveDateTimeUtc).First();  
 
-            _logger.Info($"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
+            _logger.Info(message:$"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 
             return privacyPolicy.Content;
         }

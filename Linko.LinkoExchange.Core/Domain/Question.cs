@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a possible question to ask the users.
+    ///     Represents a possible question to ask the users.
     /// </summary>
-    public partial class Question
+    public class Question
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int QuestionId { get; set; }
 
@@ -18,8 +20,8 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual QuestionType QuestionType { get; set; }
 
         /// <summary>
-        /// True: the question is displayed in the list. 
-        /// Default: true.
+        ///     True: the question is displayed in the list.
+        ///     Default: true.
         /// </summary>
         public bool IsActive { get; set; }
 
@@ -28,5 +30,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a regulatory program.
+    ///     Represents a regulatory program.
     /// </summary>
-    public partial class RegulatoryProgram
+    public class RegulatoryProgram
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int RegulatoryProgramId { get; set; }
 
@@ -23,10 +25,11 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
 
         public virtual ICollection<OrganizationTypeRegulatoryProgram> OrganizationTypeRegulatoryPrograms { get; set; }
+
+        #endregion
     }
 }

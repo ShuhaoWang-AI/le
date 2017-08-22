@@ -1,20 +1,20 @@
 ﻿<!--
 
 >>>>>>>>>>>>>>>> WARNING <<<<<<<<<<<<<<<<
-    
-    There are various places throughout this page where we have opted NOT to use Html.HiddenFor to persist values between postbacks.
 
-    It is a known issue that if we are modifying a viewmodel's property on the server after posting, MVC will choose the originally posted value
-    and NOT the manually updated value to repopulate the Html.HiddenFor fields.
-    
-    Please refer to this SO post:
+There are various places throughout this page where we have opted NOT to use Html.HiddenFor to persist values between postbacks.
 
-    https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model    
+It is a known issue that if we are modifying a viewmodel's property on the server after posting, MVC will choose the originally posted value
+and NOT the manually updated value to repopulate the Html.HiddenFor fields.
+
+Please refer to this SO post:
+
+https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
 
 -->
 
-@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
 @using Linko.LinkoExchange.Web.ViewModels.Shared
+@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
 
 @{
     ViewBag.Title = "Profile";
@@ -83,29 +83,29 @@
                                            @class = "alert alert-danger"
                                        })
                 }
- 
+
                 @{
                     var vm = new ConfirmationMessageViewModal
-                    {
-                        ShowMessage = ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
-                        Messaage =  ViewBag.SuccessMessage
-                    };
-                    @Html.Partial("_ConfirmationMessageView", vm);
+                             {
+                                 ShowMessage = ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                                 Messaage = ViewBag.SuccessMessage
+                             };
+                    @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
+                    
+                    vm = new ConfirmationMessageViewModal
+                         {
+                             ShowMessage = ViewBag.changeEmailSucceed != null && ViewBag.changeEmailSucceed,
+                             Messaage = "Email successfully changed."
+                         };
+                    @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
 
                     vm = new ConfirmationMessageViewModal
-                    {
-                        ShowMessage = ViewBag.changeEmailSucceed != null && ViewBag.changeEmailSucceed,
-                        Messaage = "Email successfully changed."
-                    };
-                    @Html.Partial("_ConfirmationMessageView", vm);
-
-                    vm = new ConfirmationMessageViewModal
-                    {
-                        ShowMessage = ViewBag.changePasswordSucceed != null && ViewBag.changePasswordSucceed,
-                        Messaage = "Password successfully changed."
-                    };
-                    @Html.Partial("_ConfirmationMessageView", vm);
-                }                 
+                         {
+                             ShowMessage = ViewBag.changePasswordSucceed != null && ViewBag.changePasswordSucceed,
+                             Messaage = "Password successfully changed."
+                         };
+                    @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
+                }
             </div>
 
             <section class="box-body form-horizontal">
@@ -499,16 +499,16 @@
                                            @class = "alert alert-danger"
                                        })
                 }
-                
+
                 @{
                     var vm = new ConfirmationMessageViewModal
-                    {
-                        ShowMessage = ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
-                        Messaage =  ViewBag.SuccessMessage
-                    };
+                             {
+                                 ShowMessage = ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                                 Messaage = ViewBag.SuccessMessage
+                             };
 
-                    @Html.Partial("_ConfirmationMessageView", vm);
-                } 
+                    @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
+                }
             </div>
 
             <section class="box-body form-horizontal">
@@ -555,10 +555,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            
+
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ1)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ1" /> 
-                            
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ1)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ1" />
+
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer1,
                                 additionalViewData:new
                                                    {
@@ -612,10 +612,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            
+
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ2)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ2" />
-                            
+
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer2,
                                 additionalViewData:new
                                                    {
@@ -669,10 +669,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            
+
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ3)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ3" />
-                            
+
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer3,
                                 additionalViewData:new
                                                    {
@@ -726,10 +726,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            
+
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ4)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ4" />
-                            
+
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer4,
                                 additionalViewData:new
                                                    {
@@ -783,10 +783,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            
+
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ5)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ5" />
-                            
+
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer5,
                                 additionalViewData:new
                                                    {
@@ -849,16 +849,16 @@
                                            @class = "alert alert-danger"
                                        })
                 }
-                
+
                 @{
                     var vm = new ConfirmationMessageViewModal
-                    {
-                        ShowMessage = ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
-                        Messaage =  ViewBag.SuccessMessage
-                    };
+                             {
+                                 ShowMessage = ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                                 Messaage = ViewBag.SuccessMessage
+                             };
 
-                    @Html.Partial("_ConfirmationMessageView", vm);
-                } 
+                    @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
+                }
             </div>
 
             <section class="box-body form-horizontal">
@@ -908,7 +908,7 @@
                         <div class="col-md-8">
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserSQ.UserQuestionAnserId_SQ1)" value="@Model.UserSQ.UserQuestionAnserId_SQ1" />
-                            
+
                             @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer1,
                                 additionalViewData:new
                                                    {
@@ -962,7 +962,7 @@
                         <div class="col-md-8">
                             <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
                             <input type="hidden" name="@Html.NameFor(x => Model.UserSQ.UserQuestionAnserId_SQ2)" value="@Model.UserSQ.UserQuestionAnserId_SQ2" />
-                            
+
                             @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer2,
                                 additionalViewData:new
                                                    {
@@ -1002,10 +1002,12 @@
         var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
         var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
         var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
-        var newRegistration = '@Html.Raw(ViewBag.newRegistration)'; 
+        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
 
-        $(document).ready(function(){
-            disableAutoComplete();
-        }());
+        $(document)
+            .ready(function()
+            {
+                disableAutoComplete();
+            }());
     </script>
 }

@@ -1,8 +1,9 @@
-﻿
-namespace Linko.LinkoExchange.Services.Dto
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public class AuthorityDetailsDto
     {
+        #region public properties
+
         public string Name { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
@@ -23,5 +24,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int MaxIndustryLicenses { get; set; }
         public int IndustryLicensesInUse { get; set; }
         public int MaxUsersPerIndustry { get; set; }
+
+        #endregion
     }
 }

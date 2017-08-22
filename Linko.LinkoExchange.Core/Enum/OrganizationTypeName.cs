@@ -5,5 +5,4 @@
         Authority,
         Industry
     }
-
 }

@@ -5,6 +5,8 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
     [XmlType(TypeName = "SampleResult")]
     public class SampleResultNode
     {
+        #region public properties
+
         public string SampleName { get; set; }
         public string MonitoringPointName { get; set; }
         public string CtsEventTypeCategoryName { get; set; }
@@ -28,5 +30,7 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public string AnalysisDateTimeUtc { get; set; }
         public string IsApprovedEPAMethod { get; set; }
         public string LimitBasis { get; set; }
+
+        #endregion
     }
 }

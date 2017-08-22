@@ -8,24 +8,24 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     {
         public static string CalculateFileHash(string fileName)
         {
-            var data = File.ReadAllBytes(fileName);
-            return ComputeSha256Hash(data);
+            var data = File.ReadAllBytes(path:fileName);
+            return ComputeSha256Hash(data:data);
         }
 
         public static string ComputeSha256Hash(byte[] data)
         {
             using (var sha256 = new SHA256Managed())
             {
-                var hash = sha256.ComputeHash(data);
-                var hex = ByteArrayToString(hash).ToLowerInvariant();
+                var hash = sha256.ComputeHash(buffer:data);
+                var hex = ByteArrayToString(data:hash).ToLowerInvariant();
                 return hex;
             }
         }
 
         private static string ByteArrayToString(byte[] data)
         {
-            string hex = BitConverter.ToString(data);
-            return hex.Replace(oldValue: "-", newValue: "");
+            var hex = BitConverter.ToString(value:data);
+            return hex.Replace(oldValue:"-", newValue:"");
         }
     }
 }

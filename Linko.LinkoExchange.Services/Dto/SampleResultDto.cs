@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Linko.LinkoExchange.Test")]
+[assembly:InternalsVisibleTo(assemblyName:"Linko.LinkoExchange.Test")]
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class SampleResultDto
     {
+        #region public properties
+
         public int? ConcentrationSampleResultId { get; set; }
         public int ParameterId { get; set; }
         public string ParameterName { get; set; }
         public string Qualifier { get; set; }
         public string EnteredValue { get; set; }
-        public double? Value {get;set; }
+        public double? Value { get; set; }
         public int UnitId { get; set; }
         public string UnitName { get; set; }
         public string EnteredMethodDetectionLimit { get; set; }
@@ -28,5 +30,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string MassLoadingValue { get; set; }
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
+
+        #endregion
     }
 }

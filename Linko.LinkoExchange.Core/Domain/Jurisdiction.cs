@@ -3,22 +3,24 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a jurisdiction, which can be a state, a province or a country.
+    ///     Represents a jurisdiction, which can be a state, a province or a country.
     /// </summary>
-    public partial class Jurisdiction
+    public class Jurisdiction
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int JurisdictionId { get; set; }
 
         /// <summary>
-        /// A JurisdictionId that represents the country.
+        ///     A JurisdictionId that represents the country.
         /// </summary>
         public int CountryId { get; set; }
 
         /// <summary>
-        /// A JurisdictionId that represents the state.
+        ///     A JurisdictionId that represents the state.
         /// </summary>
         public int StateId { get; set; }
 
@@ -27,8 +29,8 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Name { get; set; }
 
         /// <summary>
-        /// A JurisdictionId that the current Jurisdiction belongs to.
-        /// If the current Jurisdiction has no parent (0) then it is a country.
+        ///     A JurisdictionId that the current Jurisdiction belongs to.
+        ///     If the current Jurisdiction has no parent (0) then it is a country.
         /// </summary>
         public int? ParentId { get; set; }
 
@@ -37,5 +39,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

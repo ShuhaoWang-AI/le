@@ -3,7 +3,9 @@
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class UserDto
-    { 
+    {
+        #region public properties
+
         public int UserProfileId { get; set; }
 
         public string TitleRole { get; set; }
@@ -17,7 +19,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string AddressLine2 { get; set; }
         public string CityName { get; set; }
         public string ZipCode { get; set; }
-        public int JurisdictionId { get; set; } 
+        public int JurisdictionId { get; set; }
         public JurisdictionDto Jurisdiction { get; set; }
 
         public int? PhoneExt { get; set; }
@@ -27,16 +29,18 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsInternalAccount { get; set; }
         public DateTimeOffset? CreationDateTimeUtc { get; set; }
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-        
+
         public string Email { get; set; }
         public string OldEmailAddress { get; set; }
         public bool EmailConfirmed { get; set; }
-        public string PasswordHash { get; set; } 
-        public string PhoneNumber { get; set; } 
-        public DateTime LockoutEndDateUtc { get; set; } 
+        public string PasswordHash { get; set; }
+        public string PhoneNumber { get; set; }
+        public DateTime LockoutEndDateUtc { get; set; }
         public bool LockoutEnabled { get; set; }
 
         public string Password { get; set; }
         public bool AgreeTermsAndConditions { get; set; }
+
+        #endregion
     }
 }

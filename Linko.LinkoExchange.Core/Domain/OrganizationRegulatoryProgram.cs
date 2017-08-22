@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents the different regulatory programs that an organization belongs to.
+    ///     Represents the different regulatory programs that an organization belongs to.
     /// </summary>
-    public partial class OrganizationRegulatoryProgram
+    public class OrganizationRegulatoryProgram
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
 
@@ -20,29 +22,30 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual Organization Organization { get; set; }
 
         /// <summary>
-        /// NULL: an Authority OrganizationType since they are the ones who regulate other Organizations.
+        ///     NULL: an Authority OrganizationType since they are the ones who regulate other Organizations.
         /// </summary>
         public int? RegulatorOrganizationId { get; set; }
+
         public virtual Organization RegulatorOrganization { get; set; }
 
         /// <summary>
-        /// Industry specific column.
+        ///     Industry specific column.
         /// </summary>
         public string AssignedTo { get; set; }
 
         /// <summary>
-        /// Authority: NPDES Permit Number. 
-        /// Industry: Industry Number (in IPP).
+        ///     Authority: NPDES Permit Number.
+        ///     Industry: Industry Number (in IPP).
         /// </summary>
         public string ReferenceNumber { get; set; }
 
         /// <summary>
-        /// True: the Organization has access to this particular Regulatory Program. False, otherwise.
+        ///     True: the Organization has access to this particular Regulatory Program. False, otherwise.
         /// </summary>
         public bool IsEnabled { get; set; }
 
         /// <summary>
-        /// True: the Organization has been removed from this particular Regulatory Program. False, otherwise.
+        ///     True: the Organization has been removed from this particular Regulatory Program. False, otherwise.
         /// </summary>
         public bool IsRemoved { get; set; }
 
@@ -51,7 +54,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
-
 
         // Reverse navigation
         public virtual ICollection<OrganizationRegulatoryProgramModule> OrganizationRegulatoryProgramModules { get; set; }
@@ -89,5 +91,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ICollection<RepudiationReason> RepudiationReasons { get; set; }
 
         public virtual ICollection<ReportPackage> ReportPackages { get; set; }
+
+        #endregion
     }
 }

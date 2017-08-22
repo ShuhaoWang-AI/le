@@ -1,12 +1,18 @@
-﻿
-using System;
+﻿using System;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class CromerrAuditLogEntryDto : IAuditLogEntry
     {
-        public int CromerrAuditLogId { get; set; }
+        #region interface implementations
+
         public int AuditLogTemplateId { get; set; }
+
+        #endregion
+
+        #region public properties
+
+        public int CromerrAuditLogId { get; set; }
         public int? RegulatoryProgramId { get; set; }
         public string RegulatoryProgramName { get; set; }
         public int? OrganizationId { get; set; }
@@ -24,5 +30,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Comment { get; set; }
         public DateTimeOffset LogDateTimeUtc { get; set; }
         public string OrganizationName { get; set; }
+
+        #endregion
     }
 }

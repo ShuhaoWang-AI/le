@@ -1,36 +1,34 @@
-﻿using System.Web.Mvc;
-using NLog;
-using System.Data.Entity.Validation;
-using System.Data.Entity.Infrastructure;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using System.Configuration;
+using System.Data.Entity.Validation;
+using System.Web;
+using System.Web.Mvc;
+using NLog;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
     /// <summary>
-    /// Custom error handling that logs the exception.
+    ///     Custom error handling that logs the exception.
     /// </summary>
     public class CustomHandleErrorAttribute : HandleErrorAttribute
     {
-        #region private members
+        #region fields
 
         private readonly ILogger _logger;
-        private string _unauthorizedPagePath;
+        private readonly string _unauthorizedPagePath;
 
         #endregion
 
-
-        #region constructor
+        #region constructors and destructor
 
         public CustomHandleErrorAttribute(ILogger logger)
         {
             _logger = logger;
-            _unauthorizedPagePath = ConfigurationManager.AppSettings["UnauthorizedPagePath"];
+            _unauthorizedPagePath = ConfigurationManager.AppSettings[name:"UnauthorizedPagePath"];
         }
 
         #endregion
-
 
         #region public methods
 
@@ -41,82 +39,82 @@ namespace Linko.LinkoExchange.Web.Mvc
                 return;
             }
 
-            var httpCode = new System.Web.HttpException(message: null, innerException: filterContext.Exception).GetHttpCode();
+            var httpCode = new HttpException(message:null, innerException:filterContext.Exception).GetHttpCode();
             if (httpCode != 500 && httpCode != 401) //401 = Unauthorized Access
             {
                 return;
             }
 
-            if (!ExceptionType.IsInstanceOfType(filterContext.Exception))
+            if (!ExceptionType.IsInstanceOfType(o:filterContext.Exception))
             {
                 return;
             }
 
             // if the request is AJAX return JSON else view
-            if (filterContext.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (filterContext.HttpContext.Request.Headers[name:"X-Requested-With"] == "XMLHttpRequest")
             {
                 filterContext.Result = new JsonResult
-                {
-                    JsonRequestBehavior = JsonRequestBehavior.AllowGet,
-                    Data = new
-                    {
-                        error = true,
-                        message = filterContext.Exception.Message
-                    }
-                };
+                                       {
+                                           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                                           Data = new
+                                                  {
+                                                      error = true,
+                                                      message = filterContext.Exception.Message
+                                                  }
+                                       };
             }
             else
             {
                 if (filterContext.Exception is UnauthorizedAccessException)
                 {
                     var result = new ViewResult
-                    {
-                        ViewName = _unauthorizedPagePath,
-                    };
+                                 {
+                                     ViewName = _unauthorizedPagePath
+                                 };
                     filterContext.Result = result;
                 }
-                else {
-
-                    string controllerName = (string)filterContext.RouteData.Values["controller"];
-                    string actionName = (string)filterContext.RouteData.Values["action"];
-                    HandleErrorInfo model = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
+                else
+                {
+                    var controllerName = (string) filterContext.RouteData.Values[key:"controller"];
+                    var actionName = (string) filterContext.RouteData.Values[key:"action"];
+                    var model = new HandleErrorInfo(exception:filterContext.Exception, controllerName:controllerName, actionName:actionName);
                     filterContext.Result = new ViewResult
-                    {
-                        ViewName = View,
-                        MasterName = Master,
-                        ViewData = new ViewDataDictionary<HandleErrorInfo>(model),
-                        TempData = filterContext.Controller.TempData
-                    };
+                                           {
+                                               ViewName = View,
+                                               MasterName = Master,
+                                               ViewData = new ViewDataDictionary<HandleErrorInfo>(model:model),
+                                               TempData = filterContext.Controller.TempData
+                                           };
                 }
-               
             }
 
             // log the error
             string errorMessage;
             if (filterContext.Exception is DbEntityValidationException)
             {
-                var ex = (DbEntityValidationException)filterContext.Exception;
-                var errors = new List<string>() { ex.Message };
+                var ex = (DbEntityValidationException) filterContext.Exception;
+                var errors = new List<string> {ex.Message};
 
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                foreach (var item in ex.EntityValidationErrors)
                 {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
+                    var entry = item.Entry;
+                    var entityTypeName = entry.Entity.GetType().Name;
 
-                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    foreach (var subItem in item.ValidationErrors)
                     {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        errors.Add(message);
+                        var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
+                        errors.Add(item:message);
                     }
                 }
 
-                errorMessage = String.Join("," + Environment.NewLine, errors);
+                errorMessage = string.Join(separator:"," + Environment.NewLine, values:errors);
             }
             else
             {
                 errorMessage = filterContext.Exception.Message;
             }
 
+            // ReSharper disable once ArgumentsStyleNamedExpression
             _logger.Error(filterContext.Exception, errorMessage);
 
             filterContext.ExceptionHandled = true;

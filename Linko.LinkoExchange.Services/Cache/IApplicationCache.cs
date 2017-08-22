@@ -1,11 +1,4 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Linko.LinkoExchange.Services.Cache
+﻿namespace Linko.LinkoExchange.Services.Cache
 {
     public interface IApplicationCache
     {

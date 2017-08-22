@@ -1,5 +1,4 @@
-﻿
-namespace Linko.LinkoExchange.Services.Dto
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public enum EnableOrganizationFailureReason
     {
@@ -9,7 +8,11 @@ namespace Linko.LinkoExchange.Services.Dto
 
     public class EnableOrganizationResultDto
     {
+        #region public properties
+
         public bool IsSuccess { get; set; }
         public EnableOrganizationFailureReason FailureReason { get; set; }
+
+        #endregion
     }
 }

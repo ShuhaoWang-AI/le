@@ -1,8 +1,9 @@
-﻿
-namespace Linko.LinkoExchange.Services.Dto
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageTemplateElementTypeDto
     {
+        #region public properties
+
         public int ReportPackageTemplateElementTypeId { get; set; }
 
         public int ReportPackageTemplateElementCategoryId { get; set; }
@@ -14,5 +15,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsRequired { get; set; }
 
         public int SortOrder { get; set; }
+
+        #endregion
     }
 }

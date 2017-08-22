@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a setting name.
+    ///     Represents a setting name.
     /// </summary>
-    public partial class SettingTemplate
+    public class SettingTemplate
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int SettingTemplateId { get; set; }
 
@@ -18,7 +20,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Description { get; set; }
 
         /// <summary>
-        /// Default value to be copied over during the initial specific Organization or OrganizationRegulatoryProgram setup.
+        ///     Default value to be copied over during the initial specific Organization or OrganizationRegulatoryProgram setup.
         /// </summary>
         public string DefaultValue { get; set; }
 
@@ -26,9 +28,10 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual OrganizationType OrganizationType { get; set; }
 
         /// <summary>
-        /// NULL: the setting is applicable to all regulatory program for a particular organization type.
+        ///     NULL: the setting is applicable to all regulatory program for a particular organization type.
         /// </summary>
         public int? RegulatoryProgramId { get; set; }
+
         public virtual RegulatoryProgram RegulatoryProgram { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
@@ -37,10 +40,11 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings { get; set; }
 
         public virtual ICollection<OrganizationSetting> OrganizationSettings { get; set; }
+
+        #endregion
     }
 }

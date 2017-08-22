@@ -4,22 +4,26 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using Kendo.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Unit;
@@ -29,52 +33,53 @@ using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
-using Linko.LinkoExchange.Core.Resources;
-using Linko.LinkoExchange.Services.Sample;
-using System.Web;
-using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [PortalAuthorize("authority")]
     [RoutePrefix(prefix:"Authority")]
-    public class AuthorityController:BaseController
+    public class AuthorityController : BaseController
     {
-        #region constructor
+        #region fields
+
+        private readonly ICromerrAuditLogService _cromerrLogService;
+        private readonly IHttpContextService _httpContextService;
+        private readonly IInvitationService _invitationService;
+        private readonly ILogger _logger;
 
         private readonly IOrganizationService _organizationService;
-        private readonly IUserService _userService;
-        private readonly IInvitationService _invitationService;
-        private readonly ISettingService _settingService;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly ITimeZoneService _timeZoneService;
-        private readonly IPermissionService _permissionService;
-        private readonly IHttpContextService _httpContextService;
-        private readonly ILogger _logger;
-        private readonly ICromerrAuditLogService _cromerrLogService;
         private readonly IParameterService _parameterService;
+        private readonly IPermissionService _permissionService;
+        private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IReportElementService _reportElementService;
         private readonly IReportTemplateService _reportTemplateService;
+        private readonly ISettingService _settingService;
+        private readonly ITimeZoneService _timeZoneService;
         private readonly IUnitService _unitService;
+        private readonly IUserService _userService;
+
+        #endregion
+
+        #region constructors and destructor
 
         public AuthorityController(
-            IOrganizationService organizationService, 
-            IUserService userService, 
+            IOrganizationService organizationService,
+            IUserService userService,
             IInvitationService invitationService,
-            ISettingService settingService, 
-            IQuestionAnswerService questionAnswerService, 
-            ITimeZoneService timeZoneService, 
+            ISettingService settingService,
+            IQuestionAnswerService questionAnswerService,
+            ITimeZoneService timeZoneService,
             IPermissionService permissionService,
-            ILogger logger, 
-            ICromerrAuditLogService cromerrLogService, 
-            IHttpContextService httpContextService, 
+            ILogger logger,
+            ICromerrAuditLogService cromerrLogService,
+            IHttpContextService httpContextService,
             IParameterService parameterService,
-            IReportElementService reportElementService, 
-            IReportTemplateService reportTemplateService, 
+            IReportElementService reportElementService,
+            IReportTemplateService reportTemplateService,
             IUnitService unitService,
-            IReportPackageService reportPackageService, 
+            IReportPackageService reportPackageService,
             ISampleService sampleService)
-            :base(httpContextService,userService,reportPackageService,sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -93,7 +98,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-        
+
         #region default action
 
         // GET: Authority
@@ -102,12 +107,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             //
             //  Default landing page for Authority users: Report Packages - Submitted Pending Review
             //
-            return RedirectToAction(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new { reportStatus = ReportStatusName.SubmittedPendingReview });
+            return RedirectToAction(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.SubmittedPendingReview});
         }
 
         #endregion
 
-        #region Show Authority Settings
+        #region show authority settings
 
         // GET: /Authority/Settings
         public ActionResult Settings()
@@ -139,14 +144,19 @@ namespace Linko.LinkoExchange.Web.Controllers
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.FailedPasswordAttemptMaxCount))
                                  .ToList()
                                  .ForEach(s => s.Value = model.FailedPasswordAttemptMaxCount);
+
                 //FailedKbqAttemptMaxCount
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.FailedKBQAttemptMaxCount)).ToList().ForEach(s => s.Value = model.FailedKbqAttemptMaxCount);
+
                 //InvitationExpiredHours
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.InvitationExpiredHours)).ToList().ForEach(s => s.Value = model.InvitationExpiredHours);
+
                 //PasswordChangeRequiredDays
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.PasswordChangeRequiredDays)).ToList().ForEach(s => s.Value = model.PasswordChangeRequiredDays);
+
                 //PasswordHistoryMaxCount
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.PasswordHistoryMaxCount)).ToList().ForEach(s => s.Value = model.PasswordHistoryMaxCount);
+
                 //TimeZone
                 authoritySettings.Where(s => s.TemplateName.Equals(obj:SettingType.TimeZone)).ToList().ForEach(s => s.Value = model.TimeZone);
 
@@ -187,19 +197,26 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 //ReportRepudiatedDays
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays)).ToList().ForEach(s => s.Value = model.ReportRepudiatedDays);
+
                 //EmailContactInfoName
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.EmailContactInfoName)).ToList().ForEach(s => s.Value = model.EmailContactInfoName);
+
                 //EmailContactInfoPhone
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.EmailContactInfoPhone)).ToList().ForEach(s => s.Value = model.EmailContactInfoPhone);
+
                 //EmailContactInfoEmailAddress
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.EmailContactInfoEmailAddress)).ToList()
                                .ForEach(s => s.Value = "" + model.EmailContactInfoEmailAddress);
+
                 //ResultQualifierValidValues
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).ToList()
-                               .ForEach(s => s.Value = string.Join(separator:",", values:model.AvailableResultQualifierValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+                               .ForEach(s => s.Value = string.Join(separator:",",
+                                                                   values:model.AvailableResultQualifierValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+
                 //FlowUnitValidValues
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues)).ToList()
                                .ForEach(s => s.Value = string.Join(separator:",", values:model.AvailableFlowUnitValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+
                 //SampleNameCreationRule
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule)).ToList().ForEach(s => s.Value = model.SampleNameCreationRule);
 
@@ -282,14 +299,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                       .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                       .Select(s => s.Value).First(),
                                 ResultQualifierValidValues = programSettings.Settings
-                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues))
-                                                                      .Select(s => s.Value).First(),
+                                                                            .Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues))
+                                                                            .Select(s => s.Value).First(),
                                 FlowUnitValidValues = programSettings.Settings
-                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues))
-                                                                      .Select(s => s.Value).First(),
+                                                                     .Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues))
+                                                                     .Select(s => s.Value).First(),
                                 SampleNameCreationRule = programSettings.Settings
-                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule))
-                                                                      .Select(s => s.Value).First(),
+                                                                        .Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule))
+                                                                        .Select(s => s.Value).First(),
                                 ReportRepudiatedDaysDefault = programSettings.Settings
                                                                              .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                              .Select(s => s.DefaultValue).First(),
@@ -334,11 +351,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (resultQualifierValidValues.Count > 0)
             {
                 viewModel.AvailableResultQualifierValidValues = resultQualifierValidValues.Select(x => new SelectListItem
-                                                                     {
-                                                                         Text = x,
-                                                                         Value = x,
-                                                                         Selected = selectedResultQualifierValidValues.Contains(item:x)
-                                                                     }).ToList();
+                                                                                                       {
+                                                                                                           Text = x,
+                                                                                                           Value = x,
+                                                                                                           Selected = selectedResultQualifierValidValues.Contains(item:x)
+                                                                                                       }).ToList();
             }
 
             // Flow Units
@@ -350,14 +367,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (flowUnitDtos.Any())
             {
                 viewModel.AvailableFlowUnitValidValues = flowUnitDtos.Select(x => new SelectListItem
-                                                                     {
-                                                                         Text = x.Name,
-                                                                         Value = x.Name,
-                                                                         Selected = selectedFlowUnits.Contains(item:x.Name)
-                                                                     }).ToList();
+                                                                                  {
+                                                                                      Text = x.Name,
+                                                                                      Value = x.Name,
+                                                                                      Selected = selectedFlowUnits.Contains(item:x.Name)
+                                                                                  }).ToList();
             }
-
-
 
             // Time Zones
             viewModel.AvailableTimeZones = new List<SelectListItem>();
@@ -371,6 +386,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                           Selected = tz.TimeZoneId.ToString().Equals(value:viewModel.TimeZone)
                                                                       }).ToList();
             }
+
             //viewModel.AvailableTimeZones.Insert(index: 0, item: new SelectListItem { Text = "Select Time Zone", Value = "0" });
 
             return viewModel;
@@ -378,7 +394,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Audit Logs
+        #region show audit logs
 
         // GET: /Authority/AuditLogs
         public ActionResult AuditLogs()
@@ -398,7 +414,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             for (var i = 0; i < filterDescriptors.Count(); i++)
             {
-                var filter = filterDescriptors[i];
+                var filter = filterDescriptors[index:i];
                 if (filter is CompositeFilterDescriptor)
                 {
                     GetFilterDescriptersFromTree(filterDescriptors:((CompositeFilterDescriptor) filter).FilterDescriptors, foundFilterDescriptors:ref foundFilterDescriptors);
@@ -460,14 +476,16 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     break;
                 }
+
                 if (filterDescriptor.Member == "EventCategory")
                 {
                     //Remove spaces
-                    eventCategoryContains = filterDescriptor.Value.ToString().Replace(" ", string.Empty);
+                    eventCategoryContains = filterDescriptor.Value.ToString().Replace(oldValue:" ", newValue:string.Empty);
                 }
                 else if (filterDescriptor.Member == "EventType")
                 {
-                    eventTypeContains = filterDescriptor.Value.ToString().Replace(" ", string.Empty);
+                    eventTypeContains = filterDescriptor.Value.ToString().Replace(oldValue:" ", newValue:string.Empty);
+
                     //Remove spaces
                 }
                 else if (filterDescriptor.Member == "EmailAddress")
@@ -496,7 +514,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId:organizationRegulatoryProgramId,
                                                                           page:page, pageSize:pageSize, sortColumn:sortColumn, isSortAscending:isSortAscending,
                                                                           dateRangeStart:dateRangeStart, dateRangeEnd:dateRangeEnd, dateToExclude:dateToExclude,
-                                                                          eventCategoryContains:eventCategoryContains, eventTypeContains:eventTypeContains, emailAddressContains:emailAddressContains,
+                                                                          eventCategoryContains:eventCategoryContains, eventTypeContains:eventTypeContains,
+                                                                          emailAddressContains:emailAddressContains,
                                                                           totalCount:out totalCount);
 
             var viewModels = logEntries.Select(dto => new AuditLogViewModel
@@ -507,8 +526,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           OrganizationId = dto.OrganizationId ?? 0,
                                                           OrganizationName = dto.OrganizationName,
                                                           RegulatorName = dto.RegulatorOrganizationName,
-                                                          EventCategory = Label.ResourceManager.GetString(dto.EventCategory) ?? dto.EventCategory,
-                                                          EventType = Label.ResourceManager.GetString(dto.EventType) ?? dto.EventType,
+                                                          EventCategory = Label.ResourceManager.GetString(name:dto.EventCategory) ?? dto.EventCategory,
+                                                          EventType = Label.ResourceManager.GetString(name:dto.EventType) ?? dto.EventType,
                                                           UserProfileIdDisplay = dto.UserProfileId.HasValue && dto.UserProfileId > 0 ? dto.UserProfileId.ToString() : "n/a",
                                                           UserName = dto.UserName,
                                                           FirstName = dto.UserFirstName,
@@ -517,17 +536,18 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           IPAddress = dto.IPAddress,
                                                           HostName = dto.HostName,
                                                           Comment = dto.Comment,
+
                                                           //Need to modify date time to local
                                                           LogDateTimeUtc = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(
                                                                                                                                     utcDateTime:dto.LogDateTimeUtc.UtcDateTime,
                                                                                                                                     timeZoneId:timeZoneId)
                                                       });
 
-            var result = new DataSourceResult()
-            {
-                Data = viewModels,
-                Total = totalCount
-            };
+            var result = new DataSourceResult
+                         {
+                             Data = viewModels,
+                             Total = totalCount
+                         };
 
             return Json(data:result);
         }
@@ -546,6 +566,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                          details = logDetails //$"Log Entry Details for Id = {cromerrAuditLogId}"
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -572,7 +593,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Authority Users
+        #region show authority users
 
         // GET: /Authority/Users
         [Route(template:"Users")]
@@ -591,7 +612,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult AuthorityUsers_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null, isRemoved:false);
+            var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null,
+                                                                     isRemoved:false);
 
             var viewModels = users.Select(vm => new AuthorityUserViewModel
                                                 {
@@ -645,6 +667,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                         })
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -664,7 +687,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult AuthorityUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var invitations = _invitationService.GetInvitationsForOrgRegProgram(senderOrgRegProgramId:organizationRegulatoryProgramId, targetOrgRegProgramId:organizationRegulatoryProgramId);
+            var invitations = _invitationService.GetInvitationsForOrgRegProgram(senderOrgRegProgramId:organizationRegulatoryProgramId,
+                                                                                targetOrgRegProgramId:organizationRegulatoryProgramId);
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
                                                       {
@@ -684,20 +708,21 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Email,
                                                                                            DateInvited = vm.DateInvited.ToString(),
                                                                                            InviteExpires = vm.InviteExpires.ToString()
-            });
-              
-            return Json(data:result,behavior:JsonRequestBehavior.AllowGet);
+                                                                                       });
+
+            return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
         }
-        
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult AuthorityUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")] IEnumerable<PendingInvitationViewModel> items)
+        public ActionResult AuthorityUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request,
+                                                                     [Bind(Prefix = "models")] IEnumerable<PendingInvitationViewModel> items)
         {
             if (!ModelState.IsValid)
             {
                 return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
             }
 
-            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList(); 
+            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList();
             try
             {
                 if (viewModels.Any())
@@ -717,13 +742,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Authority User Details
+        #region show authority user details
 
         // GET: /Authority/AuthorityUserDetails
         [Route(template:"User/{id:int}/Details")]
         public ActionResult AuthorityUserDetails(int id)
         {
-            var viewModel = PrepareAuthorityUserDetails(id: id, isAuthorizationRequired: true);
+            var viewModel = PrepareAuthorityUserDetails(id:id, isAuthorizationRequired:true);
 
             return View(model:viewModel);
         }
@@ -737,9 +762,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(model:model);
             }
+
             try
             {
-                _userService.UpdateUserPermissionGroupId(orgRegProgUserId: model.Id, permissionGroupId: model.Role, isAuthorizationRequired: true);
+                _userService.UpdateUserPermissionGroupId(orgRegProgUserId:model.Id, permissionGroupId:model.Role, isAuthorizationRequired:true);
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "User role updated successfully!";
                 ModelState.Clear();
@@ -763,9 +789,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"AuthorityUserDetails", model:model);
             }
+
             try
             {
-                _userService.LockUnlockUserAccount(targetOrgRegProgUserId: id, isAttemptingLock: !model.AccountLocked, reason: AccountLockEvent.ManualAction, isAuthorizationRequired: true);
+                _userService.LockUnlockUserAccount(targetOrgRegProgUserId:id, isAttemptingLock:!model.AccountLocked, reason:AccountLockEvent.ManualAction,
+                                                   isAuthorizationRequired:true);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
@@ -790,9 +818,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"AuthorityUserDetails", model:model);
             }
+
             try
             {
-                _userService.EnableDisableUserAccount(orgRegProgramUserId: model.Id, isAttemptingDisable: model.Status, isAuthorizationRequired: true);
+                _userService.EnableDisableUserAccount(orgRegProgramUserId:model.Id, isAttemptingDisable:model.Status, isAuthorizationRequired:true);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
@@ -817,14 +846,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"AuthorityUserDetails", model:model);
             }
+
             try
             {
-                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);  
+                var result = _userService.RemoveUser(orgRegProgUserId:model.Id, isAuthorizationRequired:true);
                 if (result)
                 {
-                    TempData["UserDeleteSucceed"] = true; 
-                    return RedirectToAction("AuthorityUsers");  
+                    TempData[key:"UserDeleteSucceed"] = true;
+                    return RedirectToAction(actionName:"AuthorityUsers");
                 }
+
                 var validationIssues = new List<RuleViolation>();
                 var message = "Remove user failed.";
                 validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
@@ -835,10 +866,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 model = PrepareAuthorityUserDetails(id:id);
             }
-            
-           return View(viewName:"AuthorityUserDetails", model:model);
+
+            return View(viewName:"AuthorityUserDetails", model:model);
         }
- 
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"User/{id:int}/Details/UserReset")]
@@ -849,9 +880,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"AuthorityUserDetails", model:model);
             }
+
             try
             {
-                var result = _userService.ResetUser(targetOrgRegProgUserId: id, newEmailAddress: newEmail, isAuthorizationRequired: true);
+                var result = _userService.ResetUser(targetOrgRegProgUserId:id, newEmailAddress:newEmail, isAuthorizationRequired:true);
 
                 if (result.IsSuccess)
                 {
@@ -892,13 +924,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private AuthorityUserViewModel PrepareAuthorityUserDetails(int id, bool isAuthorizationRequired = false)
         {
-            var user = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired: isAuthorizationRequired);
+            var user = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired:isAuthorizationRequired);
             var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(userProfileId:user.UserProfileId, questionType:QuestionTypeName.SQ);
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             var currentUserProfileId = _httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId);
 
-            ViewBag.HasPermissionForUpdate = currentUserRole.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString()) &&
-                                             !currentUserProfileId.IsCaseInsensitiveEqual(comparing:user.UserProfileId.ToString());
+            ViewBag.HasPermissionForUpdate = currentUserRole.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString())
+                                             && !currentUserProfileId.IsCaseInsensitiveEqual(comparing:user.UserProfileId.ToString());
             ViewBag.HasPermissionForChangeRole = currentUserRole.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString());
 
             var viewModel = new AuthorityUserViewModel
@@ -922,24 +954,25 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Answer2 = userQuesAns.Count > 1 && userQuesAns.ElementAt(index:1) != null ? userQuesAns.ElementAt(index:1).Answer.Content : "",
                                 AvailableRoles = new List<SelectListItem>()
                             };
+
             // Roles
             var roles = _permissionService.GetRoles(orgRegProgramId:user.OrganizationRegulatoryProgramId);
             var permissionGroupDtos = roles as IList<PermissionGroupDto> ?? roles.ToList();
             if (permissionGroupDtos.Any())
             {
                 viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
-                                                             {
-                                                                 Text = r.Name,
-                                                                 Value = r.PermissionGroupId.ToString(),
-                                                                 Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
-                                                             }).ToList();
+                                                                           {
+                                                                               Text = r.Name,
+                                                                               Value = r.PermissionGroupId.ToString(),
+                                                                               Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
+                                                                           }).ToList();
             }
             return viewModel;
         }
 
         #endregion
 
-        #region Show Industry list
+        #region show industry list
 
         // GET: /Authority/Industries
         public ActionResult Industries()
@@ -975,7 +1008,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
 
             // int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId: currentOrganizationRegulatoryProgramId, searchString: searchString)
+            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId, searchString:searchString)
                                                  .Where(i => i.IsRemoved == false);
 
             var viewModels = industries.Select(vm => new IndustryViewModel
@@ -1032,6 +1065,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                    })
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -1050,13 +1084,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Industry Details
+        #region show industry details
 
         // GET: /Authority/IndustryDetails
         [Route(template:"Industry/{id:int}/Details")]
         public ActionResult IndustryDetails(int id)
         {
-            var viewModel = PrepareIndustryDetails(id: id, isAuthorizationRequired: true);
+            var viewModel = PrepareIndustryDetails(id:id, isAuthorizationRequired:true);
 
             return View(model:viewModel);
         }
@@ -1068,7 +1102,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                var result = _organizationService.UpdateEnableDisableFlag(orgRegProgId: model.Id, isEnabled: !model.IsEnabled, isAuthorizationRequired: true);
+                var result = _organizationService.UpdateEnableDisableFlag(orgRegProgId:model.Id, isEnabled:!model.IsEnabled, isAuthorizationRequired:true);
                 var isUpdated = result.IsSuccess;
 
                 if (isUpdated)
@@ -1119,27 +1153,28 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 HasSignatory = industry.HasSignatory,
                                 AssignedTo = industry.AssignedTo,
                                 LastSubmission = industry.LastSubmissionDateTimeLocal,
-                                HasPermissionForEnableDisable = true //All Authority user types have permission! //userRole.ToLower().IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
+                                HasPermissionForEnableDisable =
+                                    true //All Authority user types have permission! //userRole.ToLower().IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
                             };
             return viewModel;
         }
 
         #endregion
 
-        #region Show Industry Users
+        #region show industry users
 
         // GET: /Authority/IndustryUsers
         [Route(template:"Industry/{id:int}/Users")]
         public ActionResult IndustryUsers(int id)
         {
             ViewBag.IndustryId = id;
-            var industry = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId: id, isAuthorizationRequired: true);
+            var industry = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:id, isAuthorizationRequired:true);
             ViewBag.Title = string.Format(format:"{0} Users", arg0:industry.OrganizationDto.OrganizationName);
 
             //Invite button only visible if there isn't currently an active Admin for this IU
             //AND at least 1 user license available
-            var remainingUserLicenses = _organizationService.GetRemainingUserLicenseCount(id);
-            ViewBag.CanInvite = !industry.HasActiveAdmin && (remainingUserLicenses > 0);
+            var remainingUserLicenses = _organizationService.GetRemainingUserLicenseCount(orgRegProgramId:id);
+            ViewBag.CanInvite = !industry.HasActiveAdmin && remainingUserLicenses > 0;
 
             return View();
         }
@@ -1147,7 +1182,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult IndustryUsers_Read([CustomDataSourceRequest] DataSourceRequest request, string industryId)
         {
             var organizationRegulatoryProgramId = int.Parse(s:industryId);
-            var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null, isRemoved:false);
+            var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null,
+                                                                     isRemoved:false);
 
             var viewModels = users.Select(vm => new IndustryUserViewModel
                                                 {
@@ -1206,6 +1242,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                        })
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -1252,7 +1289,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult IndustryUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")] IEnumerable<PendingInvitationViewModel> items)
+        public ActionResult IndustryUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request,
+                                                                    [Bind(Prefix = "models")] IEnumerable<PendingInvitationViewModel> items)
         {
             if (!ModelState.IsValid)
             {
@@ -1279,13 +1317,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Industry User Details
+        #region show industry user details
 
         // GET: /Authority/IndustryUserDetails
         [Route(template:"Industry/{iid:int}/User/{id:int}/Details")]
         public ActionResult IndustryUserDetails(int iid, int id)
         {
-            var viewModel = PrepareIndustryUserDetails(id: id, isAuthorizationRequired: true);
+            var viewModel = PrepareIndustryUserDetails(id:id, isAuthorizationRequired:true);
 
             return View(model:viewModel);
         }
@@ -1299,9 +1337,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"IndustryUserDetails", model:model);
             }
+
             try
             {
-                _userService.UpdateUserSignatoryStatus(orgRegProgUserId: model.Id, isSignatory: model.IsSignatory, isAuthorizationRequired: true);
+                _userService.UpdateUserSignatoryStatus(orgRegProgUserId:model.Id, isSignatory:model.IsSignatory, isAuthorizationRequired:true);
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.IsSignatory ? "User signatory permission granted!" : "User signatory permission removed!";
                 ModelState.Clear();
@@ -1325,9 +1364,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"IndustryUserDetails", model:model);
             }
+
             try
             {
-                _userService.LockUnlockUserAccount(targetOrgRegProgUserId: id, isAttemptingLock: !model.AccountLocked, reason: AccountLockEvent.ManualAction, isAuthorizationRequired: true);
+                _userService.LockUnlockUserAccount(targetOrgRegProgUserId:id, isAttemptingLock:!model.AccountLocked, reason:AccountLockEvent.ManualAction,
+                                                   isAuthorizationRequired:true);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
@@ -1381,9 +1422,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName:"IndustryUserDetails", model:model);
             }
+
             try
             {
-                var result = _userService.ResetUser(targetOrgRegProgUserId: id, newEmailAddress: newEmail, isAuthorizationRequired: true);
+                var result = _userService.ResetUser(targetOrgRegProgUserId:id, newEmailAddress:newEmail, isAuthorizationRequired:true);
 
                 if (result.IsSuccess)
                 {
@@ -1415,7 +1457,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
 
-                model = PrepareIndustryUserDetails(id: id);
+                model = PrepareIndustryUserDetails(id:id);
                 model.ResetEmail = newEmail;
             }
 
@@ -1455,7 +1497,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Pending User Approvals
+        #region show pending user approvals
 
         // GET: /Authority/PendingUserApprovals
         [Route(template:"PendingUserApprovals")]
@@ -1500,7 +1542,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
                                                                                        });
 
-            return Json(data:result,behavior:JsonRequestBehavior.AllowGet);
+            return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -1520,6 +1562,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                               })
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -1538,13 +1581,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Pending User Approval Details
+        #region show pending user approval details
 
         // GET: /Authority/PendingUserApprovals
         [Route(template:"PendingUserApprovals/{id:int}/Details")]
         public ActionResult PendingUserApprovalDetails(int id)
         {
-            var viewModel = PreparePendingUserApprovalDetails(id: id, isAuthorizationRequired: true);
+            var viewModel = PreparePendingUserApprovalDetails(id:id, isAuthorizationRequired:true);
             return View(model:viewModel);
         }
 
@@ -1557,7 +1600,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: true, isAuthorizationRequired: true, isSignatory: model.IsSignatory);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:true,
+                                                                         isAuthorizationRequired:true, isSignatory:model.IsSignatory);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -1585,6 +1629,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 }
             }
+
             model = PreparePendingUserApprovalDetails(id:id);
             return View(viewName:"PendingUserApprovalDetails", model:model);
         }
@@ -1599,24 +1644,25 @@ namespace Linko.LinkoExchange.Web.Controllers
             //
             try
             {
-                var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false, isAuthorizationRequired: true, isSignatory:model.IsSignatory);
+                var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:false, isAuthorizationRequired:true,
+                                                                     isSignatory:model.IsSignatory);
                 switch (result.Result)
                 {
                     case RegistrationResult.Success:
                         ViewBag.ShowSuccessMessage = true;
                         ViewBag.SuccessMessage = "Registration Denied!";
                         ModelState.Clear();
-                        _logger.Info(message: $"PendingUserDeny. User={model.UserName} - id={model.Id} Registration Denied!");
+                        _logger.Info(message:$"PendingUserDeny. User={model.UserName} - id={model.Id} Registration Denied!");
                         break;
                     default:
-                        _logger.Info(message: string.Format(format: "PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0: model.UserName, arg1: model.Id));
-                        ModelState.AddModelError(key: "", errorMessage: @"Registration Denial Failed");
+                        _logger.Info(message:string.Format(format:"PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0:model.UserName, arg1:model.Id));
+                        ModelState.AddModelError(key:"", errorMessage:@"Registration Denial Failed");
                         break;
                 }
             }
             catch (RuleViolationException rve)
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
             model = PreparePendingUserApprovalDetails(id:id);
@@ -1625,7 +1671,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private PendingUserApprovalViewModel PreparePendingUserApprovalDetails(int id, bool isAuthorizationRequired = false)
         {
-            var result = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired: isAuthorizationRequired);
+            var result = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired:isAuthorizationRequired);
 
             var viewModel = new PendingUserApprovalViewModel
                             {
@@ -1651,6 +1697,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name,
                                 IsSignatory = result.IsSignatory
                             };
+
             // Roles
             viewModel.AvailableRoles = new List<SelectListItem>();
             var roles = _permissionService.GetRoles(orgRegProgramId:result.OrganizationRegulatoryProgramId);
@@ -1659,11 +1706,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (permissionGroupDtos.Any())
             {
                 viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
-                                                             {
-                                                                 Text = r.Name,
-                                                                 Value = r.PermissionGroupId.ToString(),
-                                                                 Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
-                                                             }).ToList();
+                                                                           {
+                                                                               Text = r.Name,
+                                                                               Value = r.PermissionGroupId.ToString(),
+                                                                               Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
+                                                                           }).ToList();
             }
             viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0", Disabled = true});
 
@@ -1696,7 +1743,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Static Parameter Group List
+        #region show static parameter group list
 
         // GET: /Authority/ParameterGroups
         public ActionResult ParameterGroups()
@@ -1724,7 +1771,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Name,
                                                                                            vm.Description,
                                                                                            vm.Status,
-                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal =
+                                                                                           vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -1745,6 +1793,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                          newurl = Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new {id = item.Id})
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -1763,7 +1812,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Static Parameter Group Details
+        #region show static parameter group details
 
         [Route(template:"ParameterGroup/Details")]
         public ActionResult ParameterGroupDetails(int? id)
@@ -1772,7 +1821,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                viewModel = PrepareParameterGroupDetails(id:id, isAuthorizationRequired: true);
+                viewModel = PrepareParameterGroupDetails(id:id, isAuthorizationRequired:true);
             }
             catch (RuleViolationException rve)
             {
@@ -1802,25 +1851,25 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _parameterService.DeleteParameterGroup(parameterGroupId:id);
-                TempData["ParameterGroupDeleteSucceed"] = true; 
-                return RedirectToAction("ParameterGroups");
+                TempData[key:"ParameterGroupDeleteSucceed"] = true;
+                return RedirectToAction(actionName:"ParameterGroups");
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 return View(viewName:"ParameterGroupDetails", model:PrepareParameterGroupDetails(id:id));
-            } 
+            }
         }
 
         private ActionResult SaveParameterGroupDetails(ParameterGroupViewModel model)
         {
             if (model.Parameters.Count > 0)
             {
-                ModelState.Remove(key: "Parameters");
+                ModelState.Remove(key:"Parameters");
             }
             if (!ModelState.IsValid)
             {
-                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel: model);
+                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel:model);
 
                 if (ModelState[key:"."] != null)
                 {
@@ -1832,6 +1881,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(viewName:"ParameterGroupDetails", model:model);
             }
+
             try
             {
                 var parameterGroupDto = new ParameterGroupDto();
@@ -1858,7 +1908,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel: model);
+                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel:model);
             }
 
             return View(viewName:"ParameterGroupDetails", model:model);
@@ -1870,7 +1920,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (id.HasValue)
             {
                 ViewBag.Satus = "Edit";
-                var parameterGroup = _parameterService.GetParameterGroup(parameterGroupId:id.Value, isAuthorizationRequired: isAuthorizationRequired);
+                var parameterGroup = _parameterService.GetParameterGroup(parameterGroupId:id.Value, isAuthorizationRequired:isAuthorizationRequired);
                 viewModel = new ParameterGroupViewModel
                             {
                                 Id = parameterGroup.ParameterGroupId,
@@ -1901,25 +1951,25 @@ namespace Linko.LinkoExchange.Web.Controllers
                 viewModel.Parameters = new List<ParameterViewModel>();
                 foreach (var parameterToRetain in dirtyViewModel.Parameters)
                 {
-                    viewModel.Parameters.Add(parameterToRetain);
+                    viewModel.Parameters.Add(item:parameterToRetain);
                 }
             }
 
             viewModel.AllParameters = _parameterService.GetGlobalParameters().Select(p => new ParameterViewModel
-                                                                                           {
-                                                                                               Id = p.ParameterId,
-                                                                                               Name = p.Name,
-                                                                                               Description = p.Description,
-                                                                                               DefaultUnitId = p.DefaultUnit.UnitId,
-                                                                                               DefaultUnitName = p.DefaultUnit.Name,
-                                                                                               IsRemoved = p.IsRemoved
-                                                                                           }).ToList();
+                                                                                          {
+                                                                                              Id = p.ParameterId,
+                                                                                              Name = p.Name,
+                                                                                              Description = p.Description,
+                                                                                              DefaultUnitId = p.DefaultUnit.UnitId,
+                                                                                              DefaultUnitName = p.DefaultUnit.Name,
+                                                                                              IsRemoved = p.IsRemoved
+                                                                                          }).ToList();
             return viewModel;
         }
 
         #endregion
 
-        #region Show Report Element Type List
+        #region show report element type list
 
         // GET: /Authority/ReportElementTypes
         public ActionResult ReportElementTypes()
@@ -1945,7 +1995,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Id,
                                                                                            vm.Name,
                                                                                            vm.Description,
-                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal =
+                                                                                           vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -1966,6 +2017,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                          newurl = Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority", routeValues:new {id = item.Id})
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -1984,7 +2036,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Report Element Type Details
+        #region show report element type details
 
         [Route(template:"ReportElementType/New")]
         public ActionResult NewReportElementTypeDetails(ReportElementCategoryName categoryName)
@@ -2044,15 +2096,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 var reportElementTypeDto = _reportElementService.DeleteReportElementType(reportElementTypeId:id);
-                TempData["ReporElementTypeDeleteSucceed"] = reportElementTypeDto.ReportElementCategory;
+                TempData[key:"ReporElementTypeDeleteSucceed"] = reportElementTypeDto.ReportElementCategory;
 
-                return  RedirectToAction("ReportElementTypes"); 
+                return RedirectToAction(actionName:"ReportElementTypes");
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 return View(viewName:"ReportElementTypeDetails", model:PrepareReportElementTypeDetails(id:id));
-            } 
+            }
         }
 
         private ReportElementTypeViewModel PrepareReportElementTypeDetails(int? id = null)
@@ -2085,24 +2137,26 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample: false)
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false)
                                                                      .OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
                                                                                                                        {
                                                                                                                            Text = $@"{c.Name} ({c.CtsEventCategoryName})",
                                                                                                                            Value = c.CtsEventTypeId.ToString(),
-                                                                                                                           Selected = c.CtsEventTypeId.Equals(obj: viewModel.CtsEventTypeId)
+                                                                                                                           Selected =
+                                                                                                                               c.CtsEventTypeId.Equals(obj:viewModel
+                                                                                                                                                           .CtsEventTypeId)
                                                                                                                        }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
             if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected) && viewModel.CtsEventTypeName.Trim().Length > 0)
             {
                 // If previously selected one is not in the list then add that
-                viewModel.AvailableCtsEventTypes.Add(item: new SelectListItem
-                                                           {
-                                                               Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CtsCategoryName})",
-                                                               Value = viewModel.CtsEventTypeId.ToString(),
-                                                               Selected = true
-                                                           });
+                viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
+                                                          {
+                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CtsCategoryName})",
+                                                              Value = viewModel.CtsEventTypeId.ToString(),
+                                                              Selected = true
+                                                          });
             }
 
             return viewModel;
@@ -2150,8 +2204,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-        
-        #region Show Report Package Template List
+
+        #region show report package template list
 
         // GET: /Authority/ReportPackageTemplates
         public ActionResult ReportPackageTemplates()
@@ -2164,15 +2218,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(includeChildObjects:false).ToList();
 
             var viewModels = reportPackageTemplates.Select(vm => new ReportPackageTemplateViewModel
-                                                          {
-                                                              Id = vm.ReportPackageTemplateId,
-                                                              Name = vm.Name,
-                                                              Description = vm.Description,
-                                                              IsActive = vm.IsActive,
-                                                              EffectiveDateTimeLocal = vm.EffectiveDateTimeLocal,
-                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
-                                                              LastModifierUserName = vm.LastModifierFullName
-                                                          });
+                                                                 {
+                                                                     Id = vm.ReportPackageTemplateId,
+                                                                     Name = vm.Name,
+                                                                     Description = vm.Description,
+                                                                     IsActive = vm.IsActive,
+                                                                     EffectiveDateTimeLocal = vm.EffectiveDateTimeLocal,
+                                                                     LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                                     LastModifierUserName = vm.LastModifierFullName
+                                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
                                                                                        {
@@ -2180,8 +2234,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Name,
                                                                                            vm.Description,
                                                                                            vm.Status,
-                                                                                           EffectiveDateTimeLocal = vm.EffectiveDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
-                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           EffectiveDateTimeLocal =
+                                                                                           vm.EffectiveDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal =
+                                                                                           vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -2202,6 +2258,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                          newurl = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority", routeValues:new {id = item.Id})
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -2220,12 +2277,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Report Package Template Details
-        
+        #region show report package template details
+
         [Route(template:"ReportPackageTemplate/New")]
         public ActionResult NewReportPackageTemplateDetails()
         {
-           
             var viewModel = new ReportPackageTemplateViewModel();
 
             try
@@ -2246,11 +2302,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             return SaveReportPackageTemplateDetails(model:model);
         }
-        
+
         [Route(template:"ReportPackageTemplate/{id:int}/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
-           
             var viewModel = new ReportPackageTemplateViewModel();
 
             try
@@ -2282,14 +2337,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _reportTemplateService.DeleteReportPackageTemplate(reportPackageTemplateId:id);
 
-                TempData["ReportPackageTemplateDeleteSucceed"] = true; 
-                return  RedirectToAction("ReportPackageTemplates");
+                TempData[key:"ReportPackageTemplateDeleteSucceed"] = true;
+                return RedirectToAction(actionName:"ReportPackageTemplates");
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 return View(viewName:"ReportPackageTemplateDetails", model:PrepareReportPackageTemplateDetails(id:id));
-            } 
+            }
         }
 
         private ReportPackageTemplateViewModel PrepareReportPackageTemplateDetails(int? id = null, ReportPackageTemplateViewModel dirtyViewModel = null)
@@ -2350,19 +2405,20 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             else
             {
-                ViewBag.Satus                                    = "New";
+                ViewBag.Satus = "New";
 
-                viewModel.SamplesAndResultsTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
-                                                                                                                                                                      {
-                                                                                                                                                                          Id = vm.ReportElementTypeId,
-                                                                                                                                                                          Name = vm.Name,
-                                                                                                                                                                          Description = vm.Description
-                                                                                                                                                                      }).ToList();
-                viewModel.AttachmentTypes                        = new List<ReportElementTypeViewModel>();
-                viewModel.CertificationTypes                     = new List<ReportElementTypeViewModel>();
-                viewModel.ReportPackageTemplateAssignments       = new List<IndustryViewModel>();
+                viewModel.SamplesAndResultsTypes = _reportElementService
+                    .GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
+                                                                                                                  {
+                                                                                                                      Id = vm.ReportElementTypeId,
+                                                                                                                      Name = vm.Name,
+                                                                                                                      Description = vm.Description
+                                                                                                                  }).ToList();
+                viewModel.AttachmentTypes = new List<ReportElementTypeViewModel>();
+                viewModel.CertificationTypes = new List<ReportElementTypeViewModel>();
+                viewModel.ReportPackageTemplateAssignments = new List<IndustryViewModel>();
                 viewModel.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
-                viewModel.EffectiveDateTimeLocal                 = DateTime.Today;
+                viewModel.EffectiveDateTimeLocal = DateTime.Today;
             }
 
             if (dirtyViewModel != null)
@@ -2372,7 +2428,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var attachment in dirtyViewModel.AttachmentTypes)
                     {
-                        viewModel.AttachmentTypes.Add(attachment);
+                        viewModel.AttachmentTypes.Add(item:attachment);
                     }
                 }
 
@@ -2381,7 +2437,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var certification in dirtyViewModel.CertificationTypes)
                     {
-                        viewModel.CertificationTypes.Add(certification);
+                        viewModel.CertificationTypes.Add(item:certification);
                     }
                 }
 
@@ -2390,7 +2446,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var sample in dirtyViewModel.SamplesAndResultsTypes)
                     {
-                        viewModel.SamplesAndResultsTypes.Add(sample);
+                        viewModel.SamplesAndResultsTypes.Add(item:sample);
                     }
                 }
 
@@ -2399,29 +2455,30 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var industry in dirtyViewModel.ReportPackageTemplateAssignments)
                     {
-                        industry.IndustryName = HttpUtility.HtmlDecode(industry.IndustryName);
-                        viewModel.ReportPackageTemplateAssignments.Add(industry);
+                        industry.IndustryName = HttpUtility.HtmlDecode(s:industry.IndustryName);
+                        viewModel.ReportPackageTemplateAssignments.Add(item:industry);
                     }
                 }
-
             }
 
             viewModel.AllSamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
 
-            viewModel.AllAttachmentTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
-                                                             {
-                                                                 Id = vm.ReportElementTypeId,
-                                                                 Name = vm.Name,
-                                                                 Description = vm.Description
-                                                             }).ToList();
+            viewModel.AllAttachmentTypes = _reportElementService
+                .GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
+                                                                                                        {
+                                                                                                            Id = vm.ReportElementTypeId,
+                                                                                                            Name = vm.Name,
+                                                                                                            Description = vm.Description
+                                                                                                        }).ToList();
 
-            viewModel.AllCertificationTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Certifications).Select(vm => new ReportElementTypeViewModel
-                                                             {
-                                                                 Id = vm.ReportElementTypeId,
-                                                                 Name = vm.Name,
-                                                                 Description = vm.Description
-                                                             }).ToList();
-            
+            viewModel.AllCertificationTypes = _reportElementService
+                .GetReportElementTypes(categoryName:ReportElementCategoryName.Certifications).Select(vm => new ReportElementTypeViewModel
+                                                                                                           {
+                                                                                                               Id = vm.ReportElementTypeId,
+                                                                                                               Name = vm.Name,
+                                                                                                               Description = vm.Description
+                                                                                                           }).ToList();
+
             var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
             var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId).Where(i => !i.IsRemoved);
 
@@ -2438,16 +2495,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                         ZipCode = vm.OrganizationDto.ZipCode,
                                                                                         Classification = vm.OrganizationDto.Classification
                                                                                     }).ToList();
-            
+
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
             viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
-                                                                                                                                          {
-                                                                                                                                              Text = $@"{c.Name} ({c.CtsEventCategoryName})",
-                                                                                                                                              Value = c.CtsEventTypeId.ToString(),
-                                                                                                                                              Selected =
-                                                                                                                                                  c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                                                          }).ToList();
+                                                                                                                                                           {
+                                                                                                                                                               Text = $@"{c.Name} ({c.CtsEventCategoryName})",
+                                                                                                                                                               Value = c.CtsEventTypeId.ToString(),
+                                                                                                                                                               Selected =c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                                                                           }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
             if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected) && viewModel.CtsEventTypeName.Trim().Length > 0)
@@ -2461,7 +2517,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           });
             }
 
-
             return viewModel;
         }
 
@@ -2469,7 +2524,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareReportPackageTemplateDetails(id: model.Id, dirtyViewModel: model);
+                model = PrepareReportPackageTemplateDetails(id:model.Id, dirtyViewModel:model);
 
                 //foreach (var issue in ModelState[key: "."].Errors)
                 //{
@@ -2478,6 +2533,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(viewName:"ReportPackageTemplateDetails", model:model);
             }
+
             try
             {
                 var reportPackageTemplateDto = new ReportPackageTemplateDto();
@@ -2496,30 +2552,29 @@ namespace Linko.LinkoExchange.Web.Controllers
                 reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
                 reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
                 reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.ReportPackageTemplateAssignments = model.ReportPackageTemplateAssignments?.Select(p => new OrganizationRegulatoryProgramDto() {OrganizationRegulatoryProgramId = p.Id}).ToList();
+                reportPackageTemplateDto.ReportPackageTemplateAssignments = model
+                    .ReportPackageTemplateAssignments?.Select(p => new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = p.Id}).ToList();
                 reportPackageTemplateDto.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
                 reportPackageTemplateDto.IsSubmissionBySignatoryRequired = model.IsSubmissionBySignatoryRequired;
                 reportPackageTemplateDto.ShowSampleResults = model.ShowSampleResults;
 
-
                 var id = _reportTemplateService.SaveReportPackageTemplate(rpt:reportPackageTemplateDto);
-                
+
                 TempData[key:"ShowSuccessMessage"] = true;
                 TempData[key:"SuccessMessage"] = $"Report package template {(model.Id.HasValue ? "updated" : "created")} successfully!";
 
                 ModelState.Clear();
-                return Json(data:new { redirect = true, newurl = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority", routeValues:new {id}) });
+                return Json(data:new {redirect = true, newurl = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority", routeValues:new {id})});
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                model = PrepareReportPackageTemplateDetails(id: model.Id, dirtyViewModel: model);
+                model = PrepareReportPackageTemplateDetails(id:model.Id, dirtyViewModel:model);
             }
 
             return View(viewName:"ReportPackageTemplateDetails", model:model);
         }
 
         #endregion
-
     }
 }

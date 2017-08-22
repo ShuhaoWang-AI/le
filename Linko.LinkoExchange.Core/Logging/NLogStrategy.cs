@@ -15,16 +15,16 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public override void PreBuildUp(IBuilderContext context)
         {
-            ICreationStackTrackerPolicy policy = context.Policies.Get<ICreationStackTrackerPolicy>(buildKey: null, localOnly: true);
+            var policy = context.Policies.Get<ICreationStackTrackerPolicy>(buildKey:null, localOnly:true);
 
             // The stack seems to contain duplicate of each type.
             // Thus, the 3rd element is the actual type that the logger should be named after.
-            if (policy.TypeStack.Count >= 3 && policy.TypeStack.Peek(depth: 0)== typeof(ILogger))
+            if (policy.TypeStack.Count >= 3 && policy.TypeStack.Peek(depth:0) == typeof(ILogger))
             {
-                context.Existing = LogManager.GetLogger(policy.TypeStack.Peek(depth: 2).FullName);
+                context.Existing = LogManager.GetLogger(name:policy.TypeStack.Peek(depth:2).FullName);
             }
 
-            base.PreBuildUp(context);
+            base.PreBuildUp(context:context);
         }
 
         #endregion

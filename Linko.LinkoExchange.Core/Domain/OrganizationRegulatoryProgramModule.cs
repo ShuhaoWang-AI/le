@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a permitted module within a regulatory program for a particular organization.
+    ///     Represents a permitted module within a regulatory program for a particular organization.
     /// </summary>
-    public partial class OrganizationRegulatoryProgramModule
+    public class OrganizationRegulatoryProgramModule
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationRegulatoryProgramModuleId { get; set; }
 
@@ -23,5 +25,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

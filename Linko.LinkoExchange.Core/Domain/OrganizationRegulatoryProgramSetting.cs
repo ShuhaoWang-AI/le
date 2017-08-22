@@ -3,13 +3,15 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a setting within a regulatory program for a particular organization.
-    /// A regulatee will inherit these settings from its regulator.
+    ///     Represents a setting within a regulatory program for a particular organization.
+    ///     A regulatee will inherit these settings from its regulator.
     /// </summary>
-    public partial class OrganizationRegulatoryProgramSetting
+    public class OrganizationRegulatoryProgramSetting
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationRegulatoryProgramSettingId { get; set; }
 
@@ -26,5 +28,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

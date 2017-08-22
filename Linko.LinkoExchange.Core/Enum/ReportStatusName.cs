@@ -1,5 +1,4 @@
-﻿
-namespace Linko.LinkoExchange.Core.Enum
+﻿namespace Linko.LinkoExchange.Core.Enum
 {
     public enum ReportStatusName
     {

@@ -6,6 +6,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageTemplateDto
     {
+        #region public properties
+
         public int? ReportPackageTemplateId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -27,5 +29,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<OrganizationRegulatoryProgramDto> ReportPackageTemplateAssignments { get; set; }
         public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
         public bool ShowSampleResults { get; set; }
+
+        #endregion
     }
 }

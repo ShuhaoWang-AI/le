@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents an answer entered by a user for a particular question.
+    ///     Represents an answer entered by a user for a particular question.
     /// </summary>
-    public partial class UserQuestionAnswer
+    public class UserQuestionAnswer
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int UserQuestionAnswerId { get; set; }
 
@@ -18,10 +20,13 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual Question Question { get; set; }
 
         public int UserProfileId { get; set; }
+
         //public UserProfile UserProfile { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        #endregion
     }
 }

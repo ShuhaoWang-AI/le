@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a type of an organization.
+    ///     Represents a type of an organization.
     /// </summary>
-    public partial class OrganizationType
+    public class OrganizationType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationTypeId { get; set; }
 
@@ -23,8 +25,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<OrganizationTypeRegulatoryProgram> OrganizationTypeRegulatoryPrograms { get; set; }
+
+        #endregion
     }
 }

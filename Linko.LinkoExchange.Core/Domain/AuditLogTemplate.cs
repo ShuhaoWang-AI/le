@@ -2,20 +2,21 @@
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-
     /// <summary>
-    /// Represents a message template for an audit log.
+    ///     Represents a message template for an audit log.
     /// </summary>
-    public partial class AuditLogTemplate
+    public class AuditLogTemplate
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int AuditLogTemplateId { get; set; }
 
         /// <summary>
-        /// Format: TemplateType_EventCategory_EventType. 
-        /// It exists to assist the business layer to refer a single row because there are many non-existent combination of the three values.
+        ///     Format: TemplateType_EventCategory_EventType.
+        ///     It exists to assist the business layer to refer a single row because there are many non-existent combination of the three values.
         /// </summary>
         public string Name { get; set; }
 
@@ -26,7 +27,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string EventType { get; set; }
 
         /// <summary>
-        /// Used by Email TemplateType.
+        ///     Used by Email TemplateType.
         /// </summary>
         public string SubjectTemplate { get; set; }
 
@@ -37,6 +38,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
-    }
 
+        #endregion
+    }
 }

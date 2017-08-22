@@ -1,12 +1,14 @@
 ﻿namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents an attached file for a Report Package Element Type.
+    ///     Represents an attached file for a Report Package Element Type.
     /// </summary>
-    public partial class ReportFile
+    public class ReportFile
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportFileId { get; set; }
 
@@ -15,5 +17,7 @@
 
         public int FileStoreId { get; set; }
         public virtual FileStore FileStore { get; set; }
+
+        #endregion
     }
 }

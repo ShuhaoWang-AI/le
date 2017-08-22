@@ -1,13 +1,15 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class UserQuestionAnswerMap : EntityTypeConfiguration<UserQuestionAnswer>
     {
+        #region constructors and destructor
+
         public UserQuestionAnswerMap()
         {
-            ToTable("tUserQuestionAnswer");
+            ToTable(tableName:"tUserQuestionAnswer");
 
             HasKey(x => x.UserQuestionAnswerId);
 
@@ -16,9 +18,10 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasRequired(a => a.Question)
                 .WithMany()
                 .HasForeignKey(c => c.QuestionId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.UserProfileId).IsRequired();
+
             //HasRequired(a => a.UserProfile)
             //    .WithMany()
             //    .HasForeignKey(c => c.UserProfileId)
@@ -28,5 +31,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModificationDateTimeUtc).IsOptional();
         }
+
+        #endregion
     }
 }

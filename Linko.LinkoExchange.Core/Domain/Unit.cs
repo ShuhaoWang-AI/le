@@ -3,31 +3,34 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Unit.
+    ///     Represents a Unit.
     /// </summary>
-    public partial class Unit
+    public class Unit
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int UnitId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        ///     Unique within a particular OrganizationRegulatoryProgramId.
         /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// True: the current unit is for flow. False, otherwise.
+        ///     True: the current unit is for flow. False, otherwise.
         /// </summary>
         public bool IsFlowUnit { get; set; }
 
         /// <summary>
-        /// Typical value: Authority id.
+        ///     Typical value: Authority id.
         /// </summary>
         public int OrganizationId { get; set; }
+
         public virtual Organization Organization { get; set; }
 
         public bool IsRemoved { get; set; }
@@ -37,6 +40,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

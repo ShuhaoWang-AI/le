@@ -1,24 +1,26 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class MonitoringPointMap : EntityTypeConfiguration<MonitoringPoint>
     {
+        #region constructors and destructor
+
         public MonitoringPointMap()
         {
-            ToTable("tMonitoringPoint");
+            ToTable(tableName:"tMonitoringPoint");
 
             HasKey(x => x.MonitoringPointId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(50);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:50);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.MonitoringPoints)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.IsEnabled).IsRequired();
 
@@ -30,6 +32,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
-    }
 
+        #endregion
+    }
 }

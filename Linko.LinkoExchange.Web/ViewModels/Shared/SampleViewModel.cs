@@ -10,10 +10,12 @@ using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    [Validator(validatorType: typeof(SampleViewModelValidator))]
+    [Validator(validatorType:typeof(SampleViewModelValidator))]
     public class SampleViewModel
     {
-        [ScaffoldColumn(scaffold: false)]
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
         [Display(Name = "Name")]
@@ -61,7 +63,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
 
-        [Editable(allowEdit: false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Last Submitted")]
         public DateTime? LastSubmitted { get; set; }
 
@@ -70,6 +72,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Flow Unit")]
         public int? FlowUnitId { get; set; }
+
         public string FlowUnitName { get; set; }
         public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
 
@@ -81,10 +84,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
                                                                          {
                                                                              Text = c.Name,
                                                                              Value = c.UnitId.ToString(),
-                                                                             Selected = c.UnitId.Equals(obj: FlowUnitId)
+                                                                             Selected = c.UnitId.Equals(obj:FlowUnitId)
                                                                          }).ToList();
 
-                availableFlowUnits.Insert(index: 0, item: new SelectListItem {Text = @"Select Flow Unit", Value = "0"});
+                availableFlowUnits.Insert(index:0, item:new SelectListItem {Text = @"Select Flow Unit", Value = "0"});
                 return availableFlowUnits;
             }
         }
@@ -99,13 +102,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
                 var options = new List<SelectListItem> {new SelectListItem {Text = " ", Value = "NUMERIC"}};
 
-                options.AddRange(collection: selectedValues.Select(
-                                                                   x => new SelectListItem
-                                                                        {
-                                                                            Text = x,
-                                                                            Value = x
-                                                                        }
-                                                                  ).ToList());
+                options.AddRange(collection:selectedValues.Select(
+                                                                  x => new SelectListItem
+                                                                       {
+                                                                           Text = x,
+                                                                           Value = x
+                                                                       }
+                                                                 ).ToList());
                 return options;
             }
         }
@@ -123,27 +126,33 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = " ")]
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
+
+        #endregion
     }
 
     public class SampleViewModelValidator : AbstractValidator<SampleViewModel>
     {
+        #region constructors and destructor
+
         public SampleViewModelValidator()
         {
             //CollectionMethodId
-            RuleFor(x => x.CollectionMethodId).NotNull().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.CollectionMethodId).NotNull().WithMessage(errorMessage:"{PropertyName} is required.");
 
             //CtsEventTypeId
-            RuleFor(x => x.CtsEventTypeId).NotNull().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.CtsEventTypeId).NotNull().WithMessage(errorMessage:"{PropertyName} is required.");
 
             //StartDateTimeLocal
-            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
 
             //EndDateTimeLocal
-            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
 
             //FlowUnitId
-            RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThan(valueToCompare: 0)
-                                      .When(x => !string.IsNullOrWhiteSpace(value: x.FlowValue)).WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.").GreaterThan(valueToCompare:0)
+                                      .When(x => !string.IsNullOrWhiteSpace(value:x.FlowValue)).WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }

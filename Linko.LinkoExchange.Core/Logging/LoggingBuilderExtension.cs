@@ -7,26 +7,26 @@ namespace Linko.LinkoExchange.Core.Logging
     {
         protected override void Initialize()
         {
-            LoggingBuilderStrategy builder = new LoggingBuilderStrategy(UnityBuildStage.Creation);
-            Context.Strategies.Add(builder, builder.Stage);
+            var builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.Creation);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.Initialization);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.Initialization);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.Lifetime);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.Lifetime);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.PostInitialization);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.PostInitialization);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.PreCreation);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.PreCreation);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.Setup);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.Setup);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
 
-            builder = new LoggingBuilderStrategy(UnityBuildStage.TypeMapping);
-            Context.Strategies.Add(builder, builder.Stage);
+            builder = new LoggingBuilderStrategy(unityBuildStage:UnityBuildStage.TypeMapping);
+            Context.Strategies.Add(strategy:builder, stage:builder.Stage);
         }
     }
 }

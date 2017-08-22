@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a setting for a particular organization.
+    ///     Represents a setting for a particular organization.
     /// </summary>
-    public partial class OrganizationSetting
+    public class OrganizationSetting
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationSettingId { get; set; }
 
@@ -25,5 +27,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

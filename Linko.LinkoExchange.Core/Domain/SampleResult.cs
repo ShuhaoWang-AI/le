@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Sample Result.
+    ///     Represents a Sample Result.
     /// </summary>
-    public partial class SampleResult
+    public class SampleResult
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int SampleResultId { get; set; }
 
@@ -18,14 +20,14 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ParameterId { get; set; }
 
         /// <summary>
-        /// Denormalized data. Unique within a Sample.
+        ///     De-normalized data. Unique within a Sample.
         /// </summary>
         public string ParameterName { get; set; }
 
         public string Qualifier { get; set; }
 
         /// <summary>
-        /// Value as entered by the user.
+        ///     Value as entered by the user.
         /// </summary>
         public string EnteredValue { get; set; }
 
@@ -34,12 +36,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public int UnitId { get; set; }
 
         /// <summary>
-        /// Denormalized data.
+        ///     De-normalized data.
         /// </summary>
         public string UnitName { get; set; }
 
         /// <summary>
-        /// Method detection limit as entered by the user.
+        ///     Method detection limit as entered by the user.
         /// </summary>
         public string EnteredMethodDetectionLimit { get; set; }
 
@@ -66,6 +68,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

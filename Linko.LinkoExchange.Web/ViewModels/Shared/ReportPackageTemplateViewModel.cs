@@ -13,6 +13,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     [Validator(validatorType:typeof(ReportPackageTemplateViewModelValidator))]
     public class ReportPackageTemplateViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
@@ -37,8 +39,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "CTS Event Type")]
         public string CtsEventTypeName { get; set; }
+
         public IList<SelectListItem> AvailableCtsEventTypes { get; set; }
-        
+
         [Display(Name = "CTS Event Type Category")]
         public string CtsCategoryName { get; set; }
 
@@ -56,39 +59,52 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Samples And Results")]
         public List<ReportElementTypeViewModel> SamplesAndResultsTypes { get; set; }
+
         public List<ReportElementTypeViewModel> AllSamplesAndResultsTypes { private get; set; }
         public List<ReportElementTypeViewModel> AvailableSamplesAndResultsTypes => AllSamplesAndResultsTypes.Where(a => SamplesAndResultsTypes.All(b => a.Id != b.Id)).ToList();
-        
+
         [Display(Name = "Attachments")]
         public List<ReportElementTypeViewModel> AttachmentTypes { get; set; }
+
         public List<ReportElementTypeViewModel> AllAttachmentTypes { private get; set; }
         public List<ReportElementTypeViewModel> AvailableAttachmentTypes => AllAttachmentTypes.Where(a => AttachmentTypes.All(b => a.Id != b.Id)).ToList();
 
         [Display(Name = "Certifications")]
         public List<ReportElementTypeViewModel> CertificationTypes { get; set; }
+
         public List<ReportElementTypeViewModel> AllCertificationTypes { private get; set; }
         public List<ReportElementTypeViewModel> AvailableCertificationTypes => AllCertificationTypes.Where(a => CertificationTypes.All(b => a.Id != b.Id)).ToList();
-        
+
         [Display(Name = "Industries")]
         public List<IndustryViewModel> ReportPackageTemplateAssignments { get; set; }
+
         public List<IndustryViewModel> AllReportPackageTemplateAssignments { private get; set; }
-        public List<IndustryViewModel> AvailableReportPackageTemplateAssignments => AllReportPackageTemplateAssignments.Where(a => ReportPackageTemplateAssignments.All(b => a.Id != b.Id)).ToList();
-        
+
+        public List<IndustryViewModel> AvailableReportPackageTemplateAssignments => AllReportPackageTemplateAssignments
+            .Where(a => ReportPackageTemplateAssignments.All(b => a.Id != b.Id)).ToList();
+
         [Display(Name = "Categories")]
         public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
 
         [Display(Name = "Show Sample Results")]
         public bool ShowSampleResults => true;
+
+        #endregion
     }
 
-    public class ReportPackageTemplateViewModelValidator:AbstractValidator<ReportPackageTemplateViewModel>
+    public class ReportPackageTemplateViewModelValidator : AbstractValidator<ReportPackageTemplateViewModel>
     {
+        #region constructors and destructor
+
         public ReportPackageTemplateViewModelValidator()
         {
             //Name
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+
             //EffectiveDateTimeLocal
             RuleFor(x => x.EffectiveDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }

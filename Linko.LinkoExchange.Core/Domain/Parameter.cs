@@ -4,17 +4,19 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Parameter.
+    ///     Represents a Parameter.
     /// </summary>
-    public partial class Parameter
+    public class Parameter
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ParameterId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        ///     Unique within a particular OrganizationRegulatoryProgramId.
         /// </summary>
         public string Name { get; set; }
 
@@ -28,9 +30,10 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsFlowForMassLoadingCalculation { get; set; }
 
         /// <summary>
-        /// Typical value: Authority Organization Regulatory Program id.
+        ///     Typical value: Authority Organization Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         public bool IsRemoved { get; set; }
@@ -41,9 +44,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
+
+        #endregion
     }
 }
-

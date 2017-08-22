@@ -1,27 +1,30 @@
 ﻿namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Copy of Record (COR).
+    ///     Represents a Copy of Record (COR).
     /// </summary>
-    public partial class CopyOfRecord
+    public class CopyOfRecord
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportPackageId { get; set; }
+
         public virtual ReportPackage ReportPackage { get; set; }
 
         public string Signature { get; set; }
 
         /// <summary>
-        /// Encryption algorithm used in the creation of the digital signature.
+        ///     Encryption algorithm used in the creation of the digital signature.
         /// </summary>
         public string SignatureAlgorithm { get; set; }
 
         public string Hash { get; set; }
 
         /// <summary>
-        /// Hashing algorithm used in the creation of the data hash.
+        ///     Hashing algorithm used in the creation of the data hash.
         /// </summary>
         public string HashAlgorithm { get; set; }
 
@@ -29,6 +32,7 @@
 
         public int CopyOfRecordCertificateId { get; set; }
         public virtual CopyOfRecordCertificate CopyOfRecordCertificate { get; set; }
+
+        #endregion
     }
 }
-

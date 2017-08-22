@@ -3,11 +3,15 @@ using NLog;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
-    public class LogAttribute:ActionFilterAttribute
+    public class LogAttribute : ActionFilterAttribute
     {
+        #region fields
+
         private readonly ILogger _logger;
 
-        #region constructor
+        #endregion
+
+        #region constructors and destructor
 
         public LogAttribute(ILogger logger)
         {

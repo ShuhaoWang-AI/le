@@ -1,20 +1,22 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class EmailAuditLogMap : EntityTypeConfiguration<EmailAuditLog>
     {
+        #region constructors and destructor
+
         public EmailAuditLogMap()
         {
-            ToTable("tEmailAuditLog");
+            ToTable(tableName:"tEmailAuditLog");
 
             HasKey(x => x.EmailAuditLogId);
 
             HasRequired(a => a.AuditLogTemplate)
                 .WithMany()
                 .HasForeignKey(c => c.AuditLogTemplateId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.SenderRegulatoryProgramId).IsOptional();
 
@@ -24,13 +26,13 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.SenderUserProfileId).IsOptional();
 
-            Property(x => x.SenderUserName).IsOptional().HasMaxLength(256);
+            Property(x => x.SenderUserName).IsOptional().HasMaxLength(value:256);
 
-            Property(x => x.SenderFirstName).IsOptional().HasMaxLength(50);
+            Property(x => x.SenderFirstName).IsOptional().HasMaxLength(value:50);
 
-            Property(x => x.SenderLastName).IsOptional().HasMaxLength(50);
+            Property(x => x.SenderLastName).IsOptional().HasMaxLength(value:50);
 
-            Property(x => x.SenderEmailAddress).IsRequired().HasMaxLength(256);
+            Property(x => x.SenderEmailAddress).IsRequired().HasMaxLength(value:256);
 
             Property(x => x.RecipientRegulatoryProgramId).IsOptional();
 
@@ -40,21 +42,23 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.RecipientUserProfileId).IsOptional();
 
-            Property(x => x.RecipientUserName).IsOptional().HasMaxLength(256);
+            Property(x => x.RecipientUserName).IsOptional().HasMaxLength(value:256);
 
-            Property(x => x.RecipientFirstName).IsOptional().HasMaxLength(50);
+            Property(x => x.RecipientFirstName).IsOptional().HasMaxLength(value:50);
 
-            Property(x => x.RecipientLastName).IsOptional().HasMaxLength(50);
+            Property(x => x.RecipientLastName).IsOptional().HasMaxLength(value:50);
 
-            Property(x => x.RecipientEmailAddress).IsRequired().HasMaxLength(256);
+            Property(x => x.RecipientEmailAddress).IsRequired().HasMaxLength(value:256);
 
-            Property(x => x.Subject).IsRequired().HasMaxLength(500);
+            Property(x => x.Subject).IsRequired().HasMaxLength(value:500);
 
             Property(x => x.Body).IsRequired();
 
-            Property(x => x.Token).IsOptional().HasMaxLength(128);
+            Property(x => x.Token).IsOptional().HasMaxLength(value:128);
 
             Property(x => x.SentDateTimeUtc).IsRequired();
         }
+
+        #endregion
     }
 }

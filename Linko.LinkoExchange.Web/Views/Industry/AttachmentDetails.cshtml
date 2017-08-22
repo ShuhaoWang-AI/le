@@ -5,22 +5,21 @@
 }
 
 
-@using (Html.BeginForm(actionName: "NewAttachmentDetails", controllerName: "Industry", routeValues: null, method: FormMethod.Post, htmlAttributes: new
-                                                                                                                                                   {
-                                                                                                                                                       enctype = "multipart/form-data"
-                                                                                                                                                       ,
-                                                                                                                                                       id = "LinkoExchangeForm"
-                                                                                                                                                   }))
+@using (Html.BeginForm(actionName:"NewAttachmentDetails", controllerName:"Industry", routeValues:null, method:FormMethod.Post, htmlAttributes:new
+                                                                                                                                              {
+                                                                                                                                                  enctype = "multipart/form-data",
+                                                                                                                                                  id = "LinkoExchangeForm"
+                                                                                                                                              }))
 {
     @Html.AntiForgeryToken()
 
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "Attachments", controllerName: "Industry")'"><i class=""></i> Attachments </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Attachments", controllerName:"Industry")'"><i class=""></i> Attachments </a>
             </li>
             <li class="active">Details</li>
         </ol>
@@ -63,7 +62,7 @@
                         </p>
                         <div class="form-group">
                             <div class="pull-right">
-                                <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "DeleteAttachment", controllerName: "Industry", routeValues: new {id = Model.Id})" formmethod="post">
+                                <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteAttachment", controllerName:"Industry", routeValues:new {id = Model.Id})" formmethod="post">
                                     Yes
                                 </button>
                                 <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -75,10 +74,10 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
-                                                                                                                                {
-                                                                                                                                    @class = "alert alert-danger"
-                                                                                                                                })
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                             {
+                                                                                                                                 @class = "alert alert-danger"
+                                                                                                                             })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -93,10 +92,10 @@
             @if (ViewBag.Satus.Equals("New"))
             {
                 <div class="form-group">
-                    @Html.Label(expression: "File", htmlAttributes: new
-                                                                    {
-                                                                        @class = "control-label col-md-2 required"
-                                                                    })
+                    @Html.Label(expression:"File", htmlAttributes:new
+                                                                  {
+                                                                      @class = "control-label col-md-2 required"
+                                                                  })
                     <div class="col-md-10">
                         <input id="upload" name="upload" type="file" style="width: 100%;" accept=@Model.AllowedFileExtensions />
                     </div>
@@ -107,105 +106,105 @@
                 <div class="form-group">
                     @Html.HiddenFor(model => model.Id)
                     @Html.HiddenFor(model => model.MediaType)
-                    @Html.LabelFor(model => model.Name, htmlAttributes: new
-                                                                        {
-                                                                            @class = "control-label col-md-2"
-                                                                        })
+                    @Html.LabelFor(model => model.Name, htmlAttributes:new
+                                                                       {
+                                                                           @class = "control-label col-md-2"
+                                                                       })
                     <div class="col-md-8">
-                        @Html.ActionLink(linkText: Model.Name, actionName: "DownloadAttachment", routeValues: new
-                                                                                                              {
-                                                                                                                  id = Model.Id
-                                                                                                              }, htmlAttributes: new
-                                                                                                                                 {
-                                                                                                                                     @class = "btn btn-sm btn-link"
-                                                                                                                                 })
+                        @Html.ActionLink(linkText:Model.Name, actionName:"DownloadAttachment", routeValues:new
+                                                                                                           {
+                                                                                                               id = Model.Id
+                                                                                                           }, htmlAttributes:new
+                                                                                                                             {
+                                                                                                                                 @class = "btn btn-sm btn-link"
+                                                                                                                             })
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(model => model.OriginalFileName, htmlAttributes: new
-                                                                                    {
-                                                                                        @class = "control-label col-md-2"
-                                                                                    })
+                    @Html.LabelFor(model => model.OriginalFileName, htmlAttributes:new
+                                                                                   {
+                                                                                       @class = "control-label col-md-2"
+                                                                                   })
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.OriginalFileName, additionalViewData: new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control",
-                                                                                                                      @readonly = "readonly"
-                                                                                                                  }
-                                                                                             })
+                        @Html.EditorFor(model => model.OriginalFileName, additionalViewData:new
+                                                                                            {
+                                                                                                htmlAttributes = new
+                                                                                                                 {
+                                                                                                                     @class = "form-control",
+                                                                                                                     @readonly = "readonly"
+                                                                                                                 }
+                                                                                            })
                     </div>
                 </div>
             }
 
             <div class="form-group">
 
-                @Html.LabelFor(model => model.ReportElementTypeId, htmlAttributes: new
-                                                                                   {
-                                                                                       @class = "control-label col-md-2 required"
-                                                                                   })
+                @Html.LabelFor(model => model.ReportElementTypeId, htmlAttributes:new
+                                                                                  {
+                                                                                      @class = "control-label col-md-2 required"
+                                                                                  })
                 @if (Model.UsedByReports)
                 {
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData: new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           @readonly = "readonly"
-                                                                                                                       }
-                                                                                                  })
+                        @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData:new
+                                                                                                 {
+                                                                                                     htmlAttributes = new
+                                                                                                                      {
+                                                                                                                          @class = "form-control",
+                                                                                                                          @readonly = "readonly"
+                                                                                                                      }
+                                                                                                 })
                     </div>
                 }
                 else
                 {
                     <div class="col-md-4">
                         @Html.HiddenFor(model => model.ReportElementTypeName)
-                        @Html.DropDownList(name: "ReportElementTypeId", selectList: Model.AvailableReportElementTypes, htmlAttributes: new
-                                                                                                                                       {
-                                                                                                                                           @class = "form-control"
-                                                                                                                                       })
-                        @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage: "", htmlAttributes: new
-                                                                                                                              {
-                                                                                                                                  @class = "text-danger"
-                                                                                                                              })
+                        @Html.DropDownList(name:"ReportElementTypeId", selectList:Model.AvailableReportElementTypes, htmlAttributes:new
+                                                                                                                                    {
+                                                                                                                                        @class = "form-control"
+                                                                                                                                    })
+                        @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage:"", htmlAttributes:new
+                                                                                                                            {
+                                                                                                                                @class = "text-danger"
+                                                                                                                            })
                     </div>
                 }
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.Description, htmlAttributes: new
-                                                                           {
-                                                                               @class = "control-label col-md-2"
-                                                                           })
+                @Html.LabelFor(model => model.Description, htmlAttributes:new
+                                                                          {
+                                                                              @class = "control-label col-md-2"
+                                                                          })
                 @if (Model.UsedByReports)
                 {
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.Description, additionalViewData: new
-                                                                                        {
-                                                                                            htmlAttributes = new
-                                                                                                             {
-                                                                                                                 @class = "form-control",
-                                                                                                                 @readonly = "readonly",
-                                                                                                                 rows = "3",
-                                                                                                                 maxlength = 500
-                                                                                                             }
-                                                                                        })
+                        @Html.EditorFor(model => model.Description, additionalViewData:new
+                                                                                       {
+                                                                                           htmlAttributes = new
+                                                                                                            {
+                                                                                                                @class = "form-control",
+                                                                                                                @readonly = "readonly",
+                                                                                                                rows = "3",
+                                                                                                                maxlength = 500
+                                                                                                            }
+                                                                                       })
                     </div>
                 }
                 else
                 {
                     <div class="col-md-8">
-                        @Html.EditorFor(model => model.Description, additionalViewData: new
-                                                                                        {
-                                                                                            htmlAttributes = new
-                                                                                                             {
-                                                                                                                 @class = "form-control",
-                                                                                                                 rows = "3",
-                                                                                                                 maxlength = 500
-                                                                                                             }
-                                                                                        })
+                        @Html.EditorFor(model => model.Description, additionalViewData:new
+                                                                                       {
+                                                                                           htmlAttributes = new
+                                                                                                            {
+                                                                                                                @class = "form-control",
+                                                                                                                rows = "3",
+                                                                                                                maxlength = 500
+                                                                                                            }
+                                                                                       })
                     </div>
                 }
             </div>
@@ -217,7 +216,7 @@
                 <div class="form-group pull-right">
                     @if (!ViewBag.Satus.Equals("New"))
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "AttachmentDetails", controllerName: "Industry")" formmethod="post" />
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"AttachmentDetails", controllerName:"Industry")" formmethod="post" />
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteAttachmentModal" data-toggle="modal" type="button" value="Delete" />
 
@@ -228,7 +227,7 @@
                     }
                     else
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "NewAttachmentDetails", controllerName: "Industry")" formmethod="post" />
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry")" formmethod="post" />
                     }
                 </div>
             </div>
@@ -239,7 +238,7 @@
 
     @if (ViewBag.Satus.Equals("New"))
     {
-        @Scripts.Render(paths: "~/bundles/jqueryval")
+        @Scripts.Render(paths:"~/bundles/jqueryval")
 
         <script>
             $(document)

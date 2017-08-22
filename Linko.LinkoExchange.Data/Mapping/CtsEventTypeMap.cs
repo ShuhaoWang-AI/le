@@ -1,26 +1,28 @@
-using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class CtsEventTypeMap : EntityTypeConfiguration<CtsEventType>
+    public class CtsEventTypeMap : EntityTypeConfiguration<CtsEventType>
     {
+        #region constructors and destructor
+
         public CtsEventTypeMap()
         {
-            ToTable("tCtsEventType");
+            ToTable(tableName:"tCtsEventType");
 
             HasKey(x => x.CtsEventTypeId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(50);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:50);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
-            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(50);
+            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(value:50);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.CtsEventTypes)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.IsEnabled).IsRequired();
 
@@ -32,5 +34,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

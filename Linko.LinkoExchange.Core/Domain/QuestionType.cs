@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a type of a question.
+    ///     Represents a type of a question.
     /// </summary>
-    public partial class QuestionType
+    public class QuestionType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int QuestionTypeId { get; set; }
 
@@ -23,8 +25,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<Question> Questions { get; set; }
+
+        #endregion
     }
 }

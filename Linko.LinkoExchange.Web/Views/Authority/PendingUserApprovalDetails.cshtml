@@ -170,16 +170,16 @@
                 </div>
                 @if (Model.Type == OrganizationTypeName.Industry.ToString())
                 {
-                    @Html.LabelFor(model => model.IsSignatory, htmlAttributes: new
-                                                                   {
-                                                                       @class = "control-label col-md-2"
-                                                                   })
+                    @Html.LabelFor(model => model.IsSignatory, htmlAttributes:new
+                                                                              {
+                                                                                  @class = "control-label col-md-2"
+                                                                              })
                     <div class="col-md-4">
                         <div class="checkbox">
                             @Html.EditorFor(model => model.IsSignatory)
                         </div>
-                    </div> 
-                } 
+                    </div>
+                }
 
             </div>
 

@@ -59,12 +59,12 @@ namespace Linko.LinkoExchange.Web
                             .Include(virtualPath:"~/Scripts/auditlogs.js"));
 
             bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/pendingInvitations")
-                            .Include(virtualPath:"~/Scripts/pendingInvitation.js"));  
-             
+                            .Include(virtualPath:"~/Scripts/pendingInvitation.js"));
+
 #if DEBUG
             BundleTable.EnableOptimizations = false;
 #else
-            BundleTable.EnableOptimizations = true;
+                BundleTable.EnableOptimizations = true;
 #endif
         }
     }

@@ -1,48 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Dto;
-using NLog;
-using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Cache;
-using System.Configuration;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Mapping;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
-	public class SettingService : ISettingService
-	{
-        #region private members
+    public class SettingService : ISettingService
+    {
+        #region fields
+
+        private readonly IRequestCache _cache;
 
         private readonly LinkoExchangeContext _dbContext;
+        private readonly IGlobalSettings _globalSettings;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
-        private readonly IRequestCache _cache;
-        private readonly IGlobalSettings _globalSettings;
 
         #endregion
 
-        public SettingService(LinkoExchangeContext dbContext, ILogger logger,
-            IMapHelper mapHelper, IRequestCache cache, IGlobalSettings globalSettings)
+        #region constructors and destructor
+
+        public SettingService(LinkoExchangeContext dbContext, ILogger logger, IMapHelper mapHelper, IRequestCache cache, IGlobalSettings globalSettings)
         {
-            _dbContext = dbContext; 
+            _dbContext = dbContext;
             _logger = logger;
             _mapHelper = mapHelper;
             _cache = cache;
             _globalSettings = globalSettings;
         }
 
+        #endregion
+
+        #region interface implementations
+
         /// <summary>
-        /// Get organization settings for a collection of organization Ids
+        ///     Get organization settings for a collection of organization Ids
         /// </summary>
-        /// <param name="organizationIds">The organization Ids.</param>
-        /// <returns>Collection of organization settings</returns>
+        /// <param name="organizationIds"> The organization Ids. </param>
+        /// <returns> Collection of organization settings </returns>
         public ICollection<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds)
         {
             var orgSettingsDtoList = new List<OrganizationSettingDto>();
@@ -50,65 +54,66 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 foreach (var orgId in organizationIds)
                 {
-                    var orgSettingDto = GetOrganizationSettingsById(orgId);
-                    orgSettingsDtoList.Add(orgSettingDto);
+                    var orgSettingDto = GetOrganizationSettingsById(organizationId:orgId);
+                    orgSettingsDtoList.Add(item:orgSettingDto);
                 }
             }
+
             return orgSettingsDtoList;
         }
 
         public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
         {
-            var orgSettingDto = new OrganizationSettingDto() { OrganizationId = organizationId };
+            var orgSettingDto = new OrganizationSettingDto {OrganizationId = organizationId};
             orgSettingDto.Settings = new List<SettingDto>();
+
             //Get Organization settings first
             var orgSettings = _dbContext.OrganizationSettings.Include(s => s.SettingTemplate.OrganizationType)
-                .Where(o => o.OrganizationId == organizationId);
+                                        .Where(o => o.OrganizationId == organizationId);
             foreach (var orgSetting in orgSettings)
             {
-                orgSettingDto.Settings.Add(_mapHelper.GetSettingDtoFromOrganizationSetting(orgSetting));
+                orgSettingDto.Settings.Add(item:_mapHelper.GetSettingDtoFromOrganizationSetting(setting:orgSetting));
             }
 
             return orgSettingDto;
         }
 
-
-		/// <summary>
-		/// Get settings for one program
-		/// </summary>
-		/// <param name="orgRegProgramId">The program Id to get for</param>
-		/// <returns>The ProgramSetting object</returns>
-		public ProgramSettingDto GetProgramSettingsById(int orgRegProgramId)
-		{
-            var progSettingDto = new ProgramSettingDto() { OrgRegProgId = orgRegProgramId };
+        /// <summary>
+        ///     Get settings for one program
+        /// </summary>
+        /// <param name="orgRegProgramId"> The program Id to get for </param>
+        /// <returns> The ProgramSetting object </returns>
+        public ProgramSettingDto GetProgramSettingsById(int orgRegProgramId)
+        {
+            var progSettingDto = new ProgramSettingDto {OrgRegProgId = orgRegProgramId};
             progSettingDto.Settings = new List<SettingDto>();
             var settings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
             foreach (var setting in settings)
             {
-                progSettingDto.Settings.Add(_mapHelper.GetSettingDtoFromOrganizationRegulatoryProgramSetting(setting));
+                progSettingDto.Settings.Add(item:_mapHelper.GetSettingDtoFromOrganizationRegulatoryProgramSetting(setting:setting));
             }
-            return progSettingDto;
-		}
 
+            return progSettingDto;
+        }
 
         /// <summary>
-        /// Get settings for one program. If industry it will find the authority first and return the settings for the authority 
+        ///     Get settings for one program. If industry it will find the authority first and return the settings for the authority
         /// </summary>
-        /// <param name="orgRegProgramId">The program Id to get for</param>
-        /// <returns>The ProgramSetting object</returns>
+        /// <param name="orgRegProgramId"> The program Id to get for </param>
+        /// <returns> The ProgramSetting object </returns>
         public ProgramSettingDto GetAuthorityProgramSettingsById(int orgRegProgramId)
         {
-            var progSettingDto = new ProgramSettingDto() { OrgRegProgId = orgRegProgramId };
+            var progSettingDto = new ProgramSettingDto {OrgRegProgId = orgRegProgramId};
             progSettingDto.Settings = new List<SettingDto>();
-            
-            var org = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.Jurisdiction")
-                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            var org = _dbContext.OrganizationRegulatoryPrograms.Include(path:"Organization.Jurisdiction")
+                                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
             OrganizationRegulatoryProgram authority;
             if (org.RegulatorOrganization != null)
             {
-                authority = _dbContext.OrganizationRegulatoryPrograms.Include("Organization")
-                    .Single(o => o.OrganizationId == org.RegulatorOrganization.OrganizationId
-                    && o.RegulatoryProgramId == org.RegulatoryProgramId);
+                authority = _dbContext.OrganizationRegulatoryPrograms.Include(path:"Organization")
+                                      .Single(o => o.OrganizationId == org.RegulatorOrganization.OrganizationId
+                                                   && o.RegulatoryProgramId == org.RegulatoryProgramId);
             }
             else
             {
@@ -118,37 +123,10 @@ namespace Linko.LinkoExchange.Services.Settings
             var settings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
             foreach (var setting in settings)
             {
-                progSettingDto.Settings.Add(_mapHelper.GetSettingDtoFromOrganizationRegulatoryProgramSetting(setting));
+                progSettingDto.Settings.Add(item:_mapHelper.GetSettingDtoFromOrganizationRegulatoryProgramSetting(setting:setting));
             }
+
             return progSettingDto;
-        }
-
-        public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
-        {
-            var transaction = _dbContext.BeginTransaction();
-            try
-            {
-                foreach (var settingDto in settingDtos.Settings)
-                {
-                    CreateOrUpdateProgramSetting(settingDtos.OrgRegProgId, settingDto);
-                }
-
-                transaction.Commit();
-            }
-            catch (RuleViolationException)
-            {
-                transaction.Rollback();
-                throw;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                transaction.Dispose();
-            }
         }
 
         public void CreateOrUpdateProgramSettings(int orgRegProgId, IEnumerable<SettingDto> settingDtos)
@@ -158,15 +136,10 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 foreach (var settingDto in settingDtos)
                 {
-                    CreateOrUpdateProgramSetting(orgRegProgId, settingDto);
+                    CreateOrUpdateProgramSetting(orgRegProgId:orgRegProgId, settingDto:settingDto);
                 }
 
                 transaction.Commit();
-            }
-            catch (RuleViolationException)
-            {
-                transaction.Rollback();
-                throw;
             }
             catch
             {
@@ -178,12 +151,13 @@ namespace Linko.LinkoExchange.Services.Settings
                 transaction.Dispose();
             }
         }
+
         public void CreateOrUpdateProgramSetting(int orgRegProgId, SettingDto settingDto)
         {
             var existingSetting = _dbContext.OrganizationRegulatoryProgramSettings
-                .SingleOrDefault(o => o.OrganizationRegulatoryProgramId == orgRegProgId
-                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString() 
-                 && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
+                                            .SingleOrDefault(o => o.OrganizationRegulatoryProgramId == orgRegProgId
+                                                                  && o.SettingTemplate.Name == settingDto.TemplateName.ToString()
+                                                                  && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
 
             if (existingSetting != null)
             {
@@ -194,10 +168,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
                 newSetting.OrganizationRegulatoryProgramId = orgRegProgId;
                 newSetting.SettingTemplateId = _dbContext.SettingTemplates
-                    .Single(s => s.Name == settingDto.TemplateName.ToString()
-                    && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
+                                                         .Single(s => s.Name == settingDto.TemplateName.ToString()
+                                                                      && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
                 newSetting.Value = settingDto.Value;
-                _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
+                _dbContext.OrganizationRegulatoryProgramSettings.Add(entity:newSetting);
             }
             try
             {
@@ -205,37 +179,11 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, ex.Message);
-                string msg = $"Cannot create/update program setting '{settingDto.Description}.'" ;
-                var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
-                throw new RuleViolationException(msg, violations);
-            }
-        }
-        public void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
-        {
-            var transaction = _dbContext.BeginTransaction();
-            try
-            {
-                foreach (var settingDto in settingDtos.Settings)
-                {
-                    CreateOrUpdateOrganizationSetting(settingDtos.OrganizationId, settingDto);
-                }
-
-                transaction.Commit();
-            }
-            catch (RuleViolationException rve)
-            {
-                transaction.Rollback();
-                throw rve;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw ;
-            }
-            finally
-            {
-                transaction.Dispose();
+                // ReSharper disable once ArgumentsStyleNamedExpression
+                _logger.Error(ex, message:ex.Message);
+                var msg = $"Cannot create/update program setting '{settingDto.Description}.'";
+                var violations = new List<RuleViolation> {new RuleViolation(propertyName:"", propertyValue:settingDto.Value, errorMessage:msg)};
+                throw new RuleViolationException(message:msg, validationIssues:violations);
             }
         }
 
@@ -246,15 +194,10 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 foreach (var settingDto in settingDtos)
                 {
-                    CreateOrUpdateOrganizationSetting(organizationId, settingDto);
+                    CreateOrUpdateOrganizationSetting(organizationId:organizationId, settingDto:settingDto);
                 }
 
                 transaction.Commit();
-            }
-            catch (RuleViolationException rve)
-            {
-                transaction.Rollback();
-                throw rve;
             }
             catch
             {
@@ -270,9 +213,9 @@ namespace Linko.LinkoExchange.Services.Settings
         public void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto)
         {
             var existingSetting = _dbContext.OrganizationSettings
-                .SingleOrDefault(o => o.OrganizationId == organizationId
-                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString()
-                 && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
+                                            .SingleOrDefault(o => o.OrganizationId == organizationId
+                                                                  && o.SettingTemplate.Name == settingDto.TemplateName.ToString()
+                                                                  && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
 
             if (existingSetting != null)
             {
@@ -283,10 +226,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 var newSetting = _dbContext.OrganizationSettings.Create();
                 newSetting.OrganizationId = organizationId;
                 newSetting.SettingTemplateId = _dbContext.SettingTemplates
-                    .Single(s => s.Name == settingDto.TemplateName.ToString() 
-                    && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
+                                                         .Single(s => s.Name == settingDto.TemplateName.ToString()
+                                                                      && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
                 newSetting.Value = settingDto.Value;
-                _dbContext.OrganizationSettings.Add(newSetting);
+                _dbContext.OrganizationSettings.Add(entity:newSetting);
             }
 
             try
@@ -295,94 +238,99 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, ex.Message);
-                string msg = $"Cannot create/update program setting '{settingDto.Description}.'";
-                var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
-                throw new RuleViolationException(msg, violations);
+                // ReSharper disable once ArgumentsStyleNamedExpression
+                _logger.Error(ex, message:ex.Message);
+                var msg = $"Cannot create/update program setting '{settingDto.Description}.'";
+                var violations = new List<RuleViolation> {new RuleViolation(propertyName:"", propertyValue:settingDto.Value, errorMessage:msg)};
+                throw new RuleViolationException(message:msg, validationIssues:violations);
             }
         }
-  
-	    public int PasswordLockoutHours()
-	    {
+
+        public int PasswordLockoutHours()
+        {
             return 24;
         }
-        
+
         /// <summary>
-        /// Get application global settings.
+        ///     Get application global settings.
         /// </summary>
-        /// <returns>The settings for dictionary object</returns>
+        /// <returns> The settings for dictionary object </returns>
         public IDictionary<SystemSettingType, string> GetGlobalSettings()
-		{
+        {
             return _globalSettings.GetGlobalSettings();
-		}
+        }
 
         public string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax)
         {
             var orgRegProgramIds = _dbContext.OrganizationRegulatoryProgramUsers
-                .Where(o => o.UserProfileId == userProfileId)
-                .Select(o => o.OrganizationRegulatoryProgramId).Distinct();
+                                             .Where(o => o.UserProfileId == userProfileId)
+                                             .Select(o => o.OrganizationRegulatoryProgramId).Distinct();
 
             var authorityOrgIds = new List<int>();
             foreach (var orgRegProgId in orgRegProgramIds)
             {
-                var authority = this.GetAuthority(orgRegProgramId: orgRegProgId);
-                if (!authorityOrgIds.Contains(authority.OrganizationId))
+                var authority = GetAuthority(orgRegProgramId:orgRegProgId);
+                if (!authorityOrgIds.Contains(item:authority.OrganizationId))
                 {
-                    authorityOrgIds.Add(authority.OrganizationId);
+                    authorityOrgIds.Add(item:authority.OrganizationId);
                 }
             }
 
-            if (authorityOrgIds != null)
+            if (authorityOrgIds.Any())
             {
-                var orgSettingDtos = this.GetOrganizationSettingsByIds(authorityOrgIds);
-                var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.TemplateName == settingType);
-                if (settings == null || settings.Count() < 1)
-                    throw new Exception(string.Format("ERROR: Could not find organization settings for user profile id={0} and setting type={1}", userProfileId, settingType.ToString()));
+                var orgSettingDtos = GetOrganizationSettingsByIds(organizationIds:authorityOrgIds);
+                var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.TemplateName == settingType).ToList();
+                if (!settings.Any())
+                {
+                    throw new Exception(message:string.Format(format:"ERROR: Could not find organization settings for user profile id={0} and setting type={1}", arg0:userProfileId,
+                                                              arg1:settingType));
+                }
                 else if (settings.Count() == 1)
-                    return settings.ElementAt(0).Value;
+                {
+                    return settings.ElementAt(index:0).Value;
+                }
                 else
                 {
                     if (isChooseMin.HasValue && isChooseMin.Value)
                     {
                         //can't use LINQ .Min and .Max b/c values are string! #argh
-                        int minValue = int.MaxValue;
+                        var minValue = int.MaxValue;
                         foreach (var setting in settings)
                         {
-                            if (Convert.ToInt32(setting.Value) < minValue)
+                            if (Convert.ToInt32(value:setting.Value) < minValue)
                             {
-                                minValue = Convert.ToInt32(setting.Value);
+                                minValue = Convert.ToInt32(value:setting.Value);
                                 break;
                             }
                         }
+
                         return minValue.ToString();
                     }
                     else if (isChooseMax.HasValue && isChooseMax.Value)
                     {
                         //can't use LINQ .Min and .Max b/c values are string! #argh
-                        int maxValue = int.MinValue;
+                        var maxValue = int.MinValue;
                         foreach (var setting in settings)
                         {
-                            if (Convert.ToInt32(setting.Value) > maxValue)
+                            if (Convert.ToInt32(value:setting.Value) > maxValue)
                             {
-                                maxValue = Convert.ToInt32(setting.Value);
+                                maxValue = Convert.ToInt32(value:setting.Value);
                                 break;
                             }
                         }
+
                         return maxValue.ToString();
                     }
                     else
                     {
-                        return settings.ElementAt(0).Value; //Return first item by default
+                        return settings.ElementAt(index:0).Value; //Return first item by default
                     }
-
                 }
             }
             else
             {
-                throw new Exception(string.Format("ERROR: Could not find any associated organizations for user profile id={0}", userProfileId));
+                throw new Exception(message:string.Format(format:"ERROR: Could not find any associated organizations for user profile id={0}", arg0:userProfileId));
             }
-
-
         }
 
         public OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null)
@@ -391,121 +339,157 @@ namespace Linko.LinkoExchange.Services.Settings
             if (orgRegProgramId.HasValue)
             {
                 thisOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
-                       .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId.Value);
+                                              .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId.Value);
             }
             else
             {
                 thisOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
-                       .Single(o => o.OrganizationId == organizationId.Value && o.RegulatoryProgramId == regProgramId.Value);
+                                              .Single(o => o.OrganizationId == organizationId.Value && o.RegulatoryProgramId == regProgramId.Value);
             }
 
             OrganizationRegulatoryProgram authority;
             if (thisOrgRegProgram.RegulatorOrganization != null)
             {
-                authority = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
-                    .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganizationId
-                    && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
-
+                authority = _dbContext.OrganizationRegulatoryPrograms.Include(path:"Organization.OrganizationType")
+                                      .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganizationId
+                                                   && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
             }
             else
+            {
                 authority = thisOrgRegProgram;
+            }
 
             return authority;
         }
 
         public string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType)
         {
-            string cacheKey = $"OrgRegProgramId-{orgRegProgramId}-{settingType}";
-            if (_cache.GetValue(cacheKey) != null)
+            var cacheKey = $"OrgRegProgramId-{orgRegProgramId}-{settingType}";
+            if (_cache.GetValue(key:cacheKey) != null)
             {
-                return (string)_cache.GetValue(cacheKey);
+                return (string) _cache.GetValue(key:cacheKey);
             }
 
-            OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
+            var authority = GetAuthority(orgRegProgramId:orgRegProgramId);
             var settingValue = _dbContext.OrganizationSettings
-               .Single(s => s.OrganizationId == authority.OrganizationId
-               && s.SettingTemplate.Name == settingType.ToString()).Value;
+                                         .Single(s => s.OrganizationId == authority.OrganizationId
+                                                      && s.SettingTemplate.Name == settingType.ToString()).Value;
 
-
-            _cache.SetValue(cacheKey, settingValue);
+            _cache.SetValue(key:cacheKey, value:settingValue);
 
             return settingValue;
-
         }
 
         public string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType)
         {
-            OrganizationRegulatoryProgram authority = GetAuthority(organizationId, regProgramId);
+            var authority = GetAuthority(organizationId:organizationId, regProgramId:regProgramId);
             return _dbContext.OrganizationSettings
-               .Single(s => s.OrganizationId == authority.OrganizationId
-               && s.SettingTemplate.Name == settingType.ToString()).Value;
+                             .Single(s => s.OrganizationId == authority.OrganizationId
+                                          && s.SettingTemplate.Name == settingType.ToString()).Value;
         }
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
             try
             {
-                OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
+                var authority = GetAuthority(orgRegProgramId:orgRegProgramId);
                 var orgTypeId = authority.Organization.OrganizationType.OrganizationTypeId;
 
                 return _dbContext.OrganizationRegulatoryProgramSettings
-                    .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
-                    && s.SettingTemplate.Name == settingType.ToString() 
-                    && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
-
+                                 .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                                              && s.SettingTemplate.Name == settingType.ToString()
+                                              && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
             }
             catch (DbEntityValidationException ex)
             {
-                HandleEntityException(ex);
+                HandleEntityException(ex:ex);
             }
-            catch
-            {
-                throw;
-            }
+
             return null;
-        } 
+        }
 
         public string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType)
         {
-            var settings = _dbContext.SettingTemplates.Include("OrganizationType")
-                .Where(i => i.Name == settingType.ToString());
+            var settings = _dbContext.SettingTemplates.Include(path:"OrganizationType")
+                                     .Where(i => i.Name == settingType.ToString());
 
-            if (settings == null || settings.Count() < 1)
+            if (!settings.Any())
+            {
                 return string.Empty;
+            }
 
-            SettingTemplate setting;
-            if (orgType.HasValue)
-            {
-                setting = settings.Single(s => s.OrganizationType.Name == orgType.ToString());
-            }
-            else
-            {
-                setting = settings.First();
-            }
+            var setting = orgType.HasValue ? settings.Single(s => s.OrganizationType.Name == orgType.ToString()) : settings.First();
 
             return setting.DefaultValue;
         }
 
-        private void HandleEntityException(DbEntityValidationException ex)
+        #endregion
+
+        public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {
-            _logger.Error(ex, ex.Message);
-
-            List<RuleViolation> validationIssues = new List<RuleViolation>();
-            foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+            var transaction = _dbContext.BeginTransaction();
+            try
             {
-                DbEntityEntry entry = item.Entry;
-                string entityTypeName = entry.Entity.GetType().Name;
-
-                foreach (DbValidationError subItem in item.ValidationErrors)
+                foreach (var settingDto in settingDtos.Settings)
                 {
-                    string message = string.Format(format: "Error '{0}' occurred in {1} at {2}", arg0: subItem.ErrorMessage, arg1: entityTypeName, arg2: subItem.PropertyName);
-                    validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
+                    CreateOrUpdateProgramSetting(orgRegProgId:settingDtos.OrgRegProgId, settingDto:settingDto);
                 }
+
+                transaction.Commit();
             }
-            
-            throw new RuleViolationException(message: "", validationIssues: validationIssues);
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
         }
 
+        public void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
+        {
+            var transaction = _dbContext.BeginTransaction();
+            try
+            {
+                foreach (var settingDto in settingDtos.Settings)
+                {
+                    CreateOrUpdateOrganizationSetting(organizationId:settingDtos.OrganizationId, settingDto:settingDto);
+                }
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+        }
+
+        private void HandleEntityException(DbEntityValidationException ex)
+        {
+            // ReSharper disable once ArgumentsStyleNamedExpression
+            _logger.Error(ex, message:ex.Message);
+
+            var validationIssues = new List<RuleViolation>();
+            foreach (var item in ex.EntityValidationErrors)
+            {
+                var entry = item.Entry;
+                var entityTypeName = entry.Entity.GetType().Name;
+
+                foreach (var subItem in item.ValidationErrors)
+                {
+                    var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
+                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                }
+            }
+
+            throw new RuleViolationException(message:"", validationIssues:validationIssues);
+        }
     }
 }

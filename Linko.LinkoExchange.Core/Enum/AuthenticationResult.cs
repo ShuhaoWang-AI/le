@@ -14,10 +14,10 @@
         PasswordLockedOut,
         PasswordExpired,
         UserAlreadyExists,
-        CanNotUseOldPassword, 
+        CanNotUseOldPassword,
         ExpiredRegistrationToken,
         AccountIsNotAssociated,
         IncorrectAnswerToQuestion,
         AccountResetRequired
-    } 
+    }
 }

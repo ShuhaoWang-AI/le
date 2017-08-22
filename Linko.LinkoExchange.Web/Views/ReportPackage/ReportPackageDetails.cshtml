@@ -5,48 +5,48 @@
     ViewBag.Title = "Report Package Details";
 }
 
-@using (Html.BeginForm(actionName: null, controllerName: null, method: FormMethod.Post, htmlAttributes: new
-                                                                                                        {
-                                                                                                            id = "LinkoExchangeForm"
-                                                                                                        }))
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new
+                                                                                                    {
+                                                                                                        id = "LinkoExchangeForm"
+                                                                                                    }))
 {
     @Html.AntiForgeryToken()
 
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: Model.IsCurrentPortalAuthority ? "Authority" : "Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:Model.IsCurrentPortalAuthority ? "Authority" : "Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
                 @if (Model.IsCurrentPortalAuthority)
                 {
                     if (Model.Status == ReportStatusName.Submitted && !Model.SubmissionReviewDateTimeLocal.HasValue)
                     {
-                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
+                        <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
                             <i class=""></i>
-                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.SubmittedPendingReview)
+                            @Label.ResourceManager.GetString(name:"Breadcrumb_" + ReportStatusName.SubmittedPendingReview)
                         </a>
                     }
                     else if (Model.Status == ReportStatusName.Repudiated && !Model.RepudiationReviewDateTimeLocal.HasValue)
                     {
-                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
+                        <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
                             <i class=""></i>
-                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.RepudiatedPendingReview)
+                            @Label.ResourceManager.GetString(name:"Breadcrumb_" + ReportStatusName.RepudiatedPendingReview)
                         </a>
                     }
                     else
                     {
-                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.All})'">
+                        <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.All})'">
                             <i class=""></i>
-                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.All)
+                            @Label.ResourceManager.GetString(name:"Breadcrumb_" + ReportStatusName.All)
                         </a>
                     }
                 }
                 else
                 {
-                    <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = Model.Status})'">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = Model.Status})'">
                         <i class=""></i>
-                        @Label.ResourceManager.GetString(name: "Breadcrumb_" + Model.Status)
+                        @Label.ResourceManager.GetString(name:"Breadcrumb_" + Model.Status)
                     </a>
                 }
             </li>
@@ -67,16 +67,16 @@
                 @switch (Model.Status)
                 {
                     case ReportStatusName.Draft:
-                        <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name:Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.ReadyToSubmit:
-                        <strong class="bg-green-active btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-green-active btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name:Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.Submitted:
-                        <strong class="bg-purple btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-purple btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name:Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.Repudiated:
-                        <strong class="bg-red btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-red btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name:Model.Status.ToString())&nbsp; </strong>
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -100,7 +100,7 @@
                         </p>
                         <div class="form-group">
                             <div class="pull-right">
-                                <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "DeleteReportPackage", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post">
+                                <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportPackage", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post">
                                     Yes
                                 </button>
                                 <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -112,10 +112,10 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
-                                                                                                                                {
-                                                                                                                                    @class = "alert alert-danger"
-                                                                                                                                })
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                             {
+                                                                                                                                 @class = "alert alert-danger"
+                                                                                                                             })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -132,75 +132,75 @@
                 @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
                 @Html.HiddenFor(model => model.FailedCountPassword)
                 @Html.HiddenFor(model => model.FailedCountKbq)
-                @Html.Hidden(name: "SelectedSamples", value: Html.Raw(value: Json.Encode(value: Model.SelectedSamples)))
-                @Html.Hidden(name: "SelectedAttachments", value: Html.Raw(value: Json.Encode(value: Model.SelectedAttachments)))
+                @Html.Hidden(name:"SelectedSamples", value:Html.Raw(value:Json.Encode(value:Model.SelectedSamples)))
+                @Html.Hidden(name:"SelectedAttachments", value:Html.Raw(value:Json.Encode(value:Model.SelectedAttachments)))
 
             </div>
             <div class="form-group">
 
-                @Html.LabelFor(model => model.Name, htmlAttributes: new
-                                                                    {
-                                                                        @class = "control-label col-md-2"
-                                                                    })
+                @Html.LabelFor(model => model.Name, htmlAttributes:new
+                                                                   {
+                                                                       @class = "control-label col-md-2"
+                                                                   })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.Name, additionalViewData: new
-                                                                             {
-                                                                                 htmlAttributes = new
-                                                                                                  {
-                                                                                                      @class = "form-control",
-                                                                                                      @readonly = "readonly"
-                                                                                                  }
-                                                                             })
-                </div>
-
-                @Html.LabelFor(model => model.ReportPeriod, htmlAttributes: new
+                    @Html.EditorFor(model => model.Name, additionalViewData:new
                                                                             {
-                                                                                @class = "control-label col-md-2"
+                                                                                htmlAttributes = new
+                                                                                                 {
+                                                                                                     @class = "form-control",
+                                                                                                     @readonly = "readonly"
+                                                                                                 }
                                                                             })
+                </div>
+
+                @Html.LabelFor(model => model.ReportPeriod, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-2"
+                                                                           })
 
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.ReportPeriod, additionalViewData: new
-                                                                                     {
-                                                                                         htmlAttributes = new
-                                                                                                          {
-                                                                                                              @class = "form-control",
-                                                                                                              @readonly = "readonly"
-                                                                                                          }
-                                                                                     })
+                    @Html.EditorFor(model => model.ReportPeriod, additionalViewData:new
+                                                                                    {
+                                                                                        htmlAttributes = new
+                                                                                                         {
+                                                                                                             @class = "form-control",
+                                                                                                             @readonly = "readonly"
+                                                                                                         }
+                                                                                    })
                 </div>
             </div>
             <div class="form-group">
 
-                @Html.LabelFor(model => model.OrganizationName, htmlAttributes: new
-                                                                                {
-                                                                                    @class = "control-label col-md-2"
-                                                                                })
+                @Html.LabelFor(model => model.OrganizationName, htmlAttributes:new
+                                                                               {
+                                                                                   @class = "control-label col-md-2"
+                                                                               })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.OrganizationName, additionalViewData: new
-                                                                                         {
-                                                                                             htmlAttributes = new
-                                                                                                              {
-                                                                                                                  @class = "form-control",
-                                                                                                                  @readonly = "readonly"
-                                                                                                              }
-                                                                                         })
+                    @Html.EditorFor(model => model.OrganizationName, additionalViewData:new
+                                                                                        {
+                                                                                            htmlAttributes = new
+                                                                                                             {
+                                                                                                                 @class = "form-control",
+                                                                                                                 @readonly = "readonly"
+                                                                                                             }
+                                                                                        })
                 </div>
 
                 @Html.HiddenFor(model => model.OrganizationRegulatoryProgramId)
-                @Html.LabelFor(model => model.OrganizationReferenceNumber, htmlAttributes: new
-                                                                                           {
-                                                                                               @class = "control-label col-md-2"
-                                                                                           })
+                @Html.LabelFor(model => model.OrganizationReferenceNumber, htmlAttributes:new
+                                                                                          {
+                                                                                              @class = "control-label col-md-2"
+                                                                                          })
 
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.OrganizationReferenceNumber, additionalViewData: new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control",
-                                                                                                                             @readonly = "readonly"
-                                                                                                                         }
-                                                                                                    })
+                    @Html.EditorFor(model => model.OrganizationReferenceNumber, additionalViewData:new
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            @readonly = "readonly"
+                                                                                                                        }
+                                                                                                   })
                 </div>
             </div>
             @if (Model.IsCurrentPortalAuthority)
@@ -263,118 +263,118 @@
                         <section class="box-body form-horizontal">
                             @* grid name should be start with grid for centralized error handling *@
                             @(Html.Kendo().Grid<SampleViewModel>()
-                                  .Name(componentName: "gridSample_" + samplesAndResultType.Id)
+                                  .Name(componentName:"gridSample_" + samplesAndResultType.Id)
                                   .Columns(columns =>
                                            {
                                                if (Model.Status == ReportStatusName.Draft)
                                                {
                                                    columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                          .ClientTemplate(value: "<input type='checkbox' name='ckgridSample_" + samplesAndResultType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
-                                                          .HtmlAttributes(attributes: new
-                                                                                      {
-                                                                                          align = "center"
-                                                                                      })
-                                                          .Filterable(f => f.Enabled(value: false))
-                                                          .Width(pixelWidth: 40);
+                                                          .ClientTemplate(value:"<input type='checkbox' name='ckgridSample_" + samplesAndResultType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                          .HtmlAttributes(attributes:new
+                                                                                     {
+                                                                                         align = "center"
+                                                                                     })
+                                                          .Filterable(f => f.Enabled(value:false))
+                                                          .Width(pixelWidth:40);
                                                }
                                                columns.Bound(c => c.MonitoringPointName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                              .SuggestionOperator(filterType: FilterType.Contains)));
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
                                                columns.Bound(c => c.CtsEventTypeName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                              .SuggestionOperator(filterType: FilterType.Contains)));
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
                                                columns.Bound(c => c.CollectionMethodName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                              .SuggestionOperator(filterType: FilterType.Contains)));
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
                                                columns.Bound(c => c.StartDateTimeLocal)
-                                                      .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                      .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                                      .ClientTemplate(value:"#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                                columns.Bound(c => c.EndDateTimeLocal)
-                                                      .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                      .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                                      .ClientTemplate(value:"#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                                columns.Bound(c => c.LabSampleIdentifier)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                              .SuggestionOperator(filterType: FilterType.Contains)));
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
                                                if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
                                                {
-                                                   columns.Bound(c => c.LastSubmitted).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                                          .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                                   columns.Bound(c => c.LastSubmitted).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                                }
                                            })
                                   .Pageable(pageable => pageable
-                                                            .PageSizes(pageSizes: new List<object> {"all", 15, 25, 50, 75})
-                                                            .Refresh(enabled: true)
-                                                            .Input(enabled: true)
-                                                            .Numeric(enabled: false)
+                                                            .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                            .Refresh(enabled:true)
+                                                            .Input(enabled:true)
+                                                            .Numeric(enabled:false)
                                   )
-                                  .ClientDetailTemplateId(id: "template")
-                                  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                                  .ClientDetailTemplateId(id:"template")
+                                  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                                   .Filterable(filterable =>
                                               {
                                                   if (Model.Status == ReportStatusName.Draft)
                                                   {
-                                                      filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
+                                                      filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
                                                   }
                                                   else
                                                   {
-                                                      filterable.Enabled(value: false);
+                                                      filterable.Enabled(value:false);
                                                   }
                                               })
-                                  .Resizable(resizable => resizable.Columns(value: true))
-                                  .Scrollable(s => s.Height(value: "auto"))
-                                  .NoRecords(text: "No sample exists.")
+                                  .Resizable(resizable => resizable.Columns(value:true))
+                                  .Scrollable(s => s.Height(value:"auto"))
+                                  .NoRecords(text:"No sample exists.")
                                   .Events(events =>
                                           {
                                               if (Model.Status == ReportStatusName.Draft)
                                               {
-                                                  events.DataBound(handler: "onGridDataBound");
+                                                  events.DataBound(handler:"onGridDataBound");
                                               }
                                           })
                                   .DataSource(dataSource => dataSource
                                                                 .Ajax()
-                                                                .ServerOperation(enabled: true)
-                                                                .Batch(enabled: true)
+                                                                .ServerOperation(enabled:true)
+                                                                .Batch(enabled:true)
                                                                 .Sort(sort =>
                                                                       {
-                                                                          sort.Add(memberName: "StartDateTimeLocal").Ascending();
-                                                                          sort.Add(memberName: "MonitoringPointName").Ascending();
-                                                                          sort.Add(memberName: "CollectionMethodName").Ascending();
+                                                                          sort.Add(memberName:"StartDateTimeLocal").Ascending();
+                                                                          sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                                          sort.Add(memberName:"CollectionMethodName").Ascending();
                                                                       }) // <-- initial sort expression
-                                                                .Read(read => read.Action(actionName: "Samples_Read", controllerName: "ReportPackage", routeValues: new
-                                                                                                                                                                    {
-                                                                                                                                                                        reportPackageElementTypeId = samplesAndResultType.Id.GetValueOrDefault(),
-                                                                                                                                                                        reportStatusName = Model.Status
-                                                                                                                                                                    }))
-                                                                .PageSize(pageSize: 15)
-                                                                .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridSample_" + samplesAndResultType.Id + "'})"))
+                                                                .Read(read => read.Action(actionName:"Samples_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                 {
+                                                                                                                                                                     reportPackageElementTypeId = samplesAndResultType.Id.GetValueOrDefault(),
+                                                                                                                                                                     reportStatusName = Model.Status
+                                                                                                                                                                 }))
+                                                                .PageSize(pageSize:15)
+                                                                .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridSample_" + samplesAndResultType.Id + "'})"))
                                   )
                                   )
                         </section>
                         <script id="template" type="text/kendo-tmpl">
                             @(Html.Kendo().Grid<SampleResultViewModel>()
-                                  .Name(componentName: "gridSampleResult_#=Id#")
+                                  .Name(componentName:"gridSampleResult_#=Id#")
                                   .Columns(columns =>
                                            {
                                                columns.Bound(c => c.ParameterName);
-                                               columns.Bound(c => c.Value).HtmlAttributes(attributes: new {align = "right"});
-                                               columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes: new {align = "right"});
+                                               columns.Bound(c => c.Value).HtmlAttributes(attributes:new {align = "right"});
+                                               columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes:new {align = "right"});
                                                columns.Bound(c => c.AnalysisMethod);
                                                columns.Bound(c => c.IsApprovedEPAMethodText);
-                                               columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes: new {align = "right"});
+                                               columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
                                                columns.Bound(c => c.AnalysisDateTimeLocal)
-                                                      .ClientTemplate(value: "\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.toString(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
+                                                      .ClientTemplate(value:"\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.toString(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
                                            })
                                   .Pageable()
-                                  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
-                                  .Scrollable(s => s.Height(value: "auto"))
-                                  .NoRecords(text: "No sample result exists.")
+                                  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                                  .Scrollable(s => s.Height(value:"auto"))
+                                  .NoRecords(text:"No sample result exists.")
                                   .DataSource(dataSource => dataSource
                                                                 .Ajax()
-                                                                .ServerOperation(enabled: true)
-                                                                .Read(read => read.Action(actionName: "SampleResults_Read", controllerName: "ReportPackage", routeValues: new
-                                                                                                                                                                          {
-                                                                                                                                                                              sampleId = "#=Id#"
-                                                                                                                                                                          }))
+                                                                .ServerOperation(enabled:true)
+                                                                .Read(read => read.Action(actionName:"SampleResults_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                       {
+                                                                                                                                                                           sampleId = "#=Id#"
+                                                                                                                                                                       }))
                                   )
                                   .ToClientTemplate()
                                   )
@@ -403,88 +403,88 @@
                                 <div class="col-md-12">
                                     @* grid name should be start with grid for centralized error handling *@
                                     @(Html.Kendo().Grid<AttachmentViewModel>()
-                                          .Name(componentName: "gridAttachment_" + attachmentType.Id)
+                                          .Name(componentName:"gridAttachment_" + attachmentType.Id)
                                           .Columns(columns =>
                                                    {
                                                        if (Model.Status == ReportStatusName.Draft)
                                                        {
                                                            columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                                  .ClientTemplate(value: "<input type='checkbox' name='ckgridAttachment_" + attachmentType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' # />")
-                                                                  .HtmlAttributes(attributes: new
-                                                                                              {
-                                                                                                  align = "center"
-                                                                                              })
-                                                                  .Filterable(f => f.Enabled(value: false))
-                                                                  .Width(pixelWidth: 40);
+                                                                  .ClientTemplate(value:"<input type='checkbox' name='ckgridAttachment_" + attachmentType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' # />")
+                                                                  .HtmlAttributes(attributes:new
+                                                                                             {
+                                                                                                 align = "center"
+                                                                                             })
+                                                                  .Filterable(f => f.Enabled(value:false))
+                                                                  .Width(pixelWidth:40);
                                                        }
                                                        columns.Bound(c => c.Name)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                                      .SuggestionOperator(filterType: FilterType.Contains)))
-                                                              .ClientTemplate(value: Html.ActionLink(linkText: "#=Name#", actionName: "DownloadAttachment", routeValues: new
-                                                                                                                                                                         {
-                                                                                                                                                                             id = "#=Id#"
-                                                                                                                                                                         }).ToHtmlString());
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)))
+                                                              .ClientTemplate(value:Html.ActionLink(linkText:"#=Name#", actionName:"DownloadAttachment", routeValues:new
+                                                                                                                                                                     {
+                                                                                                                                                                         id = "#=Id#"
+                                                                                                                                                                     }).ToHtmlString());
                                                        columns.Bound(c => c.OriginalFileName)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                                      .SuggestionOperator(filterType: FilterType.Contains)));
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
                                                        columns.Bound(c => c.Description)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                                      .SuggestionOperator(filterType: FilterType.Contains)));
-                                                       columns.Bound(c => c.UploadDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                                              .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
+                                                       columns.Bound(c => c.UploadDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                              .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                                        columns.Bound(c => c.UploaderUserFullName)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                                      .SuggestionOperator(filterType: FilterType.Contains)));
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
                                                        if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
                                                        {
-                                                           columns.Bound(c => c.LastSubmitted).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                                                  .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                                           columns.Bound(c => c.LastSubmitted).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                                  .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                                        }
                                                    })
                                           .Pageable(pageable => pageable
-                                                                    .PageSizes(pageSizes: new List<object> {"all", 15, 25, 50, 75})
-                                                                    .Refresh(enabled: true)
-                                                                    .Input(enabled: true)
-                                                                    .Numeric(enabled: false)
+                                                                    .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                                    .Refresh(enabled:true)
+                                                                    .Input(enabled:true)
+                                                                    .Numeric(enabled:false)
                                           )
-                                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                                           .Filterable(filterable =>
                                                       {
                                                           if (Model.Status == ReportStatusName.Draft)
                                                           {
-                                                              filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
+                                                              filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
                                                           }
                                                           else
                                                           {
-                                                              filterable.Enabled(value: false);
+                                                              filterable.Enabled(value:false);
                                                           }
                                                       })
-                                          .Resizable(resizable => resizable.Columns(value: true))
-                                          .Scrollable(s => s.Height(value: "auto"))
-                                          .NoRecords(text: "No attachment exists.")
+                                          .Resizable(resizable => resizable.Columns(value:true))
+                                          .Scrollable(s => s.Height(value:"auto"))
+                                          .NoRecords(text:"No attachment exists.")
                                           .Events(events =>
                                                   {
                                                       if (Model.Status == ReportStatusName.Draft)
                                                       {
-                                                          events.DataBound(handler: "onGridDataBound");
+                                                          events.DataBound(handler:"onGridDataBound");
                                                       }
                                                   })
                                           .DataSource(dataSource => dataSource
                                                                         .Ajax()
-                                                                        .ServerOperation(enabled: true)
-                                                                        .Batch(enabled: true)
+                                                                        .ServerOperation(enabled:true)
+                                                                        .Batch(enabled:true)
                                                                         .Sort(sort =>
                                                                               {
-                                                                                  sort.Add(memberName: "UploadDateTimeLocal").Descending();
-                                                                                  sort.Add(memberName: "Name").Ascending();
+                                                                                  sort.Add(memberName:"UploadDateTimeLocal").Descending();
+                                                                                  sort.Add(memberName:"Name").Ascending();
                                                                               }) // <-- initial sort expression
-                                                                        .Read(read => read.Action(actionName: "Attachments_Read", controllerName: "ReportPackage", routeValues: new
-                                                                                                                                                                                {
-                                                                                                                                                                                    reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
-                                                                                                                                                                                    reportStatusName = Model.Status
-                                                                                                                                                                                }))
-                                                                        .PageSize(pageSize: 15)
-                                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAttachment_" + attachmentType.Id + "'})"))
+                                                                        .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                             {
+                                                                                                                                                                                 reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
+                                                                                                                                                                                 reportStatusName = Model.Status
+                                                                                                                                                                             }))
+                                                                        .PageSize(pageSize:15)
+                                                                        .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAttachment_" + attachmentType.Id + "'})"))
                                           )
                                           )
                                 </div>
@@ -537,16 +537,16 @@
                 <div class="col-md-12">
                     @if (Model.Status == ReportStatusName.Draft)
                     {
-                        @Html.EditorFor(model => model.Comments, additionalViewData: new
-                                                                                     {
-                                                                                         htmlAttributes = new
-                                                                                                          {
-                                                                                                              @class = "form-control",
-                                                                                                              placeholder = "Enter your Comments",
-                                                                                                              rows = "3",
-                                                                                                              maxlength = 500
-                                                                                                          }
-                                                                                     })
+                        @Html.EditorFor(model => model.Comments, additionalViewData:new
+                                                                                    {
+                                                                                        htmlAttributes = new
+                                                                                                         {
+                                                                                                             @class = "form-control",
+                                                                                                             placeholder = "Enter your Comments",
+                                                                                                             rows = "3",
+                                                                                                             maxlength = 500
+                                                                                                         }
+                                                                                    })
                     }
                     else
                     {
@@ -582,26 +582,26 @@
                 }
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Password, htmlAttributes: new {@class = "col-md-4 control-label required"})
+                    @Html.LabelFor(m => m.Password, htmlAttributes:new {@class = "col-md-4 control-label required"})
                     <div class="col-md-6">
-                        @Html.PasswordFor(m => m.Password, htmlAttributes: new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.Password, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.PasswordFor(m => m.Password, htmlAttributes:new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Password, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Answer, labelText: Model.Question, htmlAttributes: new {@class = "col-md-4 control-label required"})
+                    @Html.LabelFor(m => m.Answer, labelText:Model.Question, htmlAttributes:new {@class = "col-md-4 control-label required"})
                     @Html.HiddenFor(model => model.QuestionAnswerId)
 
                     <div class="col-md-6">
-                        @Html.PasswordFor(m => m.Answer, htmlAttributes: new {@class = "form-control", autocomplete = "off"})
-                        @Html.ValidationMessageFor(m => m.Answer, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.PasswordFor(m => m.Answer, htmlAttributes:new {@class = "form-control", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.Answer, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
             </div>
 
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SignAndSubmit", controllerName: "ReportPackage", routeValues: new {id = Model.Id})#divSignAndSubmitReport" formmethod="post" />
+                    <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})#divSignAndSubmitReport" formmethod="post" />
                 </div>
             </div>
         </div>
@@ -631,42 +631,42 @@
                     </div>
                 }
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Submitter, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.Submitter, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.Submitter, additionalViewData: new
-                                                                                      {
-                                                                                          htmlAttributes = new
-                                                                                                           {
-                                                                                                               @class = "form-control",
-                                                                                                               @readonly = "readonly"
-                                                                                                           }
-                                                                                      })
+                        @Html.EditorFor(model => model.Submitter, additionalViewData:new
+                                                                                     {
+                                                                                         htmlAttributes = new
+                                                                                                          {
+                                                                                                              @class = "form-control",
+                                                                                                              @readonly = "readonly"
+                                                                                                          }
+                                                                                     })
                     </div>
-                    @Html.LabelFor(m => m.SubmitterTitleRole, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.SubmitterTitleRole, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.SubmitterTitleRole, additionalViewData: new
-                                                                                               {
-                                                                                                   htmlAttributes = new
-                                                                                                                    {
-                                                                                                                        @class = "form-control",
-                                                                                                                        @readonly = "readonly"
-                                                                                                                    }
-                                                                                               })
+                        @Html.EditorFor(model => model.SubmitterTitleRole, additionalViewData:new
+                                                                                              {
+                                                                                                  htmlAttributes = new
+                                                                                                                   {
+                                                                                                                       @class = "form-control",
+                                                                                                                       @readonly = "readonly"
+                                                                                                                   }
+                                                                                              })
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.SubmissionDateTimeLocal, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.SubmissionDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "SubmissionDateTimeLocal")
-                              .Value(date: Model.SubmissionDateTimeLocal)
-                              .Format(format: "MM/dd/yyyy hh:mm tt")
-                              .Max(date: DateTime.Now)
-                              .HtmlAttributes(attributes: new
-                                                          {
-                                                              @readonly = true,
-                                                              style = "width:210px; background-color: #eee;"
-                                                          }))
+                              .Name(componentName:"SubmissionDateTimeLocal")
+                              .Value(date:Model.SubmissionDateTimeLocal)
+                              .Format(format:"MM/dd/yyyy hh:mm tt")
+                              .Max(date:DateTime.Now)
+                              .HtmlAttributes(attributes:new
+                                                         {
+                                                             @readonly = true,
+                                                             style = "width:210px; background-color: #eee;"
+                                                         }))
                     </div>
                 </div>
             </div>
@@ -681,7 +681,7 @@
                 <h3 class="box-title">Repudiate Report</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
-                        @if (Model.Status == ReportStatusName.Repudiated || (ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage))
+                        @if (Model.Status == ReportStatusName.Repudiated || ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage)
                         {
                             // if Model.Status is Repudiated or showing any error for repudiation then open the repudiation box onload, otherwise collapse
                             <i class="fa fa-minus"></i>
@@ -717,7 +717,7 @@
                                 </p>
                                 <div class="form-group">
                                     <div class="pull-right">
-                                        <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "RepudiateReport", controllerName: "ReportPackage", routeValues: new {id = Model.Id})#divRepudiateReport" formmethod="post">
+                                        <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"RepudiateReport", controllerName:"ReportPackage", routeValues:new {id = Model.Id})#divRepudiateReport" formmethod="post">
                                             Yes
                                         </button>
                                         <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -733,50 +733,50 @@
                 }
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes: new {@class = "col-md-4 control-label required"})
+                    @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes:new {@class = "col-md-4 control-label required"})
                     <div class="col-md-6">
-                        @Html.DropDownList(name: "RepudiationReasonId", selectList: Model.AvailableRepudiationReasonNames, htmlAttributes: new
-                                                                                                                                           {
-                                                                                                                                               @class = "form-control input-sm"
-                                                                                                                                           })
+                        @Html.DropDownList(name:"RepudiationReasonId", selectList:Model.AvailableRepudiationReasonNames, htmlAttributes:new
+                                                                                                                                        {
+                                                                                                                                            @class = "form-control input-sm"
+                                                                                                                                        })
 
                         @Html.HiddenFor(model => model.RepudiationReasonId)
                         @Html.HiddenFor(model => model.RepudiationReasonName)
-                        @Html.ValidationMessageFor(m => m.RepudiationReasonId, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.ValidationMessageFor(m => m.RepudiationReasonId, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationComments, htmlAttributes: new {@class = "col-md-4 control-label"})
+                    @Html.LabelFor(m => m.RepudiationComments, htmlAttributes:new {@class = "col-md-4 control-label"})
                     <div class="col-md-6">
-                        @Html.EditorFor(model => model.RepudiationComments, additionalViewData: new
-                                                                                                {
-                                                                                                    htmlAttributes = new
-                                                                                                                     {
-                                                                                                                         @class = "form-control",
-                                                                                                                         placeholder = "Enter your Comments",
-                                                                                                                         rows = "3",
-                                                                                                                         maxlength = 500
-                                                                                                                     }
-                                                                                                })
-                        @Html.ValidationMessageFor(m => m.RepudiationComments, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.EditorFor(model => model.RepudiationComments, additionalViewData:new
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control",
+                                                                                                                        placeholder = "Enter your Comments",
+                                                                                                                        rows = "3",
+                                                                                                                        maxlength = 500
+                                                                                                                    }
+                                                                                               })
+                        @Html.ValidationMessageFor(m => m.RepudiationComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Password, htmlAttributes: new {@class = "col-md-4 control-label required"})
+                    @Html.LabelFor(m => m.Password, htmlAttributes:new {@class = "col-md-4 control-label required"})
                     <div class="col-md-6">
-                        @Html.PasswordFor(m => m.Password, htmlAttributes: new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.Password, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.PasswordFor(m => m.Password, htmlAttributes:new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Password, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Answer, labelText: Model.Question, htmlAttributes: new {@class = "col-md-4 control-label required"})
+                    @Html.LabelFor(m => m.Answer, labelText:Model.Question, htmlAttributes:new {@class = "col-md-4 control-label required"})
                     @Html.HiddenFor(model => model.QuestionAnswerId)
 
                     <div class="col-md-6">
-                        @Html.PasswordFor(m => m.Answer, htmlAttributes: new {@class = "form-control", autocomplete = "off"})
-                        @Html.ValidationMessageFor(m => m.Answer, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                        @Html.PasswordFor(m => m.Answer, htmlAttributes:new {@class = "form-control", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.Answer, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
             </div>
@@ -826,46 +826,46 @@
                 @if (Model.SubmissionReviewDateTimeLocal.HasValue)
                 {
                     <div class="form-group">
-                        @Html.LabelFor(m => m.SubmissionReviewer, htmlAttributes: new {@class = "col-md-2 control-label"})
+                        @Html.LabelFor(m => m.SubmissionReviewer, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.SubmissionReviewer, additionalViewData: new
-                                                                                                   {
-                                                                                                       htmlAttributes = new
-                                                                                                                        {
-                                                                                                                            @class = "form-control",
-                                                                                                                            @readonly = "readonly"
-                                                                                                                        }
-                                                                                                   })
+                            @Html.EditorFor(model => model.SubmissionReviewer, additionalViewData:new
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control",
+                                                                                                                           @readonly = "readonly"
+                                                                                                                       }
+                                                                                                  })
                         </div>
-                        @Html.LabelFor(m => m.SubmissionReviewDateTimeLocal, htmlAttributes: new {@class = "col-md-2 control-label"})
+                        @Html.LabelFor(m => m.SubmissionReviewDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
                             @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName: "SubmissionReviewDateTimeLocal")
-                                  .Value(date: Model.LastSentDateTimeLocal)
-                                  .Format(format: "MM/dd/yyyy hh:mm tt")
-                                  .Max(date: DateTime.Now)
-                                  .HtmlAttributes(attributes: new
-                                                              {
-                                                                  @readonly = true,
-                                                                  style = "width:210px; background-color: #eee;"
-                                                              }))
+                                  .Name(componentName:"SubmissionReviewDateTimeLocal")
+                                  .Value(date:Model.LastSentDateTimeLocal)
+                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Max(date:DateTime.Now)
+                                  .HtmlAttributes(attributes:new
+                                                             {
+                                                                 @readonly = true,
+                                                                 style = "width:210px; background-color: #eee;"
+                                                             }))
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes: new
-                                                                                        {
-                                                                                            @class = "col-md-2 control-label"
-                                                                                        })
+                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "col-md-2 control-label"
+                                                                                       })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData: new
-                                                                                                         {
-                                                                                                             htmlAttributes = new
-                                                                                                                              {
-                                                                                                                                  @class = "form-control",
-                                                                                                                                  @readonly = "readonly",
-                                                                                                                                  rows = "3"
-                                                                                                                              }
-                                                                                                         })
+                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData:new
+                                                                                                        {
+                                                                                                            htmlAttributes = new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control",
+                                                                                                                                 @readonly = "readonly",
+                                                                                                                                 rows = "3"
+                                                                                                                             }
+                                                                                                        })
 
                         </div>
                     </div>
@@ -873,20 +873,20 @@
                 else
                 {
                     <div class="form-group">
-                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes: new
-                                                                                        {
-                                                                                            @class = "col-md-2 control-label"
-                                                                                        })
+                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "col-md-2 control-label"
+                                                                                       })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData: new
-                                                                                                         {
-                                                                                                             htmlAttributes = new
-                                                                                                                              {
-                                                                                                                                  @class = "form-control",
-                                                                                                                                  rows = "3",
-                                                                                                                                  maxlength = 500
-                                                                                                                              }
-                                                                                                         })
+                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData:new
+                                                                                                        {
+                                                                                                            htmlAttributes = new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control",
+                                                                                                                                 rows = "3",
+                                                                                                                                 maxlength = 500
+                                                                                                                             }
+                                                                                                        })
 
                         </div>
                     </div>
@@ -896,7 +896,7 @@
             {
                 <div class="box-footer">
                     <div class="form-group pull-right">
-                        <input type="submit" value="Submission Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReviewSubmission", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
+                        <input type="submit" value="Submission Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReviewSubmission", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                     </div>
                 </div>
             }
@@ -927,69 +927,69 @@
                     </div>
                 }
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Repudiator, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.Repudiator, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.Repudiator, additionalViewData: new
-                                                                                       {
-                                                                                           htmlAttributes = new
-                                                                                                            {
-                                                                                                                @class = "form-control",
-                                                                                                                @readonly = "readonly"
-                                                                                                            }
-                                                                                       })
+                        @Html.EditorFor(model => model.Repudiator, additionalViewData:new
+                                                                                      {
+                                                                                          htmlAttributes = new
+                                                                                                           {
+                                                                                                               @class = "form-control",
+                                                                                                               @readonly = "readonly"
+                                                                                                           }
+                                                                                      })
                     </div>
-                    @Html.LabelFor(m => m.RepudiatorTitleRole, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.RepudiatorTitleRole, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.RepudiatorTitleRole, additionalViewData: new
-                                                                                                {
-                                                                                                    htmlAttributes = new
-                                                                                                                     {
-                                                                                                                         @class = "form-control",
-                                                                                                                         @readonly = "readonly"
-                                                                                                                     }
-                                                                                                })
+                        @Html.EditorFor(model => model.RepudiatorTitleRole, additionalViewData:new
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control",
+                                                                                                                        @readonly = "readonly"
+                                                                                                                    }
+                                                                                               })
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationDateTimeLocal, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.RepudiationDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "RepudiationDateTimeLocal")
-                              .Value(date: Model.RepudiationDateTimeLocal)
-                              .Format(format: "MM/dd/yyyy hh:mm tt")
-                              .Max(date: DateTime.Now)
-                              .HtmlAttributes(attributes: new
-                                                          {
-                                                              @readonly = true,
-                                                              style = "width:210px; background-color: #eee;"
-                                                          }))
+                              .Name(componentName:"RepudiationDateTimeLocal")
+                              .Value(date:Model.RepudiationDateTimeLocal)
+                              .Format(format:"MM/dd/yyyy hh:mm tt")
+                              .Max(date:DateTime.Now)
+                              .HtmlAttributes(attributes:new
+                                                         {
+                                                             @readonly = true,
+                                                             style = "width:210px; background-color: #eee;"
+                                                         }))
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationReasonName, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.RepudiationReasonName, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.RepudiationReasonName, additionalViewData: new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           @readonly = "readonly"
-                                                                                                                       }
-                                                                                                  })
+                        @Html.EditorFor(model => model.RepudiationReasonName, additionalViewData:new
+                                                                                                 {
+                                                                                                     htmlAttributes = new
+                                                                                                                      {
+                                                                                                                          @class = "form-control",
+                                                                                                                          @readonly = "readonly"
+                                                                                                                      }
+                                                                                                 })
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationComments, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.RepudiationComments, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.RepudiationComments, additionalViewData: new
-                                                                                                {
-                                                                                                    htmlAttributes = new
-                                                                                                                     {
-                                                                                                                         @class = "form-control",
-                                                                                                                         @readonly = "readonly",
-                                                                                                                         rows = "3"
-                                                                                                                     }
-                                                                                                })
+                        @Html.EditorFor(model => model.RepudiationComments, additionalViewData:new
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control",
+                                                                                                                        @readonly = "readonly",
+                                                                                                                        rows = "3"
+                                                                                                                    }
+                                                                                               })
                     </div>
                 </div>
             </div>
@@ -1022,46 +1022,46 @@
                 @if (Model.RepudiationReviewDateTimeLocal.HasValue)
                 {
                     <div class="form-group">
-                        @Html.LabelFor(m => m.RepudiationReviewer, htmlAttributes: new {@class = "col-md-2 control-label"})
+                        @Html.LabelFor(m => m.RepudiationReviewer, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.RepudiationReviewer, additionalViewData: new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control",
-                                                                                                                             @readonly = "readonly"
-                                                                                                                         }
-                                                                                                    })
+                            @Html.EditorFor(model => model.RepudiationReviewer, additionalViewData:new
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            @readonly = "readonly"
+                                                                                                                        }
+                                                                                                   })
                         </div>
-                        @Html.LabelFor(m => m.RepudiationReviewDateTimeLocal, htmlAttributes: new {@class = "col-md-2 control-label"})
+                        @Html.LabelFor(m => m.RepudiationReviewDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
                             @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName: "RepudiationReviewDateTimeLocal")
-                                  .Value(date: Model.LastSentDateTimeLocal)
-                                  .Format(format: "MM/dd/yyyy hh:mm tt")
-                                  .Max(date: DateTime.Now)
-                                  .HtmlAttributes(attributes: new
-                                                              {
-                                                                  @readonly = true,
-                                                                  style = "width:210px; background-color: #eee;"
-                                                              }))
+                                  .Name(componentName:"RepudiationReviewDateTimeLocal")
+                                  .Value(date:Model.LastSentDateTimeLocal)
+                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Max(date:DateTime.Now)
+                                  .HtmlAttributes(attributes:new
+                                                             {
+                                                                 @readonly = true,
+                                                                 style = "width:210px; background-color: #eee;"
+                                                             }))
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes: new
-                                                                                         {
-                                                                                             @class = "col-md-2 control-label"
-                                                                                         })
+                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
+                                                                                        {
+                                                                                            @class = "col-md-2 control-label"
+                                                                                        })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData: new
-                                                                                                          {
-                                                                                                              htmlAttributes = new
-                                                                                                                               {
-                                                                                                                                   @class = "form-control",
-                                                                                                                                   @readonly = "readonly",
-                                                                                                                                   rows = "3"
-                                                                                                                               }
-                                                                                                          })
+                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
+                                                                                                         {
+                                                                                                             htmlAttributes = new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control",
+                                                                                                                                  @readonly = "readonly",
+                                                                                                                                  rows = "3"
+                                                                                                                              }
+                                                                                                         })
 
                         </div>
                     </div>
@@ -1069,21 +1069,21 @@
                 else
                 {
                     <div class="form-group">
-                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes: new
-                                                                                         {
-                                                                                             @class = "col-md-2 control-label required"
-                                                                                         })
+                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
+                                                                                        {
+                                                                                            @class = "col-md-2 control-label required"
+                                                                                        })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData: new
-                                                                                                          {
-                                                                                                              htmlAttributes = new
-                                                                                                                               {
-                                                                                                                                   @class = "form-control",
-                                                                                                                                   rows = "3",
-                                                                                                                                   maxlength = 500
-                                                                                                                               }
-                                                                                                          })
-                            @Html.ValidationMessageFor(m => m.RepudiationReviewComments, validationMessage: "", htmlAttributes: new {@class = "text-red"})
+                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
+                                                                                                         {
+                                                                                                             htmlAttributes = new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control",
+                                                                                                                                  rows = "3",
+                                                                                                                                  maxlength = 500
+                                                                                                                              }
+                                                                                                         })
+                            @Html.ValidationMessageFor(m => m.RepudiationReviewComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
 
                         </div>
                     </div>
@@ -1093,7 +1093,7 @@
             {
                 <div class="box-footer">
                     <div class="form-group pull-right">
-                        <input type="submit" value="Repudiation Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReviewRepudiation", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
+                        <input type="submit" value="Repudiation Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReviewRepudiation", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                     </div>
                 </div>
             }
@@ -1148,29 +1148,29 @@
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.LastSender, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.LastSender, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.LastSender, additionalViewData: new
-                                                                                       {
-                                                                                           htmlAttributes = new
-                                                                                                            {
-                                                                                                                @class = "form-control",
-                                                                                                                @readonly = "readonly"
-                                                                                                            }
-                                                                                       })
+                        @Html.EditorFor(model => model.LastSender, additionalViewData:new
+                                                                                      {
+                                                                                          htmlAttributes = new
+                                                                                                           {
+                                                                                                               @class = "form-control",
+                                                                                                               @readonly = "readonly"
+                                                                                                           }
+                                                                                      })
                     </div>
-                    @Html.LabelFor(m => m.LastSentDateTimeLocal, htmlAttributes: new {@class = "col-md-2 control-label"})
+                    @Html.LabelFor(m => m.LastSentDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "LastSentDateTimeLocal")
-                              .Value(date: Model.LastSentDateTimeLocal)
-                              .Format(format: "MM/dd/yyyy hh:mm tt")
-                              .Max(date: DateTime.Now)
-                              .HtmlAttributes(attributes: new
-                                                          {
-                                                              @readonly = true,
-                                                              style = "width:210px; background-color: #eee;"
-                                                          }))
+                              .Name(componentName:"LastSentDateTimeLocal")
+                              .Value(date:Model.LastSentDateTimeLocal)
+                              .Format(format:"MM/dd/yyyy hh:mm tt")
+                              .Max(date:DateTime.Now)
+                              .HtmlAttributes(attributes:new
+                                                         {
+                                                             @readonly = true,
+                                                             style = "width:210px; background-color: #eee;"
+                                                         }))
                     </div>
                 </div>
             </div>
@@ -1186,12 +1186,12 @@
                                 .click(function()
                                 {
                                     var getUrl =
-                                        "@Url.Action(actionName: "IsSimilarReportPackageSubmittedAfter", controllerName: "ReportPackage", routeValues: new {id = Model.Id})";
+                                        "@Url.Action(actionName:"IsSimilarReportPackageSubmittedAfter", controllerName:"ReportPackage", routeValues:new {id = Model.Id})";
 
                                     $.ajax({
-                                        type: "GET"
-                                        , url: getUrl
-                                        , success: function(response)
+                                        type: "GET",
+                                        url: getUrl,
+                                        success: function(response)
                                         {
                                             if (response.toUpperCase() === "TRUE")
                                             {
@@ -1253,32 +1253,32 @@
                 @switch (Model.Status)
                 {
                     case ReportStatusName.Draft:
-                        <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
-                        <input type="submit" value="Ready to Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReadyToSubmit", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
+                        <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        <input type="submit" value="Ready to Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReadyToSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageModal" data-toggle="modal" type="button" value="Delete Draft" />
                         break;
                     case ReportStatusName.ReadyToSubmit:
-                        @Html.ActionLink(linkText: "Preview", actionName: "ReportPackagePreview", routeValues: new {id = Model.Id}, htmlAttributes: new {@class = "btn btn-primary btn-sm"})
+                        @Html.ActionLink(linkText:"Preview", actionName:"ReportPackagePreview", routeValues:new {id = Model.Id}, htmlAttributes:new {@class = "btn btn-primary btn-sm"})
 
-                        <input type="submit" value="Enable Edit Report Package" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableReportPackage", controllerName: "ReportPackage")" formmethod="post" />
+                        <input type="submit" value="Enable Edit Report Package" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableReportPackage", controllerName:"ReportPackage")" formmethod="post" />
 
                         if (!Model.IsSubmissionBySignatoryRequired)
                         {
-                            <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SignAndSubmit", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
+                            <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                         }
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageModal" data-toggle="modal" type="button" value="Delete Report Package" />
                         break;
                     case ReportStatusName.Submitted:
                     case ReportStatusName.Repudiated:
-                        @Html.ActionLink(linkText: "Download COR", actionName: "DownloadCor", routeValues: new
-                                                                                                           {
-                                                                                                               id = Model.Id
-                                                                                                           }, htmlAttributes: new
-                                                                                                                              {
-                                                                                                                                  @class = "btn btn-primary btn-sm"
-                                                                                                                              })
-                        <input class="btn btn-primary btn-sm" type="submit" value="Validate COR" formaction="@Url.Action(actionName: "ValidateCor", controllerName: "ReportPackage", routeValues: new {id = Model.Id})#divFooter" formmethod="post" />
+                        @Html.ActionLink(linkText:"Download COR", actionName:"DownloadCor", routeValues:new
+                                                                                                        {
+                                                                                                            id = Model.Id
+                                                                                                        }, htmlAttributes:new
+                                                                                                                          {
+                                                                                                                              @class = "btn btn-primary btn-sm"
+                                                                                                                          })
+                        <input class="btn btn-primary btn-sm" type="submit" value="Validate COR" formaction="@Url.Action(actionName:"ValidateCor", controllerName:"ReportPackage", routeValues:new {id = Model.Id})#divFooter" formmethod="post" />
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1289,7 +1289,7 @@
 
 @section Scripts {
 
-    @if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted && (ViewBag.ShowRepudiateValidationErrorMessage == null))
+    @if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted && ViewBag.ShowRepudiateValidationErrorMessage == null)
     {
         <script>
             // if Model.Status is Submitted and not showing Repudiation validation error message, then collapse the repudiation box onload
@@ -1335,55 +1335,53 @@
 
             //on click of the checkbox:gridId
             $(document)
-                .on('click'
-                    , "input[name^='ckgrid']"
-                    , function()
+                .on('click', "input[name^='ckgrid']", function()
+                {
+                    var checked = this.checked;
+                    var row = $(this).closest("tr");
+                    var gridId = this.name.substring(2); // remove 'ck' from the name to get the grid id
+                    var grid = $('[id=' + gridId + ']').data("kendoGrid");
+                    var dataItem = grid.dataItem(row);
+                    var isFound = false;
+                    var id, selectedObj, selectedObjsFromAllGrids;
+
+                    if (gridId.startsWith("gridSample_"))
                     {
-                        var checked = this.checked;
-                        var row = $(this).closest("tr");
-                        var gridId = this.name.substring(2); // remove 'ck' from the name to get the grid id
-                        var grid = $('[id=' + gridId + ']').data("kendoGrid");
-                        var dataItem = grid.dataItem(row);
-                        var isFound = false;
-                        var id, selectedObj, selectedObjsFromAllGrids;
+                        id = parseInt(gridId.replace('gridSample_', ''));
+                        selectedObjsFromAllGrids = selectedSamples;
+                    }
+                    else
+                    {
+                        id = parseInt(gridId.replace('gridAttachment_', ''));
+                        selectedObjsFromAllGrids = selectedAttachments;
+                    }
+
+                    for (var itemIndex = 0; itemIndex < selectedObjsFromAllGrids.length; itemIndex++)
+                    {
+                        if (selectedObjsFromAllGrids[itemIndex].Id === id)
+                        {
+                            selectedObj = selectedObjsFromAllGrids[itemIndex];
+                            isFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!isFound)
+                    {
+                        // there was no row selected for the grid. Need to create the selected object
+                        selectedObj = {};
+                        selectedObj.Id = id;
+                        selectedObj.ChildElements = [];
 
                         if (gridId.startsWith("gridSample_"))
                         {
-                            id = parseInt(gridId.replace('gridSample_', ''));
-                            selectedObjsFromAllGrids = selectedSamples;
+                            selectedSamples.push(selectedObj);
                         }
                         else
                         {
-                            id = parseInt(gridId.replace('gridAttachment_', ''));
-                            selectedObjsFromAllGrids = selectedAttachments;
+                            selectedAttachments.push(selectedObj);
                         }
-
-                        for (var itemIndex = 0; itemIndex < selectedObjsFromAllGrids.length; itemIndex++)
-                        {
-                            if (selectedObjsFromAllGrids[itemIndex].Id === id)
-                            {
-                                selectedObj = selectedObjsFromAllGrids[itemIndex];
-                                isFound = true;
-                                break;
-                            }
-                        }
-
-                        if (!isFound)
-                        {
-                            // there was no row selected for the grid. Need to create the selected object
-                            selectedObj = {};
-                            selectedObj.Id = id;
-                            selectedObj.ChildElements = [];
-
-                            if (gridId.startsWith("gridSample_"))
-                            {
-                                selectedSamples.push(selectedObj);
-                            }
-                            else
-                            {
-                                selectedAttachments.push(selectedObj);
-                            }
-                        }
+                    }
 
                         if (selectedObj.Id === id)
                         {
@@ -1405,7 +1403,7 @@
                                     return obj.Id !== dataItem[idField];
                                 });
 
-                                selectedObj.ChildElements = newArray;
+                            selectedObj.ChildElements = newArray;
 
                                 //console.log(selectedObj.ChildElements);
                             }

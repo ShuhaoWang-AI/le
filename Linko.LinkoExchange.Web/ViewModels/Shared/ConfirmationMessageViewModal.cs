@@ -2,7 +2,11 @@
 {
     public class ConfirmationMessageViewModal
     {
-        public bool ShowMessage {get; set; }
-        public string Messaage {get;set; }
+        #region public properties
+
+        public bool ShowMessage { get; set; }
+        public string Messaage { get; set; }
+
+        #endregion
     }
 }

@@ -1,21 +1,23 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class SystemSettingMap : EntityTypeConfiguration<SystemSetting>
     {
+        #region constructors and destructor
+
         public SystemSettingMap()
         {
-            ToTable("tSystemSetting");
+            ToTable(tableName:"tSystemSetting");
 
             HasKey(x => x.SystemSettingId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.Value).IsRequired().HasMaxLength(500);
+            Property(x => x.Value).IsRequired().HasMaxLength(value:500);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
@@ -23,5 +25,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

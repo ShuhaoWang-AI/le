@@ -1,24 +1,26 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class ModuleMap : EntityTypeConfiguration<Module>
     {
+        #region constructors and destructor
+
         public ModuleMap()
         {
-            ToTable("tModule");
+            ToTable(tableName:"tModule");
 
             HasKey(x => x.ModuleId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             HasRequired(a => a.OrganizationTypeRegulatoryProgram)
                 .WithMany(b => b.Modules)
                 .HasForeignKey(c => c.OrganizationTypeRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
@@ -26,5 +28,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

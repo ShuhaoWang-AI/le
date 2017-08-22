@@ -12,6 +12,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
     [Validator(validatorType:typeof(ReportPackageViewModelValidator))]
     public class ReportPackageViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Report Package ID")]
         public int? Id { get; set; }
@@ -162,10 +164,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Categories")]
         public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
-        
-        public List<SelectedParentChildCombination> SelectedSamples{ get; set; }
-        public List<SelectedParentChildCombination> SelectedAttachments{ get; set; }
+
+        public List<SelectedParentChildCombination> SelectedSamples { get; set; }
+        public List<SelectedParentChildCombination> SelectedAttachments { get; set; }
+
+        #endregion
     }
 
-    public class ReportPackageViewModelValidator:AbstractValidator<ReportPackageViewModel> {}
+    public class ReportPackageViewModelValidator : AbstractValidator<ReportPackageViewModel> { }
 }

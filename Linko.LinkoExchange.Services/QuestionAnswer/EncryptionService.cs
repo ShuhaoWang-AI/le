@@ -4,9 +4,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
     public class EncryptionService : IEncryptionService
     {
-        public EncryptionService()
-        {
-        }
+        #region interface implementations
 
         public string EncryptString(string readableString)
         { 
@@ -18,5 +16,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             return StringCipher.Decrypt(encryptedString);
         }
 
+        #endregion
     }
 }

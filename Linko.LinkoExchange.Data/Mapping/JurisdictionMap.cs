@@ -1,13 +1,15 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class JurisdictionMap : EntityTypeConfiguration<Jurisdiction>
     {
+        #region constructors and destructor
+
         public JurisdictionMap()
         {
-            ToTable("tJurisdiction");
+            ToTable(tableName:"tJurisdiction");
 
             HasKey(x => x.JurisdictionId);
 
@@ -15,9 +17,9 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.StateId).IsRequired();
 
-            Property(x => x.Code).IsRequired().HasMaxLength(2).IsFixedLength();
+            Property(x => x.Code).IsRequired().HasMaxLength(value:2).IsFixedLength();
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:100);
 
             Property(x => x.ParentId).IsOptional();
 
@@ -27,5 +29,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

@@ -1,19 +1,21 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System.Threading.Tasks;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a merged entity between .NET identity and application.
-    /// There is currently no alternate key support in EF 6.1.3 that will enable any navigation properties to this entity.
+    ///     Represents a merged entity between .NET identity and application.
+    ///     There is currently no alternate key support in EF 6.1.3 that will enable any navigation properties to this entity.
     /// </summary>
-    public partial class UserProfile : IdentityUser
+    public class UserProfile : IdentityUser
     {
+        #region public properties
+
         /// <summary>
-        /// Identity column. Alternate key.
+        ///     Identity column. Alternate key.
         /// </summary>
         public int UserProfileId { get; set; }
 
@@ -56,21 +58,22 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
+        #endregion
+
         // Reverse navigation
         //public virtual ICollection<UserPasswordHistory> UserPasswordHistories { get; set; }
         //public virtual ICollection<UserQuestionAnswer> UserQuestionAnswers { get; set; }
 
-
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<UserProfile> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+            var userIdentity = await manager.CreateIdentityAsync(user:this, authenticationType:DefaultAuthenticationTypes.ApplicationCookie);
 
             // Add custom user claims here
-            userIdentity.AddClaim(new Claim("UserFullName", this.FirstName + " " + this.LastName));
-            userIdentity.AddClaim(new Claim("UserProfileId", this.UserProfileId.ToString()));
-            userIdentity.AddClaim(new Claim("UserName", this.UserName));
-            userIdentity.AddClaim(new Claim("Email", this.Email));
+            userIdentity.AddClaim(claim:new Claim(type:"UserFullName", value:FirstName + " " + LastName));
+            userIdentity.AddClaim(claim:new Claim(type:"UserProfileId", value:UserProfileId.ToString()));
+            userIdentity.AddClaim(claim:new Claim(type:"UserName", value:UserName));
+            userIdentity.AddClaim(claim:new Claim(type:"Email", value:Email));
 
             return userIdentity;
         }
@@ -106,6 +109,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         /// <summary>
         /// True: the user will be locked out after the pre-determined nth attempt. Default: False.
+
         /// </summary>
         //public bool LockoutEnabled { get; set; }
 

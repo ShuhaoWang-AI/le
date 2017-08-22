@@ -5,14 +5,17 @@ namespace Linko.LinkoExchange.Data.Mapping
 {
     public class FileStoreDataMap : EntityTypeConfiguration<FileStoreData>
     {
+        #region constructors and destructor
+
         public FileStoreDataMap()
         {
-            ToTable("tFileStoreData");
+            ToTable(tableName:"tFileStoreData");
 
             HasKey(t => t.FileStoreId);
 
             Property(t => t.Data).IsRequired();
-
         }
+
+        #endregion
     }
 }

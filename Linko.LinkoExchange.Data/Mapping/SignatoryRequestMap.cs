@@ -1,13 +1,15 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class SignatoryRequestMap : EntityTypeConfiguration<SignatoryRequest>
     {
+        #region constructors and destructor
+
         public SignatoryRequestMap()
         {
-            ToTable("tSignatoryRequest");
+            ToTable(tableName:"tSignatoryRequest");
 
             HasKey(x => x.SignatoryRequestId);
 
@@ -20,12 +22,14 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasRequired(a => a.OrganizationRegulatoryProgramUser)
                 .WithMany(b => b.SignatoryRequests)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramUserId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(a => a.SignatoryRequestStatus)
                 .WithMany(b => b.SignatoryRequests)
                 .HasForeignKey(c => c.SignatoryRequestStatusId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
         }
+
+        #endregion
     }
 }

@@ -7,177 +7,113 @@ using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    [Validator(typeof(PendingUserApprovalValidator))]
+    [Validator(validatorType:typeof(PendingUserApprovalValidator))]
     public class PendingUserApprovalViewModel
     {
-        [ScaffoldColumn(false)]
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Id")]
-        public int Id
-        {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        [ScaffoldColumn(false)]
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "PId")]
-        public int PId
-        {
-            get; set;
-        }
+        public int PId { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Registered For")]
-        public string RegisteredOrgName
-        {
-            get; set;
-        }
+        public string RegisteredOrgName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Organization Type")]
-        public string Type
-        {
-            get; set;
-        }
+        public string Type { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "User Name")]
-        public string UserName
-        {
-            get; set;
-        }
+        public string UserName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "First Name")]
-        public string FirstName
-        {
-            get; set;
-        }
+        public string FirstName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Last Name")]
-        public string LastName
-        {
-            get; set;
-        }
+        public string LastName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Organization Name")]
-        public string BusinessName
-        {
-            get; set;
-        }
+        public string BusinessName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Title/Role")]
-        public string TitleRole
-        {
-            get; set;
-        }
+        public string TitleRole { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 1")]
-        public string AddressLine1
-        {
-            get; set;
-        }
+        public string AddressLine1 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address line 2")]
-        public string AddressLine2
-        {
-            get; set;
-        }
+        public string AddressLine2 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "City")]
-        public string CityName
-        {
-            get; set;
-        }
+        public string CityName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "State")]
-        public string State
-        {
-            get; set;
-        }
+        public string State { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Zip Code")]
-        public string ZipCode
-        {
-            get; set;
-        }
+        public string ZipCode { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Address")]
-        public string Address
-        {
-            get
-            {
-                return string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
-            }
-        }
+        public string Address => string.Format(format:"{0} {1}, {2}, {3} {4}", args:new object[] {AddressLine1, AddressLine2, CityName, State, ZipCode});
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Email")]
         [EmailAddress]
-        public string Email
-        {
-            get; set;
-        }
+        public string Email { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Phone Number")]
         [Phone]
-        public string PhoneNumber
-        {
-            get; set;
-        }
+        public string PhoneNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Ext")]
-        public int? PhoneExt
-        {
-            get; set;
-        }
+        public int? PhoneExt { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Registration Date")]
-        public DateTime? DateRegistered
-        {
-            get; set;
-        }
-        
-        [Display(Name = "Role")]
-        public int? Role
-        {
-            get; set;
-        }
+        public DateTime? DateRegistered { get; set; }
 
         [Display(Name = "Role")]
-        public string RoleText
-        {
-            get; set;
-        }
+        public int? Role { get; set; }
 
-        [Display(Name ="Is Signatory")]
-        public bool IsSignatory
-        {
-            get; set;
-        }
+        [Display(Name = "Role")]
+        public string RoleText { get; set; }
 
-        public IList<SelectListItem> AvailableRoles
-        {
-            get; set;
-        }        
+        [Display(Name = "Is Signatory")]
+        public bool IsSignatory { get; set; }
+
+        public IList<SelectListItem> AvailableRoles { get; set; }
+
+        #endregion
     }
 
-    public partial class PendingUserApprovalValidator : AbstractValidator<PendingUserApprovalViewModel>
+    public class PendingUserApprovalValidator : AbstractValidator<PendingUserApprovalViewModel>
     {
+        #region constructors and destructor
+
         public PendingUserApprovalValidator()
         {
             //Role
-            RuleFor(x => x.Role).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.Role).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }

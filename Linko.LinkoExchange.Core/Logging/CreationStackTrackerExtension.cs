@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </summary>
         protected override void Initialize()
         {
-            Context.Strategies.AddNew<CreationStackTrackerStrategy>(UnityBuildStage.TypeMapping);
+            Context.Strategies.AddNew<CreationStackTrackerStrategy>(stage:UnityBuildStage.TypeMapping);
         }
 
         #endregion

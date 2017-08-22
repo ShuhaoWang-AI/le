@@ -18,6 +18,7 @@
         <section class="box-body form-horizontal">
             <div class="form-group">
                 <div class="col-md-1 col-sm-3">
+                    @* ReSharper disable once UnknownCssClass *@
                     <input checked="checked" class="onoffswitch" data-off-text="Basic" data-on-text="Advanced" name="onOffSwitchSearchControl" type="checkbox" />
                 </div>
                 <div class="col-sm-1">
@@ -86,6 +87,7 @@
                       .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
+
                       //.Groupable()
                       .HtmlAttributes(attributes:new
                                                  {
@@ -121,17 +123,16 @@
 
         $("[name='onOffSwitchSearchControl']").bootstrapSwitch();
         $("[name='onOffSwitchSearchControl']")
-            .on('switchChange.bootstrapSwitch'
-                , function()
-                {
-                    $("[id='basicSearch']").toggle(500);
-                    $("#grid .k-filter-row").toggle(500);
+            .on('switchChange.bootstrapSwitch', function()
+            {
+                $("[id='basicSearch']").toggle(500);
+                $("#grid .k-filter-row").toggle(500);
 
-                    //console.debug($("#grid .k-filter-row")); // DOM element
-                    //console.debug(this); // DOM element
-                    //console.debug(event); // jQuery event
-                    //console.debug(state); // true | false
-                });
+                //console.debug($("#grid .k-filter-row")); // DOM element
+                //console.debug(this); // DOM element
+                //console.debug(event); // jQuery event
+                //console.debug(state); // true | false
+            });
 
         gotoNextPage = function()
         {

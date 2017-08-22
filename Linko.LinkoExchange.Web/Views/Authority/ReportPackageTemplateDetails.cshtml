@@ -77,9 +77,9 @@
 
         <section class="box-body form-horizontal">
             @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
-                                                                                                                            {
-                                                                                                                                @class = "alert alert-danger"
-                                                                                                                            })
+                                                                                                                             {
+                                                                                                                                 @class = "alert alert-danger"
+                                                                                                                             })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -90,7 +90,7 @@
                     </h5>
                 </div>
             }
-            
+
             @if (!ViewBag.Satus.Equals("ViewOnly"))
             {
                 if (!ViewBag.Satus.Equals("New"))
@@ -124,8 +124,8 @@
                                                                                                          })
                 </div>
                 <div class="col-md-1">
-                    <button class="btn btn-info btn-sm" tabindex="-1" data-placement="top" data-toggle="tooltip" title="The Industry sees this Name and Description. It should describe the report." type="button">
-                        <i class="fa fa-lg fa-info-circle"></i>
+                    <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="The Industry sees this Name and Description. It should describe the report." type="button">
+                        <i class="fa fa-info-circle fa-lg"></i>
                     </button>
                 </div>
 
@@ -177,16 +177,16 @@
                                                      {
                                                          style = "width:210px;"
                                                      }))
-                    <br/>
+                    <br />
                     @Html.ValidationMessageFor(model => model.EffectiveDateTimeLocal, validationMessage:"", htmlAttributes:new
-                                                                                                         {
-                                                                                                             @class = "text-danger"
-                                                                                                         })
+                                                                                                                           {
+                                                                                                                               @class = "text-danger"
+                                                                                                                           })
 
                 </div>
                 <div>
-                    <button class="btn btn-info btn-sm" tabindex="-1" data-placement="top" data-toggle="tooltip" title="When will the Industry start seeing and using this template?" type="button">
-                        <i class="fa fa-lg fa-info-circle"></i>
+                    <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="When will the Industry start seeing and using this template?" type="button">
+                        <i class="fa fa-info-circle fa-lg"></i>
                     </button>
                 </div>
             </div>
@@ -209,8 +209,8 @@
                                                                                                                      })
                 </div>
                 <div>
-                    <button class="btn btn-info btn-sm" tabindex="-1" tabdata-placement="top" data-toggle="tooltip" title="The Report Package Template must have a CTS Event Type assigned to show up in LinkoCTS." type="button">
-                        <i class="fa fa-lg fa-info-circle"></i>
+                    <button class="btn btn-info btn-sm" data-toggle="tooltip" tabdata-placement="top" tabindex="-1" title="The Report Package Template must have a CTS Event Type assigned to show up in LinkoCTS." type="button">
+                        <i class="fa fa-info-circle fa-lg"></i>
                     </button>
                 </div>
             </div>
@@ -231,8 +231,8 @@
         <div class="box-body box-collapse collapse in">
             <h5>Samples and Results are included in this report package template.</h5>
 
-            @Html.Hidden(name: "SamplesAndResultsTypes", value: Html.Raw(value: Json.Encode(value: Model.SamplesAndResultsTypes)))
-            
+            @Html.Hidden(name:"SamplesAndResultsTypes", value:Html.Raw(value:Json.Encode(value:Model.SamplesAndResultsTypes)))
+
         </div>
     </div>
 
@@ -248,7 +248,9 @@
             </div>
         </div>
         <div class="box-body box-collapse collapse in">
-            <div class="col-md-12"><h5>Select the attachments that should be submitted with the report.</h5></div>
+            <div class="col-md-12">
+                <h5>Select the attachments that should be submitted with the report.</h5>
+            </div>
 
             <div class="col-md-6">
                 <strong>Available</strong>
@@ -269,7 +271,7 @@
                             <tr>
                                 <td>@attachment.Id</td>
                                 <td>@attachment.Name</td>
-                                <td style="word-break:break-word;">@attachment.Description</td>
+                                <td style="word-break: break-word;">@attachment.Description</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" id="btnAddAttachment" type="button">
                                         <i class="fa fa-plus"></i>
@@ -305,7 +307,7 @@
                                 </td>
                                 <td>@attachment.Id</td>
                                 <td>@attachment.Name</td>
-                                <td style="word-break:break-word;">@attachment.Description</td>
+                                <td style="word-break: break-word;">@attachment.Description</td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" id="btnRemoveAttachment" type="button">
                                         <i class="fa fa-minus"></i>
@@ -341,8 +343,10 @@
             </div>
         </div>
         <div class="box-body box-collapse collapse in">
-            
-            <div class="col-md-12"><h5>Select the certifications that must be agreed to when submitting the report.</h5></div>
+
+            <div class="col-md-12">
+                <h5>Select the certifications that must be agreed to when submitting the report.</h5>
+            </div>
 
             <div class="col-md-6">
                 <strong>Available</strong>
@@ -363,7 +367,7 @@
                             <tr>
                                 <td>@certification.Id</td>
                                 <td>@certification.Name</td>
-                                <td style="word-break:break-word;">@certification.Description</td>
+                                <td style="word-break: break-word;">@certification.Description</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" id="btnAddCertification" type="button">
                                         <i class="fa fa-plus"></i>
@@ -399,7 +403,7 @@
                                 </td>
                                 <td>@certification.Id</td>
                                 <td>@certification.Name</td>
-                                <td style="word-break:break-word;">@certification.Description</td>
+                                <td style="word-break: break-word;">@certification.Description</td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" id="btnRemoveCertification" type="button">
                                         <i class="fa fa-minus"></i>
@@ -436,11 +440,15 @@
             </div>
         </div>
         <div class="box-body box-collapse collapse in">
-            
-            <div class="col-md-12"><h5>Select the Industries that will be able to submit this report.</h5></div>
+
+            <div class="col-md-12">
+                <h5>Select the Industries that will be able to submit this report.</h5>
+            </div>
 
             <div class="col-md-6">
-                <div><strong>Available</strong><button class="btn btn-primary btn-sm pull-right" id="btnAddAllIndustry" type="button"> Add All </button></div><br/>
+                <div>
+                    <strong>Available</strong><button class="btn btn-primary btn-sm pull-right" id="btnAddAllIndustry" type="button"> Add All </button>
+                </div><br />
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableIndustryTable">
                     <thead>
                         <tr>
@@ -475,7 +483,9 @@
             </div>
 
             <div class="col-md-6">
-                <div><strong>Selected</strong><button class="btn btn-danger btn-sm pull-right" id="btnRemoveAllIndustry" type="button"> Remove All </button></div><br/>
+                <div>
+                    <strong>Selected</strong><button class="btn btn-danger btn-sm pull-right" id="btnRemoveAllIndustry" type="button"> Remove All </button>
+                </div><br />
 
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedIndustryTable">
                     <thead>
@@ -537,27 +547,26 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [1, 2] }
-                                , {
+                                { "searchable": true, "targets": [1, 2] }, {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' id='btnAddAttachment'><i class='fa fa-plus'></i></button>"
-                                    , "targets": 3
+                                        "<button class='btn btn-primary btn-sm' id='btnAddAttachment'><i class='fa fa-plus'></i></button>",
+                                    "targets": 3
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": true
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Attachment..."
-                                , "zeroRecords": "No attachments match your search."
-                                , "emptyTable": "No attachments are available for selection."
+                            ],
+                            "searching": false,
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Attachment...",
+                                "zeroRecords": "No attachments match your search.",
+                                "emptyTable": "No attachments are available for selection."
                             }
                         }
                     );
@@ -566,31 +575,29 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [2, 3] }
-                                , {
+                                { "searchable": true, "targets": [2, 3] }, {
                                     "defaultContent":
-                                        "<span class='btn btn-sm handler'>&nbsp;</span>"
-                                    , "targets": 0
-                                }
-                                , {
+                                        "<span class='btn btn-sm handler'>&nbsp;</span>",
+                                    "targets": 0
+                                }, {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' id='btnRemoveAttachment'><i class='fa fa-minus'></i></button>"
-                                    , "targets": 4
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveAttachment'><i class='fa fa-minus'></i></button>",
+                                    "targets": 4
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": false
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Attachment..."
-                                , "zeroRecords": "No attachments match your search."
-                                , "emptyTable": "No attachments are selected."
+                            ],
+                            "searching": false,
+                            "ordering": false,
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Attachment...",
+                                "zeroRecords": "No attachments match your search.",
+                                "emptyTable": "No attachments are selected."
 
                             }
                         }
@@ -600,27 +607,26 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [1, 2] }
-                                , {
+                                { "searchable": true, "targets": [1, 2] }, {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' id='btnAddCertification'><i class='fa fa-plus'></i></button>"
-                                    , "targets": 3
+                                        "<button class='btn btn-primary btn-sm' id='btnAddCertification'><i class='fa fa-plus'></i></button>",
+                                    "targets": 3
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": true
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Certification..."
-                                , "zeroRecords": "No certifications match your search."
-                                , "emptyTable": "No certifications are available for selection."
+                            ],
+                            "searching": false,
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Certification...",
+                                "zeroRecords": "No certifications match your search.",
+                                "emptyTable": "No certifications are available for selection."
                             }
                         }
                     );
@@ -629,31 +635,29 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [2, 3] }
-                                , {
+                                { "searchable": true, "targets": [2, 3] }, {
                                     "defaultContent":
-                                        "<span class='btn btn-sm handler'>&nbsp;</span>"
-                                    , "targets": 0
-                                }
-                                , {
+                                        "<span class='btn btn-sm handler'>&nbsp;</span>",
+                                    "targets": 0
+                                }, {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' id='btnRemoveCertification'><i class='fa fa-minus'></i></button>"
-                                    , "targets": 4
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveCertification'><i class='fa fa-minus'></i></button>",
+                                    "targets": 4
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": false
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Certification..."
-                                , "zeroRecords": "No certifications match your search."
-                                , "emptyTable": "No certifications are selected."
+                            ],
+                            "searching": false,
+                            "ordering": false,
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Certification...",
+                                "zeroRecords": "No certifications match your search.",
+                                "emptyTable": "No certifications are selected."
                             }
                         }
                     );
@@ -662,26 +666,25 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [1, 2, 3, 4] }
-                                , {
+                                { "searchable": true, "targets": [1, 2, 3, 4] }, {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' id='btnAddIndustry'><i class='fa fa-plus'></i></button>"
-                                    , "targets": 5
+                                        "<button class='btn btn-primary btn-sm' id='btnAddIndustry'><i class='fa fa-plus'></i></button>",
+                                    "targets": 5
                                 }
-                            ]
-                            , "ordering": true
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Industry..."
-                                , "zeroRecords": "No industries match your search."
-                                , "emptyTable": "No industries are available for selection."
+                            ],
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Industry...",
+                                "zeroRecords": "No industries match your search.",
+                                "emptyTable": "No industries are available for selection."
                             }
                         }
                     );
@@ -690,229 +693,211 @@
                     .DataTable(
                         {
                             "columnDefs": [
-                                { "searchable": true, "targets": [1, 2, 3, 4] }
-                                , {
+                                { "searchable": true, "targets": [1, 2, 3, 4] }, {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' id='btnRemoveIndustry'><i class='fa fa-minus'></i></button>"
-                                    , "targets": 5
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveIndustry'><i class='fa fa-minus'></i></button>",
+                                    "targets": 5
                                 }
-                            ]
-                            , "ordering": true
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , "language": {
-                                "search": ""
-                                , "searchPlaceholder": "Search Industry..."
-                                , "zeroRecords": "No industries match your search."
-                                , "emptyTable": "No industries are selected."
+                            ],
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Industry...",
+                                "zeroRecords": "No industries match your search.",
+                                "emptyTable": "No industries are selected."
                             }
                         }
                     );
             });
-        
-        $(document)
-            .on('click'
-                , "button[id^='btnAddAttachment']"
-                , function()
-                {
-                    var tableMoveFrom = $('#availableAttachmentTable').DataTable();
-
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
-
-                    var tableMoveTo = $('#selectedAttachmentTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([null, data[0], data[1], data[2]])
-                        .draw()
-                        .node();
-
-                    $(rowNode).css('color', 'green');
-
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
 
         $(document)
-            .on('click'
-                , "button[id^='btnRemoveAttachment']"
-                , function()
-                {
-                    var tableMoveFrom = $('#selectedAttachmentTable').DataTable();
+            .on('click', "button[id^='btnAddAttachment']", function()
+            {
+                var tableMoveFrom = $('#availableAttachmentTable').DataTable();
 
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    var tableMoveTo = $('#availableAttachmentTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([data[1], data[2], data[3]])
-                        .draw()
-                        .node();
+                var tableMoveTo = $('#selectedAttachmentTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([null, data[0], data[1], data[2]])
+                    .draw()
+                    .node();
 
-                    $(rowNode).css('color', 'green');
+                $(rowNode).css('color', 'green');
 
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id^='btnAddCertification']"
-                , function()
-                {
-                    var tableMoveFrom = $('#availableCertificationTable').DataTable();
+            .on('click', "button[id^='btnRemoveAttachment']", function()
+            {
+                var tableMoveFrom = $('#selectedAttachmentTable').DataTable();
 
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    var tableMoveTo = $('#selectedCertificationTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([null, data[0], data[1], data[2]])
-                        .draw()
-                        .node();
+                var tableMoveTo = $('#availableAttachmentTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([data[1], data[2], data[3]])
+                    .draw()
+                    .node();
 
-                    $(rowNode).css('color', 'green');
+                $(rowNode).css('color', 'green');
 
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id^='btnRemoveCertification']"
-                , function()
-                {
-                    var tableMoveFrom = $('#selectedCertificationTable').DataTable();
+            .on('click', "button[id^='btnAddCertification']", function()
+            {
+                var tableMoveFrom = $('#availableCertificationTable').DataTable();
 
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    var tableMoveTo = $('#availableCertificationTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([data[1], data[2], data[3]])
-                        .draw()
-                        .node();
+                var tableMoveTo = $('#selectedCertificationTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([null, data[0], data[1], data[2]])
+                    .draw()
+                    .node();
 
-                    $(rowNode).css('color', 'green');
+                $(rowNode).css('color', 'green');
 
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id^='btnAddIndustry']"
-                , function()
-                {
-                    var tableMoveFrom = $('#availableIndustryTable').DataTable();
+            .on('click', "button[id^='btnRemoveCertification']", function()
+            {
+                var tableMoveFrom = $('#selectedCertificationTable').DataTable();
 
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    var tableMoveTo = $('#selectedIndustryTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([data[0], data[1], data[2], data[3], data[4]])
-                        .draw()
-                        .node();
+                var tableMoveTo = $('#availableCertificationTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([data[1], data[2], data[3]])
+                    .draw()
+                    .node();
 
-                    $(rowNode).css('color', 'green');
+                $(rowNode).css('color', 'green');
 
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id^='btnRemoveIndustry']"
-                , function()
-                {
-                    var tableMoveFrom = $('#selectedIndustryTable').DataTable();
+            .on('click', "button[id^='btnAddIndustry']", function()
+            {
+                var tableMoveFrom = $('#availableIndustryTable').DataTable();
 
-                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    var tableMoveTo = $('#availableIndustryTable').DataTable();
-                    var rowNode = tableMoveTo
-                        .row.add([data[0], data[1], data[2], data[3], data[4]])
-                        .draw()
-                        .node();
+                var tableMoveTo = $('#selectedIndustryTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([data[0], data[1], data[2], data[3], data[4]])
+                    .draw()
+                    .node();
 
-                    $(rowNode).css('color', 'green');
+                $(rowNode).css('color', 'green');
 
-                    tableMoveFrom
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id='btnAddAllIndustry']"
-                , function()
-                {
-                    var tableMoveFrom = $('#availableIndustryTable').DataTable();
+            .on('click', "button[id^='btnRemoveIndustry']", function()
+            {
+                var tableMoveFrom = $('#selectedIndustryTable').DataTable();
 
-                    var tableMoveTo = $('#selectedIndustryTable').DataTable();
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    tableMoveFrom
-                        .rows({ filter : 'applied'})
-                        .every(function()
-                        {
-                            var data = this.data();
-                            var rowNode = tableMoveTo
-                                .row.add([data[0], data[1], data[2], data[3], data[4]])
-                                .draw()
-                                .node();
+                var tableMoveTo = $('#availableIndustryTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([data[0], data[1], data[2], data[3], data[4]])
+                    .draw()
+                    .node();
 
-                            $(rowNode).css('color', 'green');
-                            
-                        });
-                        
-                    tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
-                });
+                $(rowNode).css('color', 'green');
+
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
 
         $(document)
-            .on('click'
-                , "button[id='btnRemoveAllIndustry']"
-                , function()
-                {
-                    var tableMoveFrom = $('#selectedIndustryTable').DataTable();
+            .on('click', "button[id='btnAddAllIndustry']", function()
+            {
+                var tableMoveFrom = $('#availableIndustryTable').DataTable();
 
-                    var tableMoveTo = $('#availableIndustryTable').DataTable();
-                    tableMoveFrom
-                        .rows({ filter : 'applied'})
-                        .every(function()
-                        {
-                            var data = this.data();
-                            var rowNode = tableMoveTo
-                                .row.add([data[0], data[1], data[2], data[3], data[4]])
-                                .draw()
-                                .node();
+                var tableMoveTo = $('#selectedIndustryTable').DataTable();
 
-                            $(rowNode).css('color', 'green');
-                            
-                        });
-                        
-                    tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
-                });
+                tableMoveFrom
+                    .rows({ filter: 'applied' })
+                    .every(function()
+                    {
+                        var data = this.data();
+                        var rowNode = tableMoveTo
+                            .row.add([data[0], data[1], data[2], data[3], data[4]])
+                            .draw()
+                            .node();
+
+                        $(rowNode).css('color', 'green');
+                    });
+
+                tableMoveFrom.rows({ filter: 'applied' }).remove().draw();
+            });
+
+        $(document)
+            .on('click', "button[id='btnRemoveAllIndustry']", function()
+            {
+                var tableMoveFrom = $('#selectedIndustryTable').DataTable();
+
+                var tableMoveTo = $('#availableIndustryTable').DataTable();
+                tableMoveFrom
+                    .rows({ filter: 'applied' })
+                    .every(function()
+                    {
+                        var data = this.data();
+                        var rowNode = tableMoveTo
+                            .row.add([data[0], data[1], data[2], data[3], data[4]])
+                            .draw()
+                            .node();
+
+                        $(rowNode).css('color', 'green');
+                    });
+
+                tableMoveFrom.rows({ filter: 'applied' }).remove().draw();
+            });
 
 
-
-        function getSelectedReportPackageTemplateElements(domId) { 
-         
+        function getSelectedReportPackageTemplateElements(domId)
+        {
             var searchId = "#" + domId + "> tbody > tr";
             var rows = $.makeArray($(searchId));
-            return rows.map(function (row) {
+            return rows.map(function(row)
+            {
                 var values = $(row).find("td");
-                if (values.length <= 1) {
+                if (values.length <= 1)
+                {
                     return [];
                 }
                 return {
@@ -920,99 +905,101 @@
                     Name: values[1].innerText,
                     Description: values[2].innerText
                 };
-            }); 
+            });
         }
 
-        function getReportPackageTempateElementTypeId(domId, elementTypeName){  
-
+        function getReportPackageTempateElementTypeId(domId, elementTypeName)
+        {
             var attachmentTypes = $.makeArray($('#' + domId).DataTable().data());
-            for(var i=0; i< attachmentTypes.length; i++){
-                var value = attachmentTypes[i]; 
-                if(value[2] === elementTypeName){
+            for (var i = 0; i < attachmentTypes.length; i++)
+            {
+                var value = attachmentTypes[i];
+                if (value[2] === elementTypeName)
+                {
                     return value[1];
                 }
-            } 
+            }
 
-           return -1;
-       }
+            return -1;
+        }
 
         $("#btnSave")
-            .on("click"
-                , function()
+            .on("click", function()
+            {
+                var selectedSamplesAndResults = [];
+
+                var samplesAndResultsTypes = $.parseJSON($("#SamplesAndResultsTypes").val());
+
+                $.each(samplesAndResultsTypes, function(index, value)
                 {
-                    var selectedSamplesAndResults = [];
-
-                    var samplesAndResultsTypes = $.parseJSON($("#SamplesAndResultsTypes").val());
-
-                    $.each(samplesAndResultsTypes, function (index, value) {
-                        var reportElementTypeViewModel = {};
-                        reportElementTypeViewModel.Id = value.Id;
-                        reportElementTypeViewModel.Name = value.Name;
-                        reportElementTypeViewModel.Description = value.Description;
-                        selectedSamplesAndResults.push(reportElementTypeViewModel);
-                        //console.debug('Data in index: ' + index + ' is: ' + value);
-                    });
-
-                    var selectedAttachments = getSelectedReportPackageTemplateElements("selectedAttachmentTable");
-                    var selectedCertifications = getSelectedReportPackageTemplateElements("selectedCertificationTable");
-
-                    var selectedIndustries = [];
-                    $('#selectedIndustryTable')
-                        .DataTable()
-                        .rows()
-                        .data()
-                        .each(function(value, index)
-                        {
-                            var industryViewModel = {};
-                            industryViewModel.Id = value[0];
-                            industryViewModel.ReferenceNumber = value[1];
-                            industryViewModel.IndustryName = value[2];
-                            industryViewModel.Address = value[3];
-                            industryViewModel.Classification = value[4];
-                            selectedIndustries.push(industryViewModel);
-                        });
-
-
-                    var viewModel = {};
-                    viewModel.Id = $('#Id').val();
-                    viewModel.Name = $('#Name').val();
-                    viewModel.Description = $('#Description').val();
-                    viewModel.IsActive = $('#IsActive').is(":checked");
-                    viewModel.EffectiveDateTimeLocal = $('#dEffectiveDateTimeLocal').val();
-                    viewModel.IsSubmissionBySignatoryRequired = $('#IsSubmissionBySignatoryRequired').val();
-                    viewModel.ShowSampleResults = $('#ShowSampleResults').val();
-                    viewModel.CtsEventTypeId = $('#CtsEventTypeId').val();
-                    viewModel.SamplesAndResultsTypes = selectedSamplesAndResults;
-                    viewModel.AttachmentTypes = selectedAttachments;
-                    viewModel.CertificationTypes = selectedCertifications;
-                    viewModel.ReportPackageTemplateAssignments = selectedIndustries;
-
-                    //console.debug('----', viewModel);
-
-                    var postUrl = "@ViewBag.PostURL";
-                    var token = $("[name='__RequestVerificationToken']").val();
-                    viewModel.__RequestVerificationToken = token;
-
-                    $.ajax({
-                        type: "POST"
-                        , url: postUrl
-                        , data: viewModel
-                        , success: function(response)
-                        {
-                            if (response.redirect != null && response.redirect)
-                            {
-                                window.location.replace(response.newurl);
-                            }
-                            else
-                            {
-                                var newDoc = document.open("text/html", "replace");
-                                newDoc.write(response);
-                                newDoc.close();
-                            }
-                        }
-                        //, error: function()
-                        //    {}
-                    });
+                    var reportElementTypeViewModel = {};
+                    reportElementTypeViewModel.Id = value.Id;
+                    reportElementTypeViewModel.Name = value.Name;
+                    reportElementTypeViewModel.Description = value.Description;
+                    selectedSamplesAndResults.push(reportElementTypeViewModel);
+                    //console.debug('Data in index: ' + index + ' is: ' + value);
                 });
+
+                var selectedAttachments = getSelectedReportPackageTemplateElements("selectedAttachmentTable");
+                var selectedCertifications = getSelectedReportPackageTemplateElements("selectedCertificationTable");
+
+                var selectedIndustries = [];
+                $('#selectedIndustryTable')
+                    .DataTable()
+                    .rows()
+                    .data()
+                    .each(function(value, index)
+                    {
+                        var industryViewModel = {};
+                        industryViewModel.Id = value[0];
+                        industryViewModel.ReferenceNumber = value[1];
+                        industryViewModel.IndustryName = value[2];
+                        industryViewModel.Address = value[3];
+                        industryViewModel.Classification = value[4];
+                        selectedIndustries.push(industryViewModel);
+                    });
+
+
+                var viewModel = {};
+                viewModel.Id = $('#Id').val();
+                viewModel.Name = $('#Name').val();
+                viewModel.Description = $('#Description').val();
+                viewModel.IsActive = $('#IsActive').is(":checked");
+                viewModel.EffectiveDateTimeLocal = $('#dEffectiveDateTimeLocal').val();
+                viewModel.IsSubmissionBySignatoryRequired = $('#IsSubmissionBySignatoryRequired').val();
+                viewModel.ShowSampleResults = $('#ShowSampleResults').val();
+                viewModel.CtsEventTypeId = $('#CtsEventTypeId').val();
+                viewModel.SamplesAndResultsTypes = selectedSamplesAndResults;
+                viewModel.AttachmentTypes = selectedAttachments;
+                viewModel.CertificationTypes = selectedCertifications;
+                viewModel.ReportPackageTemplateAssignments = selectedIndustries;
+
+                //console.debug('----', viewModel);
+
+                var postUrl = "@ViewBag.PostURL";
+                var token = $("[name='__RequestVerificationToken']").val();
+                viewModel.__RequestVerificationToken = token;
+
+                $.ajax({
+                    type: "POST",
+                    url: postUrl,
+                    data: viewModel,
+                    success: function(response)
+                    {
+                        if (response.redirect != null && response.redirect)
+                        {
+                            window.location.replace(response.newurl);
+                        }
+                        else
+                        {
+                            var newDoc = document.open("text/html", "replace");
+                            newDoc.write(response);
+                            newDoc.close();
+                        }
+                    }
+                    //, error: function()
+                    //    {}
+                });
+            });
     </script>
 }

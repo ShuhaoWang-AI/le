@@ -1,12 +1,14 @@
 ﻿namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a specific permission within a permission group.
+    ///     Represents a specific permission within a permission group.
     /// </summary>
-    public partial class PermissionGroupPermission
+    public class PermissionGroupPermission
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int PermissionGroupPermissionId { get; set; }
 
@@ -15,5 +17,7 @@
 
         public int PermissionId { get; set; }
         public virtual Permission Permission { get; set; }
+
+        #endregion
     }
 }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a status of a request for signature.
+    ///     Represents a status of a request for signature.
     /// </summary>
-    public partial class SignatoryRequestStatus
+    public class SignatoryRequestStatus
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int SignatoryRequestStatusId { get; set; }
 
@@ -23,8 +25,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<SignatoryRequest> SignatoryRequests { get; set; }
+
+        #endregion
     }
 }

@@ -6,11 +6,13 @@ namespace Linko.LinkoExchange.Data.Mapping
 {
     public class PrivacyPolicyMap : EntityTypeConfiguration<PrivacyPolicy>
     {
+        #region constructors and destructor
+
         public PrivacyPolicyMap()
         {
-            ToTable("tPrivacyPolicy");
+            ToTable(tableName:"tPrivacyPolicy");
 
-            Property(x => x.PrivacyPolicyId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.PrivacyPolicyId).IsRequired().HasDatabaseGeneratedOption(databaseGeneratedOption:DatabaseGeneratedOption.Identity);
 
             Property(x => x.Content).IsRequired();
 
@@ -20,5 +22,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

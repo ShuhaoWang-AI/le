@@ -1,11 +1,13 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageDto
     {
+        #region public properties
+
         public int ReportPackageId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -34,6 +36,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         //Recipient
         public string RecipientOrganizationName { get; internal set; }
+
         public string RecipientOrganizationAddressLine1 { get; internal set; }
         public string RecipientOrganizationAddressLine2 { get; internal set; }
         public string RecipientOrganizationCityName { get; internal set; }
@@ -44,6 +47,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         //Submitter
         public int SubmitterUserId { get; set; }
+
         public string SubmitterFirstName { get; set; }
         public string SubmitterLastName { get; set; }
         public string SubmitterTitleRole { get; set; }
@@ -52,11 +56,11 @@ namespace Linko.LinkoExchange.Services.Dto
 
         //Submission Review
         public DateTime? SubmissionReviewDateTimeLocal { get; internal set; }
+
         public string SubmissionReviewerFirstName { get; internal set; }
         public string SubmissionReviewerLastName { get; internal set; }
         public string SubmissionReviewerTitleRole { get; internal set; }
         public string SubmissionReviewComments { get; internal set; }
-
 
         public DateTime? RepudiationDateTimeLocal { get; set; }
         public int? RepudiatorUserId { get; set; }
@@ -76,9 +80,9 @@ namespace Linko.LinkoExchange.Services.Dto
 
         //Last Sent
         public DateTime? LastSentDateTimeLocal { get; internal set; }
+
         public string LastSenderFirstName { get; internal set; }
         public string LastSenderLastName { get; internal set; }
-
 
         public string PermitNumber { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
@@ -90,5 +94,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ReportElementCategoryName> ReportPackageElementCategories { get; set; }
         public string LastModifierFullName { get; set; }
 
+        #endregion
     }
 }

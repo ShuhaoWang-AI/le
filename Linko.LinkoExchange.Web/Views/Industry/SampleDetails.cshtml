@@ -7,17 +7,17 @@
     ViewBag.Readonly = Model.SampleStatusName != SampleStatusName.Draft;
 }
 
-@using (Html.BeginForm(actionName: null, controllerName: null, method: FormMethod.Post, htmlAttributes: new {id = "LinkoExchangeForm"}))
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
 {
     @Html.AntiForgeryToken()
 
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "Samples", controllerName: "Industry", routeValues: new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name: Model.SampleStatusName.ToString())</a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name:Model.SampleStatusName.ToString())</a>
             </li>
             <li class="active">
                 Details
@@ -66,7 +66,7 @@
                         </p>
                         <div class="form-group">
                             <div class="pull-right">
-                                <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName: "DeleteSample", controllerName: "Industry", routeValues: new {id = Model.Id})" formmethod="post">
+                                <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName:"DeleteSample", controllerName:"Industry", routeValues:new {id = Model.Id})" formmethod="post">
                                     Yes
                                 </button>
                                 <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -78,10 +78,10 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
-                                                                                                                                {
-                                                                                                                                    @class = "alert alert-danger"
-                                                                                                                                })
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                             {
+                                                                                                                                 @class = "alert alert-danger"
+                                                                                                                             })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -129,102 +129,102 @@
                     @Html.HiddenFor(model => model.IsMassLoadingResultToUseLessThanSign)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitId)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
-                    @Html.Hidden(name: "FlowUnitValidValues", value: Html.Raw(value: Json.Encode(value: Model.FlowUnitValidValues)))
+                    @Html.Hidden(name:"FlowUnitValidValues", value:Html.Raw(value:Json.Encode(value:Model.FlowUnitValidValues)))
                     @Html.HiddenFor(model => model.CtsEventTypeName)
                     @Html.HiddenFor(model => model.CollectionMethodName)
                     @Html.HiddenFor(model => model.FlowUnitName)
                     @Html.HiddenFor(model => model.ResultQualifierValidValues)
                     @Html.HiddenFor(model => model.SampleStatusName)
-                    @Html.Hidden(name: "AllParameters", value: Html.Raw(value: Json.Encode(value: Model.AllParameters)))
-                    @Html.Hidden(name: "SampleResults", value: Html.Raw(value: Json.Encode(value: Model.SampleResults)))
+                    @Html.Hidden(name:"AllParameters", value:Html.Raw(value:Json.Encode(value:Model.AllParameters)))
+                    @Html.Hidden(name:"SampleResults", value:Html.Raw(value:Json.Encode(value:Model.SampleResults)))
                 </div>
 
                 <div class="form-group">
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes: new
-                                                                                          {
-                                                                                              @class = "control-label col-sm-6 required"
-                                                                                          })
+                        @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "control-label col-sm-6 required"
+                                                                                         })
                         <div class="col-sm-6 no-padding">
 
-                            @Html.DropDownList(name: "CollectionMethodId", selectList: Model.AvailableCollectionMethods, htmlAttributes: new
-                                                                                                                                         {
-                                                                                                                                             @class = "form-control input-sm"
-                                                                                                                                         })
+                            @Html.DropDownList(name:"CollectionMethodId", selectList:Model.AvailableCollectionMethods, htmlAttributes:new
+                                                                                                                                      {
+                                                                                                                                          @class = "form-control input-sm"
+                                                                                                                                      })
 
                             @Html.HiddenFor(model => model.CollectionMethodId)
-                            @Html.ValidationMessageFor(model => model.CollectionMethodId, validationMessage: "", htmlAttributes: new
-                                                                                                                                 {
-                                                                                                                                     @class = "text-danger"
-                                                                                                                                 })
+                            @Html.ValidationMessageFor(model => model.CollectionMethodId, validationMessage:"", htmlAttributes:new
+                                                                                                                               {
+                                                                                                                                   @class = "text-danger"
+                                                                                                                               })
                         </div>
                     </div>
 
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.CtsEventTypeId, htmlAttributes: new
-                                                                                      {
-                                                                                          @class = "control-label col-sm-5 required"
-                                                                                      })
+                        @Html.LabelFor(model => model.CtsEventTypeId, htmlAttributes:new
+                                                                                     {
+                                                                                         @class = "control-label col-sm-5 required"
+                                                                                     })
                         <div class="col-sm-7 no-padding">
-                            @Html.DropDownList(name: "CtsEventTypeId", selectList: Model.AvailableCtsEventTypes, htmlAttributes: new
-                                                                                                                                 {
-                                                                                                                                     @class = "form-control input-sm"
-                                                                                                                                 })
+                            @Html.DropDownList(name:"CtsEventTypeId", selectList:Model.AvailableCtsEventTypes, htmlAttributes:new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control input-sm"
+                                                                                                                              })
 
                             @Html.HiddenFor(model => model.CtsEventTypeId)
-                            @Html.ValidationMessageFor(model => model.CtsEventTypeId, validationMessage: "", htmlAttributes: new
-                                                                                                                             {
-                                                                                                                                 @class = "text-danger"
-                                                                                                                             })
+                            @Html.ValidationMessageFor(model => model.CtsEventTypeId, validationMessage:"", htmlAttributes:new
+                                                                                                                           {
+                                                                                                                               @class = "text-danger"
+                                                                                                                           })
                         </div>
                     </div>
 
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes: new
-                                                                                          {
-                                                                                              @class = "control-label col-sm-4 required"
-                                                                                          })
+                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "control-label col-sm-4 required"
+                                                                                         })
                         <div class="col-sm-8 no-padding">
                             @if (ViewBag.Readonly)
                             {
-                                if (Model.StartDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                if (Model.StartDateTimeLocal.ToString(format:"hh:mm tt").ToLower().Equals(value:"12:00 am"))
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName: "StartDateTimeLocal")
-                                          .Value(date: Model.StartDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy")
-                                          .Max(date: DateTime.Now)
-                                          .HtmlAttributes(attributes: new
-                                                                      {
-                                                                          @readonly = true,
-                                                                          style = "width:210px; background-color: #eee;"
-                                                                      }))
+                                          .Name(componentName:"StartDateTimeLocal")
+                                          .Value(date:Model.StartDateTimeLocal)
+                                          .Format(format:"MM/dd/yyyy")
+                                          .Max(date:DateTime.Now)
+                                          .HtmlAttributes(attributes:new
+                                                                     {
+                                                                         @readonly = true,
+                                                                         style = "width:210px; background-color: #eee;"
+                                                                     }))
                                 }
                                 else
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName: "StartDateTimeLocal")
-                                          .Value(date: Model.StartDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy hh:mm tt")
-                                          .Max(date: DateTime.Now)
-                                          .HtmlAttributes(attributes: new
-                                                                      {
-                                                                          @readonly = true,
-                                                                          style = "width:210px; background-color: #eee;"
-                                                                      }))
+                                          .Name(componentName:"StartDateTimeLocal")
+                                          .Value(date:Model.StartDateTimeLocal)
+                                          .Format(format:"MM/dd/yyyy hh:mm tt")
+                                          .Max(date:DateTime.Now)
+                                          .HtmlAttributes(attributes:new
+                                                                     {
+                                                                         @readonly = true,
+                                                                         style = "width:210px; background-color: #eee;"
+                                                                     }))
                                 }
                             }
                             else
                             {
                                 @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName: "StartDateTimeLocal")
-                                      .Value(date: Model.StartDateTimeLocal)
-                                      .Format(format: "MM/dd/yyyy hh:mm tt")
-                                      .Max(date: DateTime.Now)
-                                      .HtmlAttributes(attributes: new
-                                                                  {
-                                                                      style = "width:210px;"
-                                                                  }))
+                                      .Name(componentName:"StartDateTimeLocal")
+                                      .Value(date:Model.StartDateTimeLocal)
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
+                                      .Max(date:DateTime.Now)
+                                      .HtmlAttributes(attributes:new
+                                                                 {
+                                                                     style = "width:210px;"
+                                                                 }))
                             }
                         </div>
                     </div>
@@ -232,99 +232,99 @@
 
                 <div class="form-group">
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.LabSampleIdentifier, htmlAttributes: new
-                                                                                           {
-                                                                                               @class = "control-label col-sm-6"
-                                                                                           })
+                        @Html.LabelFor(model => model.LabSampleIdentifier, htmlAttributes:new
+                                                                                          {
+                                                                                              @class = "control-label col-sm-6"
+                                                                                          })
                         <div class="col-sm-6 no-padding">
-                            @Html.EditorFor(model => model.LabSampleIdentifier, additionalViewData: new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control input-sm",
-                                                                                                                             maxlength = 50
-                                                                                                                         }
-                                                                                                    })
+                            @Html.EditorFor(model => model.LabSampleIdentifier, additionalViewData:new
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control input-sm",
+                                                                                                                            maxlength = 50
+                                                                                                                        }
+                                                                                                   })
                         </div>
                     </div>
 
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.FlowValue, htmlAttributes: new
-                                                                                 {
-                                                                                     @class = "control-label col-sm-5"
-                                                                                 })
+                        @Html.LabelFor(model => model.FlowValue, htmlAttributes:new
+                                                                                {
+                                                                                    @class = "control-label col-sm-5"
+                                                                                })
                         <div class="col-sm-7 no-padding">
                             <div class="col-sm-7 no-margin no-padding">
-                                @Html.EditorFor(model => model.FlowValue, additionalViewData: new
-                                                                                              {
-                                                                                                  htmlAttributes = new
-                                                                                                                   {
-                                                                                                                       @class = "form-control input-sm"
-                                                                                                                   }
-                                                                                              })
+                                @Html.EditorFor(model => model.FlowValue, additionalViewData:new
+                                                                                             {
+                                                                                                 htmlAttributes = new
+                                                                                                                  {
+                                                                                                                      @class = "form-control input-sm"
+                                                                                                                  }
+                                                                                             })
                             </div>
                             <div class="col-sm-5 no-padding">
-                                @Html.DropDownList(name: "FlowUnitId", selectList: Model.AvailableFlowUnits, htmlAttributes: new
-                                                                                                                             {
-                                                                                                                                 @class = "form-control input-sm"
-                                                                                                                             })
+                                @Html.DropDownList(name:"FlowUnitId", selectList:Model.AvailableFlowUnits, htmlAttributes:new
+                                                                                                                          {
+                                                                                                                              @class = "form-control input-sm"
+                                                                                                                          })
 
 
                                 @Html.HiddenFor(model => model.FlowUnitId)
-                                @Html.ValidationMessageFor(model => model.FlowUnitId, validationMessage: "", htmlAttributes: new
-                                                                                                                             {
-                                                                                                                                 @class = "text-danger"
-                                                                                                                             })
+                                @Html.ValidationMessageFor(model => model.FlowUnitId, validationMessage:"", htmlAttributes:new
+                                                                                                                           {
+                                                                                                                               @class = "text-danger"
+                                                                                                                           })
                             </div>
                         </div>
                     </div>
 
                     <div class="col-sm-4 no-padding">
-                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes: new
-                                                                                        {
-                                                                                            @class = "control-label col-sm-4 required"
-                                                                                        })
+                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-sm-4 required"
+                                                                                       })
                         <div class="col-sm-8 no-padding">
                             @if (ViewBag.Readonly)
                             {
-                                if (Model.EndDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                if (Model.EndDateTimeLocal.ToString(format:"hh:mm tt").ToLower().Equals(value:"12:00 am"))
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName: "EndDateTimeLocal")
-                                          .Value(date: Model.EndDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy")
-                                          .Max(date: DateTime.Now)
-                                          .HtmlAttributes(attributes: new
-                                                                      {
-                                                                          @readonly = true,
-                                                                          style = "width:210px; background-color: #eee;"
-                                                                      }))
+                                          .Name(componentName:"EndDateTimeLocal")
+                                          .Value(date:Model.EndDateTimeLocal)
+                                          .Format(format:"MM/dd/yyyy")
+                                          .Max(date:DateTime.Now)
+                                          .HtmlAttributes(attributes:new
+                                                                     {
+                                                                         @readonly = true,
+                                                                         style = "width:210px; background-color: #eee;"
+                                                                     }))
                                 }
                                 else
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName: "EndDateTimeLocal")
-                                          .Value(date: Model.EndDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy hh:mm tt")
-                                          .Max(date: DateTime.Now)
-                                          .HtmlAttributes(attributes: new
-                                                                      {
-                                                                          @readonly = true,
-                                                                          style = "width:210px; background-color: #eee;"
-                                                                      }))
+                                          .Name(componentName:"EndDateTimeLocal")
+                                          .Value(date:Model.EndDateTimeLocal)
+                                          .Format(format:"MM/dd/yyyy hh:mm tt")
+                                          .Max(date:DateTime.Now)
+                                          .HtmlAttributes(attributes:new
+                                                                     {
+                                                                         @readonly = true,
+                                                                         style = "width:210px; background-color: #eee;"
+                                                                     }))
                                 }
                             }
                             else
                             {
                                 @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName: "EndDateTimeLocal")
-                                      .Value(date: Model.EndDateTimeLocal)
-                                      .Format(format: "MM/dd/yyyy hh:mm tt")
-                                      .Max(date: DateTime.Now)
-                                      .HtmlAttributes(attributes: new
-                                                                  {
-                                                                      style = "width:210px;"
-                                                                  }))
+                                      .Name(componentName:"EndDateTimeLocal")
+                                      .Value(date:Model.EndDateTimeLocal)
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
+                                      .Max(date:DateTime.Now)
+                                      .HtmlAttributes(attributes:new
+                                                                 {
+                                                                     style = "width:210px;"
+                                                                 }))
                             }
                         </div>
                     </div>
@@ -408,7 +408,7 @@
                         <th class="all"> Result </th>
                         <th class="all" style="width: 80px"> MDL </th>
                         <th class="all"> Analysis Method </th>
-                        <th class="all" style="width: 180px; min-width: 160px;"> Analysis Date & Time </th>
+                        <th class="all" style="min-width: 160px; width: 180px;"> Analysis Date & Time </th>
                         <th class="all" style="width: 50px"> EPA Method </th>
                         <th class="all" style="width: 50px"> Calculate Loading </th>
                         <th class="never"> Mass Loading Id </th>
@@ -429,7 +429,7 @@
                                 <select class="form-control input-sm no-margin no-padding" id="Qualifier_@sampleResult.ParameterId" style="width: 100%">
                                     @foreach (var q in Model.AvailableResultQualifierValidValues)
                                     {
-                                        if (q.Value.Equals(value: sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue: "NUMERIC")))
+                                        if (q.Value.Equals(value:sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue:"NUMERIC")))
                                         {
                                             <option value=@q.Value selected> @q.Text </option>
                                         }
@@ -442,7 +442,7 @@
                             </td>
                             <td>
                                 <div class="input-group input-group-sm" style="min-width: 125px">
-                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value" autocomplete="off" >
+                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value" autocomplete="off">
                                     <input id="UnitId_@sampleResult.ParameterId" type="hidden" value="@sampleResult.UnitId">
                                     <span id="UnitName_@sampleResult.ParameterId" class="input-group-addon">@sampleResult.UnitName</span>
                                 </div>
@@ -456,44 +456,44 @@
                             <td>
                                 @if (ViewBag.Readonly)
                                 {
-                                    if (sampleResult.AnalysisDateTimeLocal.HasValue && sampleResult.AnalysisDateTimeLocal.Value.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                    if (sampleResult.AnalysisDateTimeLocal.HasValue && sampleResult.AnalysisDateTimeLocal.Value.ToString(format:"hh:mm tt").ToLower().Equals(value:"12:00 am"))
                                     {
                                         @(Html.Kendo().DateTimePicker()
-                                              .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
-                                              .Value(date: sampleResult.AnalysisDateTimeLocal)
-                                              .Format(format: "MM/dd/yyyy")
-                                              .Max(date: DateTime.Now)
-                                              .HtmlAttributes(attributes: new
-                                                                          {
-                                                                              @readonly = true,
-                                                                              style = "width:100%; font-size:12px; background-color: #eee;"
-                                                                          }))
+                                              .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
+                                              .Value(date:sampleResult.AnalysisDateTimeLocal)
+                                              .Format(format:"MM/dd/yyyy")
+                                              .Max(date:DateTime.Now)
+                                              .HtmlAttributes(attributes:new
+                                                                         {
+                                                                             @readonly = true,
+                                                                             style = "width:100%; font-size:12px; background-color: #eee;"
+                                                                         }))
                                     }
                                     else
                                     {
                                         @(Html.Kendo().DateTimePicker()
-                                              .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
-                                              .Value(date: sampleResult.AnalysisDateTimeLocal)
-                                              .Format(format: "MM/dd/yyyy hh:mm tt")
-                                              .Max(date: DateTime.Now)
-                                              .HtmlAttributes(attributes: new
-                                                                          {
-                                                                              @readonly = true,
-                                                                              style = "width:100%; font-size:12px; background-color: #eee;"
-                                                                          }))
+                                              .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
+                                              .Value(date:sampleResult.AnalysisDateTimeLocal)
+                                              .Format(format:"MM/dd/yyyy hh:mm tt")
+                                              .Max(date:DateTime.Now)
+                                              .HtmlAttributes(attributes:new
+                                                                         {
+                                                                             @readonly = true,
+                                                                             style = "width:100%; font-size:12px; background-color: #eee;"
+                                                                         }))
                                     }
                                 }
                                 else
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
-                                          .Value(date: sampleResult.AnalysisDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy hh:mm tt")
-                                          .Max(date: DateTime.Now)
-                                          .HtmlAttributes(attributes: new
-                                                                      {
-                                                                          style = "width:100%; font-size:12px"
-                                                                      }))
+                                          .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
+                                          .Value(date:sampleResult.AnalysisDateTimeLocal)
+                                          .Format(format:"MM/dd/yyyy hh:mm tt")
+                                          .Max(date:DateTime.Now)
+                                          .HtmlAttributes(attributes:new
+                                                                     {
+                                                                         style = "width:100%; font-size:12px"
+                                                                     }))
                                 }
                             </td>
                             <td>
@@ -520,7 +520,7 @@
                                 <input id="MassResultId_@sampleResult.ParameterId" type="hidden" value=@(sampleResult.MassLoadingSampleResultId.HasValue ? sampleResult.MassLoadingSampleResultId.Value.ToString() : "")>
                             </td>
                             <td>
-                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue: "").Length == 0)
+                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue:"").Length == 0)
                                 {
                                     <strong id="MassResult_@sampleResult.ParameterId"></strong>
                                 }
@@ -555,11 +555,11 @@
                         switch (Model.SampleStatusName)
                         {
                             case SampleStatusName.Draft:
-                                <input type="submit" id="btnSave" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SampleDetails", controllerName: "Industry")" formmethod="post" />
-                                <input type="submit" id="btnReadyToReport" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = true})" formmethod="post" />
+                                <input type="submit" id="btnSave" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SampleDetails", controllerName:"Industry")" formmethod="post" />
+                                <input type="submit" id="btnReadyToReport" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableSample", controllerName:"Industry", routeValues:new {isReadyToReport = true})" formmethod="post" />
                                 break;
                             case SampleStatusName.ReadyToReport:
-                                <input type="submit" id="btnEnableEditSample" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = false})" formmethod="post" />
+                                <input type="submit" id="btnEnableEditSample" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableSample", controllerName:"Industry", routeValues:new {isReadyToReport = false})" formmethod="post" />
                                 break;
                         }
 
@@ -567,7 +567,7 @@
                     }
                     else
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "NewSampleDetailsStep2", controllerName: "Industry")" formmethod="post" />
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewSampleDetailsStep2", controllerName:"Industry")" formmethod="post" />
                     }
                 }
             </div>
@@ -581,14 +581,13 @@
             {
                 //Prevent "enter key" press from doing anything on the page, i.e. collapsing boxes, submitting form, etc...
                 $('#LinkoExchangeForm')
-                    .bind('keydown'
-                        , function(e)
+                    .bind('keydown', function(e)
+                    {
+                        if (e.keyCode == 13)
                         {
-                            if (e.keyCode == 13)
-                            {
-                                e.preventDefault();
-                            }
-                        });
+                            e.preventDefault();
+                        }
+                    });
 
                 $('#ParameterGroupTable')
                     .DataTable(
@@ -596,19 +595,19 @@
                             "columnDefs": [
                                 {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' name='btnAddParamsFromGroup' type='button'><i class='fa fa-lg fa-plus'></i></button>"
-                                    , "targets": 4
+                                        "<button class='btn btn-primary btn-sm' name='btnAddParamsFromGroup' type='button'><i class='fa fa-lg fa-plus'></i></button>",
+                                    "targets": 4
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": false
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
+                            ],
+                            "searching": false,
+                            "ordering": false,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false
                         }
                     );
 
@@ -618,22 +617,22 @@
                             "columnDefs": [
                                 {
                                     "defaultContent":
-                                        '<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>'
-                                    , "targets": 11
+                                        '<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>',
+                                    "targets": 11
                                 }
-                            ]
-                            , "searching": false
-                            , "ordering": true
-                            , "order": [[1, 'asc']]
-                            , "paging": false
-                            , "info": false
-                            , "responsive": true
-                            , "autoWidth": false
-                            , "processing": true
-                            , "stateSave": false
-                            , language: {
-                                search: ""
-                                , searchPlaceholder: "Search Parameter..."
+                            ],
+                            "searching": false,
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            language: {
+                                search: "",
+                                searchPlaceholder: "Search Parameter..."
                             }
                         }
                     );
@@ -654,10 +653,9 @@
                         try
                         {
                             isFormValid = $(this).valid();
-                        }                
-                        catch(e)
-                        {
                         }
+                        catch (e)
+                        {}
 
                         try
                         {
@@ -738,7 +736,7 @@
                                 event.preventDefault();
                                 $("input[type='submit']").prop('disabled', false);
                                 $("input[type='button']").prop("disabled", false);
-        
+
                                 validationSummary.removeClass("validation-summary-valid");
                                 validationSummary.find("ul")
                                     .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
@@ -795,43 +793,41 @@
                     $("#FlowValue").inputmask('decimal', { digits: '16', rightAlign: true });
                     $("#StartDateTimeLocal")
                         .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm'
-                            , mask: "1/2/y [h:s t\\m]"
-                            , placeholder: "mm/dd/yyyy 00:00 am"
-                            , greedy: false
-                            , clearMaskOnLostFocus: false
-                            , clearIncomplete: true
+                            alias: 'mm/dd/yyyy hh:mm xm',
+                            mask: "1/2/y [h:s t\\m]",
+                            placeholder: "mm/dd/yyyy 00:00 am",
+                            greedy: false,
+                            clearMaskOnLostFocus: false,
+                            clearIncomplete: true
                         });
 
                     $("#EndDateTimeLocal")
                         .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm'
-                            , mask: "1/2/y [h:s t\\m]"
-                            , placeholder: "mm/dd/yyyy 00:00 am"
-                            , greedy: false
-                            , clearMaskOnLostFocus: false
-                            , clearIncomplete: true
+                            alias: 'mm/dd/yyyy hh:mm xm',
+                            mask: "1/2/y [h:s t\\m]",
+                            placeholder: "mm/dd/yyyy 00:00 am",
+                            greedy: false,
+                            clearMaskOnLostFocus: false,
+                            clearIncomplete: true
                         });
 
                     $("input[id^='AnalysisDateTime_']")
                         .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm'
-                            , mask: "1/2/y [h:s t\\m]"
-                            , placeholder: "mm/dd/yyyy 00:00 am"
-                            , greedy: false
-                            , clearMaskOnLostFocus: false
-                            , clearIncomplete: true
+                            alias: 'mm/dd/yyyy hh:mm xm',
+                            mask: "1/2/y [h:s t\\m]",
+                            placeholder: "mm/dd/yyyy 00:00 am",
+                            greedy: false,
+                            clearMaskOnLostFocus: false,
+                            clearIncomplete: true
                         });
                 });
 
             $(document)
-                .on('change'
-                    , "input[id^='AnalysisDateTime_']"
-                    , function()
-                    {
-                        var value = $(this).val().toLowerCase().replace("12:00 am", "");
-                        $(this).val(value);
-                    });
+                .on('change', "input[id^='AnalysisDateTime_']", function()
+                {
+                    var value = $(this).val().toLowerCase().replace("12:00 am", "");
+                    $(this).val(value);
+                });
 
             updateResultTextBoxState = function()
             {
@@ -964,65 +960,55 @@
 
 
             $(document)
-                .on('change'
-                    , "select[id^='Qualifier_']"
-                    , function()
+                .on('change', "select[id^='Qualifier_']", function()
+                {
+                    var paramId = this.id.replace('Qualifier_', '');
+                    var qualifier = $("#Qualifier_" + paramId).val();
+
+                    if (qualifier === "ND" || qualifier === "NF")
                     {
-                        var paramId = this.id.replace('Qualifier_', '');
-                        var qualifier = $("#Qualifier_" + paramId).val();
+                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                    }
+                    else
+                    {
+                        $("#Result_" + paramId).removeAttr("readonly");
+                    }
 
-                        if (qualifier === "ND" || qualifier === "NF")
-                        {
-                            $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                        }
-                        else
-                        {
-                            $("#Result_" + paramId).removeAttr("readonly");
-                        }
-
-                        displayMassLoading(paramId);
-                    });
+                    displayMassLoading(paramId);
+                });
 
 
             $(document)
-                .on('blur'
-                    , "input[id^='Result_']"
-                    , function()
-                    {
-                        var paramId = this.id.replace('Result_', '');
-                        displayMassLoading(paramId);
-                    });
+                .on('blur', "input[id^='Result_']", function()
+                {
+                    var paramId = this.id.replace('Result_', '');
+                    displayMassLoading(paramId);
+                });
 
             $(document)
-                .on('ifChecked'
-                    , "input[id^='CalcLoading_']"
-                    , function(event)
-                    {
-                        var paramId = this.id.replace('CalcLoading_', '');
-                        displayMassLoading(paramId);
-                    });
+                .on('ifChecked', "input[id^='CalcLoading_']", function(event)
+                {
+                    var paramId = this.id.replace('CalcLoading_', '');
+                    displayMassLoading(paramId);
+                });
 
 
             $(document)
-                .on('ifUnchecked'
-                    , "input[id^='CalcLoading_']"
-                    , function(event)
-                    {
-                        var paramId = this.id.replace('CalcLoading_', '');
-                        displayMassLoading(paramId);
-                    });
+                .on('ifUnchecked', "input[id^='CalcLoading_']", function(event)
+                {
+                    var paramId = this.id.replace('CalcLoading_', '');
+                    displayMassLoading(paramId);
+                });
 
             $(document)
-                .on('click'
-                    , "button[name='btnDeleteParam']"
-                    , function()
-                    {
-                        var table = $('#ParameterTable').DataTable();
-                        table
-                            .row($(this).parents('tr'))
-                            .remove()
-                            .draw();
-                    });
+                .on('click', "button[name='btnDeleteParam']", function()
+                {
+                    var table = $('#ParameterTable').DataTable();
+                    table
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
 
             $("#btnDeleteEmptyParameters")
                 .click(function()
@@ -1077,25 +1063,24 @@
 
                     //console.debug(alreadyAddedParameterIds);
 
-                    var availableParameters = $.grep(allParameters
-                        , function(obj)
-                        {
-                            //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                            return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
-                        });
+                    var availableParameters = $.grep(allParameters, function(obj)
+                    {
+                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
+                    });
 
                     //console.debug(allParameters);
                     //console.debug(availableParameters);
 
                     $("#AddParameterDropdown")
                         .kendoDropDownList({
-                            filter: "contains"
-                            , dataSource: availableParameters
-                            , dataTextField: "Name"
-                            , dataValueField: "Id"
-                            , autoWidth: true
-                            , noDataTemplate: 'No Parameter Available!'
-                            , popup: {
+                            filter: "contains",
+                            dataSource: availableParameters,
+                            dataTextField: "Name",
+                            dataValueField: "Id",
+                            autoWidth: true,
+                            noDataTemplate: 'No Parameter Available!',
+                            popup: {
                                 appendTo: $("#AddParameterModal")
                             }
                         });
@@ -1104,169 +1089,160 @@
                 });
 
             $(document)
-                .on('click'
-                    , "button[id='btnAddParameterInsideModal']"
-                    , function()
+                .on('click', "button[id='btnAddParameterInsideModal']", function()
+                {
+                    var allParameters = $.parseJSON($("#AllParameters").val());
+
+                    var availableParameters = $.grep(allParameters, function(obj)
                     {
-                        var allParameters = $.parseJSON($("#AllParameters").val());
-
-                        var availableParameters = $.grep(allParameters
-                            , function(obj)
-                            {
-                                return (obj.Id === parseInt($("#AddParameterDropdown").val()));
-                            });
-
-                        $('#AddParameterModal').modal('hide');
-                        //console.debug(availableParameters);
-                        AddParamtersToParameterTable(availableParameters);
+                        return (obj.Id === parseInt($("#AddParameterDropdown").val()));
                     });
+
+                    $('#AddParameterModal').modal('hide');
+                    //console.debug(availableParameters);
+                    AddParamtersToParameterTable(availableParameters);
+                });
 
             $(document)
-                .on('click'
-                    , "button[name='btnAddParamsFromGroup']"
-                    , function()
+                .on('click', "button[name='btnAddParamsFromGroup']", function()
+                {
+                    var alreadyAddedParameterIds = [];
+
+                    $('#ParameterTable')
+                        .DataTable()
+                        .rows()
+                        .every(function()
+                        {
+                            var d = this.data();
+                            //console.debug(d);
+                            var cell = d[0];
+                            var paramId = $('input', cell)['prevObject'][0].id
+                                .replace('sampleResultId_', '');
+                            alreadyAddedParameterIds.push(parseInt(paramId));
+                        });
+
+                    //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
+
+                    var strGroupParameterIds = $('#ParameterGroupTable')
+                        .DataTable()
+                        .row($(this).parents('tr'))
+                        .data();
+                    var groupParameterIds = [];
+
+                    $.each(strGroupParameterIds[3].split(','), function(index, value)
                     {
-                        var alreadyAddedParameterIds = [];
-
-                        $('#ParameterTable')
-                            .DataTable()
-                            .rows()
-                            .every(function()
-                            {
-                                var d = this.data();
-                                //console.debug(d);
-                                var cell = d[0];
-                                var paramId = $('input', cell)['prevObject'][0].id
-                                    .replace('sampleResultId_', '');
-                                alreadyAddedParameterIds.push(parseInt(paramId));
-                            });
-
-                        //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
-
-                        var strGroupParameterIds = $('#ParameterGroupTable')
-                            .DataTable()
-                            .row($(this).parents('tr'))
-                            .data();
-                        var groupParameterIds = [];
-
-                        $.each(strGroupParameterIds[3].split(',')
-                            , function(index, value)
-                            {
-                                groupParameterIds.push(parseInt(value));
-                            });
-
-                        //console.debug(groupParameterIds);
-                        var allParameters = $.parseJSON($("#AllParameters").val());
-
-                        var availableParameters = $.grep(allParameters
-                            , function(obj)
-                            {
-                                //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                                return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
-                                    && ($.inArray(obj.Id, groupParameterIds) !== -1);
-                            });
-
-                        //console.debug("allParameters :" + allParameters);
-                        //console.debug("availableParameters :" + availableParameters);
-
-                        AddParamtersToParameterTable(availableParameters);
+                        groupParameterIds.push(parseInt(value));
                     });
+
+                    //console.debug(groupParameterIds);
+                    var allParameters = $.parseJSON($("#AllParameters").val());
+
+                    var availableParameters = $.grep(allParameters, function(obj)
+                    {
+                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
+                            && ($.inArray(obj.Id, groupParameterIds) !== -1);
+                    });
+
+                    //console.debug("allParameters :" + allParameters);
+                    //console.debug("availableParameters :" + availableParameters);
+
+                    AddParamtersToParameterTable(availableParameters);
+                });
 
             AddParamtersToParameterTable = function(availableParameters)
             {
                 var parameterTable = $('#ParameterTable').DataTable();
 
-                $.each(availableParameters
-                    , function(index, value)
+                $.each(availableParameters, function(index, value)
+                {
+                    //console.debug(value.Id + " : " + value.Name);
+                    var data = {};
+                    data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''  autocomplete='false' >";
+                    data[1] = value.Name;
+
+                    var availableResultQualifierValidValues =
+                        @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
+
+                    var qualifierCtrl =
+                        '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
+                            + value.Id
+                            + '" style="width: 100%">';
+
+                    $.each(availableResultQualifierValidValues, function(i, v)
                     {
-                        //console.debug(value.Id + " : " + value.Name);
-                        var data = {};
-                        data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''  autocomplete='false' >";
-                        data[1] = value.Name;
-
-                        var availableResultQualifierValidValues =
-                            @Html.Raw(value: Json.Encode(value: Model.AvailableResultQualifierValidValues));
-
-                        var qualifierCtrl =
-                            '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
-                                + value.Id
-                                + '" style="width: 100%">';
-
-                        $.each(availableResultQualifierValidValues
-                            , function(i, v)
-                            {
-                                if (v.Value === "NUMERIC")
-                                {
-                                    qualifierCtrl += '<option value="'
-                                        + v.Value
-                                        + '" selected="">'
-                                        + v.Text
-                                        + '</option>';
-                                }
-                                else
-                                {
-                                    qualifierCtrl +=
-                                        '<option value="' + v.Value + '">' + v.Text + '</option>';
-                                }
-                            });
-                        qualifierCtrl += '</select>';
-
-                        data[2] = qualifierCtrl;
-                        data[3] =
-                            '<div class="input-group input-group-sm" style="min-width:125px">'
-                            + '<input class="form-control input-sm" id="Result_'
-                            + value.Id
-                            + '" type="text" value=""  autocomplete="false"><input id="UnitId_'
-                            + value.Id
-                            + '" type="hidden" value="'
-                            + value.DefaultUnitId
-                            + '"><span id="UnitName_'
-                            + value.Id
-                            + '" class="input-group-addon">'
-                            + value.DefaultUnitName
-                            + '</span></div>';
-                        data[4] = '<input class="form-control input-sm" id="MDL_'
-                            + value.Id
-                            + '" type="text" style="width: 80px" value="" autocomplete="false">';
-                        data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
-                            + value.Id
-                            + '" type="text" value="" autocomplete="false">';
-                        data[6] = '<input id="AnalysisDateTime_'
-                            + value.Id
-                            + '" style="width: 100%; font-size: 12px;"'
-                            + 'autocomplete="false" />';
-                        data[7] =
-                            '<input type="checkbox" class="checkbox" id="EPAMethod_'
-                            + value.Id
-                            + '"/>';
-
-                        if (value.IsCalcMassLoading)
+                        if (v.Value === "NUMERIC")
                         {
-                            data[8] =
-                                '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                                + value.Id
-                                + '" checked />';
+                            qualifierCtrl += '<option value="'
+                                + v.Value
+                                + '" selected="">'
+                                + v.Text
+                                + '</option>';
                         }
                         else
                         {
-                            data[8] =
-                                '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                                + value.Id
-                                + '"/>';
+                            qualifierCtrl +=
+                                '<option value="' + v.Value + '">' + v.Text + '</option>';
                         }
-                        data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
-                        data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
-                        data[11] = null;
-
-                        //console.debug("data : " + data);
-
-                        var rowNode = parameterTable
-                            .row.add(data)
-                            .draw()
-                            .node();
-
-                        $(rowNode).css('color', 'green');
                     });
+                    qualifierCtrl += '</select>';
+
+                    data[2] = qualifierCtrl;
+                    data[3] =
+                        '<div class="input-group input-group-sm" style="min-width:125px">'
+                        + '<input class="form-control input-sm" id="Result_'
+                        + value.Id
+                        + '" type="text" value=""  autocomplete="false"><input id="UnitId_'
+                        + value.Id
+                        + '" type="hidden" value="'
+                        + value.DefaultUnitId
+                        + '"><span id="UnitName_'
+                        + value.Id
+                        + '" class="input-group-addon">'
+                        + value.DefaultUnitName
+                        + '</span></div>';
+                    data[4] = '<input class="form-control input-sm" id="MDL_'
+                        + value.Id
+                        + '" type="text" style="width: 80px" value="" autocomplete="false">';
+                    data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
+                        + value.Id
+                        + '" type="text" value="" autocomplete="false">';
+                    data[6] = '<input id="AnalysisDateTime_'
+                        + value.Id
+                        + '" style="width: 100%; font-size: 12px;"'
+                        + 'autocomplete="false" />';
+                    data[7] =
+                        '<input type="checkbox" class="checkbox" id="EPAMethod_'
+                        + value.Id
+                        + '"/>';
+
+                    if (value.IsCalcMassLoading)
+                    {
+                        data[8] =
+                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                            + value.Id
+                            + '" checked />';
+                    }
+                    else
+                    {
+                        data[8] =
+                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                            + value.Id
+                            + '"/>';
+                    }
+                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
+                    data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                    data[11] = null;
+
+                    //console.debug("data : " + data);
+
+                    var rowNode = parameterTable
+                        .row.add(data)
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green');
+                });
 
                 // need to reinitialize iCheck otherwise newly added checkbox doesn't work
                 $("input[id^='EPAMethod_']")
@@ -1286,15 +1262,15 @@
                 $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
                 $("input[id^='AnalysisDateTime_']")
                     .inputmask({
-                        alias: 'mm/dd/yyyy hh:mm xm'
-                        , mask: "1/2/y [h:s t\\m]"
-                        , placeholder: "mm/dd/yyyy 00:00 am"
-                        , greedy: false
-                        , clearMaskOnLostFocus: false
-                        , clearIncomplete: true
+                        alias: 'mm/dd/yyyy hh:mm xm',
+                        mask: "1/2/y [h:s t\\m]",
+                        placeholder: "mm/dd/yyyy 00:00 am",
+                        greedy: false,
+                        clearMaskOnLostFocus: false,
+                        clearIncomplete: true
                     });
             };
-            
+
             $("#StartDateTimeLocal")
                 .on("blur", function()
                 {
@@ -1307,7 +1283,7 @@
                     $("#StartDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                     $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
                 });
-            
+
             $("#EndDateTimeLocal")
                 .on("blur", function()
                 {
@@ -1325,13 +1301,13 @@
                     viewModel.endDateTime = $('#EndDateTimeLocal').val();
 
                     var postUrl =
-                        "@Url.Action(actionName: "GetParameterGroupsForSample", controllerName: "Industry")";
+                        "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
 
                     $.ajax({
-                        type: "POST"
-                        , url: postUrl
-                        , data: viewModel
-                        , success: function(response)
+                        type: "POST",
+                        url: postUrl,
+                        data: viewModel,
+                        success: function(response)
                         {
                             if (response.hasError != null && response.hasError)
                             {
@@ -1348,25 +1324,24 @@
                                     .clear()
                                     .draw();
 
-                                $.each(parameterGroups
-                                    , function(index, value)
-                                    {
-                                        var data = {};
-                                        data[0] = value.Id;
-                                        data[1] = value.Name;
-                                        data[2] = value.Description;
-                                        data[3] = value.ParameterIds;
-                                        data[4] = null;
+                                $.each(parameterGroups, function(index, value)
+                                {
+                                    var data = {};
+                                    data[0] = value.Id;
+                                    data[1] = value.Name;
+                                    data[2] = value.Description;
+                                    data[3] = value.ParameterIds;
+                                    data[4] = null;
 
-                                        //console.debug("data : " + data);
+                                    //console.debug("data : " + data);
 
-                                        var rowNode = table
-                                            .row.add(data)
-                                            .draw()
-                                            .node();
+                                    var rowNode = table
+                                        .row.add(data)
+                                        .draw()
+                                        .node();
 
-                                        $(rowNode).css('color', 'green');
-                                    });
+                                    $(rowNode).css('color', 'green');
+                                });
                             }
                         }
                         //, error: function()
@@ -1388,7 +1363,7 @@
                     {
                         var value = $(this).val().toLowerCase().replace("12:00 am", "");
                         $(this).val(value);
-                    }); 
+                    });
 
                 disableAutoComplete();
             });

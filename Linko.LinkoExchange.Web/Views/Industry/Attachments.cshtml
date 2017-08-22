@@ -1,5 +1,4 @@
-﻿@using Linko.LinkoExchange.Core.Enum
-@using Linko.LinkoExchange.Web.ViewModels.Shared
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
 @{
     ViewBag.Title = "Attachments";
 }
@@ -26,14 +25,14 @@
         </div>
     </div>
     <div>
-        @{ 
+        @{
             var vm = new ConfirmationMessageViewModal
-            {
-                ShowMessage = TempData["AttachmentDeletedSucceed"] != null,
-                Messaage =  "Attachment deleted successfully."
-            }; 
+                     {
+                         ShowMessage = TempData[key:"AttachmentDeletedSucceed"] != null,
+                         Messaage = "Attachment deleted successfully."
+                     };
 
-            @Html.Partial("_ConfirmationMessageView", vm); 
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
     </div>
 

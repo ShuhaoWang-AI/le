@@ -3,29 +3,31 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Report Element Type for a Report Element Category within a Report Package or Report Package Template.
+    ///     Represents a Report Element Type for a Report Element Category within a Report Package or Report Package Template.
     /// </summary>
-    public partial class ReportElementType
+    public class ReportElementType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ReportElementTypeId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        ///     Unique within a particular OrganizationRegulatoryProgramId.
         /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// Text to be displayed when IsContentProvided is true, e.g. certification text the submitter will agree to.
+        ///     Text to be displayed when IsContentProvided is true, e.g. certification text the submitter will agree to.
         /// </summary>
         public string Content { get; set; }
 
         /// <summary>
-        /// True: the content is provided and should be displayed on the UI. False, otherwise.
+        ///     True: the content is provided and should be displayed on the UI. False, otherwise.
         /// </summary>
         public bool IsContentProvided { get; set; }
 
@@ -36,9 +38,10 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ReportElementCategory ReportElementCategory { get; set; }
 
         /// <summary>
-        /// Typical value: Authority Regulatory Program id.
+        ///     Typical value: Authority Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
@@ -46,5 +49,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

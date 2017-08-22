@@ -3,9 +3,9 @@
     public interface IPrivacyPolicyService
     {
         /// <summary>
-        /// Get the latest Privacy Policy content
+        ///     Get the latest Privacy Policy content
         /// </summary>
-        /// <returns></returns>
-       string GetPrivacyPolicyContent();
+        /// <returns> </returns>
+        string GetPrivacyPolicyContent();
     }
 }

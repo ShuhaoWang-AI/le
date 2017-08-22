@@ -9,12 +9,14 @@ using System.Web.Script.Serialization;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
@@ -24,53 +26,42 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
-using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Core.Resources;
-using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    [PortalAuthorize("authority","industry")]
+    [PortalAuthorize("authority", "industry")]
     [RoutePrefix(prefix:"ReportPackage")]
-    public class ReportPackageController:BaseController
+    public class ReportPackageController : BaseController
     {
-        #region default action
+        #region fields
 
-        // GET: ReprotPackage
-        public ActionResult Index()
-        {
-            return RedirectToAction(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Draft});
-        }
+        private readonly IAuthenticationService _authenticationService;
+        private readonly LinkoExchangeContext _dbContext;
+        private readonly IFileStoreService _fileStoreService;
+        private readonly IHttpContextService _httpContextService;
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IReportPackageService _reportPackageService;
+        private readonly IReportTemplateService _reportTemplateService;
+        private readonly ISampleService _sampleService;
+        private readonly ISyncService _syncService;
+        private readonly IUserService _userService;
 
         #endregion
 
-        #region constructor
-
-        private readonly IAuthenticationService _authenticationService;
-        private readonly IReportPackageService _reportPackageService;
-        private readonly IReportTemplateService _reportTemplateService;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly LinkoExchangeContext _dbContext;
-        private readonly IFileStoreService _fileStoreService;
-        private readonly ISampleService _sampleService;
-        private readonly IHttpContextService _httpContextService;
-        private readonly IUserService _userService;
-        private readonly ISyncService _syncService;
-        private readonly ICromerrAuditLogService _crommerAuditLogService;
+        #region constructors and destructor
 
         public ReportPackageController(
-            IAuthenticationService authenticationService, 
-            IReportPackageService reportPackageService, 
+            IAuthenticationService authenticationService,
+            IReportPackageService reportPackageService,
             IReportTemplateService reportTemplateService,
-            LinkoExchangeContext linkoExchangeContext, 
-            IFileStoreService fileStoreService, 
+            LinkoExchangeContext linkoExchangeContext,
+            IFileStoreService fileStoreService,
             ISampleService sampleService,
-            IHttpContextService httpContextService, 
-            IQuestionAnswerService questionAnswerService, 
+            IHttpContextService httpContextService,
+            IQuestionAnswerService questionAnswerService,
             IUserService userService,
-            ISyncService syncService,
-            ICromerrAuditLogService crommerAuditLogService)
-            :base(httpContextService: httpContextService,userService: userService,reportPackageService: reportPackageService,sampleService: sampleService)
+            ISyncService syncService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _authenticationService = authenticationService;
             _reportPackageService = reportPackageService;
@@ -82,7 +73,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             _httpContextService = httpContextService;
             _userService = userService;
             _syncService = syncService;
-            _crommerAuditLogService = crommerAuditLogService;
+        }
+
+        #endregion
+
+        #region default action
+
+        // GET: ReprotPackage
+        public ActionResult Index()
+        {
+            return RedirectToAction(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Draft});
         }
 
         #endregion
@@ -124,14 +124,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
                                                                                        {
                                                                                            vm.Id,
-                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal =
+                                                                                           vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName,
                                                                                            LastSentDateTimeLocal = vm.LastSentDateTimeLocal.ToString(),
                                                                                            vm.Name,
                                                                                            vm.OrganizationName,
                                                                                            vm.OrganizationReferenceNumber,
-                                                                                           PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
-                                                                                           PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           PeriodEndDateTimeLocal =
+                                                                                           vm.PeriodEndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           PeriodStartDateTimeLocal =
+                                                                                           vm.PeriodStartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal.ToString(),
                                                                                            vm.Repudiator,
                                                                                            vm.Status,
@@ -150,13 +153,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                 if (items != null)
                 {
                     var item = items.First();
-                    var newUrl = Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id = item.Id });
+                    var newUrl = Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = item.Id});
                     return Json(data:new
                                      {
                                          redirect = true,
                                          newurl = newUrl
                                      });
                 }
+
                 return Json(data:new
                                  {
                                      redirect = false,
@@ -181,12 +185,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         [PortalAuthorize("industry")]
         public ActionResult NewReportPackage()
         {
-            var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(isForCreatingDraft:true, includeChildObjects:false).Select(vm => new ReportPackageTemplateViewModel
-                                                                                                                                                           {
-                                                                                                                                                               Id = vm.ReportPackageTemplateId,
-                                                                                                                                                               Name = vm.Name,
-                                                                                                                                                               Description = vm.Description
-                                                                                                                                                           }).OrderBy(c =>c.Name).ToList();
+            var reportPackageTemplates = _reportTemplateService
+                .GetReportPackageTemplates(isForCreatingDraft:true, includeChildObjects:false).Select(vm => new ReportPackageTemplateViewModel
+                                                                                                            {
+                                                                                                                Id = vm.ReportPackageTemplateId,
+                                                                                                                Name = vm.Name,
+                                                                                                                Description = vm.Description
+                                                                                                            }).OrderBy(c => c.Name).ToList();
 
             var viewModel = new NewReportPackageViewModel {AllReportPackageTemplates = reportPackageTemplates};
 
@@ -211,8 +216,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                         throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                     }
 
-                    Debug.Assert(condition: model.StartDateTimeLocal != null, message: "model.StartDateTimeLocal != null");
-                    Debug.Assert(condition: model.EndDateTimeLocal != null, message: "model.EndDateTimeLocal != null");
+                    Debug.Assert(condition:model.StartDateTimeLocal != null, message:"model.StartDateTimeLocal != null");
+                    Debug.Assert(condition:model.EndDateTimeLocal != null, message:"model.EndDateTimeLocal != null");
 
                     var id = _reportPackageService.CreateDraft(reportPackageTemplateId:model.SelectedReportPackageTemplateId, startDateTimeLocal:model.StartDateTimeLocal.Value,
                                                                endDateTimeLocal:model.EndDateTimeLocal.Value);
@@ -239,12 +244,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
             }
 
-            var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(isForCreatingDraft:true, includeChildObjects:false).Select(vm => new ReportPackageTemplateViewModel
-                                                                                                                                                           {
-                                                                                                                                                               Id = vm.ReportPackageTemplateId,
-                                                                                                                                                               Name = vm.Name,
-                                                                                                                                                               Description = vm.Description
-                                                                                                                                                           }).OrderBy(c =>c.Name).ToList();
+            var reportPackageTemplates = _reportTemplateService
+                .GetReportPackageTemplates(isForCreatingDraft:true, includeChildObjects:false).Select(vm => new ReportPackageTemplateViewModel
+                                                                                                            {
+                                                                                                                Id = vm.ReportPackageTemplateId,
+                                                                                                                Name = vm.Name,
+                                                                                                                Description = vm.Description
+                                                                                                            }).OrderBy(c => c.Name).ToList();
             model.AllReportPackageTemplates = reportPackageTemplates;
             return View(model:model);
         }
@@ -256,19 +262,19 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
-            
+
             ViewBag.ShowSubmissionConfirmationMessage = TempData[key:"ShowSubmissionConfirmationMessage"] ?? false;
             ViewBag.SubmissionConfirmationMessage = TempData[key:"SubmissionConfirmationMessage"] ?? "";
-            
+
             ViewBag.ShowRepudiationConfirmationMessage = TempData[key:"ShowRepudiationConfirmationMessage"] ?? false;
             ViewBag.RepudiationConfirmationMessage = TempData[key:"RepudiationConfirmationMessage"] ?? "";
-            
+
             ViewBag.ShowSubmissionReviewConfirmationMessage = TempData[key:"ShowSubmissionReviewConfirmationMessage"] ?? false;
             ViewBag.SubmissionReviewConfirmationMessage = TempData[key:"SubmissionReviewConfirmationMessage"] ?? "";
-            
+
             ViewBag.ShowRepudiationReviewConfirmationMessage = TempData[key:"ShowRepudiationReviewConfirmationMessage"] ?? false;
             ViewBag.RepudiationReviewConfirmationMessage = TempData[key:"RepudiationReviewConfirmationMessage"] ?? "";
-            
+
             ViewBag.ShowSendToLinkoCTSSuccessMessage = TempData[key:"ShowSendToLinkoCTSSuccessMessage"] ?? false;
             ViewBag.SendToLinkoCTSSuccessMessage = TempData[key:"SendToLinkoCTSSuccessMessage"] ?? "";
 
@@ -282,7 +288,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
+                var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true, isAuthorizationRequired:true);
 
                 vm.Comments = model.Comments;
 
@@ -386,7 +392,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                               vm.Id,
                                                                                               vm.ParameterName,
                                                                                               Value =
-                                                                                              string.IsNullOrWhiteSpace(value:vm.Value) ? $"{vm.Qualifier}" : $"{vm.Qualifier} {vm.Value} {vm.UnitName}",
+                                                                                              string.IsNullOrWhiteSpace(value:vm.Value)
+                                                                                                  ? $"{vm.Qualifier}"
+                                                                                                  : $"{vm.Qualifier} {vm.Value} {vm.UnitName}",
                                                                                               MassLoadingValue =
                                                                                               string.IsNullOrWhiteSpace(value:vm.MassLoadingValue)
                                                                                                   ? ""
@@ -427,7 +435,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Name,
                                                                                            vm.OriginalFileName,
                                                                                            vm.Description,
-                                                                                           UploadDateTimeLocal = vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           UploadDateTimeLocal =
+                                                                                           vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.UploaderUserFullName,
                                                                                            vm.IsAssociatedWithReportPackage,
                                                                                            LastSubmitted = vm.LastSubmitted.ToString()
@@ -443,8 +452,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 var reportPackageDeleted = _reportPackageService.DeleteReportPackage(reportPackageId:id);
-                TempData["ReportPackageDeletedSucceed"] = true;
-                return RedirectToAction("ReportPackages", new {reportStatus = reportPackageDeleted.ReportStatusName}); 
+                TempData[key:"ReportPackageDeletedSucceed"] = true;
+                return RedirectToAction(actionName:"ReportPackages", routeValues:new {reportStatus = reportPackageDeleted.ReportStatusName});
             }
             catch (RuleViolationException rve)
             {
@@ -466,7 +475,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     try
                     {
-                        var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
+                        var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true, isAuthorizationRequired:true);
 
                         vm.Comments = model.Comments;
 
@@ -565,19 +574,18 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var failedCountPassword = model.FailedCountPassword;
                         var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(
-                            password:model.Password, 
-                            userQuestionAnswerId:model.QuestionAnswerId, 
-                            kbqAnswer:model.Answer,
-                            failedPasswordCount:failedCountPassword, 
-                            failedKbqCount:failedCountKbq,
-                            reportOperation:ReportOperation.SignAndSubmit,
-                            reportPackageId:id);
+                                                                                   password:model.Password,
+                                                                                   userQuestionAnswerId:model.QuestionAnswerId,
+                                                                                   kbqAnswer:model.Answer,
+                                                                                   failedPasswordCount:failedCountPassword,
+                                                                                   failedKbqCount:failedCountKbq,
+                                                                                   reportOperation:ReportOperation.SignAndSubmit,
+                                                                                   reportPackageId:id);
                         ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
                         switch (result)
                         {
-                            case PasswordAndKbqValidationResult.Success:
-                                break;
+                            case PasswordAndKbqValidationResult.Success: break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
                                 isValid = false;
                                 model.FailedCountPassword = failedCountPassword;
@@ -593,10 +601,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
-                            case PasswordAndKbqValidationResult.UserLocked_Password:
-                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
-                            default:
-                                throw new ArgumentOutOfRangeException();
+                            case PasswordAndKbqValidationResult.UserLocked_Password: return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            default: throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
@@ -607,6 +613,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.ShowSubmissionValidationErrorMessage = true;
                 ViewBag.SubmissionValidationErrorMessage = rve.ValidationIssues[index:0].ErrorMessage;
             }
+
             try
             {
                 if (isValid)
@@ -615,7 +622,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     TempData[key:"ShowSubmissionConfirmationMessage"] = true;
                     TempData[key:"SubmissionConfirmationMessage"] = "Report package submitted successfully!";
-                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionConfirmation");
+                    return Redirect(url:Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id}) + "#divSubmissionConfirmation");
                 }
             }
             catch (RuleViolationException rve)
@@ -624,9 +631,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.ShowSubmissionValidationErrorMessage = true;
             }
 
-            model = PrepareReportPackageDetails(id: id, failedCountPassword: model.FailedCountPassword, failedCountKbq: model.FailedCountKbq);
-            ModelState.Remove(key: "QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
-            ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
+            model = PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq);
+            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.SetModelValue(key:"Answer", value:null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
         }
@@ -661,21 +668,20 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var failedCountPassword = model.FailedCountPassword;
                         var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(
-                            password:model.Password, 
-                            userQuestionAnswerId:model.QuestionAnswerId, 
-                            kbqAnswer:model.Answer,
-                            failedPasswordCount:failedCountPassword, 
-                            failedKbqCount:failedCountKbq,
-                            reportOperation:ReportOperation.Repudiation,
-                            reportPackageId: id);
+                                                                                   password:model.Password,
+                                                                                   userQuestionAnswerId:model.QuestionAnswerId,
+                                                                                   kbqAnswer:model.Answer,
+                                                                                   failedPasswordCount:failedCountPassword,
+                                                                                   failedKbqCount:failedCountKbq,
+                                                                                   reportOperation:ReportOperation.Repudiation,
+                                                                                   reportPackageId:id);
 
-                        ModelState.Remove(key: "FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
-                        ModelState.Remove(key: "FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
 
                         switch (result)
                         {
-                            case PasswordAndKbqValidationResult.Success:
-                                break;
+                            case PasswordAndKbqValidationResult.Success: break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
                                 isValid = false;
                                 model.FailedCountPassword = failedCountPassword;
@@ -691,10 +697,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
-                            case PasswordAndKbqValidationResult.UserLocked_Password:
-                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
-                            default:
-                                throw new ArgumentOutOfRangeException();
+                            case PasswordAndKbqValidationResult.UserLocked_Password: return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            default: throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
@@ -705,6 +709,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.ShowRepudiateValidationErrorMessage = true;
                 ViewBag.RepudiateValidationErrorMessage = rve.ValidationIssues[index:0].ErrorMessage;
             }
+
             try
             {
                 if (isValid)
@@ -718,7 +723,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     TempData[key:"ShowRepudiationConfirmationMessage"] = true;
                     TempData[key:"RepudiationConfirmationMessage"] = confirmationMessage;
-                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divRepudiationConfirmation");
+                    return Redirect(url:Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id}) + "#divRepudiationConfirmation");
                 }
             }
             catch (RuleViolationException rve)
@@ -726,10 +731,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 ViewBag.ShowRepudiateValidationErrorMessage = true;
             }
-            
+
             model = PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq);
-            ModelState.Remove(key: "QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
-            ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
+            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.SetModelValue(key:"Answer", value:null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
         }
@@ -748,7 +753,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData[key:"SubmissionReviewConfirmationMessage"] = "Report Package submission review completed successfully!";
 
                 ModelState.Clear();
-                return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionReview");
+                return Redirect(url:Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id}) + "#divSubmissionReview");
             }
             catch (RuleViolationException rve)
             {
@@ -778,7 +783,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     TempData[key:"RepudiationReviewConfirmationMessage"] = "Report Package repudiation review completed successfully!";
 
                     ModelState.Clear();
-                    return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divRepudiationReview");
+                    return Redirect(url:Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id}) + "#divRepudiationReview");
                 }
             }
             catch (RuleViolationException rve)
@@ -795,11 +800,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             var isNewerReportPackageExist = false;
             try
             {
-                isNewerReportPackageExist = _reportPackageService.IsSimilarReportPackageSubmittedAfter(reportPackageId: id);
+                isNewerReportPackageExist = _reportPackageService.IsSimilarReportPackageSubmittedAfter(reportPackageId:id);
             }
             catch (RuleViolationException rve)
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
             return isNewerReportPackageExist;
         }
@@ -812,20 +817,20 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                _syncService.SendSubmittedReportPackageToCts(reportPackageId: id);
+                _syncService.SendSubmittedReportPackageToCts(reportPackageId:id);
 
-                TempData[key: "ShowSendToLinkoCTSSuccessMessage"] = true;
-                TempData[key: "SendToLinkoCTSSuccessMessage"] = "Report Package queued for LinkoCTS.";
+                TempData[key:"ShowSendToLinkoCTSSuccessMessage"] = true;
+                TempData[key:"SendToLinkoCTSSuccessMessage"] = "Report Package queued for LinkoCTS.";
 
                 ModelState.Clear();
-                return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSendToLinkoCTS");
+                return Redirect(url:Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id}) + "#divSendToLinkoCTS");
             }
             catch (RuleViolationException rve)
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return View(viewName: "ReportPackageDetails", model: PrepareReportPackageDetails(id: id));
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
         [Route(template:"{id:int}/Details/Preview")]
@@ -903,87 +908,97 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
+                var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true, isAuthorizationRequired:true);
 
                 viewModel = new ReportPackageViewModel
-                {
-                    Id = vm.ReportPackageId,
-                    Name = vm.Name,
-                    PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal,
-                    PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal,
-                    OrganizationRegulatoryProgramId = vm.OrganizationRegulatoryProgramId,
-                    OrganizationName = vm.OrganizationName,
-                    OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
-                    Status = vm.ReportStatusName,
-                    CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"{vm.CtsEventTypeName} ({vm.CtsEventCategoryName})",
-                    CtsEventTypeId = vm.CtsEventTypeId,
-                    ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
-                    Comments = vm.Comments,
-                    SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
-                    {
-                        Id = t.ReportPackageElementTypeId,
-                        Name = t.ReportElementTypeName
-                    }).ToList(),
-                    SelectedSamples = vm.SamplesAndResultsTypes?.Where(t => t.Samples.Count > 0).Select(t => new SelectedParentChildCombination
-                                                                             {
-                                                                                 Id = t.ReportPackageElementTypeId,
-                                                                                 ChildElements = t.Samples?.Select(s => new ChildElement {Id = s.SampleId ?? 0}).ToList()
-                                                                             }).ToList(),
-                    AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
-                    {
-                        Id = t.ReportPackageElementTypeId,
-                        Name = t.ReportElementTypeName
-                    }).ToList(),
-                    SelectedAttachments = vm.AttachmentTypes?.Where(t => t.FileStores.Count > 0).Select(t => new SelectedParentChildCombination
-                                                                             {
-                                                                                 Id = t.ReportPackageElementTypeId,
-                                                                                 ChildElements = t.FileStores?.Select(f => new ChildElement {Id = f.FileStoreId ?? 0}).ToList()
-                                                                             }).ToList(),
-                    CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
-                    {
-                        Id = t.ReportPackageElementTypeId,
-                        Name = t.ReportElementTypeName,
-                        Content = t.ReportElementTypeContent
-                    }).ToList(),
-                    IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
-                    SubmitterFirstName = vm.SubmitterFirstName,
-                    SubmitterLastName = vm.SubmitterLastName,
-                    SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal,
-                    SubmitterTitleRole = vm.SubmitterTitleRole,
-                    SubmissionReviewerFirstName = vm.SubmissionReviewerFirstName,
-                    SubmissionReviewerLastName = vm.SubmissionReviewerLastName,
-                    SubmissionReviewComments = vm.SubmissionReviewComments,
-                    SubmissionReviewDateTimeLocal = vm.SubmissionReviewDateTimeLocal,
-                    LastSenderFirstName = vm.LastSenderFirstName,
-                    LastSenderLastName = vm.LastSenderLastName,
-                    LastSentDateTimeLocal = vm.LastSentDateTimeLocal,
-                    RepudiatorFirstName = vm.RepudiatorFirstName,
-                    RepudiatorLastName = vm.RepudiatorLastName,
-                    RepudiatorTitleRole = vm.RepudiatorTitleRole,
-                    RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal,
-                    RepudiationReasonId = vm.RepudiationReasonId,
-                    RepudiationReasonName = vm.RepudiationReasonName,
-                    RepudiationComments = vm.RepudiationComments,
-                    RepudiationReviewerFirstName = vm.RepudiationReviewerFirstName,
-                    RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
-                    RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
-                    RepudiationReviewComments = vm.RepudiationReviewComments,
-                    CanCurrentUserSubmitAndReputiate = false,
-                    FailedCountPassword = failedCountPassword,
-                    FailedCountKbq = failedCountKbq
-                };
+                            {
+                                Id = vm.ReportPackageId,
+                                Name = vm.Name,
+                                PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal,
+                                PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal,
+                                OrganizationRegulatoryProgramId = vm.OrganizationRegulatoryProgramId,
+                                OrganizationName = vm.OrganizationName,
+                                OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
+                                Status = vm.ReportStatusName,
+                                CtsEventTypeName = string.IsNullOrWhiteSpace(value:vm.CtsEventTypeName) ? "" : $@"{vm.CtsEventTypeName} ({vm.CtsEventCategoryName})",
+                                CtsEventTypeId = vm.CtsEventTypeId,
+                                ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
+                                Comments = vm.Comments,
+                                SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                                {
+                                                                                                    Id = t.ReportPackageElementTypeId,
+                                                                                                    Name = t.ReportElementTypeName
+                                                                                                }).ToList(),
+                                SelectedSamples = vm.SamplesAndResultsTypes?.Where(t => t.Samples.Count > 0).Select(t => new SelectedParentChildCombination
+                                                                                                                         {
+                                                                                                                             Id = t.ReportPackageElementTypeId,
+                                                                                                                             ChildElements = t
+                                                                                                                                 .Samples?.Select(s => new ChildElement
+                                                                                                                                                       {
+                                                                                                                                                           Id =
+                                                                                                                                                               s.SampleId
+                                                                                                                                                               ?? 0
+                                                                                                                                                       }).ToList()
+                                                                                                                         }).ToList(),
+                                AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                  {
+                                                                                      Id = t.ReportPackageElementTypeId,
+                                                                                      Name = t.ReportElementTypeName
+                                                                                  }).ToList(),
+                                SelectedAttachments = vm.AttachmentTypes?.Where(t => t.FileStores.Count > 0).Select(t => new SelectedParentChildCombination
+                                                                                                                         {
+                                                                                                                             Id = t.ReportPackageElementTypeId,
+                                                                                                                             ChildElements = t
+                                                                                                                                 .FileStores?.Select(f => new ChildElement
+                                                                                                                                                          {
+                                                                                                                                                              Id = f.FileStoreId ?? 0
+                                                                                                                                                          }).ToList()
+                                                                                                                         }).ToList(),
+                                CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                        {
+                                                                                            Id = t.ReportPackageElementTypeId,
+                                                                                            Name = t.ReportElementTypeName,
+                                                                                            Content = t.ReportElementTypeContent
+                                                                                        }).ToList(),
+                                IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
+                                SubmitterFirstName = vm.SubmitterFirstName,
+                                SubmitterLastName = vm.SubmitterLastName,
+                                SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal,
+                                SubmitterTitleRole = vm.SubmitterTitleRole,
+                                SubmissionReviewerFirstName = vm.SubmissionReviewerFirstName,
+                                SubmissionReviewerLastName = vm.SubmissionReviewerLastName,
+                                SubmissionReviewComments = vm.SubmissionReviewComments,
+                                SubmissionReviewDateTimeLocal = vm.SubmissionReviewDateTimeLocal,
+                                LastSenderFirstName = vm.LastSenderFirstName,
+                                LastSenderLastName = vm.LastSenderLastName,
+                                LastSentDateTimeLocal = vm.LastSentDateTimeLocal,
+                                RepudiatorFirstName = vm.RepudiatorFirstName,
+                                RepudiatorLastName = vm.RepudiatorLastName,
+                                RepudiatorTitleRole = vm.RepudiatorTitleRole,
+                                RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal,
+                                RepudiationReasonId = vm.RepudiationReasonId,
+                                RepudiationReasonName = vm.RepudiationReasonName,
+                                RepudiationComments = vm.RepudiationComments,
+                                RepudiationReviewerFirstName = vm.RepudiationReviewerFirstName,
+                                RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
+                                RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
+                                RepudiationReviewComments = vm.RepudiationReviewComments,
+                                CanCurrentUserSubmitAndReputiate = false,
+                                FailedCountPassword = failedCountPassword,
+                                FailedCountKbq = failedCountKbq
+                            };
 
-                viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType: CacheKey.PortalName).ToLower().Equals(value: "authority");
+                viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower().Equals(value:"authority");
 
                 if (!viewModel.IsCurrentPortalAuthority && (viewModel.Status == ReportStatusName.ReadyToSubmit || viewModel.Status == ReportStatusName.Submitted))
                 {
-                    var currentOrganizationRegulatoryProgramUserId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramUserId));
-                    var isCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId: currentOrganizationRegulatoryProgramUserId).IsSignatory;
+                    var currentOrganizationRegulatoryProgramUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
+                    var isCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:currentOrganizationRegulatoryProgramUserId).IsSignatory;
 
                     viewModel.CanCurrentUserSubmitAndReputiate = !viewModel.IsSubmissionBySignatoryRequired || viewModel.IsSubmissionBySignatoryRequired && isCurrentUserSignatory;
 
-                    var currentUserProfileId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.UserProfileId));
-                    var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId: currentUserProfileId, questionType: QuestionTypeName.KBQ);
+                    var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+                    var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId:currentUserProfileId, questionType:QuestionTypeName.KBQ);
 
                     viewModel.QuestionAnswerId = userQuestion.Answer.UserQuestionAnswerId ?? 0;
                     viewModel.Question = userQuestion.Question.Content;
@@ -994,23 +1009,29 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         if (viewModel.Id != null)
                         {
-                            viewModel.HasRepudiationTimeExpired = !_reportPackageService.CanRepudiateReportPackage(reportPackageId: viewModel.Id.Value);
+                            viewModel.HasRepudiationTimeExpired = !_reportPackageService.CanRepudiateReportPackage(reportPackageId:viewModel.Id.Value);
                         }
                         var repudiationReasons = _reportPackageService.GetRepudiationReasons();
                         viewModel.AvailableRepudiationReasonNames = repudiationReasons.Select(c => new SelectListItem
-                        {
-                            Text = c.Name,
-                            Value = c.RepudiationReasonId.ToString()
-                        }).OrderBy(c => c.Text).ToList();
+                                                                                                   {
+                                                                                                       Text = c.Name,
+                                                                                                       Value = c.RepudiationReasonId.ToString()
+                                                                                                   }).OrderBy(c => c.Text).ToList();
 
-                        viewModel.AvailableRepudiationReasonNames.Insert(index: 0, item: new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0", Disabled = true});
+                        viewModel.AvailableRepudiationReasonNames.Insert(index:0,
+                                                                         item:new SelectListItem
+                                                                              {
+                                                                                  Text = Label.ResourceManager.GetString(name:"SelectReason"),
+                                                                                  Value = "0",
+                                                                                  Disabled = true
+                                                                              });
                         viewModel.RepudiationReasonId = viewModel.RepudiationReasonId ?? 0;
                     }
                 }
             }
             catch (RuleViolationException rve)
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
             return viewModel;
         }

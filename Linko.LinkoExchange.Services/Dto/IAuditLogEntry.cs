@@ -2,9 +2,10 @@
 {
     public interface IAuditLogEntry
     {
-        int AuditLogTemplateId
-        {
-            get;set;
-        }
+        #region public properties
+
+        int AuditLogTemplateId { get; set; }
+
+        #endregion
     }
 }

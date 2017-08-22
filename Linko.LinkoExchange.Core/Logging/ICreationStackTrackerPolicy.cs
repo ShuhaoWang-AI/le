@@ -11,10 +11,7 @@ namespace Linko.LinkoExchange.Core.Logging
 
         /// <summary>
         /// </summary>
-        PeekableStack<Type> TypeStack
-        {
-            get;
-        }
+        PeekableStack<Type> TypeStack { get; }
 
         #endregion
     }

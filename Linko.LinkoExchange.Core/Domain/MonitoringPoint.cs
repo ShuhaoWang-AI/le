@@ -4,30 +4,33 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Monitoring Point.
+    ///     Represents a Monitoring Point.
     /// </summary>
-    public partial class MonitoringPoint
+    public class MonitoringPoint
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int MonitoringPointId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        ///     Unique within a particular OrganizationRegulatoryProgramId.
         /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// Typical value: Industry Regulatory Program id.
+        ///     Typical value: Industry Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
+
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         /// <summary>
-        /// True: the current monitoring point is visible to the Industry. False, otherwise.
+        ///     True: the current monitoring point is visible to the Industry. False, otherwise.
         /// </summary>
         public bool IsEnabled { get; set; }
 
@@ -39,9 +42,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
+
+        #endregion
     }
 }
-

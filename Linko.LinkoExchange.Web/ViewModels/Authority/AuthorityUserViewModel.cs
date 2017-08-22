@@ -7,180 +7,109 @@ using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
-    [Validator(typeof(AuthorityUserViewModelValidator))]
+    [Validator(validatorType:typeof(AuthorityUserViewModelValidator))]
     public class AuthorityUserViewModel
     {
-        [ScaffoldColumn(false)]
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "Id")]
-        public int Id
-        {
-            get; set;
-        }
-        
-        [ScaffoldColumn(false)]
+        public int Id { get; set; }
+
+        [ScaffoldColumn(scaffold:false)]
         [Display(Name = "PId")]
-        public int PId
-        {
-            get; set;
-        }
+        public int PId { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "First Name")]
-        public string FirstName
-        {
-            get; set;
-        }
+        public string FirstName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Last Name")]
-        public string LastName
-        {
-            get; set;
-        }
+        public string LastName { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Phone Number")]
         [Phone]
-        public string PhoneNumber
-        {
-            get; set;
-        }
+        public string PhoneNumber { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Ext")]
-        public int? PhoneExt
-        {
-            get; set;
-        }
+        public int? PhoneExt { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Email")]
         [EmailAddress]
-        public string Email
-        {
-            get; set;
-        }
+        public string Email { get; set; }
 
         [Display(Name = "Email")]
         [EmailAddress]
-        public string ResetEmail
-        {
-            get; set;
-        }
+        public string ResetEmail { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Registration Date")]
-        public DateTime? DateRegistered
-        {
-            get; set;
-        }
+        public DateTime? DateRegistered { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Status")]
-        public bool Status
-        {
-            get; set;
-        }
+        public bool Status { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Status")]
-        public string StatusText
-        {
-            get
-            {
-                return Status ? "Active" : "Inactive";
-            }
-        }
+        public string StatusText => Status ? "Active" : "Inactive";
 
-        [Editable(false)]
-        public string StatusButtonText
-        {
-            get
-            {
-                return Status ? "Disable" : "Enable";
-            }
-        }
+        [Editable(allowEdit:false)]
+        public string StatusButtonText => Status ? "Disable" : "Enable";
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Account Locked")]
-        public bool AccountLocked
-        {
-            get; set;
-        }
+        public bool AccountLocked { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Account Locked")]
-        public string AccountLockedText
-        {
-            get
-            {
-                return AccountLocked ? "Locked" : "No";
-            }
-        }
+        public string AccountLockedText => AccountLocked ? "Locked" : "No";
 
-        [Editable(false)]
-        public string AccountLockedButtonText
-        {
-            get
-            {
-                return AccountLocked ? "Unlock" : "Lock";
-            }
-        }
-                
+        [Editable(allowEdit:false)]
+        public string AccountLockedButtonText => AccountLocked ? "Unlock" : "Lock";
+
         [Display(Name = "Role")]
-        public int Role
-        {
-            get; set;
-        }
-        
+        public int Role { get; set; }
+
         [Display(Name = "Role")]
-        public string RoleText
-        {
-            get; set;
-        }
+        public string RoleText { get; set; }
 
-        public IList<SelectListItem> AvailableRoles
-        {
-            get; set;
-        }
+        public IList<SelectListItem> AvailableRoles { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Security Question 1")]
-        public string SecurityQuestion1
-        {
-            get; set;
-        }
+        public string SecurityQuestion1 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Answer")]
-        public string Answer1
-        {
-            get; set;
-        }
+        public string Answer1 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Security Question 2")]
-        public string SecurityQuestion2
-        {
-            get; set;
-        }
+        public string SecurityQuestion2 { get; set; }
 
-        [Editable(false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Answer")]
-        public string Answer2
-        {
-            get; set;
-        }
+        public string Answer2 { get; set; }
+
+        #endregion
     }
-    
-    public partial class AuthorityUserViewModelValidator : AbstractValidator<AuthorityUserViewModel>
+
+    public class AuthorityUserViewModelValidator : AbstractValidator<AuthorityUserViewModel>
     {
+        #region constructors and destructor
+
         public AuthorityUserViewModelValidator()
         {
             //ResetEmail
-            RuleFor(x => x.ResetEmail).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
-            RuleFor(x => x.ResetEmail.Length).LessThanOrEqualTo(valueToCompare: 256).WithMessage(errorMessage: "{PropertyName} must be less than or equal to 256 characters long.");
-            
+            RuleFor(x => x.ResetEmail).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            RuleFor(x => x.ResetEmail.Length).LessThanOrEqualTo(valueToCompare:256).WithMessage(errorMessage:"{PropertyName} must be less than or equal to 256 characters long.");
         }
+
+        #endregion
     }
 }

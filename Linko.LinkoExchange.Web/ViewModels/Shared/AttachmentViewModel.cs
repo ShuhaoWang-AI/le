@@ -10,6 +10,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     [Validator(validatorType:typeof(AttachmentViewModelValidator))]
     public class AttachmentViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
@@ -44,8 +46,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
-        
-        [Editable(allowEdit: false)]
+
+        [Editable(allowEdit:false)]
         [Display(Name = "Last Submitted")]
         public DateTime? LastSubmitted { get; set; }
 
@@ -58,14 +60,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = " ")]
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
+
+        #endregion
     }
 
-    public class AttachmentViewModelValidator:AbstractValidator<AttachmentViewModel>
+    public class AttachmentViewModelValidator : AbstractValidator<AttachmentViewModel>
     {
+        #region constructors and destructor
+
         public AttachmentViewModelValidator()
         {
             //ReportElementTypeId
             RuleFor(x => x.ReportElementTypeId).GreaterThan(valueToCompare:0).WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }

@@ -3,16 +3,21 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a TermCondition
+    ///     Represents a TermCondition
     /// </summary>
-    public partial class TermCondition
+    public class TermCondition
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key
+        ///     Primary key
         /// </summary>
         public int TermConditionId { get; set; }
+
         public string Content { get; set; }
         public DateTimeOffset CreationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents an organization.
+    ///     Represents an organization.
     /// </summary>
-    public partial class Organization
+    public class Organization
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int OrganizationId { get; set; }
 
@@ -38,7 +40,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string WebsiteUrl { get; set; }
 
         /// <summary>
-        /// Authority specific column.
+        ///     Authority specific column.
         /// </summary>
         public string Signer { get; set; }
 
@@ -50,7 +52,6 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
 
@@ -61,5 +62,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ICollection<CollectionMethod> CollectionMethods { get; set; }
 
         public virtual ICollection<Unit> Units { get; set; }
+
+        #endregion
     }
 }

@@ -85,7 +85,6 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
 
             // Services
-            //container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
             container.RegisterType<IAuditLogService, EmailAuditLogService>();
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));

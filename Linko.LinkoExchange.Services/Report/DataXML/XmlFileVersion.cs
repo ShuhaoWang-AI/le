@@ -2,6 +2,10 @@
 {
     public class XmlFileVersion
     {
+        #region public properties
+
         public string VersionNumber { get; set; }
+
+        #endregion
     }
 }

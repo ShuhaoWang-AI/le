@@ -75,7 +75,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Terms And Conditions
+        #region terms and conditions
 
         // GET: /TermsAndConditions
         [AllowAnonymous]
@@ -94,7 +94,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Privacy Policy
+        #region privacy policy
 
         // GET: /PrivacyPolicy
         [AllowAnonymous]

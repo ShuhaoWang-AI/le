@@ -5,7 +5,11 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
 {
     public class FileManifest
     {
-        [XmlElement("File")]
+        #region public properties
+
+        [XmlElement(elementName:"File")]
         public List<FileInfo> Files { get; set; } = new List<FileInfo>();
+
+        #endregion
     }
 }

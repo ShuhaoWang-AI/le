@@ -4,7 +4,9 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class InvitationDto
     {
-        public string InvitationId { get; set; } 
+        #region public properties
+
+        public string InvitationId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string EmailAddress { get; set; }
@@ -16,6 +18,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ProgramName { get; set; }
         public string AuthorityName { get; set; }
         public string IndustryName { get; set; }
-        public bool IsResetInvitation {get;set; }
+        public bool IsResetInvitation { get; set; }
+
+        #endregion
     }
 }

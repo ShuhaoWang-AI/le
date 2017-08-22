@@ -34,41 +34,24 @@ namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"Account")]
     [Route(template:"{action=Index}")]
-    public class AccountController:BaseController
+    public class AccountController : BaseController
     {
-        #region default action
-
-        [AllowAnonymous]
-        public ActionResult Index()
-        {
-            return Request.IsAuthenticated ? RedirectToAction(actionName:"UserProfile", controllerName:"User") : RedirectToAction(actionName:"SignIn");
-        }
-
-        #endregion
-
-        #region SignOut
-
-        // POST: /Account/SignOut
-        public ActionResult SignOut()
-        {
-            _authenticationService.SignOff();
-            return RedirectToLocal(returnUrl:"");
-        }
-
-        #endregion
-
-        #region constructor
+        #region fields
 
         private readonly IAuthenticationService _authenticationService;
-        private readonly IOrganizationService _organizationService;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly ILogger _logger;
-        private readonly IUserService _userService;
         private readonly IInvitationService _invitationService;
         private readonly IJurisdictionService _jurisdictionService;
-        private readonly ISettingService _settingService;
+        private readonly ILogger _logger;
+        private readonly IMapHelper _mapHelper;
+        private readonly IOrganizationService _organizationService;
         private readonly ProfileHelper _profileHelper;
-        private readonly IMapHelper _mapHelper; 
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly ISettingService _settingService;
+        private readonly IUserService _userService;
+
+        #endregion
+
+        #region constructors and destructor
 
         public AccountController(
             IAuthenticationService authenticationService,
@@ -83,7 +66,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService,
             IReportPackageService reportPackageService,
             ISampleService sampleService
-        ):base(httpContextService,userService,reportPackageService,sampleService)
+        ) : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
@@ -100,11 +83,32 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Register
+        #region default action
+
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            return Request.IsAuthenticated ? RedirectToAction(actionName:"UserProfile", controllerName:"User") : RedirectToAction(actionName:"SignIn");
+        }
+
+        #endregion
+
+        #region signOut
+
+        // POST: /Account/SignOut
+        public ActionResult SignOut()
+        {
+            _authenticationService.SignOff();
+            return RedirectToLocal(returnUrl:"");
+        }
+
+        #endregion
+
+        #region register
 
         [AllowAnonymous]
         public ActionResult Register(string token)
-        { 
+        {
             ViewBag.newRegistration = true;
             ViewBag.profileCollapsed = false;
             ViewBag.kbqCollapsed = false;
@@ -144,7 +148,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.RegistrationType = RegistrationType.NewRegistration;
                 model.UserProfile.ShowConfirmPassword = true;
             }
-            else if(invitation.IsResetInvitation)
+            else if (invitation.IsResetInvitation)
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(userProfileId:user.UserProfileId);
@@ -190,8 +194,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.SQ);
-         
-            if(model.RegistrationType == RegistrationType.ReRegistration)
+
+            if (model.RegistrationType == RegistrationType.ReRegistration)
             {
                 ModelState.Clear();
             }
@@ -205,17 +209,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ5, Content = model.UserKBQ.KBQAnswer5});
             sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion1, Content = model.UserSQ.SecurityQuestionAnswer1});
             sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2});
-            
+
             var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(viewModel:model.UserProfile);
             userDto.Password = model.UserProfile.Password;
-            userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions; 
-            
+            userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions;
+
             var kbqValidationResults = _userService.KbqValidation(kbqQuestions:kbqs);
-            var sqValidationResults  = _userService.SecurityValidation(securityQuestions:sqs); 
-            
-            var inValidUserProfileMessages = ValidUserProfileData(userDto, model.RegistrationType); 
-            var inValidKbqMessages = ValidateKbq(kbqValidationResults);
-            var inValidSqMessages = ValidateSecurityQuestions(sqValidationResults); 
+            var sqValidationResults = _userService.SecurityValidation(securityQuestions:sqs);
+
+            var inValidUserProfileMessages = ValidUserProfileData(userInfo:userDto, registrationType:model.RegistrationType);
+            var inValidKbqMessages = ValidateKbq(kbqValidationResults:kbqValidationResults);
+            var inValidSqMessages = ValidateSecurityQuestions(sqValidationResults:sqValidationResults);
 
             if (!ModelState.IsValid)
             {
@@ -238,7 +242,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 if (!isValid || inValidUserProfileMessages.Any())
                 {
-                    ViewBag.inValidProfile = true; 
+                    ViewBag.inValidProfile = true;
                 }
 
                 // Validate KBQ  
@@ -247,7 +251,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 if (!isValid || inValidKbqMessages.Any())
                 {
-                    ViewBag.inValidKBQ = true; 
+                    ViewBag.inValidKBQ = true;
                 }
 
                 // Validate SQ 
@@ -256,17 +260,18 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 if (!isValid || inValidSqMessages.Any())
                 {
-                    ViewBag.inValidSQ = true; 
+                    ViewBag.inValidSQ = true;
                 }
 
                 ViewBag.inValidKbqMessages = inValidKbqMessages;
-                ViewBag.inValidSqMessages = inValidSqMessages;  
-                ViewBag.inValidUserProfileMessages = inValidUserProfileMessages; 
+                ViewBag.inValidSqMessages = inValidSqMessages;
+                ViewBag.inValidUserProfileMessages = inValidUserProfileMessages;
 
                 return View(model:model);
             }
 
-            var result = _authenticationService.Register(userInfo:userDto, registrationToken:model.Token, securityQuestions:sqs, kbqQuestions:kbqs, registrationType:model.RegistrationType);
+            var result = _authenticationService.Register(userInfo:userDto, registrationToken:model.Token, securityQuestions:sqs, kbqQuestions:kbqs,
+                                                         registrationType:model.RegistrationType);
             switch (result.Result)
             {
                 case RegistrationResult.Success:
@@ -279,59 +284,58 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var org = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:invitation.RecipientOrganizationRegulatoryProgramId);
 
                     var messageBody = new StringBuilder();
-                    messageBody.Append(value:$"<div>Your LinkoExchange registration has been received and is now under review for the following:</div><br/>"); 
+                    messageBody.Append(value:$"<div>Your LinkoExchange registration has been received and is now under review for the following:</div><br/>");
                     messageBody.Append(value:$"<div>");
 
-                    messageBody.Append(value: $"<div>");
-                    messageBody.Append(value: $"<div class='col-md-1' style='text-align:right;'>Authority:</div>");
-                    var authorityNameInMessage = _organizationService.GetAuthority(orgRegProgramId:invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
-                    messageBody.Append(value: $"<div class='col-md-11'>{authorityNameInMessage}</div>");
-                    messageBody.Append(value: $"</div><br/>");
+                    messageBody.Append(value:$"<div>");
+                    messageBody.Append(value:$"<div class='col-md-1' style='text-align:right;'>Authority:</div>");
+                    var authorityNameInMessage = _organizationService
+                        .GetAuthority(orgRegProgramId:invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
+                    messageBody.Append(value:$"<div class='col-md-11'>{authorityNameInMessage}</div>");
+                    messageBody.Append(value:$"</div><br/>");
 
-
-                    if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing: OrganizationTypeName.Industry.ToString()))
+                    if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing:OrganizationTypeName.Industry.ToString()))
                     {
-                        messageBody.Append(value: $"<div>");
-                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'>Facility: </div>");
-                        messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.OrganizationName} </div>");
-                        messageBody.Append(value: $"</div>");
+                        messageBody.Append(value:$"<div>");
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'>Facility: </div>");
+                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.OrganizationName} </div>");
+                        messageBody.Append(value:$"</div>");
 
-                        messageBody.Append(value: $"<div>");
-                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
-                        messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
-                        messageBody.Append(value: $"</div>");
+                        messageBody.Append(value:$"<div>");
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
+                        messageBody.Append(value:$"</div>");
 
-                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.AddressLine2))
+                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.AddressLine2))
                         {
-                            messageBody.Append(value: $"<div>");
-                            messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
-                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
-                            messageBody.Append(value: $"</div>");
+                            messageBody.Append(value:$"<div>");
+                            messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
+                            messageBody.Append(value:$"</div>");
                         }
 
-                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
-                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.State))
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.State))
                         {
-                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName}, {org.OrganizationDto.State}</div>");
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName}, {org.OrganizationDto.State}</div>");
                         }
                         else
                         {
-                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
                         }
 
                         messageBody.Append(value:$"<br/>&nbsp<br/>");
                     }
                     else
                     {
-                        messageBody.Append(value: $"");
+                        messageBody.Append(value:$"");
                         messageBody.Append(value:$"<br/>");
                     }
 
                     messageBody.Append(value:$"<div>You will be notified by email when a decision has been made about your account request.</div>");
                     messageBody.Append(value:$"<div>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</div>");
-                    
-                    messageBody.Append(value:$"</div>"); 
 
+                    messageBody.Append(value:$"</div>");
 
                     return View(viewName:"Confirmation",
                                 model:new ConfirmationViewModel
@@ -342,73 +346,73 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 case RegistrationResult.BadUserProfileData:
                     ViewBag.inValidProfile = true;
-                    inValidUserProfileMessages.Add("Invalid user profile data.");
+                    inValidUserProfileMessages.Add(item:"Invalid user profile data.");
                     break;
                 case RegistrationResult.BadPassword:
                     ViewBag.inValidProfile = true;
-                    inValidUserProfileMessages.Add("Password does not meet criteria.");
+                    inValidUserProfileMessages.Add(item:"Password does not meet criteria.");
                     break;
                 case RegistrationResult.CanNotUseLastNumberOfPasswords:
                     model.UserProfile.Password = "";
                     model.UserProfile.ConfirmPassword = "";
                     ViewBag.inValidProfile = true;
-                    inValidUserProfileMessages.Add(string.Join(separator:" ", values:result.Errors));
+                    inValidUserProfileMessages.Add(item:string.Join(separator:" ", values:result.Errors));
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Knowledge based questions cannot be duplicated."); 
+                    inValidKbqMessages.Add(item:"Knowledge based questions cannot be duplicated.");
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Knowledge based question answers cannot be duplicated."); 
+                    inValidKbqMessages.Add(item:"Knowledge based question answers cannot be duplicated.");
                     break;
                 case RegistrationResult.MissingKBQ:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Not enough knowledge based questions."); 
+                    inValidKbqMessages.Add(item:"Not enough knowledge based questions.");
                     break;
                 case RegistrationResult.MissingKBQAnswer:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Not enough knowledge based question answers."); 
+                    inValidKbqMessages.Add(item:"Not enough knowledge based question answers.");
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Security questions cannot be duplicated."); 
+                    inValidSqMessages.Add(item:"Security questions cannot be duplicated.");
                     break;
                 case RegistrationResult.MissingSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Not enough security questions."); 
+                    inValidSqMessages.Add(item:"Not enough security questions.");
                     break;
                 case RegistrationResult.MissingSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Not enough security question answers."); 
+                    inValidSqMessages.Add(item:"Not enough security question answers.");
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Security question answers cannot be duplicated."); 
+                    inValidSqMessages.Add(item:"Security question answers cannot be duplicated.");
                     break;
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Invalid knowledge based question and answers."); 
+                    inValidKbqMessages.Add(item:"Invalid knowledge based question and answers.");
                     break;
                 case RegistrationResult.UserNameIsUsed:
                     ViewBag.inValidProfile = true;
-                    inValidUserProfileMessages.Add("User Name is already in use on another account. Please select a different User Name.");
+                    inValidUserProfileMessages.Add(item:"User Name is already in use on another account. Please select a different User Name.");
                     break;
                 case RegistrationResult.EmailIsUsed:
                     ViewBag.inValidProfile = true;
-                    inValidUserProfileMessages.Add("Email is being used by another person, please change a different one.");
+                    inValidUserProfileMessages.Add(item:"Email is being used by another person, please change a different one.");
                     break;
             }
 
             model.AgreeTermsAndConditions = false;
 
-            ViewBag.invalidKbqMessages = inValidSqMessages.Distinct(); 
-            ViewBag.inValidSqMessages = inValidSqMessages.Distinct(); 
+            ViewBag.invalidKbqMessages = inValidSqMessages.Distinct();
+            ViewBag.inValidSqMessages = inValidSqMessages.Distinct();
             ViewBag.inValidUserProfileMessages = inValidUserProfileMessages.Distinct();
             _logger.Info(message:$"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result}");
             return View(model:model);
         }
-      
+
         #endregion
 
         #region sign in action
@@ -526,7 +530,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var regulator in regulatoryList)
                     {
-                        model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone
+                        model.HtmlStr += "<tr><td>"
+                                         + regulator.EmailContactInfoName
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoEmailAddress
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoPhone
                                          + " </td></tr>";
                     }
                 }
@@ -564,7 +573,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var regulator in regulatoryList)
                     {
-                        model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone
+                        model.HtmlStr += "<tr><td>"
+                                         + regulator.EmailContactInfoName
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoEmailAddress
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoPhone
                                          + " </td></tr>";
                     }
                 }
@@ -628,7 +642,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var regulator in regulatoryList)
                     {
-                        model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone
+                        model.HtmlStr += "<tr><td>"
+                                         + regulator.EmailContactInfoName
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoEmailAddress
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoPhone
                                          + " </td></tr>";
                     }
                 }
@@ -664,7 +683,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     foreach (var regulator in regulatoryList)
                     {
-                        model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone
+                        model.HtmlStr += "<tr><td>"
+                                         + regulator.EmailContactInfoName
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoEmailAddress
+                                         + "</td><td>"
+                                         + regulator.EmailContactInfoPhone
                                          + " </td></tr>";
                     }
                 }
@@ -879,7 +903,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Reset Password
+        #region reset password
 
         //
         // GET: /Account/ResetPassword
@@ -894,7 +918,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var model = new ConfirmationViewModel();
                 model.Title = "Password Reset Link Expiry";
-                model.HtmlStr = "The password reset link has expired.  Please use <a href=" +  Url.Action(actionName:"ForgotPassword", controllerName:"Account") + ">Forgot Password</a>";
+                model.HtmlStr = "The password reset link has expired.  Please use <a href="
+                                + Url.Action(actionName:"ForgotPassword", controllerName:"Account")
+                                + ">Forgot Password</a>";
 
                 return View(viewName:"Confirmation", model:model);
             }
@@ -928,9 +954,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(model:model);
             }
 
-            var errorMessage = new List<string>(); 
+            var errorMessage = new List<string>();
 
-            var result = await _authenticationService.ResetPasswordAsync(token:model.Token, userQuestionAnswerId:model.Id, answer:model.Answer, attempCount:model.FailedCount, password:model.Password);
+            var result = await _authenticationService.ResetPasswordAsync(token:model.Token, userQuestionAnswerId:model.Id, answer:model.Answer, attemptCount:model.FailedCount,
+                                                                         password:model.Password);
 
             switch (result.Result)
             {
@@ -942,8 +969,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(message:string.Format(format:"ResetPassword. Password Requirements Not Met for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                       ModelState.AddModelError(key:"", errorMessage:error);
-                       errorMessage.Add(error);
+                        ModelState.AddModelError(key:"", errorMessage:error);
+                        errorMessage.Add(item:error);
                     }
 
                     break;
@@ -953,8 +980,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(message:string.Format(format:"ResetPassword. Cannot use old password for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                       ModelState.AddModelError(key:"", errorMessage:error);
-                       errorMessage.Add(error);
+                        ModelState.AddModelError(key:"", errorMessage:error);
+                        errorMessage.Add(item:error);
                     }
 
                     break;
@@ -966,8 +993,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(message:string.Format(format:"ResetPassword. Failed for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                      ModelState.AddModelError(key:"", errorMessage:error);
-                      errorMessage.Add(error);
+                        ModelState.AddModelError(key:"", errorMessage:error);
+                        errorMessage.Add(item:error);
                     }
 
                     break;
@@ -986,13 +1013,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
-                        errorMessage.Add(error);
+                        errorMessage.Add(item:error);
                     }
 
-                    break; 
+                    break;
             }
-            
-            ViewBag.errorMessage = errorMessage; 
+
+            ViewBag.errorMessage = errorMessage;
             return View(model:model);
         }
 
@@ -1011,7 +1038,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region  Change password and change email address   
+        #region  change password and change email address   
 
         [AllowAnonymous]
         public ActionResult ResetExpiredPassword()
@@ -1053,7 +1080,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.FailedCount++;
                 var maxAnswerAttempts =
                     Convert.ToInt32(value:
-                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:model.UserProfileId, settingType:SettingType.FailedKBQAttemptMaxCount, isChooseMin:true,
+                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:model.UserProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
+                                                                                        isChooseMin:true,
                                                                                         isChooseMax:null));
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
@@ -1098,7 +1126,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(viewName:"ResetPassword", model:model);
         }
-        
+
         // GET: /Account/ResetExpiredPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetExpiredPasswordConfirmation()
@@ -1143,16 +1171,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = _authenticationService.ChangePasswordAsync(userId:userId, newPassword:model.Password).Result;
             if (result.Success)
             {
-                TempData["ChangePasswordSucceed"] = true;
+                TempData[key:"ChangePasswordSucceed"] = true;
                 TempData[key:"KbqPass"] = "true";
-                return RedirectToAction(actionName: "UserProfile", controllerName: "User");
+                return RedirectToAction(actionName:"UserProfile", controllerName:"User");
             }
 
             var errorMessage = result.Errors.Aggregate((i, j) => i + j);
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(model:model);
         }
- 
+
         [Authorize]
         public ActionResult ChangeEmail()
         {
@@ -1205,13 +1233,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             else
             {
                 _authenticationService.UpdateClaim(key:CacheKey.Email, value:model.NewEmail);
-                
-                TempData["ChangeEmailSucceed"] = true;
+
+                TempData[key:"ChangeEmailSucceed"] = true;
                 TempData[key:"KbqPass"] = "true";
-                return RedirectToAction(actionName: "UserProfile", controllerName: "User"); 
+                return RedirectToAction(actionName:"UserProfile", controllerName:"User");
             }
         }
-         
+
         public ActionResult KbqChallenge(string returnUrl)
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
@@ -1241,7 +1269,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.FailedCount++;
                 var maxAnswerAttempts =
                     Convert.ToInt32(value:
-                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount, isChooseMin:true,
+                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
+                                                                                        isChooseMin:true,
                                                                                         isChooseMax:null));
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
@@ -1249,7 +1278,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _authenticationService.SignOff();
 
                     // Lock the account; 
-                    var result = _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
+                    var result = _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true,
+                                                                    reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
                     if (result.IsSuccess)
                     {
                         _logger.Info(message:string.Format(format:"KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
@@ -1290,94 +1320,65 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Helpers
+        #region helpers
 
         private List<string> ValidUserProfileData(UserDto userInfo, RegistrationType registrationType)
         {
-            var invalidMessages = new List<string>();  
-            var results = _authenticationService.ValidateUserProfileForRegistration(userInfo, registrationType); 
-            foreach(var result in results)
+            var invalidMessages = new List<string>();
+            var results = _authenticationService.ValidateUserProfileForRegistration(userInfo:userInfo, registrationType:registrationType);
+            foreach (var result in results)
             {
-                switch(result)
+                switch (result)
                 {
                     case RegistrationResult.BadUserProfileData:
-                        invalidMessages.Add("Invalid user profile data.");
+                        invalidMessages.Add(item:"Invalid user profile data.");
                         break;
                     case RegistrationResult.MissingUserName:
-                        invalidMessages.Add("User name is required.");
+                        invalidMessages.Add(item:"User name is required.");
                         break;
                     case RegistrationResult.MissingEmailAddress:
-                        invalidMessages.Add("Email address is required.");
+                        invalidMessages.Add(item:"Email address is required.");
                         break;
 
                     default:
-                        invalidMessages.Add("Invalid user profile data.");
+                        invalidMessages.Add(item:"Invalid user profile data.");
                         break;
                 }
-            } 
+            }
 
             return invalidMessages;
         }
 
         private List<string> ValidateKbq(ICollection<RegistrationResult> kbqValidationResults)
         {
-            List<string> invalidMessages = new List<string>(); 
+            var invalidMessages = new List<string>();
 
             if (kbqValidationResults.Any())
             {
-                ViewBag.inValidKBQ = true;  
+                ViewBag.inValidKBQ = true;
                 foreach (var item in kbqValidationResults)
                 {
                     switch (item)
                     {
                         case RegistrationResult.MissingKBQ:
+
                             //ModelState.AddModelError(key:"", errorMessage:@"Not enough knowledge based questions."); 
-                            invalidMessages.Add("Not enough knowledge based questions.");   
+                            invalidMessages.Add(item:"Not enough knowledge based questions.");
                             break;
                         case RegistrationResult.MissingKBQAnswer:
+
                             //ModelState.AddModelError(key:"", errorMessage:@"Not enough knowledge based question answers.");
-                            invalidMessages.Add("Not enough knowledge based question answers.");   
+                            invalidMessages.Add(item:"Not enough knowledge based question answers.");
                             break;
                         case RegistrationResult.DuplicatedKBQ:
-                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions cannot be duplicated.");
-                            invalidMessages.Add("Knowledge based questions cannot be duplicated.");   
+
+                            // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions cannot be duplicated.");
+                            invalidMessages.Add(item:"Knowledge based questions cannot be duplicated.");
                             break;
                         case RegistrationResult.DuplicatedKBQAnswer:
-                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers cannot be duplicated.");
-                            invalidMessages.Add("Knowledge based question answers cannot be duplicated.");   
-                            break;
-                    }
-                }
-            }
 
-            return invalidMessages; 
-        }
-        private  List<string>  ValidateSecurityQuestions( ICollection<RegistrationResult> sqValidationResults)
-        {
-            List<string> invalidMessages = new List<string>();
-             
-            if (sqValidationResults.Any())
-            {
-                ViewBag.inValidSQ = true; 
-                foreach (var item in sqValidationResults)
-                {
-                    switch (item)
-                    {
-                        case RegistrationResult.MissingSecurityQuestion:
-                          //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security questions.");
-                            invalidMessages.Add("Not enough security questions.");  
-                            break;
-                        case RegistrationResult.MissingSecurityQuestionAnswer:
-                          //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security question answers.");
-                            invalidMessages.Add("Not enough security question answers.");   
-                            break;
-                        case RegistrationResult.DuplicatedSecurityQuestion:
-                        //    ModelState.AddModelError(key:"", errorMessage:@"Security questions cannot be duplicated.");
-                            invalidMessages.Add("Security questions cannot be duplicated.");   
-                            break;
-                        case RegistrationResult.DuplicatedSecurityQuestionAnswer:
-                        //    ModelState.AddModelError(key:"", errorMessage:@"Security question answers cannot be duplicated.");
-                            invalidMessages.Add("Security question answers cannot be duplicated.");   
+                            // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers cannot be duplicated.");
+                            invalidMessages.Add(item:"Knowledge based question answers cannot be duplicated.");
                             break;
                     }
                 }
@@ -1385,13 +1386,51 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return invalidMessages;
         }
-        
+
+        private List<string> ValidateSecurityQuestions(ICollection<RegistrationResult> sqValidationResults)
+        {
+            var invalidMessages = new List<string>();
+
+            if (sqValidationResults.Any())
+            {
+                ViewBag.inValidSQ = true;
+                foreach (var item in sqValidationResults)
+                {
+                    switch (item)
+                    {
+                        case RegistrationResult.MissingSecurityQuestion:
+
+                            //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security questions.");
+                            invalidMessages.Add(item:"Not enough security questions.");
+                            break;
+                        case RegistrationResult.MissingSecurityQuestionAnswer:
+
+                            //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security question answers.");
+                            invalidMessages.Add(item:"Not enough security question answers.");
+                            break;
+                        case RegistrationResult.DuplicatedSecurityQuestion:
+
+                            //    ModelState.AddModelError(key:"", errorMessage:@"Security questions cannot be duplicated.");
+                            invalidMessages.Add(item:"Security questions cannot be duplicated.");
+                            break;
+                        case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+
+                            //    ModelState.AddModelError(key:"", errorMessage:@"Security question answers cannot be duplicated.");
+                            invalidMessages.Add(item:"Security question answers cannot be duplicated.");
+                            break;
+                    }
+                }
+            }
+
+            return invalidMessages;
+        }
+
         private bool NeedToValidKbq()
         {
             var kbqPass = TempData[key:"KbqPass"] as string;
             var previousUri = HttpContext.Request.UrlReferrer;
-            return (previousUri == null || previousUri.AbsolutePath.ToLower().IndexOf(value:"user/profile", comparisonType:StringComparison.Ordinal) < 0) &&
-                   (string.IsNullOrWhiteSpace(value:kbqPass) || kbqPass != "true");
+            return (previousUri == null || previousUri.AbsolutePath.ToLower().IndexOf(value:"user/profile", comparisonType:StringComparison.Ordinal) < 0)
+                   && (string.IsNullOrWhiteSpace(value:kbqPass) || kbqPass != "true");
         }
 
         private void AddErrors(IEnumerable<string> errors)

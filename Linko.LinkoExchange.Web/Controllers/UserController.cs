@@ -24,13 +24,19 @@ using Linko.LinkoExchange.Web.ViewModels.User;
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"User")]
-    public class UserController:BaseController
+    public class UserController : BaseController
     {
+        #region fields
+
         private readonly IAuthenticationService _authenticateService;
         private readonly IMapHelper _mapHelper;
         private readonly ProfileHelper _profileHelper;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IUserService _userService;
+
+        #endregion
+
+        #region constructors and destructor
 
         public UserController(
             IAuthenticationService authenticateService,
@@ -42,7 +48,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             IReportPackageService reportPackageService,
             ISampleService sampleService
         )
-        :base(httpContextService,userService,reportPackageService,sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             if (authenticateService == null)
             {
@@ -62,12 +68,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                httpContextService:httpContextService);
         }
 
+        #endregion
+
         // GET: UserDto
         public ActionResult Index()
         {
             return RedirectToAction(actionName:"UserProfile", controllerName:"User");
         }
-        
+
         [PortalAuthorize("industry")]
         public ActionResult DownloadSignatory()
         {
@@ -79,14 +87,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             fileStream.Position = 0;
             return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
-        
+
         [PortalAuthorize("industry")]
         public ActionResult RequestSignatory()
         {
             return View();
         }
-        
-        [PortalAuthorize("authority","industry")]
+
+        [PortalAuthorize("authority", "industry")]
         [AcceptVerbs(verbs:HttpVerbs.Get)]
         [Route(template:"Profile")]
         public ActionResult UserProfile()
@@ -116,14 +124,14 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ViewBag.userKBQ = userKbqViewModel;
             ViewBag.userProfile = userProfileViewModel;
-            ViewBag.userSQ = userSqViewModel; 
-            ViewBag.changeEmailSucceed = TempData["ChangeEmailSucceed"];
-            ViewBag.changePasswordSucceed = TempData["ChangePasswordSucceed"];
+            ViewBag.userSQ = userSqViewModel;
+            ViewBag.changeEmailSucceed = TempData[key:"ChangeEmailSucceed"];
+            ViewBag.changePasswordSucceed = TempData[key:"ChangePasswordSucceed"];
             return View(model:user);
         }
-        
-        [PortalAuthorize("authority","industry")]
-        [AcceptVerbs(verbs: HttpVerbs.Post)]
+
+        [PortalAuthorize("authority", "industry")]
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"Profile")]
         public ActionResult UserProfile(UserViewModel model, string part, FormCollection form)
@@ -132,47 +140,47 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.inValidKBQ = false;
             ViewBag.inValidSQ = false;
 
-            ViewBag.profileCollapsed = Convert.ToString(value: form[name: "profileCollapsed"]);
-            ViewBag.kbqCollapsed = Convert.ToString(value: form[name: "kbqCollapsed"]);
-            ViewBag.sqCollapsed = Convert.ToString(value: form[name: "sqCollapsed"]);
+            ViewBag.profileCollapsed = Convert.ToString(value:form[name:"profileCollapsed"]);
+            ViewBag.kbqCollapsed = Convert.ToString(value:form[name:"kbqCollapsed"]);
+            ViewBag.sqCollapsed = Convert.ToString(value:form[name:"sqCollapsed"]);
 
-            var portalName = _authenticateService.GetClaimsValue(claimType: CacheKey.PortalName);
-            portalName = string.IsNullOrWhiteSpace(value: portalName) ? "" : portalName.Trim().ToLower();
-            ViewBag.industryPortal = !portalName.Equals(value: "authority");
+            var portalName = _authenticateService.GetClaimsValue(claimType:CacheKey.PortalName);
+            portalName = string.IsNullOrWhiteSpace(value:portalName) ? "" : portalName.Trim().ToLower();
+            ViewBag.industryPortal = !portalName.Equals(value:"authority");
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var userProfileId = int.Parse(s: profileIdStr ?? "0");
+            var userProfileId = int.Parse(s:profileIdStr ?? "0");
 
-            var pristineUser = _profileHelper.GetUserViewModel(userProfileId: userProfileId);
+            var pristineUser = _profileHelper.GetUserViewModel(userProfileId:userProfileId);
             pristineUser.UserProfile.StateList = _profileHelper.GetStateList();
 
             if (part == "Profile")
             {
-                return SaveUserProfile(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
+                return SaveUserProfile(model:model, pristineUserModel:pristineUser, userProfileId:userProfileId);
             }
             else if (part == "KBQ")
             {
-                return SaveUserKbq(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
+                return SaveUserKbq(model:model, pristineUserModel:pristineUser, userProfileId:userProfileId);
             }
             else if (part == "SQ")
             {
-                return SaveUserSq(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
+                return SaveUserSq(model:model, pristineUserModel:pristineUser, userProfileId:userProfileId);
             }
 
-            return View(model: pristineUser);
+            return View(model:pristineUser);
         }
 
         private bool NeedToValidKbq()
         {
             var previousUri = HttpContext.Request.UrlReferrer;
-            if( previousUri == null)
+            if (previousUri == null)
             {
                 return true;
             }
 
-            if(previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangeEmail", comparisonType:StringComparison.OrdinalIgnoreCase) >=0 ||
-               previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangePassword", comparisonType:StringComparison.OrdinalIgnoreCase) >=0 )
+            if (previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangeEmail", comparisonType:StringComparison.OrdinalIgnoreCase) >= 0
+                || previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangePassword", comparisonType:StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 var kbqPass = TempData[key:"KbqPass"] as string;
                 return string.IsNullOrWhiteSpace(value:kbqPass) || kbqPass.ToLower() != "true";
@@ -184,11 +192,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "userprofile"
-                && Request.HttpMethod != "POST" && NeedToValidKbq())
+                && Request.HttpMethod != "POST"
+                && NeedToValidKbq())
             {
                 var kbqPass = TempData[key:"KbqPass"] as string;
-                if (!string.IsNullOrWhiteSpace(value:kbqPass) &&
-                    kbqPass.ToLower() == "true")
+                if (!string.IsNullOrWhiteSpace(value:kbqPass) && kbqPass.ToLower() == "true")
                 {
                     base.OnActionExecuting(filterContext:filterContext);
                 }
@@ -268,7 +276,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ViewBag.SuccessMessage = "Save Knowledge Based Questions successfully.";
 
                     //Reload the view model's kbq questions from database to handle potential new UserQuestionAnswer id's
-                    pristineUserModel.UserKBQ = _profileHelper.GetUserKbqViewModel(userProfileId: userProfileId);
+                    pristineUserModel.UserKBQ = _profileHelper.GetUserKbqViewModel(userProfileId:userProfileId);
 
                     break;
                 case RegistrationResult.DuplicatedKBQ:
@@ -319,7 +327,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ViewBag.SuccessMessage = "Save Security Questions successfully.";
 
                     //Reload the view model's security questions from database to handle potential new UserQuestionAnswer id's
-                    pristineUserModel.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId: userProfileId);
+                    pristineUserModel.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId:userProfileId);
 
                     break;
 

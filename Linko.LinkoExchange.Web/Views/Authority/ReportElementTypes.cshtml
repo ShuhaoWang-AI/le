@@ -28,17 +28,17 @@
             </button>
         </div>
     </div>
-      <div>
-          @{
-              var vm = new ConfirmationMessageViewModal
-              {
-                  ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Attachments),
-                  Messaage = "Attachment Report Element Type deleted successfully."
-              };
+    <div>
+        @{
+            var vm = new ConfirmationMessageViewModal
+                     {
+                         ShowMessage = TempData[key:"ReporElementTypeDeleteSucceed"] != null && (ReportElementCategoryName) TempData[key:"ReporElementTypeDeleteSucceed"] == ReportElementCategoryName.Attachments,
+                         Messaage = "Attachment Report Element Type deleted successfully."
+                     };
 
-              @Html.Partial("_ConfirmationMessageView", vm);
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
-      </div>
+    </div>
     <section class="box-body form-horizontal">
         <div class="form-group">
             <div class="col-md-12">
@@ -74,6 +74,7 @@
                                       selectable.Type(type:GridSelectionType.Row);
                                   })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
@@ -115,12 +116,12 @@
     <div>
         @{
             vm = new ConfirmationMessageViewModal
-            {
-                ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Certifications),
-                Messaage = "Certification Report Element Type deleted successfully."
-            };
+                 {
+                     ShowMessage = TempData[key:"ReporElementTypeDeleteSucceed"] != null && (ReportElementCategoryName) TempData[key:"ReporElementTypeDeleteSucceed"] == ReportElementCategoryName.Certifications,
+                     Messaage = "Certification Report Element Type deleted successfully."
+                 };
 
-            @Html.Partial("_ConfirmationMessageView", vm);
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
     </div>
     <section class="box-body form-horizontal">
@@ -130,22 +131,22 @@
                 @(Html.Kendo().Grid<ReportElementTypeViewModel>()
                       .Name(componentName:"gridCertification")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.Name)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.Description)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Template(m => { })
-                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:60);
-                      })
+                               {
+                                   columns.Bound(c => c.Name)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Description)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -153,11 +154,12 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode:GridSelectionMode.Single);
-                          selectable.Type(type:GridSelectionType.Row);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
@@ -167,13 +169,13 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
-                                                    .Sort(sort => sort.Add(memberName: "Name").Ascending()) // <-- initial sort expression
+                                                    .Sort(sort => sort.Add(memberName:"Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ReportElementTypes_Read", controllerName:"Authority", routeValues:new
-                                                    {
-                                                        categoryName = ReportElementCategoryName.Certifications
-                                                    }))
+                                                                                                                                                            {
+                                                                                                                                                                categoryName = ReportElementCategoryName.Certifications
+                                                                                                                                                            }))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridCertification'})"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridCertification'})"))
                       )
                       )
             </div>

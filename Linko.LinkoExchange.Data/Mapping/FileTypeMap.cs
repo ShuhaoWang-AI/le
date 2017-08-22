@@ -5,15 +5,17 @@ namespace Linko.LinkoExchange.Data.Mapping
 {
     public class FileTypeMap : EntityTypeConfiguration<FileType>
     {
+        #region constructors and destructor
+
         public FileTypeMap()
         {
-            ToTable("tFileType");
+            ToTable(tableName:"tFileType");
 
             HasKey(t => t.FileTypeId);
 
-            Property(t => t.Extension).IsRequired().HasMaxLength(5);
+            Property(t => t.Extension).IsRequired().HasMaxLength(value:5);
 
-            Property(t => t.Description).IsOptional().HasMaxLength(500);
+            Property(t => t.Description).IsOptional().HasMaxLength(value:500);
 
             Property(t => t.CreationDateTimeUtc).IsRequired();
 
@@ -21,5 +23,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(t => t.LastModificationDateTimeUtc).IsOptional();
         }
+
+        #endregion
     }
 }

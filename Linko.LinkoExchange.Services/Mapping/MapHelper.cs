@@ -1,24 +1,26 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services.Dto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Mapping
 {
     public class MapHelper : IMapHelper
     {
+        #region interface implementations
+
         public OrganizationDto GetOrganizationDtoFromOrganization(Core.Domain.Organization organization, OrganizationDto dto = null)
         {
             if (dto == null)
             {
                 dto = new OrganizationDto();
-                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType);
+                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(orgType:organization.OrganizationType);
             }
             else
             {
-                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType, dto.OrganizationType);
+                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(orgType:organization.OrganizationType, dto:dto.OrganizationType);
             }
 
             dto.AddressLine1 = organization.AddressLine1;
@@ -32,7 +34,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.ZipCode = organization.ZipCode;
             dto.PhoneNumber = organization.PhoneNumber;
             if (organization.PhoneExt.HasValue)
+            {
                 dto.PhoneExt = organization.PhoneExt.Value.ToString();
+            }
             dto.FaxNumber = organization.FaxNumber;
             dto.WebsiteURL = organization.WebsiteUrl;
             dto.Signer = organization.Signer;
@@ -50,6 +54,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
             dto.CityName = organization.CityName;
+
             //dto.State = organization.Jurisdiction.Code;
             dto.OrganizationId = organization.OrganizationId;
             dto.OrganizationTypeId = organization.OrganizationTypeId;
@@ -61,7 +66,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.ZipCode = organization.ZipCode;
             dto.PhoneNumber = organization.PhoneNumber;
             if (organization.PhoneExt.HasValue)
+            {
                 dto.PhoneExt = organization.PhoneExt.Value.ToString();
+            }
             dto.FaxNumber = organization.FaxNumber;
             dto.WebsiteURL = organization.WebsiteUrl;
             dto.Signer = organization.Signer;
@@ -86,7 +93,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.CityName = userProfile.CityName;
             dto.ZipCode = userProfile.ZipCode;
             if (userProfile.JurisdictionId.HasValue)
+            {
                 dto.JurisdictionId = userProfile.JurisdictionId.Value;
+            }
             dto.PhoneExt = userProfile.PhoneExt;
             dto.IsAccountLocked = userProfile.IsAccountLocked;
             dto.IsAccountResetRequired = userProfile.IsAccountResetRequired;
@@ -100,7 +109,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.PasswordHash = userProfile.PasswordHash;
             dto.PhoneNumber = userProfile.PhoneNumber;
             if (userProfile.LockoutEndDateUtc.HasValue)
+            {
                 dto.LockoutEndDateUtc = userProfile.LockoutEndDateUtc.Value;
+            }
             dto.LockoutEnabled = userProfile.LockoutEnabled;
 
             return dto;
@@ -112,6 +123,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 userProfile = new UserProfile();
             }
+
             //IGNORE userProfile.UserProfileId
             userProfile.FirstName = dto.FirstName;
             userProfile.LastName = dto.LastName;
@@ -122,9 +134,11 @@ namespace Linko.LinkoExchange.Services.Mapping
             userProfile.CityName = dto.CityName;
             userProfile.ZipCode = dto.ZipCode;
             userProfile.JurisdictionId = dto.JurisdictionId;
+
             //IGNORE userProfile.Jurisdiction
             userProfile.PhoneNumber = dto.PhoneNumber;
             userProfile.PhoneExt = dto.PhoneExt;
+
             //IGNORE userProfile.IsAccountLocked
             //IGNORE userProfile.IsAccountResetRequired
             //IGNORE userProfile.IsIdentityProofed
@@ -168,13 +182,13 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             //Map OrganizationRegulatoryProgramDto
-            userDto.OrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.OrganizationRegulatoryProgram);
+            userDto.OrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:user.OrganizationRegulatoryProgram);
 
             //Map InviterOrganizationRegulatoryProgramDto
-            userDto.InviterOrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.InviterOrganizationRegulatoryProgram);
+            userDto.InviterOrganizationRegulatoryProgramDto =
+                GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:user.InviterOrganizationRegulatoryProgram);
 
             return userDto;
-
         }
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram
@@ -186,15 +200,15 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
             dto.OrganizationRegulatoryProgramId = orgRegProgram.OrganizationRegulatoryProgramId;
             dto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
-            dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram.RegulatoryProgram);
+            dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(org:orgRegProgram.RegulatoryProgram);
             dto.OrganizationId = orgRegProgram.OrganizationId;
             dto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId;
 
-            dto.OrganizationDto = GetOrganizationDtoFromOrganization(orgRegProgram.Organization);
+            dto.OrganizationDto = GetOrganizationDtoFromOrganization(organization:orgRegProgram.Organization);
 
             if (orgRegProgram.RegulatorOrganization != null)
             {
-                dto.RegulatorOrganization = GetOrganizationDtoFromOrganization(orgRegProgram.RegulatorOrganization);
+                dto.RegulatorOrganization = GetOrganizationDtoFromOrganization(organization:orgRegProgram.RegulatorOrganization);
             }
 
             dto.IsEnabled = orgRegProgram.IsEnabled;
@@ -208,37 +222,15 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org, ProgramDto dto = null)
-        {
-            if (dto == null)
-            {
-                dto = new ProgramDto();
-            }
-            dto.RegulatoryProgramId = org.RegulatoryProgramId;
-            dto.Name = org.Name;
-            dto.Description = org.Description;
-            return dto;
-        }
-
-        public OrganizationTypeDto GetOrganizationTypeDtoFromOrganizationType(OrganizationType orgType, OrganizationTypeDto dto = null)
-        {
-            if (dto == null)
-            {
-                dto = new OrganizationTypeDto();
-            }
-            dto.Name = orgType.Name;
-            dto.Description = orgType.Description;
-            return dto;
-        }
-
         public SettingDto GetSettingDtoFromOrganizationRegulatoryProgramSetting(OrganizationRegulatoryProgramSetting setting, SettingDto dto = null)
         {
             if (dto == null)
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
+            dto.TemplateName = (SettingType) Enum.Parse(enumType:typeof(SettingType), value:setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(enumType:typeof(OrganizationTypeName),
+                                                                value:setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             dto.Description = setting.SettingTemplate.Description;
@@ -251,8 +243,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
+            dto.TemplateName = (SettingType) Enum.Parse(enumType:typeof(SettingType), value:setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(enumType:typeof(OrganizationTypeName), value:setting.SettingTemplate.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             dto.Description = setting.SettingTemplate.Description;
@@ -271,15 +263,16 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.EmailAddress = invitation.EmailAddress;
             dto.InvitationDateTimeUtc = invitation.InvitationDateTimeUtc;
             dto.IsResetInvitation = invitation.IsResetInvitation;
+
             //IGNORE ExpiryDateTimeUtc
             dto.SenderOrganizationRegulatoryProgramId = invitation.SenderOrganizationRegulatoryProgramId;
             dto.RecipientOrganizationRegulatoryProgramId = invitation.RecipientOrganizationRegulatoryProgramId;
+
             //IGNORE ProgramName
             //IGNORE AuthorityName
             //IGNORE IndustryName
 
             return dto;
-
         }
 
         public PermissionGroupDto GetPermissionGroupDtoFromPermissionGroup(PermissionGroup permissionGroup, PermissionGroupDto dto = null)
@@ -317,6 +310,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
             emailAuditLog.EmailAuditLogId = dto.EmailAuditLogId;
             emailAuditLog.AuditLogTemplateId = dto.AuditLogTemplateId;
+
             //IGNORE AuditLogTemplate
             emailAuditLog.SenderRegulatoryProgramId = dto.SenderRegulatoryProgramId;
             emailAuditLog.SenderOrganizationId = dto.SenderOrganizationId;
@@ -344,7 +338,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public JurisdictionDto GetJurisdictionDtoFromJurisdiction(Core.Domain.Jurisdiction jurisdiction, JurisdictionDto dto = null)
         {
-            if(jurisdiction == null)
+            if (jurisdiction == null)
             {
                 return null;
             }
@@ -359,7 +353,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.Code = jurisdiction.Code;
             dto.Name = jurisdiction.Name;
             if (jurisdiction.ParentId.HasValue)
+            {
                 dto.ParentId = jurisdiction.ParentId.Value;
+            }
 
             return dto;
         }
@@ -421,7 +417,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramDto.ParameterId = parameter.ParameterId;
             paramDto.Name = parameter.Name;
             paramDto.Description = parameter.Description;
-            paramDto.DefaultUnit = GetUnitDtoFromUnit(parameter.DefaultUnit);
+            paramDto.DefaultUnit = GetUnitDtoFromUnit(unit:parameter.DefaultUnit);
             paramDto.TrcFactor = parameter.TrcFactor;
             paramDto.OrganizationRegulatoryProgramId = parameter.OrganizationRegulatoryProgramId;
             paramDto.IsRemoved = parameter.IsRemoved;
@@ -442,11 +438,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             foreach (var paramAssocation in parameterGroup.ParameterGroupParameters)
             {
                 if (!paramAssocation.Parameter.IsRemoved)
-                    paramGroupDto.Parameters.Add(GetParameterDtoFromParameter(paramAssocation.Parameter));
+                {
+                    paramGroupDto.Parameters.Add(item:GetParameterDtoFromParameter(parameter:paramAssocation.Parameter));
+                }
             }
 
             return paramGroupDto;
-
         }
 
         public ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null)
@@ -456,12 +453,11 @@ namespace Linko.LinkoExchange.Services.Mapping
                 parameterGroup = new ParameterGroup();
                 parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             }
-         
 
             parameterGroup.Name = parameterGroupDto.Name.Trim();
             parameterGroup.Description = parameterGroupDto.Description;
             parameterGroup.IsActive = parameterGroupDto.IsActive;
-            
+
             //Handle updating parameters outside this method after calling code
 
             return parameterGroup;
@@ -481,24 +477,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             unitDto.LastModifierUserId = unit.LastModifierUserId;
 
             return unitDto;
-        }
-
-
-        private CtsEventTypeDto GetCtsEventTypeDtoFromCtsEventType(CtsEventType ctsEventType)
-        {
-            if (ctsEventType == null)
-            {
-                return null;
-            }
-
-            var mappedDto = new CtsEventTypeDto
-            {
-                CtsEventTypeId = ctsEventType.CtsEventTypeId,
-                Name = ctsEventType.Name,
-                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
-                Description = ctsEventType.Description
-            };
-            return mappedDto;
         }
 
         public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat)
@@ -532,11 +510,11 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
 
             reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
-            reportPackageTemplateElementCategory.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(cat.ReportElementCategory);
+            reportPackageTemplateElementCategory.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(cat:cat.ReportElementCategory);
 
             reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
 
-            //// deep naviagation cause error  
+            //// deep navigation cause error  
             //var dtos = new List<ReportPackageTemplateElementTypeDto>();
             //foreach (var c in cat.ReportPackageTemplateElementTypes)
             //{
@@ -546,6 +524,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return reportPackageTemplateElementCategory;
         }
+
         public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet)
         {
             if (rptet == null)
@@ -556,9 +535,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             var rptetDto = new ReportPackageTemplateElementTypeDto();
             rptetDto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
             rptetDto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
-            rptetDto.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            rptetDto.ReportPackageTemplateElementCategory =
+                GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat:rptet.ReportPackageTemplateElementCategory);
             rptetDto.ReportElementTypeId = rptet.ReportElementTypeId;
-            rptetDto.ReportElementType = GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+            rptetDto.ReportElementType = GetReportElementTypeDtoFromReportElementType(reportElementType:rptet.ReportElementType);
             rptetDto.IsRequired = rptet.IsRequired;
             rptetDto.SortOrder = rptet.SortOrder;
             return rptetDto;
@@ -574,9 +554,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             var rptet = new ReportPackageTemplateElementType();
             rptet.ReportPackageTemplateElementTypeId = rptetDto.ReportPackageTemplateElementTypeId;
             rptet.ReportPackageTemplateElementCategoryId = rptetDto.ReportPackageTemplateElementCategoryId;
-            rptet.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptetDto.ReportPackageTemplateElementCategory);
+            rptet.ReportPackageTemplateElementCategory =
+                GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(cat:rptetDto.ReportPackageTemplateElementCategory);
             rptet.ReportElementTypeId = rptetDto.ReportElementTypeId;
-            rptet.ReportElementType = GetReportElementTypeFromReportElementTypeDto(rptetDto.ReportElementType);
+            rptet.ReportElementType = GetReportElementTypeFromReportElementTypeDto(reportElementTypeDto:rptetDto.ReportElementType);
             rptet.IsRequired = rptetDto.IsRequired;
             rptet.SortOrder = rptetDto.SortOrder;
             return rptet;
@@ -590,16 +571,16 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategory
-            {
-                ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
-                ReportPackageTemplateId = cat.ReportPackageTemplateId,
-                ReportPackageTemplate =
-                    GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate),
-                ReportElementCategoryId = cat.ReportElementCategoryId,
-                ReportElementCategory =
-                    GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory),
-                SortOrder = cat.SortOrder
-            };
+                                                       {
+                                                           ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
+                                                           ReportPackageTemplateId = cat.ReportPackageTemplateId,
+                                                           ReportPackageTemplate =
+                                                               GetReportPackageTemplateFromReportPackageTemplateDto(reportPackageTemplateDto:cat.ReportPackageTemplate),
+                                                           ReportElementCategoryId = cat.ReportElementCategoryId,
+                                                           ReportElementCategory =
+                                                               GetReportElementCategoryFromReportElementCategoryDto(cat:cat.ReportElementCategory),
+                                                           SortOrder = cat.SortOrder
+                                                       };
 
             //var rptetps = new List<ReportPackageTemplateElementType>();
             //foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
@@ -620,14 +601,14 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var reportElementCategory = new ReportElementCategory
-            {
-                ReportElementCategoryId = cat.ReportElementCategoryId,
-                Name = cat.Name,
-                Description = cat.Description,
-                CreationDateTimeUtc = cat.CreationDateTimeUtc,
-                LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc,
-                LastModifierUserId = cat.LastModifierUserId
-            };
+                                        {
+                                            ReportElementCategoryId = cat.ReportElementCategoryId,
+                                            Name = cat.Name,
+                                            Description = cat.Description,
+                                            CreationDateTimeUtc = cat.CreationDateTimeUtc,
+                                            LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc,
+                                            LastModifierUserId = cat.LastModifierUserId
+                                        };
 
             return reportElementCategory;
         }
@@ -640,12 +621,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var ctsEventTypeDto = new CtsEventTypeDto
-            {
-                CtsEventTypeId = ctsEventType.CtsEventTypeId,
-                Name = ctsEventType.Name,
-                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
-                Description = ctsEventType.Description
-            };
+                                  {
+                                      CtsEventTypeId = ctsEventType.CtsEventTypeId,
+                                      Name = ctsEventType.Name,
+                                      CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
+                                      Description = ctsEventType.Description
+                                  };
 
             return ctsEventTypeDto;
         }
@@ -658,12 +639,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var ctsEventType = new CtsEventType
-            {
-                CtsEventTypeId = ctsEventTypeDto.CtsEventTypeId,
-                Name = ctsEventTypeDto.Name,
-                CtsEventCategoryName = ctsEventTypeDto.CtsEventCategoryName,
-                Description = ctsEventTypeDto.Description
-            };
+                               {
+                                   CtsEventTypeId = ctsEventTypeDto.CtsEventTypeId,
+                                   Name = ctsEventTypeDto.Name,
+                                   CtsEventCategoryName = ctsEventTypeDto.CtsEventCategoryName,
+                                   Description = ctsEventTypeDto.Description
+                               };
 
             return ctsEventType;
         }
@@ -676,33 +657,34 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var rpt = new ReportPackageTemplateDto
-            {
-                ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
-                Name = reportPackageTemplate.Name,
-                Description = reportPackageTemplate.Description,
-                RetirementDateTimeUtc = reportPackageTemplate.RetirementDateTimeUtc,
-                IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
-                CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
-                CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType),
-                OrganizationRegulatoryProgramId = reportPackageTemplate.OrganizationRegulatoryProgramId,
-                IsActive = reportPackageTemplate.IsActive,
-                LastModifierUserId = reportPackageTemplate.LastModifierUserId,
+                      {
+                          ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
+                          Name = reportPackageTemplate.Name,
+                          Description = reportPackageTemplate.Description,
+                          RetirementDateTimeUtc = reportPackageTemplate.RetirementDateTimeUtc,
+                          IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
+                          CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
+                          CtsEventType = GetCtsEventTypeDtoFromEventType(ctsEventType:reportPackageTemplate.CtsEventType),
+                          OrganizationRegulatoryProgramId = reportPackageTemplate.OrganizationRegulatoryProgramId,
+                          IsActive = reportPackageTemplate.IsActive,
+                          LastModifierUserId = reportPackageTemplate.LastModifierUserId,
 
-                ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>()
-            };
+                          ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>()
+                      };
 
             // This will include attachment, TTO, comments etc categories
             foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
             {
-                var reportElementCategoryName = (ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), cat.ReportElementCategory.Name);
-                rpt.ReportPackageTemplateElementCategories.Add(reportElementCategoryName);
+                var reportElementCategoryName = (ReportElementCategoryName) Enum.Parse(enumType:typeof(ReportElementCategoryName), value:cat.ReportElementCategory.Name);
+                rpt.ReportPackageTemplateElementCategories.Add(item:reportElementCategoryName);
             }
 
             // For ReportPackageTemplateAssignments fields  
             rpt.ReportPackageTemplateAssignments = new List<OrganizationRegulatoryProgramDto>();
             foreach (var rpta in reportPackageTemplate.ReportPackageTemplateAssignments)
             {
-                rpt.ReportPackageTemplateAssignments.Add(GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpta.OrganizationRegulatoryProgram));
+                rpt.ReportPackageTemplateAssignments.Add(item:
+                                                         GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:rpta.OrganizationRegulatoryProgram));
             }
 
             return rpt;
@@ -716,19 +698,21 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var rpt = new ReportPackageTemplate
-            {
-                Name = reportPackageTemplateDto.Name,
-                Description = reportPackageTemplateDto.Description,
-                RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
-                IsSubmissionBySignatoryRequired = reportPackageTemplateDto.IsSubmissionBySignatoryRequired,
-                CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
-                //OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
-                IsActive = reportPackageTemplateDto.IsActive,
-                LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
-                //CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
-                ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),
-                ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategory>()
-            };
+                      {
+                          Name = reportPackageTemplateDto.Name,
+                          Description = reportPackageTemplateDto.Description,
+                          RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
+                          IsSubmissionBySignatoryRequired = reportPackageTemplateDto.IsSubmissionBySignatoryRequired,
+                          CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
+
+                          //OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
+                          IsActive = reportPackageTemplateDto.IsActive,
+                          LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
+
+                          //CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
+                          ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),
+                          ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategory>()
+                      };
 
             if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)
             {
@@ -748,9 +732,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             var dto = new ReportPackageTemplateElementTypeDto();
             dto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
             dto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
-            dto.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            dto.ReportPackageTemplateElementCategory =
+                GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat:rptet.ReportPackageTemplateElementCategory);
             dto.ReportElementTypeId = rptet.ReportElementTypeId;
-            dto.ReportElementType = GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+            dto.ReportElementType = GetReportElementTypeDtoFromReportElementType(reportElementType:rptet.ReportElementType);
 
             return dto;
         }
@@ -765,14 +750,15 @@ namespace Linko.LinkoExchange.Services.Mapping
             var mappedReportElementType = new ReportElementTypeDto();
             if (reportElementType.ReportElementCategory != null)
             {
-                mappedReportElementType.ReportElementCategory = (ReportElementCategoryName)(Enum.Parse(typeof(ReportElementCategoryName), reportElementType.ReportElementCategory.Name));
+                mappedReportElementType.ReportElementCategory =
+                    (ReportElementCategoryName) Enum.Parse(enumType:typeof(ReportElementCategoryName), value:reportElementType.ReportElementCategory.Name);
             }
             mappedReportElementType.ReportElementTypeId = reportElementType.ReportElementTypeId;
             mappedReportElementType.Name = reportElementType.Name;
             mappedReportElementType.Description = reportElementType.Description;
             mappedReportElementType.Content = reportElementType.Content;
             mappedReportElementType.IsContentProvided = reportElementType.IsContentProvided;
-            mappedReportElementType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
+            mappedReportElementType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(ctsEventType:reportElementType.CtsEventType);
             mappedReportElementType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
             return mappedReportElementType;
         }
@@ -789,6 +775,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportElementType.Content = reportElementTypeDto.Content;
             reportElementType.IsContentProvided = reportElementTypeDto.IsContentProvided;
             reportElementType.CtsEventTypeId = reportElementTypeDto.CtsEventType?.CtsEventTypeId;
+
             //IGNORE reportElementType.CtsEventType
             //reportElementType.ReportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
             //IGNORE reportElementType.ReportElementCategory
@@ -849,21 +836,21 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             return new FileStoreDto
-            {
-                FileStoreId = fileStore.FileStoreId,
-                Name = fileStore.Name,
-                Description = fileStore.Description,
-                MediaType = fileStore.MediaType,
-                OriginalFileName = fileStore.OriginalName,
-                FileTypeId = fileStore.FileTypeId,
-                SizeByte = fileStore.SizeByte,
-                ReportElementTypeId = fileStore.ReportElementTypeId,
-                ReportElementTypeName = fileStore.ReportElementTypeName,
-                OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
-                OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(fileStore.OrganizationRegulatoryProgram),
-                UploadDateTimeLocal = fileStore.UploadDateTimeUtc.UtcDateTime,
-                UploaderUserId = fileStore.UploaderUserId
-            };
+                   {
+                       FileStoreId = fileStore.FileStoreId,
+                       Name = fileStore.Name,
+                       Description = fileStore.Description,
+                       MediaType = fileStore.MediaType,
+                       OriginalFileName = fileStore.OriginalName,
+                       FileTypeId = fileStore.FileTypeId,
+                       SizeByte = fileStore.SizeByte,
+                       ReportElementTypeId = fileStore.ReportElementTypeId,
+                       ReportElementTypeName = fileStore.ReportElementTypeName,
+                       OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
+                       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:fileStore.OrganizationRegulatoryProgram),
+                       UploadDateTimeLocal = fileStore.UploadDateTimeUtc.UtcDateTime,
+                       UploaderUserId = fileStore.UploaderUserId
+                   };
         }
 
         public Core.Domain.FileStore GetFileStoreFromFileStoreDto(FileStoreDto fileStoreDto)
@@ -874,18 +861,18 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var fileStore = new Core.Domain.FileStore
-            {
-                Name = fileStoreDto.Name,
-                Description = fileStoreDto.Description,
-                OriginalName = fileStoreDto.OriginalFileName,
-                MediaType = fileStoreDto.MediaType,
-                SizeByte = fileStoreDto.SizeByte,
-                FileTypeId = fileStoreDto.FileTypeId,
-                ReportElementTypeId = fileStoreDto.ReportElementTypeId,
-                ReportElementTypeName = fileStoreDto.ReportElementTypeName,
-                OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
-                UploaderUserId = fileStoreDto.UploaderUserId
-            };
+                            {
+                                Name = fileStoreDto.Name,
+                                Description = fileStoreDto.Description,
+                                OriginalName = fileStoreDto.OriginalFileName,
+                                MediaType = fileStoreDto.MediaType,
+                                SizeByte = fileStoreDto.SizeByte,
+                                FileTypeId = fileStoreDto.FileTypeId,
+                                ReportElementTypeId = fileStoreDto.ReportElementTypeId,
+                                ReportElementTypeName = fileStoreDto.ReportElementTypeName,
+                                OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
+                                UploaderUserId = fileStoreDto.UploaderUserId
+                            };
 
             if (fileStoreDto.FileStoreId.HasValue)
             {
@@ -931,13 +918,16 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.CollectionMethodId = sample.CollectionMethodId;
             dto.CollectionMethodName = sample.CollectionMethodName;
             dto.IsReadyToReport = sample.IsReadyToReport;
+
             //dto.SampleStatusName = set outside after exiting this method
             dto.LabSampleIdentifier = sample.LabSampleIdentifier;
+
             //dto.FlowUnitValidValues = sample.FlowUnitValidValues; // set outside after exiting this method
             dto.ResultQualifierValidValues = sample.ResultQualifierValidValues;
             dto.MassLoadingConversionFactorPounds = sample.MassLoadingConversionFactorPounds;
             dto.MassLoadingCalculationDecimalPlaces = sample.MassLoadingCalculationDecimalPlaces;
             dto.IsMassLoadingResultToUseLessThanSign = sample.IsMassLoadingResultToUseLessThanSign;
+
             //Handle this in calling code
             //var resultDtos = new List<SampleResultDto>();
             //foreach (var sampleResult in sample.SampleResults)
@@ -949,9 +939,10 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return dto;
         }
+
         public Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null)
         {
-            bool isNewSample = false;
+            var isNewSample = false;
             if (existingSample == null)
             {
                 existingSample = new Core.Domain.Sample();
@@ -967,6 +958,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSample.CollectionMethodId = sampleDto.CollectionMethodId;
             existingSample.CollectionMethodName = sampleDto.CollectionMethodName;
             existingSample.LabSampleIdentifier = sampleDto.LabSampleIdentifier;
+
             //existingSample.StartDateTimeUtc = sampleDto.StartDateTimeUtc;
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsSystemGenerated = false; //not currently used
@@ -980,7 +972,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
                 existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
             }
-            
+
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
             return existingSample;
@@ -989,7 +981,9 @@ namespace Linko.LinkoExchange.Services.Mapping
         public SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult)
         {
             if (sampleResult == null)
+            {
                 return null;
+            }
 
             var dto = new SampleResultDto();
             dto.ConcentrationSampleResultId = sampleResult.SampleResultId;
@@ -1003,8 +997,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
             dto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
             dto.AnalysisMethod = sampleResult.AnalysisMethod;
+
             //dto.AnalysisDateTimeLocal = set outside MapHelper
             dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
+
             //dto.IsCalculated = sampleResult.IsCalculated;
             //dto.LimitTypeName = set outside MapHelper
             //dto.LimitBasisName = set outside MapHelper
@@ -1025,15 +1021,18 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSampleResult.ParameterName = dto.ParameterName;
             existingSampleResult.Qualifier = dto.Qualifier;
             existingSampleResult.EnteredValue = dto.EnteredValue;
+
             //existingSampleResult.Value = Convert.ToDouble(dto.Value), //set outside after calling line
             existingSampleResult.UnitId = dto.UnitId;
             existingSampleResult.UnitName = dto.UnitName;
             existingSampleResult.EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit;
             existingSampleResult.MethodDetectionLimit = dto.MethodDetectionLimit;
             existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
+
             //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
             existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;
             existingSampleResult.IsCalculated = false;
+
             //existingSampleResult.LimitTypeId = set outside after calling line
             //existingSampleResult.LimitBasisId = set outside after calling line
             //existingSampleResult.CreationDateTimeUtc = set outside after calling line
@@ -1054,14 +1053,17 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSampleResult.ParameterName = dto.ParameterName;
             existingSampleResult.Qualifier = dto.MassLoadingQualifier;
             existingSampleResult.EnteredValue = dto.MassLoadingValue;
+
             //existingSampleResult.Value = Convert.ToDouble(dto.MassLoadingValue), //set outside after calling line
             existingSampleResult.UnitId = dto.MassLoadingUnitId;
             existingSampleResult.UnitName = dto.MassLoadingUnitName;
+
             //existingSampleResult.EnteredMethodDetectionLimit  // do not save. see more details in #Bug 4316
             //existingSampleResult.AnalysisMethod // do not save. see more details in #Bug 4316
             //existingSampleResult.AnalysisDateTimeUtc  // do not save. see more details in #Bug 4316
             //existingSampleResult.IsApprovedEPAMethod // do not save. see more details in #Bug 4316
             existingSampleResult.IsCalculated = true;
+
             //existingSampleResult.LimitTypeId = set outside after calling line
             //existingSampleResult.LimitBasisId = set outside after calling line
             //existingSampleResult.CreationDateTimeUtc = set outside after calling line
@@ -1074,7 +1076,9 @@ namespace Linko.LinkoExchange.Services.Mapping
         public ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt)
         {
             if (rpt == null)
+            {
                 return null;
+            }
 
             var reportPackageDto = new ReportPackageDto();
 
@@ -1088,6 +1092,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.CtsEventCategoryName = rpt.CtsEventCategoryName;
             reportPackageDto.Comments = rpt.Comments;
             reportPackageDto.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
+
             //reportPackageDto.ReportStatusName = set outside after calling line
             reportPackageDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
             reportPackageDto.OrganizationReferenceNumber = rpt.OrganizationReferenceNumber;
@@ -1103,6 +1108,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.RecipientOrganizationCityName = rpt.RecipientOrganizationCityName;
             reportPackageDto.RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName;
             reportPackageDto.RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode;
+
             //reportPackageDto.RecipientOrgRegProgramId = set outside after calling code
             reportPackageDto.CreationDateTimeLocal = rpt.CreationDateTimeUtc.UtcDateTime;
             reportPackageDto.SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1;
@@ -1123,15 +1129,15 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportPackageDto.SubmissionReviewComments = rpt.SubmissionReviewComments;
             }
 
-            if (rpt.RepudiationDateTimeUtc.HasValue 
+            if (rpt.RepudiationDateTimeUtc.HasValue
                 && rpt.RepudiatorUserId.HasValue
                 && rpt.RepudiationReasonId.HasValue)
             {
                 //Map all Repudiation related fields
-                
+
                 //reportPackageDto.RepudiationDateTimeLocal = set outside after calling line
                 reportPackageDto.RepudiatorUserId = rpt.RepudiatorUserId;
-                reportPackageDto.RepudiatorFirstName  = rpt.RepudiatorFirstName;
+                reportPackageDto.RepudiatorFirstName = rpt.RepudiatorFirstName;
                 reportPackageDto.RepudiatorLastName = rpt.RepudiatorLastName;
                 reportPackageDto.RepudiatorTitleRole = rpt.RepudiatorTitleRole;
                 reportPackageDto.RepudiationReasonId = rpt.RepudiationReasonId;
@@ -1164,12 +1170,13 @@ namespace Linko.LinkoExchange.Services.Mapping
             var sortedCategories = new List<ReportPackageElementCategory>();
             foreach (var rpec in rpt.ReportPackageElementCategories)
             {
-                sortedCategories.Add(rpec);
+                sortedCategories.Add(item:rpec);
             }
 
             foreach (var sortedCategoryValue in sortedCategories.OrderBy(item => item.SortOrder).ToList())
             {
-                reportPackageDto.ReportPackageElementCategories.Add((ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), sortedCategoryValue.ReportElementCategory.Name));
+                reportPackageDto.ReportPackageElementCategories.Add(item:(ReportElementCategoryName) Enum.Parse(enumType:typeof(ReportElementCategoryName),
+                                                                                                                value:sortedCategoryValue.ReportElementCategory.Name));
             }
 
             return reportPackageDto;
@@ -1177,68 +1184,125 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt)
         {
-            if (rpt == null) return null;
-            return new ReportPackage
+            if (rpt == null)
             {
-                Name = rpt.Name,
-                Description = rpt.Description,
-                //PeriodStartDateTimeUtc = set outside after calling line
-                //PeriodEndDateTimeUtc = set outside after calling line
-                CtsEventTypeId = rpt.CtsEventTypeId,
-                CtsEventTypeName = rpt.CtsEventType?.Name,
-                CtsEventCategoryName = rpt.CtsEventType?.CtsEventCategoryName,
-                IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
-                ReportPackageTemplateId = rpt.ReportPackageTemplateId,
-                //ReportStatusId = set outside after calling line
-                //OrganizationRegulatoryProgramId = set outside after calling line
-                //OrganizationName = set outside after calling line
-                //OrganizationAddressLine1 = set outside after calling line
-                //OrganizationAddressLine2 = set outside after calling line
-                //OrganizationCityName = set outside after calling line
-                //OrganizationJurisdictionName = set outside after calling line
-                //OrganizationZipCode = set outside after calling line
-                RecipientOrganizationName = rpt.OrganizationRegulatoryProgram.Organization.Name,
-                RecipientOrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
-                RecipientOrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
-                RecipientOrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
-                RecipientOrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction?.Name,
-                RecipientOrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
-                //CreationDateTimeUtc = set outside after calling line
-                ReportPackageElementCategories = new List<ReportPackageElementCategory>()
-            };
+                return null;
+            }
+
+            return new ReportPackage
+                   {
+                       Name = rpt.Name,
+                       Description = rpt.Description,
+
+                       //PeriodStartDateTimeUtc = set outside after calling line
+                       //PeriodEndDateTimeUtc = set outside after calling line
+                       CtsEventTypeId = rpt.CtsEventTypeId,
+                       CtsEventTypeName = rpt.CtsEventType?.Name,
+                       CtsEventCategoryName = rpt.CtsEventType?.CtsEventCategoryName,
+                       IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
+                       ReportPackageTemplateId = rpt.ReportPackageTemplateId,
+
+                       //ReportStatusId = set outside after calling line
+                       //OrganizationRegulatoryProgramId = set outside after calling line
+                       //OrganizationName = set outside after calling line
+                       //OrganizationAddressLine1 = set outside after calling line
+                       //OrganizationAddressLine2 = set outside after calling line
+                       //OrganizationCityName = set outside after calling line
+                       //OrganizationJurisdictionName = set outside after calling line
+                       //OrganizationZipCode = set outside after calling line
+                       RecipientOrganizationName = rpt.OrganizationRegulatoryProgram.Organization.Name,
+                       RecipientOrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
+                       RecipientOrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
+                       RecipientOrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
+                       RecipientOrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction?.Name,
+                       RecipientOrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
+
+                       //CreationDateTimeUtc = set outside after calling line
+                       ReportPackageElementCategories = new List<ReportPackageElementCategory>()
+                   };
         }
 
         public RepudiationReasonDto GetRepudiationReasonDtoFromRepudiationReason(RepudiationReason repudiationReason)
         {
-            if (repudiationReason == null) return null;
-            return new RepudiationReasonDto
+            if (repudiationReason == null)
             {
-                RepudiationReasonId = repudiationReason.RepudiationReasonId,
-                Name = repudiationReason.Name,
-                Description = repudiationReason.Description
-                //CreationLocalDateTime = set outside after calling line
-                //LastModificationLocalDateTime = set outside after calling line
-            };
+                return null;
+            }
+
+            return new RepudiationReasonDto
+                   {
+                       RepudiationReasonId = repudiationReason.RepudiationReasonId,
+                       Name = repudiationReason.Name,
+                       Description = repudiationReason.Description
+
+                       //CreationLocalDateTime = set outside after calling line
+                       //LastModificationLocalDateTime = set outside after calling line
+                   };
         }
 
         public ReportPackageElementTypeDto GetReportPackageElementTypeDtoFromReportPackageElementType(ReportPackageElementType reportPackageElementType)
         {
-            if (reportPackageElementType == null) return null;
-            return new ReportPackageElementTypeDto
+            if (reportPackageElementType == null)
             {
-                ReportPackageElementTypeId = reportPackageElementType.ReportPackageElementTypeId,
-                ReportPackageElementCategoryId = reportPackageElementType.ReportPackageElementCategoryId,
-                ReportElementTypeId = reportPackageElementType.ReportElementTypeId,
-                ReportElementTypeName = reportPackageElementType.ReportElementTypeName,
-                ReportElementTypeContent = reportPackageElementType.ReportElementTypeContent,
-                ReportElementTypeIsContentProvided = reportPackageElementType.ReportElementTypeIsContentProvided,
-                CtsEventTypeId = reportPackageElementType.CtsEventTypeId,
-                CtsEventTypeName = reportPackageElementType.CtsEventTypeName,
-                CtsEventCategoryName = reportPackageElementType.CtsEventCategoryName,
-                IsRequired = reportPackageElementType.IsRequired,
-                SortOrder = reportPackageElementType.SortOrder
-            };
+                return null;
+            }
+
+            return new ReportPackageElementTypeDto
+                   {
+                       ReportPackageElementTypeId = reportPackageElementType.ReportPackageElementTypeId,
+                       ReportPackageElementCategoryId = reportPackageElementType.ReportPackageElementCategoryId,
+                       ReportElementTypeId = reportPackageElementType.ReportElementTypeId,
+                       ReportElementTypeName = reportPackageElementType.ReportElementTypeName,
+                       ReportElementTypeContent = reportPackageElementType.ReportElementTypeContent,
+                       ReportElementTypeIsContentProvided = reportPackageElementType.ReportElementTypeIsContentProvided,
+                       CtsEventTypeId = reportPackageElementType.CtsEventTypeId,
+                       CtsEventTypeName = reportPackageElementType.CtsEventTypeName,
+                       CtsEventCategoryName = reportPackageElementType.CtsEventCategoryName,
+                       IsRequired = reportPackageElementType.IsRequired,
+                       SortOrder = reportPackageElementType.SortOrder
+                   };
         }
 
+        #endregion
+
+        public ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org, ProgramDto dto = null)
+        {
+            if (dto == null)
+            {
+                dto = new ProgramDto();
+            }
+            dto.RegulatoryProgramId = org.RegulatoryProgramId;
+            dto.Name = org.Name;
+            dto.Description = org.Description;
+            return dto;
+        }
+
+        public OrganizationTypeDto GetOrganizationTypeDtoFromOrganizationType(OrganizationType orgType, OrganizationTypeDto dto = null)
+        {
+            if (dto == null)
+            {
+                dto = new OrganizationTypeDto();
+            }
+            dto.Name = orgType.Name;
+            dto.Description = orgType.Description;
+            return dto;
+        }
+
+        private CtsEventTypeDto GetCtsEventTypeDtoFromCtsEventType(CtsEventType ctsEventType)
+        {
+            if (ctsEventType == null)
+            {
+                return null;
+            }
+
+            var mappedDto = new CtsEventTypeDto
+                            {
+                                CtsEventTypeId = ctsEventType.CtsEventTypeId,
+                                Name = ctsEventType.Name,
+                                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
+                                Description = ctsEventType.Description
+                            };
+            return mappedDto;
+        }
     }
 }

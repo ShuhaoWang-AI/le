@@ -29,34 +29,30 @@
             <h4 class="box-title">@Label.TitleKBQChanllenge</h4>
         </div>
         <section class="box-body" id="Form1">
-            @using (Html.BeginForm(
-                                   actionName: "KbqChallenge",
-                controllerName: "Account",
-                method: FormMethod.Post, routeValues: new { ViewBag.returnUrl },
-                htmlAttributes: new { @class = "form-horizontal", role = "form" }))
+            @using (Html.BeginForm(actionName:"KbqChallenge", controllerName:"Account", method:FormMethod.Post, routeValues:new {ViewBag.returnUrl}, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
                 @Html.HiddenFor(model => model.FailedCount)
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Question, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    @Html.LabelFor(m => m.Question, htmlAttributes:new {@class = "col-md-3 control-label"})
                     <div class="col-md-9">
-                        @Html.TextBoxFor(m => m.Question, htmlAttributes: new
-                   {
-                       @class = "form-control",
-                       @readonly = "readonly" 
-                   })
+                        @Html.TextBoxFor(m => m.Question, htmlAttributes:new
+                                                                         {
+                                                                             @class = "form-control",
+                                                                             @readonly = "readonly"
+                                                                         })
 
                         @Html.HiddenFor(m => m.QuestionAnswerId)
                     </div>
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Answer, htmlAttributes: new { @class = "col-md-3 required control-label" })
+                    @Html.LabelFor(m => m.Answer, htmlAttributes:new {@class = "col-md-3 required control-label"})
                     <div class="col-md-9">
-                        @Html.PasswordFor(m => m.Answer, htmlAttributes: new { @class = "form-control", autocomplete = "off" })
-                        @Html.ValidationMessageFor(m => m.Answer, validationMessage: "", htmlAttributes: new { @class = "text-red" })
+                        @Html.PasswordFor(m => m.Answer, htmlAttributes:new {@class = "form-control", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.Answer, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
 
@@ -71,5 +67,5 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/jqueryval")
+    @Scripts.Render(paths:"~/bundles/jqueryval")
 }

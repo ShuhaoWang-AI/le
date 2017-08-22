@@ -89,7 +89,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                             RequireLowercase = true,
                                             RequireUppercase = true
                                         };
-            
+
             //var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30); 
 
             // Configure user lockout defaults

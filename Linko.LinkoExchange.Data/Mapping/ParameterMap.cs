@@ -1,24 +1,26 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Data.Entity.ModelConfiguration;
+﻿using System.Data.Entity.ModelConfiguration;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class ParameterMap : EntityTypeConfiguration<Parameter>
+    public class ParameterMap : EntityTypeConfiguration<Parameter>
     {
+        #region constructors and destructor
+
         public ParameterMap()
         {
-            ToTable("tParameter");
+            ToTable(tableName:"tParameter");
 
             HasKey(x => x.ParameterId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(254);
+            Property(x => x.Name).IsRequired().HasMaxLength(value:254);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             HasRequired(a => a.DefaultUnit)
                 .WithMany()
                 .HasForeignKey(c => c.DefaultUnitId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.TrcFactor).IsOptional();
 
@@ -27,7 +29,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.Parameters)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.IsRemoved).IsRequired();
 
@@ -37,5 +39,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModifierUserId).IsOptional();
         }
+
+        #endregion
     }
 }

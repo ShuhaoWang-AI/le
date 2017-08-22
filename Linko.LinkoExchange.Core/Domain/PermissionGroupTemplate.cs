@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a system-default permission group.
+    ///     Represents a system-default permission group.
     /// </summary>
-    public partial class PermissionGroupTemplate
+    public class PermissionGroupTemplate
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int PermissionGroupTemplateId { get; set; }
 
@@ -26,8 +28,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
-
         // Reverse navigation
         public virtual ICollection<PermissionGroupTemplatePermission> PermissionGroupTemplatePermissions { get; set; }
+
+        #endregion
     }
 }

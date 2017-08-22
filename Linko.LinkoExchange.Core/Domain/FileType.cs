@@ -3,18 +3,20 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a type of a file.
-    /// Contains all accepted file types in the system.
+    ///     Represents a type of a file.
+    ///     Contains all accepted file types in the system.
     /// </summary>
-    public partial class FileType
+    public class FileType
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int FileTypeId { get; set; }
 
         /// <summary>
-        /// Unique.
+        ///     Unique.
         /// </summary>
         public string Extension { get; set; }
 
@@ -25,6 +27,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }
-

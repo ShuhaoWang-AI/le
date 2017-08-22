@@ -4,6 +4,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportElementCategoryDto
     {
+        #region public properties
+
         public int ReportElementCategoryId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -11,5 +13,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public UserDto LastModifierUser { get; set; }
         public int? LastModifierUserId { get; set; }
+
+        #endregion
     }
 }

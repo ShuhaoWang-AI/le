@@ -12,23 +12,32 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
     internal class SampleResultExtension
     {
+        #region public properties
+
         public SampleDto Sample { get; set; }
         public SampleResultDto SampleResult { get; set; }
+
+        #endregion
     }
 
     internal class PdfGenerator
     {
-        private readonly ReportPackageDto _reportPackage;
-        readonly TextState _sectionTitleBoldSize12 = new TextState("Arial", true, false);
-        readonly TextState _sectionTextSize10 = new TextState("Arial", false, false);
+        #region fields
 
         private readonly Document _pdfDocument;
         private readonly Page _pdfPage;
+        private readonly ReportPackageDto _reportPackage;
+        private readonly TextState _sectionTextSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
+        private readonly TextState _sectionTitleBoldSize12 = new TextState(fontFamily:"Arial", bold:true, italic:false);
+
+        #endregion
+
+        #region constructors and destructor
 
         public PdfGenerator(ReportPackageDto reportPackage)
         {
-            License pdflicense = new License();
-            pdflicense.SetLicense(@"Aspose.Pdf.lic");
+            var pdflicense = new License();
+            pdflicense.SetLicense(licenseName:@"Aspose.Pdf.lic");
             pdflicense.Embedded = true;
 
             _sectionTitleBoldSize12.FontSize = 12;
@@ -41,14 +50,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _pdfPage = _pdfDocument.Pages.Add();
         }
 
+        #endregion
+
         public byte[] CreateCopyOfRecordPdf(bool draftMode = false)
         {
             if (_reportPackage == null)
             {
-                throw new NullReferenceException("_reportPackage");
+                throw new NullReferenceException(message:"_reportPackage");
             }
 
-            _pdfPage.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
+            _pdfPage.SetPageSize(width:PageSize.PageLetter.Width, height:PageSize.PageLetter.Height);
             _pdfPage.PageInfo.IsLandscape = true;
             _pdfPage.PageInfo.Margin.Top = 20;
             _pdfPage.PageInfo.Margin.Left = 10;
@@ -59,17 +70,18 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var reportName = _reportPackage.Name;
             var authorityName = _reportPackage.RecipientOrganizationName;
             var industryName = _reportPackage.OrganizationName;
-            var submissionDateTimeString = _reportPackage.SubmissionDateTimeLocal?.ToString("MMMM dd yyyy hh:mm tt").ToUpper() ?? "";
+            var submissionDateTimeString = _reportPackage.SubmissionDateTimeLocal?.ToString(format:"MMMM dd yyyy hh:mm tt").ToUpper() ?? "";
 
-            HeaderFooterTable(_pdfPage, reportName, submissionDateTimeString, authorityName, industryName, draftMode);
+            HeaderFooterTable(pdfPage:_pdfPage, reportName:reportName, submittedDateTimeString:submissionDateTimeString, authorityName:authorityName, industryName:industryName,
+                              draftMode:draftMode);
 
             // report info part  
-            ReportInfoTable(_pdfPage);
+            ReportInfoTable(pdfPage:_pdfPage);
 
             //TO determine the order of the following 3 sections 
             foreach (var elementCategory in _reportPackage.ReportPackageElementCategories)
             {
-                PrintPdfSections(elementCategory);
+                PrintPdfSections(reportEkeeCategoryName:elementCategory);
             }
 
             //Add draft stamp to pdf 
@@ -79,7 +91,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
 
             var mStream = new MemoryStream();
-            _pdfDocument.Save(mStream, SaveFormat.Pdf);
+            _pdfDocument.Save(outputStream:mStream, format:SaveFormat.Pdf);
             return mStream.ToArray();
         }
 
@@ -95,6 +107,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     break;
                 case ReportElementCategoryName.SamplesAndResults:
                     SampleAndResult();
+
                     //Comments section follows samples and results 
                     CommentTable();
                     break;
@@ -105,41 +118,41 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             var attachmentsTable = new Table();
             attachmentsTable.Broken = TableBroken.VerticalInSamePage;
-            attachmentsTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
-            _pdfPage.Paragraphs.Add(attachmentsTable);
+            attachmentsTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
+            _pdfPage.Paragraphs.Add(paragraph:attachmentsTable);
 
             attachmentsTable.Margin.Top = 20;
             attachmentsTable.ColumnWidths = "33% 34% 33%";
             var row = attachmentsTable.Rows.Add();
 
-            var cell = row.Cells.Add("Attachments", _sectionTitleBoldSize12);
+            var cell = row.Cells.Add(text:"Attachments", ts:_sectionTitleBoldSize12);
             cell.ColSpan = 3;
 
             var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.FileStores).ToList();
             if (attachments.Any())
             {
                 row = attachmentsTable.Rows.Add();
-                cell = row.Cells.Add("These files are also part of the Copy Of Record.", _sectionTextSize10);
+                cell = row.Cells.Add(text:"These files are also part of the Copy Of Record.", ts:_sectionTextSize10);
                 cell.ColSpan = 3;
 
                 //Attachment files list table
-                var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
+                var tableOrder = new BorderInfo(borderSide:BorderSide.All, borderWidth:0.1F);
                 var attachmentFilesTable = new Table
-                {
-                    Border = tableOrder,
-                    DefaultCellBorder = tableOrder,
-                    DefaultCellPadding = new MarginInfo(2, 2, 2, 2),
-                    Margin = { Top = 10 }
-                };
+                                           {
+                                               Border = tableOrder,
+                                               DefaultCellBorder = tableOrder,
+                                               DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2),
+                                               Margin = {Top = 10}
+                                           };
 
-                attachmentFilesTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
-                _pdfPage.Paragraphs.Add(attachmentFilesTable);
+                attachmentFilesTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
+                _pdfPage.Paragraphs.Add(paragraph:attachmentFilesTable);
 
-                var titleBoldSize8 = new TextState("Arial", false, false);
+                var titleBoldSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
                 titleBoldSize8.FontSize = 8;
                 titleBoldSize8.FontStyle = FontStyles.Bold;
 
-                var titleSize8 = new TextState("Arial", false, false);
+                var titleSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
                 titleSize8.FontSize = 8;
 
                 attachmentFilesTable.ColumnWidths = "33% 34% 33%";
@@ -147,24 +160,24 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 row.DefaultCellTextState = titleBoldSize8;
                 row.BackgroundColor = Color.LightGray;
 
-                row.Cells.Add("Original File Name");
-                row.Cells.Add("System Generated Unique File Name");
-                row.Cells.Add("Attachment Type");
+                row.Cells.Add(text:"Original File Name");
+                row.Cells.Add(text:"System Generated Unique File Name");
+                row.Cells.Add(text:"Attachment Type");
 
                 foreach (var attachedFile in attachments)
                 {
                     row = attachmentFilesTable.Rows.Add();
                     row.DefaultCellTextState = titleSize8;
-                    row.Cells.Add(attachedFile.OriginalFileName);
-                    row.Cells.Add(attachedFile.Name);
-                    row.Cells.Add(attachedFile.ReportElementTypeName);
+                    row.Cells.Add(text:attachedFile.OriginalFileName);
+                    row.Cells.Add(text:attachedFile.Name);
+                    row.Cells.Add(text:attachedFile.ReportElementTypeName);
                 }
             }
             else
             {
                 // show "No attachments included
                 row = attachmentsTable.Rows.Add();
-                cell = row.Cells.Add("No attachments included.", _sectionTextSize10);
+                cell = row.Cells.Add(text:"No attachments included.", ts:_sectionTextSize10);
                 cell.ColSpan = 3;
             }
         }
@@ -172,16 +185,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         // Comment section
         private void CommentTable()
         {
-            var commentTable = new Table { DefaultCellPadding = new MarginInfo(2, 2, 2, 2) };
-            _pdfPage.Paragraphs.Add(commentTable);
+            var commentTable = new Table {DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2)};
+            _pdfPage.Paragraphs.Add(paragraph:commentTable);
 
             commentTable.Margin.Top = 20;
             commentTable.ColumnWidths = "100%";
             var row = commentTable.Rows.Add();
-            row.Cells.Add("Comments", _sectionTitleBoldSize12);
+            row.Cells.Add(text:"Comments", ts:_sectionTitleBoldSize12);
 
             row = commentTable.Rows.Add();
-            row.Cells.Add(_reportPackage.Comments.GetValueOrEmptyString(), _sectionTextSize10);
+            row.Cells.Add(text:_reportPackage.Comments.GetValueOrEmptyString(), ts:_sectionTextSize10);
         }
 
         // This include TTO Certification, and Signature Certification
@@ -189,17 +202,17 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             foreach (var certification in _reportPackage.CertificationTypes)
             {
-                var certificateTable = new Table { DefaultCellPadding = new MarginInfo(2, 2, 2, 2) };
+                var certificateTable = new Table {DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2)};
                 certificateTable.Broken = TableBroken.VerticalInSamePage;
-                _pdfPage.Paragraphs.Add(certificateTable);
+                _pdfPage.Paragraphs.Add(paragraph:certificateTable);
 
                 certificateTable.Margin.Top = 20;
                 certificateTable.ColumnWidths = "100%";
                 var row = certificateTable.Rows.Add();
-                row.Cells.Add(certification.ReportElementTypeName, _sectionTitleBoldSize12);
+                row.Cells.Add(text:certification.ReportElementTypeName, ts:_sectionTitleBoldSize12);
 
                 row = certificateTable.Rows.Add();
-                row.Cells.Add(certification.ReportElementTypeContent.GetValueOrEmptyString(), _sectionTextSize10);
+                row.Cells.Add(text:certification.ReportElementTypeContent.GetValueOrEmptyString(), ts:_sectionTextSize10);
             }
         }
 
@@ -211,39 +224,39 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 var sampleResultsTextTable = new Table();
                 sampleResultsTextTable.IsKeptWithNext = true;
 
-                _pdfPage.Paragraphs.Add(sampleResultsTextTable);
+                _pdfPage.Paragraphs.Add(paragraph:sampleResultsTextTable);
 
                 sampleResultsTextTable.Margin.Top = 20;
 
                 sampleResultsTextTable.ColumnWidths = "100%";
                 var row = sampleResultsTextTable.Rows.Add();
 
-                var sectionTitle = _reportPackage.SamplesAndResultsTypes[0].ReportElementTypeName;
-                row.Cells.Add(sectionTitle, _sectionTitleBoldSize12);
+                var sectionTitle = _reportPackage.SamplesAndResultsTypes[index:0].ReportElementTypeName;
+                row.Cells.Add(text:sectionTitle, ts:_sectionTitleBoldSize12);
 
                 var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.Samples).ToList();
                 if (!allSamples.Any())
                 {
                     // Show "No samples reported. 
                     row = sampleResultsTextTable.Rows.Add();
-                    row.Cells.Add("No samples reported.", _sectionTextSize10);
+                    row.Cells.Add(text:"No samples reported.", ts:_sectionTextSize10);
                 }
                 else
                 {
-                    var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
+                    var tableOrder = new BorderInfo(borderSide:BorderSide.All, borderWidth:0.1F);
 
                     //Samples and Results table  
                     var sampleResultsTable = new Table
-                    {
-                        Border = tableOrder,
-                        DefaultCellBorder = tableOrder,
-                        DefaultCellPadding = new MarginInfo(2, 2, 2, 2)
-                    };
+                                             {
+                                                 Border = tableOrder,
+                                                 DefaultCellBorder = tableOrder,
+                                                 DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2)
+                                             };
 
-                    _pdfPage.Paragraphs.Add(sampleResultsTable);
+                    _pdfPage.Paragraphs.Add(paragraph:sampleResultsTable);
+
                     // Month, Parameter, result, MDL, Sample Start, Sample End, Collection Method, Lab SampleId, Analysis Method, EPA method, Analysis Data, Flow
                     sampleResultsTable.ColumnWidths = "6% 19% 8.9% 8.9% 7.1% 7.1% 7.3% 7.8% 7.5% 5.3% 7.1% 8.0%";
-
 
                     var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
                     foreach (var sampleMonitoringPointerGroup in sampleMonitoringPointerGroups)
@@ -251,8 +264,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         var samples = sampleMonitoringPointerGroup.Select(i => i).ToList();
                         if (samples.Any())
                         {
-                            var monitoringPointName = samples[0].MonitoringPointName;
-                            DrawMonitoringPointSamplesAndResultsTable(sampleResultsTable, samples, monitoringPointName, tableOrder);
+                            var monitoringPointName = samples[index:0].MonitoringPointName;
+                            DrawMonitoringPointSamplesAndResultsTable(sampleResultsTable:sampleResultsTable, samples:samples, monitoringPointName:monitoringPointName,
+                                                                      tableOrder:tableOrder);
                         }
                     }
                 }
@@ -262,31 +276,31 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private void DrawMonitoringPointSamplesAndResultsTable(Table sampleResultsTable, List<SampleDto> samples, string monitoringPointName, BorderInfo tableOrder)
         {
             // table header text font
-            var centerTextBoldSize10 = new TextState("Arial", false, false);
+            var centerTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             centerTextBoldSize10.FontSize = 10;
             centerTextBoldSize10.FontStyle = FontStyles.Bold;
             centerTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Center;
 
-            var leftTextBoldSize10 = new TextState("Arial", false, false);
+            var leftTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             leftTextBoldSize10.FontSize = 10;
             leftTextBoldSize10.FontStyle = FontStyles.Bold;
             leftTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Left;
 
-            var rightTextBoldSize10 = new TextState("Arial", false, false);
+            var rightTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             rightTextBoldSize10.FontSize = 10;
             rightTextBoldSize10.FontStyle = FontStyles.Bold;
             rightTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Right;
 
             // cell text font
-            var centerTextSize8 = new TextState("Arial", false, false);
+            var centerTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             centerTextSize8.FontSize = 8;
             centerTextSize8.HorizontalAlignment = HorizontalAlignment.Center;
 
-            var leftTextSize8 = new TextState("Arial", false, false);
+            var leftTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             leftTextSize8.FontSize = 8;
             leftTextSize8.HorizontalAlignment = HorizontalAlignment.Left;
 
-            var rightTextSize8 = new TextState("Arial", false, false);
+            var rightTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
             rightTextSize8.FontSize = 8;
             rightTextSize8.HorizontalAlignment = HorizontalAlignment.Right;
 
@@ -295,35 +309,35 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.DefaultCellTextState = leftTextBoldSize10;
             row.BackgroundColor = Color.LightGray;
             row.Border = tableOrder;
-            var cell = row.Cells.Add($"Monitoring Point:{monitoringPointName}");
+            var cell = row.Cells.Add(text:$"Monitoring Point:{monitoringPointName}");
             cell.ColSpan = 12;
 
             row = sampleResultsTable.Rows.Add();
             row.DefaultCellTextState = centerTextBoldSize10;
             row.BackgroundColor = Color.LightGray;
 
-            row.Cells.Add("Month");
-            row.Cells.Add("Parameter");
-            row.Cells.Add("Result");
-            row.Cells.Add("MDL");
-            row.Cells.Add("Sample Start");
-            row.Cells.Add("Sample End");
-            row.Cells.Add("Collection Method");
-            row.Cells.Add("Lab Sample ID");
-            row.Cells.Add("Analysis Method");
-            row.Cells.Add("EPA Method");
-            row.Cells.Add("Analysis Date");
-            row.Cells.Add("Flow");
+            row.Cells.Add(text:"Month");
+            row.Cells.Add(text:"Parameter");
+            row.Cells.Add(text:"Result");
+            row.Cells.Add(text:"MDL");
+            row.Cells.Add(text:"Sample Start");
+            row.Cells.Add(text:"Sample End");
+            row.Cells.Add(text:"Collection Method");
+            row.Cells.Add(text:"Lab Sample ID");
+            row.Cells.Add(text:"Analysis Method");
+            row.Cells.Add(text:"EPA Method");
+            row.Cells.Add(text:"Analysis Date");
+            row.Cells.Add(text:"Flow");
 
             // samples in the same monitoring pointer are grouped by month plus year
             // in the same group,  samples are sorted by  start date ASC, end date ASC, parameter name ASC, collection method ASC. 
             var monthYearGroups = samples
-                .GroupBy(a => new { a.StartDateTimeLocal.Month, a.StartDateTimeLocal.Year }, (key, group) => new
-                {
-                    key.Month,
-                    key.Year,
-                    SamplesGroupByMonthAndYear = group.ToList()
-                })
+                .GroupBy(a => new {a.StartDateTimeLocal.Month, a.StartDateTimeLocal.Year}, (key, group) => new
+                                                                                                           {
+                                                                                                               key.Month,
+                                                                                                               key.Year,
+                                                                                                               SamplesGroupByMonthAndYear = group.ToList()
+                                                                                                           })
                 .OrderBy(i => i.Year)
                 .ThenBy(j => j.Month);
 
@@ -334,81 +348,90 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 foreach (var sample in monthYearGroup.SamplesGroupByMonthAndYear)
                 {
                     // strip off the seconds and milliseconds part for time 
-                    sample.StartDateTimeLocal = sample.StartDateTimeLocal.AddSeconds(-sample.StartDateTimeLocal.Second).AddMilliseconds(-sample.StartDateTimeLocal.Millisecond);
-                    sample.EndDateTimeLocal = sample.EndDateTimeLocal.AddSeconds(-sample.EndDateTimeLocal.Second).AddMilliseconds(-sample.EndDateTimeLocal.Millisecond);
+                    sample.StartDateTimeLocal = sample.StartDateTimeLocal.AddSeconds(value:-sample.StartDateTimeLocal.Second)
+                                                      .AddMilliseconds(value:-sample.StartDateTimeLocal.Millisecond);
+                    sample.EndDateTimeLocal = sample.EndDateTimeLocal.AddSeconds(value:-sample.EndDateTimeLocal.Second).AddMilliseconds(value:-sample.EndDateTimeLocal.Millisecond);
 
-                    sampleResultExtensions.AddRange(sample.SampleResults.Select(sampleResult => new SampleResultExtension
-                    {
-                        Sample = sample,
-                        SampleResult = sampleResult
-                    }));
+                    sampleResultExtensions.AddRange(collection:sample.SampleResults.Select(sampleResult => new SampleResultExtension
+                                                                                                           {
+                                                                                                               Sample = sample,
+                                                                                                               SampleResult = sampleResult
+                                                                                                           }));
                 }
 
-                // sort sampleResultExtensions by  start date ASC, end date ASC, parameter name ASC, limitbasis ASC, collection method ASC   
-                sampleResultExtensions = sampleResultExtensions.OrderBy(a => a.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
-                                      .ThenBy(b => b.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
-                                      .ThenBy(c => c.SampleResult.ParameterName)
-                                      .ThenBy(d => d.Sample.CollectionMethodName)
-                                      .ToList();
+                // sort sampleResultExtensions by  start date ASC, end date ASC, parameter name ASC, limit basis ASC, collection method ASC   
+                sampleResultExtensions = sampleResultExtensions.OrderBy(a => a.Sample.StartDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower())
+                                                               .ThenBy(b => b.Sample.EndDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower())
+                                                               .ThenBy(c => c.SampleResult.ParameterName)
+                                                               .ThenBy(d => d.Sample.CollectionMethodName)
+                                                               .ToList();
 
                 // Fill data; 
                 for (var i = 0; i < sampleResultExtensions.Count; i++)
                 {
-                    var sampleResultExtension = sampleResultExtensions[i];
+                    var sampleResultExtension = sampleResultExtensions[index:i];
                     row = sampleResultsTable.Rows.Add();
                     if (i == 0)
                     {
-                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MMMM"), centerTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.Sample.StartDateTimeLocal.ToString(format:"MMMM"), ts:centerTextSize8);
                     }
                     else
                     {
-                        row.Cells.Add("");
+                        row.Cells.Add(text:"");
                     }
 
-                    row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
-                    row.Cells.Add(GetSampleResultValue(sampleResultExtension.SampleResult), rightTextSize8);
-                    var mdl = sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString(); 
-                    if(!mdl.Equals(string.Empty))
+                    row.Cells.Add(text:sampleResultExtension.SampleResult.ParameterName, ts:leftTextSize8);
+                    row.Cells.Add(text:GetSampleResultValue(sampleResultDto:sampleResultExtension.SampleResult), ts:rightTextSize8);
+                    var mdl = sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString();
+                    if (!mdl.Equals(value:string.Empty))
                     {
-                       mdl = $"{mdl} {sampleResultExtension.SampleResult.UnitName}"; 
+                        mdl = $"{mdl} {sampleResultExtension.SampleResult.UnitName}";
                     }
-                    
-                    row.Cells.Add($"{mdl}", rightTextSize8);
 
-                    row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
-                    row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
+                    row.Cells.Add(text:$"{mdl}", ts:rightTextSize8);
 
-                    row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
-                    row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
-                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
-                    var isEpaMethod = "No"; 
-                    if(sampleResultExtension.SampleResult.IsApprovedEPAMethod)
+                    row.Cells.Add(text:sampleResultExtension.Sample.StartDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue:" 12:00 am", newValue:""),
+                                  ts:centerTextSize8);
+                    row.Cells.Add(text:sampleResultExtension.Sample.EndDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue:" 12:00 am", newValue:""),
+                                  ts:centerTextSize8);
+
+                    row.Cells.Add(text:sampleResultExtension.Sample.CollectionMethodName, ts:centerTextSize8);
+                    row.Cells.Add(text:sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), ts:centerTextSize8);
+                    row.Cells.Add(text:sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), ts:centerTextSize8);
+                    var isEpaMethod = "No";
+                    if (sampleResultExtension.SampleResult.IsApprovedEPAMethod)
                     {
-                        isEpaMethod = "Yes"; 
+                        isEpaMethod = "Yes";
                     }
-                    row.Cells.Add(isEpaMethod, centerTextSize8);
+                    row.Cells.Add(text:isEpaMethod, ts:centerTextSize8);
                     var analysisDateTimeString = sampleResultExtension.SampleResult.AnalysisDateTimeLocal.HasValue
-                                                     ? sampleResultExtension.SampleResult.AnalysisDateTimeLocal.Value.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: "")
+                                                     ? sampleResultExtension
+                                                         .SampleResult.AnalysisDateTimeLocal.Value.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower()
+                                                         .Replace(oldValue:" 12:00 am", newValue:"")
                                                      : "";
 
-                    row.Cells.Add(analysisDateTimeString, centerTextSize8);
-                    row.Cells.Add($"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
+                    row.Cells.Add(text:analysisDateTimeString, ts:centerTextSize8);
+                    row.Cells.Add(text:$"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}",
+                                  ts:rightTextSize8);
 
-                    if (!string.IsNullOrWhiteSpace(sampleResultExtension.SampleResult.MassLoadingValue))
+                    if (!string.IsNullOrWhiteSpace(value:sampleResultExtension.SampleResult.MassLoadingValue))
                     {
                         row = sampleResultsTable.Rows.Add();
-                        row.Cells.Add("");
-                        row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8); 
-                        row.Cells.Add($"{mdl}", rightTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
-                        row.Cells.Add(isEpaMethod, centerTextSize8);
-                        row.Cells.Add(analysisDateTimeString, centerTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
+                        row.Cells.Add(text:"");
+                        row.Cells.Add(text:sampleResultExtension.SampleResult.ParameterName, ts:leftTextSize8);
+                        row.Cells.Add(text:$"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", ts:rightTextSize8);
+                        row.Cells.Add(text:$"{mdl}", ts:rightTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.Sample.StartDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue:" 12:00 am", newValue:""),
+                                      ts:centerTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.Sample.EndDateTimeLocal.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue:" 12:00 am", newValue:""),
+                                      ts:centerTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.Sample.CollectionMethodName, ts:centerTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), ts:centerTextSize8);
+                        row.Cells.Add(text:sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), ts:centerTextSize8);
+                        row.Cells.Add(text:isEpaMethod, ts:centerTextSize8);
+                        row.Cells.Add(text:analysisDateTimeString, ts:centerTextSize8);
+                        row.Cells.Add(text:$"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}",
+                                      ts:rightTextSize8);
                     }
                 }
             }
@@ -416,7 +439,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private string GetSampleResultValue(SampleResultDto sampleResultDto)
         {
-            if (string.IsNullOrWhiteSpace(sampleResultDto.EnteredValue))
+            if (string.IsNullOrWhiteSpace(value:sampleResultDto.EnteredValue))
             {
                 return sampleResultDto.Qualifier;
             }
@@ -426,35 +449,35 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private void ReportInfoTable(Page pdfPage)
         {
-            var textStateSize10 = new TextState("Arial", false, false);
-            var boldTextStateSize10 = new TextState("Arial", true, false);
+            var textStateSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
+            var boldTextStateSize10 = new TextState(fontFamily:"Arial", bold:true, italic:false);
 
             textStateSize10.FontSize = 10;
             boldTextStateSize10.FontSize = 10;
 
             var reportInfoTable = new Table
-            {
-                DefaultCellPadding = new MarginInfo(3, 3, 3, 3),
-                Margin = { Top = 20f }
-            };
+                                  {
+                                      DefaultCellPadding = new MarginInfo(left:3, bottom:3, right:3, top:3),
+                                      Margin = {Top = 20f}
+                                  };
 
-            pdfPage.Paragraphs.Add(reportInfoTable);
+            pdfPage.Paragraphs.Add(paragraph:reportInfoTable);
             reportInfoTable.ColumnWidths = "15% 30% 10% 15% 30%";
 
-            reportInfoTable.SetColumnTextState(0, boldTextStateSize10);
-            reportInfoTable.SetColumnTextState(1, textStateSize10);
-            reportInfoTable.SetColumnTextState(2, textStateSize10);
-            reportInfoTable.SetColumnTextState(3, boldTextStateSize10);
-            reportInfoTable.SetColumnTextState(4, textStateSize10);
+            reportInfoTable.SetColumnTextState(colNumber:0, textState:boldTextStateSize10);
+            reportInfoTable.SetColumnTextState(colNumber:1, textState:textStateSize10);
+            reportInfoTable.SetColumnTextState(colNumber:2, textState:textStateSize10);
+            reportInfoTable.SetColumnTextState(colNumber:3, textState:boldTextStateSize10);
+            reportInfoTable.SetColumnTextState(colNumber:4, textState:textStateSize10);
 
             //--------------------------------Row 1 
             var row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Report:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.Name, textStateSize10);
+            row.Cells.Add(text:"Report:", ts:boldTextStateSize10);
+            row.Cells.Add(text:_reportPackage.Name, ts:textStateSize10);
 
-            row.Cells.Add("");
-            row.Cells.Add("Period:", boldTextStateSize10);
-            row.Cells.Add($"{_reportPackage.PeriodStartDateTimeLocal:MMMM dd, yyyy} - {_reportPackage.PeriodEndDateTimeLocal:MMMM dd, yyyy}", textStateSize10);
+            row.Cells.Add(text:"");
+            row.Cells.Add(text:"Period:", ts:boldTextStateSize10);
+            row.Cells.Add(text:$"{_reportPackage.PeriodStartDateTimeLocal:MMMM dd, yyyy} - {_reportPackage.PeriodEndDateTimeLocal:MMMM dd, yyyy}", ts:textStateSize10);
 
             //--------------------------------Row 2
             // empty row
@@ -463,30 +486,30 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             //--------------------------------Row 3
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Industry Name:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.OrganizationName, textStateSize10);
+            row.Cells.Add(text:"Industry Name:", ts:boldTextStateSize10);
+            row.Cells.Add(text:_reportPackage.OrganizationName, ts:textStateSize10);
 
-            row.Cells.Add("");
+            row.Cells.Add(text:"");
 
-            row.Cells.Add("Submitted Date:", boldTextStateSize10);
+            row.Cells.Add(text:"Submitted Date:", ts:boldTextStateSize10);
 
-            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal?.ToString("MMMM dd, yyyy hh:mm tt ") ?? "", textStateSize10);
+            row.Cells.Add(text:_reportPackage.SubmissionDateTimeLocal?.ToString(format:"MMMM dd, yyyy hh:mm tt ") ?? "", ts:textStateSize10);
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Industry Number:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.OrganizationReferenceNumber.GetValueOrEmptyString(), textStateSize10);
+            row.Cells.Add(text:"Industry Number:", ts:boldTextStateSize10);
+            row.Cells.Add(text:_reportPackage.OrganizationReferenceNumber.GetValueOrEmptyString(), ts:textStateSize10);
 
-            row.Cells.Add("");
+            row.Cells.Add(text:"");
 
-            row.Cells.Add("Submitted By:", boldTextStateSize10); 
+            row.Cells.Add(text:"Submitted By:", ts:boldTextStateSize10);
             var submitter = $"{_reportPackage.SubmitterFirstName.GetValueOrEmptyString()} {_reportPackage.SubmitterLastName.GetValueOrEmptyString()}";
-            row.Cells.Add(submitter, textStateSize10);
+            row.Cells.Add(text:submitter, ts:textStateSize10);
 
             //--------------------------------Row 5
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Address:", boldTextStateSize10);
-            if (string.IsNullOrWhiteSpace(_reportPackage.OrganizationAddressLine2))
+            row.Cells.Add(text:"Address:", ts:boldTextStateSize10);
+            if (string.IsNullOrWhiteSpace(value:_reportPackage.OrganizationAddressLine2))
             {
                 _reportPackage.OrganizationAddressLine2 = "";
             }
@@ -496,118 +519,114 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var cityName = _reportPackage.OrganizationCityName.GetValueOrEmptyString();
             var jursdicationName = _reportPackage.OrganizationJurisdictionName.GetValueOrEmptyString();
             var zipCode = _reportPackage.OrganizationZipCode.GetValueOrEmptyString();
-            
-            var address1 =""; 
-            if(string.IsNullOrWhiteSpace(addressLine2))
-            {
-                address1 = $"{addressLine1},";
-            }
-            else
-            {
-                address1 = $"{addressLine1} {addressLine2},";
-            }
-            
-            row.Cells.Add(address1, textStateSize10);
 
-            row.Cells.Add("");
+            var address1 = string.IsNullOrWhiteSpace(value:addressLine2) ? $"{addressLine1}," : $"{addressLine1} {addressLine2},";
 
-            row.Cells.Add("Title:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.SubmitterTitleRole.GetValueOrEmptyString(), textStateSize10);
-            
+            row.Cells.Add(text:address1, ts:textStateSize10);
+
+            row.Cells.Add(text:"");
+
+            row.Cells.Add(text:"Title:", ts:boldTextStateSize10);
+            row.Cells.Add(text:_reportPackage.SubmitterTitleRole.GetValueOrEmptyString(), ts:textStateSize10);
+
             // Add another row for city, jurisdiction and zip code 
             var address2 = $"{cityName}, {jursdicationName} {zipCode}";
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("");
-            row.Cells.Add(address2);   
+            row.Cells.Add(text:"");
+            row.Cells.Add(text:address2);
 
             //  Add empty for the rest cells
-            row.Cells.Add("");
-            row.Cells.Add("");
-            row.Cells.Add("");
+            row.Cells.Add(text:"");
+            row.Cells.Add(text:"");
+            row.Cells.Add(text:"");
         }
 
         private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName, bool draftMode)
         {
-            Table headerTable = new Table();
+            var headerTable = new Table();
 
             pdfPage.Header = new HeaderFooter();
-            var headerMargin = new MarginInfo(10, 10, 10, 5);
+            var headerMargin = new MarginInfo(left:10, bottom:10, right:10, top:5);
             pdfPage.Header.Margin = headerMargin;
 
-            pdfPage.Header.Paragraphs.Add(headerTable);
+            pdfPage.Header.Paragraphs.Add(paragraph:headerTable);
 
-            TextState leftHeaderFooterTextState = new TextState("Arial", false, false);
-            leftHeaderFooterTextState.FontSize = 6;
-            leftHeaderFooterTextState.FontStyle = FontStyles.Bold;
-            leftHeaderFooterTextState.ForegroundColor = Color.Gray;
-            leftHeaderFooterTextState.HorizontalAlignment = HorizontalAlignment.Left;
+            var leftHeaderFooterTextState = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                            {
+                                                FontSize = 6,
+                                                FontStyle = FontStyles.Bold,
+                                                ForegroundColor = Color.Gray,
+                                                HorizontalAlignment = HorizontalAlignment.Left
+                                            };
 
-            TextState centerHeaderFooterTextState = new TextState("Arial", false, false);
-            centerHeaderFooterTextState.FontSize = 6;
-            centerHeaderFooterTextState.FontStyle = FontStyles.Bold;
-            centerHeaderFooterTextState.ForegroundColor = Color.Gray;
-            centerHeaderFooterTextState.HorizontalAlignment = HorizontalAlignment.Center;
+            var centerHeaderFooterTextState = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                              {
+                                                  FontSize = 6,
+                                                  FontStyle = FontStyles.Bold,
+                                                  ForegroundColor = Color.Gray,
+                                                  HorizontalAlignment = HorizontalAlignment.Center
+                                              };
 
-            TextState rightHeaderFooterTextState = new TextState("Arial", false, false);
-            rightHeaderFooterTextState.FontSize = 6;
-            rightHeaderFooterTextState.FontStyle = FontStyles.Bold;
-            rightHeaderFooterTextState.ForegroundColor = Color.Gray;
-            rightHeaderFooterTextState.HorizontalAlignment = HorizontalAlignment.Right;
+            var rightHeaderFooterTextState = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                             {
+                                                 FontSize = 6,
+                                                 FontStyle = FontStyles.Bold,
+                                                 ForegroundColor = Color.Gray,
+                                                 HorizontalAlignment = HorizontalAlignment.Right
+                                             };
 
             headerTable.ColumnWidths = "33% 34% 33%";
-            headerTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
+            headerTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
             headerTable.Broken = TableBroken.None;
             headerTable.Margin.Top = 5f;
 
-            headerTable.SetColumnTextState(0, leftHeaderFooterTextState);
-            headerTable.SetColumnTextState(1, centerHeaderFooterTextState);
-            headerTable.SetColumnTextState(2, rightHeaderFooterTextState);
+            headerTable.SetColumnTextState(colNumber:0, textState:leftHeaderFooterTextState);
+            headerTable.SetColumnTextState(colNumber:1, textState:centerHeaderFooterTextState);
+            headerTable.SetColumnTextState(colNumber:2, textState:rightHeaderFooterTextState);
 
-            Row row = headerTable.Rows.Add();
-            row.Cells.Add(authorityName);
-            if(draftMode)
-            {
-                row.Cells.Add("");
-            }
-            else
-            {
-                row.Cells.Add("Copy Of Record");
-            }
-            row.Cells.Add(industryName);
+            var row = headerTable.Rows.Add();
+            row.Cells.Add(text:authorityName);
+            row.Cells.Add(text:draftMode ? "" : "Copy Of Record");
+            row.Cells.Add(text:industryName);
 
             // Footer 
-            Table footerTable = new Table();
-            pdfPage.Footer = new HeaderFooter();
-            pdfPage.Footer.Margin.Left = headerMargin.Left;
-            pdfPage.Footer.Margin.Right = headerMargin.Right;
-            pdfPage.Footer.Paragraphs.Add(footerTable);
+            var footerTable = new Table();
+            pdfPage.Footer = new HeaderFooter
+                             {
+                                 Margin =
+                                 {
+                                     Left = headerMargin.Left,
+                                     Right = headerMargin.Right
+                                 }
+                             };
+            pdfPage.Footer.Paragraphs.Add(paragraph:footerTable);
 
             footerTable.ColumnWidths = "33% 34% 33%";
-            footerTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
+            footerTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
             footerTable.Broken = TableBroken.None;
             footerTable.Margin.Bottom = -5f;
-            footerTable.SetColumnTextState(0, leftHeaderFooterTextState);
-            footerTable.SetColumnTextState(1, centerHeaderFooterTextState);
-            footerTable.SetColumnTextState(2, rightHeaderFooterTextState);
+            footerTable.SetColumnTextState(colNumber:0, textState:leftHeaderFooterTextState);
+            footerTable.SetColumnTextState(colNumber:1, textState:centerHeaderFooterTextState);
+            footerTable.SetColumnTextState(colNumber:2, textState:rightHeaderFooterTextState);
 
-            TextFragment text = new TextFragment("Page $p of $P");
+            var text = new TextFragment(text:"Page $p of $P");
             text.TextState.FontSize = 8;
 
             row = footerTable.Rows.Add();
-            row.Cells.Add(reportName);
-            var cell = row.Cells.Add("");
-            cell.Paragraphs.Add(text);
-            row.Cells.Add(submittedDateTimeString);
+            row.Cells.Add(text:reportName);
+            var cell = row.Cells.Add(text:"");
+            cell.Paragraphs.Add(paragraph:text);
+            row.Cells.Add(text:submittedDateTimeString);
         }
 
         private void AddWatermark()
         {
-            string annotationText = "DRAFT";
-            var textStamp = new TextStamp(annotationText)
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            var annotationText = "DRAFT";
+            var textStamp = new TextStamp(value:annotationText)
+                            {
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                VerticalAlignment = VerticalAlignment.Center
+                            };
 
             textStamp.TextState.ForegroundColor = Color.IndianRed;
             textStamp.TextState.FontSize = 160;
@@ -618,7 +637,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             foreach (var page in _pdfDocument.Pages)
             {
                 var pdfPage = page as Page;
-                pdfPage?.AddStamp(textStamp);
+                pdfPage?.AddStamp(stamp:textStamp);
             }
         }
     }

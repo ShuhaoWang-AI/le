@@ -10,6 +10,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     [Validator(validatorType:typeof(ParameterGroupViewModelValidator))]
     public class ParameterGroupViewModel
     {
+        #region public properties
+
         [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
@@ -51,17 +53,24 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         }
 
         public string ParameterIds { get; set; }
+
+        #endregion
     }
 
-    public class ParameterGroupViewModelValidator:AbstractValidator<ParameterGroupViewModel>
+    public class ParameterGroupViewModelValidator : AbstractValidator<ParameterGroupViewModel>
     {
+        #region constructors and destructor
+
         public ParameterGroupViewModelValidator()
         {
             //Name
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"Parameter Group Name is required.");
 
             //Parameters
-            RuleFor(x => x).Must(x => x.Parameters != null && x.Parameters.Count > 0).WithName(overridePropertyName:"Parameters").WithMessage(errorMessage:"At least 1 parameter must be added to the group.");
+            RuleFor(x => x).Must(x => x.Parameters != null && x.Parameters.Count > 0).WithName(overridePropertyName:"Parameters")
+                           .WithMessage(errorMessage:"At least 1 parameter must be added to the group.");
         }
+
+        #endregion
     }
 }

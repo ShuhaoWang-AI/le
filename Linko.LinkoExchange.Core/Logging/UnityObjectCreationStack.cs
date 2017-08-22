@@ -15,8 +15,7 @@ namespace Linko.LinkoExchange.Core.Logging
 
         #endregion
 
-
-        #region constructor and destructor
+        #region constructors and destructor
 
         /// <summary>
         /// </summary>
@@ -24,23 +23,16 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </param>
         public UnityObjectCreationStack(IEnumerable<Type> stack)
         {
-            _items = new List<Type>(stack);
+            _items = new List<Type>(collection:stack);
         }
 
         #endregion
-
 
         #region public properties
 
         /// <summary>
         /// </summary>
-        public IEnumerable<Type> Items
-        {
-            get
-            {
-                return _items;
-            }
-        }
+        public IEnumerable<Type> Items => _items;
 
         #endregion
 
@@ -54,7 +46,7 @@ namespace Linko.LinkoExchange.Core.Logging
         /// </returns>
         public Type Peek(int peekBack = 0)
         {
-            return _items[_items.Count - 1 - peekBack];
+            return _items[index:_items.Count - 1 - peekBack];
         }
 
         #endregion

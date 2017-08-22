@@ -1,10 +1,11 @@
-﻿
-using System;
+﻿using System;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class OrganizationRegulatoryProgramDto
     {
+        #region public properties
+
         public int OrganizationRegulatoryProgramId { get; set; }
         public int RegulatoryProgramId { get; set; }
         public ProgramDto RegulatoryProgramDto { get; set; }
@@ -21,5 +22,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         //Localized most recent date (or null) found in tReportPackage for this OrganizationRegulatoryProgramId
         public DateTime? LastSubmissionDateTimeLocal { get; set; }
+
+        #endregion
     }
 }

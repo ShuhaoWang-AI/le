@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a permission group within a regulatory program for a particular organization.
+    ///     Represents a permission group within a regulatory program for a particular organization.
     /// </summary>
-    public partial class PermissionGroup
+    public class PermissionGroup
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int PermissionGroupId { get; set; }
 
@@ -30,5 +32,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ICollection<OrganizationRegulatoryProgramUser> OrganizationRegulatoryProgramUsers { get; set; }
 
         public virtual ICollection<PermissionGroupPermission> PermissionGroupPermissions { get; set; }
+
+        #endregion
     }
 }

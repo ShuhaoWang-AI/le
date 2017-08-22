@@ -31,27 +31,27 @@
                 @(Html.Kendo().Grid<IndustryUserViewModel>()
                       .Name(componentName:"gridUser")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.FirstName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.LastName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.PhoneNumber)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.Email)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.DateRegistered).Format(value:"{0:MM/dd/yyyy}")
-                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                          columns.Bound(c => c.StatusText)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.IsSignatoryText)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.AccountLockedText)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Template(m => { })
-                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:60);
-                      })
+                               {
+                                   columns.Bound(c => c.FirstName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.PhoneNumber)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Email)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.DateRegistered).Format(value:"{0:MM/dd/yyyy}")
+                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                   columns.Bound(c => c.StatusText)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.IsSignatoryText)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.AccountLockedText)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
                                                 .PageSizes(enabled:true)
                                                 .Refresh(enabled:true)
@@ -59,11 +59,12 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode:GridSelectionMode.Single);
-                          selectable.Type(type:GridSelectionType.Row);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
@@ -74,14 +75,14 @@
                                                     .ServerOperation(enabled:true)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                    {
-                                                        sort.Add(memberName:"FirstName").Ascending();
-                                                        sort.Add(memberName:"LastName").Ascending();
-                                                    }) // <-- initial sort expression
+                                                          {
+                                                              sort.Add(memberName:"FirstName").Ascending();
+                                                              sort.Add(memberName:"LastName").Ascending();
+                                                          }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"IndustryUsers_Read", controllerName:"Authority", routeValues:new
-                                                    {
-                                                        industryId = ViewBag.IndustryId
-                                                    }))
+                                                                                                                                                       {
+                                                                                                                                                           industryId = ViewBag.IndustryId
+                                                                                                                                                       }))
                                                     .PageSize(pageSize:10)
                                                     .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridUser'})"))
                       )
@@ -110,36 +111,36 @@
         <div>
             @{
                 var vm = new ConfirmationMessageViewModal
-                {
-                    ShowMessage = TempData["InivteSendSucceed"] != null && (bool)TempData["InivteSendSucceed"],
-                    Messaage =  "An invitation has been sent."
-                };
+                         {
+                             ShowMessage = TempData[key:"InivteSendSucceed"] != null && (bool) TempData[key:"InivteSendSucceed"],
+                             Messaage = "An invitation has been sent."
+                         };
 
-                @Html.Partial("_ConfirmationMessageView", vm);
+                @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
             }
-        </div> 
+        </div>
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<PendingInvitationViewModel>()
                       .Name(componentName:"gridPendingInvitation")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.FirstName);
-                          columns.Bound(c => c.LastName);
-                          columns.Bound(c => c.Email);
-                          columns.Bound(c => c.DateInvited).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
-                          columns.Bound(c => c.InviteExpires).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
-                          columns.Command(c =>
-                          {
-                              c.Custom(" ").HtmlAttributes(new
-                              {
-                                  @class = "k-grid-destroy k-icon k-i-close k-delete k-button ",
-                                  type = "text"
-                              })
-                              .Click("confirmDelete");
-                          }).Width(pixelWidth: 100);
-                      })
+                               {
+                                   columns.Bound(c => c.FirstName);
+                                   columns.Bound(c => c.LastName);
+                                   columns.Bound(c => c.Email);
+                                   columns.Bound(c => c.DateInvited).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                                   columns.Bound(c => c.InviteExpires).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                                   columns.Command(c =>
+                                                   {
+                                                       c.Custom(name:" ").HtmlAttributes(attributes:new
+                                                                                                    {
+                                                                                                        @class = "k-grid-destroy k-icon k-i-close k-delete k-button ",
+                                                                                                        type = "text"
+                                                                                                    })
+                                                        .Click(handler:"confirmDelete");
+                                                   }).Width(pixelWidth:100);
+                               })
                       .Pageable(pageable => pageable
                                                 .PageSizes(enabled:true)
                                                 .Refresh(enabled:true)
@@ -147,32 +148,33 @@
                                                 .Numeric(enabled:false)
                       )
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
                       //.Filterable(filterable => filterable.Enabled(value: false))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
                       .NoRecords(text:"No pending invitation exists.")
-                      .Editable(s => s.DisplayDeleteConfirmation(false))
+                      .Editable(s => s.DisplayDeleteConfirmation(value:false))
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
                                                     .Model(model =>
-                                                    {
-                                                        model.Id(m => m.Id);
-                                                        model.Field(m => m.FirstName);
-                                                        model.Field(m => m.LastName);
-                                                        model.Field(m => m.Email);
-                                                        model.Field(m => m.DateInvited);
-                                                        model.Field(m => m.InviteExpires);
-                                                    })
+                                                           {
+                                                               model.Id(m => m.Id);
+                                                               model.Field(m => m.FirstName);
+                                                               model.Field(m => m.LastName);
+                                                               model.Field(m => m.Email);
+                                                               model.Field(m => m.DateInvited);
+                                                               model.Field(m => m.InviteExpires);
+                                                           })
                                                     .Sort(sort => sort.Add(memberName:"DateInvited").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"IndustryUsers_PendingInvitations_Read", controllerName:"Authority", routeValues:new
-                                                    {
-                                                        industryId = ViewBag.IndustryId
-                                                    }))
+                                                                                                                                                                          {
+                                                                                                                                                                              industryId = ViewBag.IndustryId
+                                                                                                                                                                          }))
                                                     .Destroy(d => d.Action(actionName:"IndustryUsers_PendingInvitations_Delete", controllerName:"Authority"))
                                                     .PageSize(pageSize:10)
-                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridPendingInvitation'})").RequestEnd(handler:"onRequestEnd"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridPendingInvitation'})").RequestEnd(handler:"onRequestEnd"))
                       )
                       )
             </div>
@@ -191,18 +193,18 @@
                 </p>
                 <div class="form-group">
                     <div class="pull-right">
-                        <button aria-label="Yes" class="btn btn-primary btn-sm" value="Yes" id="YesDelete" type="button">Yes</button>
-                        <button aria-label="Close" class="btn btn-primary btn-sm" id="CancelDelete" data-dismiss="modal" type="button">No</button>
+                        <button aria-label="Yes" class="btn btn-primary btn-sm" id="YesDelete" type="button" value="Yes">Yes</button>
+                        <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" id="CancelDelete" type="button">No</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
 
 @section Scripts {
-@Scripts.Render(paths: "~/bundles/pendingInvitations")
- 
+    @Scripts.Render(paths:"~/bundles/pendingInvitations")
+
     <script type="text/javascript">
         gotoNextPage = function()
         {
@@ -211,6 +213,6 @@
 
             doAjaxAction(grid, postUrl, "", "Select an user");
         };
-        
+
     </script>
 }

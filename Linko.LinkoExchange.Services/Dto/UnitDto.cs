@@ -4,6 +4,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class UnitDto
     {
+        #region public properties
+
         public int UnitId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -15,5 +17,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset? LastModificationDateTimeLocal { get; set; }
         public int? LastModifierUserId { get; set; }
         public string LastModifierFullName { get; set; }
+
+        #endregion
     }
 }

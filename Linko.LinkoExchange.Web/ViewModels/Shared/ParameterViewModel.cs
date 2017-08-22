@@ -4,14 +4,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
     public class ParameterViewModel
     {
-        [ScaffoldColumn(scaffold: false)]
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
         public int Id { get; set; }
 
         [Display(Name = "Name")]
         public string Name { get; set; }
 
         [Display(Name = "Description")]
-        [DataType(dataType: DataType.MultilineText)]
+        [DataType(dataType:DataType.MultilineText)]
         public string Description { get; set; }
 
         public int DefaultUnitId { get; set; }
@@ -21,5 +23,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public bool IsRemoved { get; set; }
         public bool IsCalcMassLoading { get; set; }
+
+        #endregion
     }
 }

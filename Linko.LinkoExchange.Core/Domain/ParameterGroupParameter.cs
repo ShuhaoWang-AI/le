@@ -1,12 +1,14 @@
 ﻿namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a specific Parameter within a static Parameter Group.
+    ///     Represents a specific Parameter within a static Parameter Group.
     /// </summary>
-    public partial class ParameterGroupParameter
+    public class ParameterGroupParameter
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int ParameterGroupParameterId { get; set; }
 
@@ -15,5 +17,7 @@
 
         public int ParameterId { get; set; }
         public virtual Parameter Parameter { get; set; }
+
+        #endregion
     }
 }

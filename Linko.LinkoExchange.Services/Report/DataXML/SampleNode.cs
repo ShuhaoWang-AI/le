@@ -6,6 +6,8 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
     [XmlType(TypeName = "Sample")]
     public class SampleNode
     {
+        #region public properties
+
         public string SampleName { get; set; }
         public string MonitoringPointName { get; set; }
         public string CtsEventTypeCategoryName { get; set; }
@@ -21,5 +23,7 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public string IsMassLoadingResultToUseLessThanSign { get; set; }
         public string SampledBy { get; set; }
         public List<SampleResultNode> SampleResults { get; set; }
+
+        #endregion
     }
 }

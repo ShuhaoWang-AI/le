@@ -3,12 +3,14 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents an audit log for email.
+    ///     Represents an audit log for email.
     /// </summary>
-    public partial class EmailAuditLog
+    public class EmailAuditLog
     {
+        #region public properties
+
         /// <summary>
-        /// Primary key.
+        ///     Primary key.
         /// </summary>
         public int EmailAuditLogId { get; set; }
 
@@ -52,11 +54,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Body { get; set; }
 
         /// <summary>
-        /// Guid. So that it can be used in the link whenever applicable inside each email.
+        ///     Guid. So that it can be used in the link whenever applicable inside each email.
         /// </summary>
         public string Token { get; set; }
 
         public DateTimeOffset SentDateTimeUtc { get; set; }
-    }
 
+        #endregion
+    }
 }

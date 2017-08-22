@@ -1,37 +1,39 @@
-﻿using Linko.LinkoExchange.Core.Domain;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
-using System.ComponentModel.DataAnnotations.Schema;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
     public class UserProfileMap : EntityTypeConfiguration<UserProfile>
     {
+        #region constructors and destructor
+
         public UserProfileMap()
         {
-            ToTable("tUserProfile");
+            ToTable(tableName:"tUserProfile");
 
-            Property(x => x.UserProfileId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.UserProfileId).IsRequired().HasDatabaseGeneratedOption(databaseGeneratedOption:DatabaseGeneratedOption.Identity);
 
-            Property(x => x.FirstName).IsRequired().HasMaxLength(50);
+            Property(x => x.FirstName).IsRequired().HasMaxLength(value:50);
 
-            Property(x => x.LastName).IsRequired().HasMaxLength(50);
+            Property(x => x.LastName).IsRequired().HasMaxLength(value:50);
 
-            Property(x => x.TitleRole).IsOptional().HasMaxLength(250);
+            Property(x => x.TitleRole).IsOptional().HasMaxLength(value:250);
 
-            Property(x => x.BusinessName).IsRequired().HasMaxLength(100);
+            Property(x => x.BusinessName).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.AddressLine1).IsRequired().HasMaxLength(100);
+            Property(x => x.AddressLine1).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.AddressLine2).IsOptional().HasMaxLength(100);
+            Property(x => x.AddressLine2).IsOptional().HasMaxLength(value:100);
 
-            Property(x => x.CityName).IsRequired().HasMaxLength(100);
+            Property(x => x.CityName).IsRequired().HasMaxLength(value:100);
 
-            Property(x => x.ZipCode).IsRequired().HasMaxLength(50);
+            Property(x => x.ZipCode).IsRequired().HasMaxLength(value:50);
 
             HasRequired(a => a.Jurisdiction)
                 .WithMany()
                 .HasForeignKey(c => c.JurisdictionId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.PhoneExt).IsOptional();
 
@@ -43,7 +45,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.IsInternalAccount).IsRequired();
 
-            Property(x => x.OldEmailAddress).IsOptional().HasMaxLength(256);
+            Property(x => x.OldEmailAddress).IsOptional().HasMaxLength(value:256);
 
             Property(x => x.TermConditionId).IsRequired();
 
@@ -53,9 +55,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LastModificationDateTimeUtc).IsOptional();
 
-
             // The default Identity entity is optional
             Property(x => x.PhoneNumber).IsRequired();
         }
+
+        #endregion
     }
 }

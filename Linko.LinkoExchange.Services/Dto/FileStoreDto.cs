@@ -4,6 +4,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class FileStoreDto
     {
+        #region public properties
+
         public int? FileStoreId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -27,5 +29,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int ReportPackageElementTypeId { get; internal set; } //only to be used when fetching files for possible inclusion in Report Package
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
         public DateTime? LastSubmissionDateTimeLocal { get; internal set; }
+
+        #endregion
     }
 }

@@ -4,70 +4,50 @@ using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Account
 {
-    [Validator(typeof(ResetPasswordValidator))]
+    [Validator(validatorType:typeof(ResetPasswordValidator))]
     public class ResetPasswordViewModel : PasswordViewModel
     {
-        [ScaffoldColumn(false)]
-        public int Id
-        {
-            get; set;
-        }
+        #region public properties
 
-        public string Question
-        {
-            get; set;
-        }
+        [ScaffoldColumn(scaffold:false)]
+        public int Id { get; set; }
 
-        public string Answer
-        {
-            get; set;
-        }
+        public string Question { get; set; }
 
-        [ScaffoldColumn(false)]
-        public string Token
-        {
-            get; set;
-        }
+        public string Answer { get; set; }
 
-        [ScaffoldColumn(false)]
-        public int UserProfileId
-        {
-            get;set;
-        }
+        [ScaffoldColumn(scaffold:false)]
+        public string Token { get; set; }
 
-        public string OwinUserId
-        {
-            get;set;
-        }
+        [ScaffoldColumn(scaffold:false)]
+        public int UserProfileId { get; set; }
 
-        [ScaffoldColumn(false)]
-        public int FailedCount
-        {
-            get; set;
-        }
+        public string OwinUserId { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "New Password")] 
-        public override string Password
-        {
-            get; set;
-        }
+        [ScaffoldColumn(scaffold:false)]
+        public int FailedCount { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm New Password")] 
-        public override string ConfirmPassword
-        {
-            get; set;
+        [DataType(dataType:DataType.Password)]
+        [Display(Name = "New Password")]
+        public override string Password { get; set; }
 
-        }
+        [DataType(dataType:DataType.Password)]
+        [Display(Name = "Confirm New Password")]
+        public override string ConfirmPassword { get; set; }
+
+        #endregion
     }
 
-    public partial class ResetPasswordValidator : LinkExchangePasswordValidator<ResetPasswordViewModel>
+    public class ResetPasswordValidator : LinkExchangePasswordValidator<ResetPasswordViewModel>
     {
+        #region constructors and destructor
+
         public ResetPasswordValidator()
         {
             // Email
-            RuleFor(x => x.Answer).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.Answer).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
         }
+
+        #endregion
     }
 }
