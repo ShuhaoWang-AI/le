@@ -450,9 +450,12 @@
                     @for (var i = 0; i < Model.AvailableResultQualifierValidValues.Count; i++)
                     {
                         <div class="checkbox-inline">
+                            @* ReSharper disable once ArgumentsStyleNamedExpression *@
                             @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[i].Selected)
+                            @* ReSharper disable once ArgumentsStyleNamedExpression *@
                             @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[i].Value)
-                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, labelText:Model.AvailableResultQualifierValidValues[i].Text)
+                            @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, labelText:Model.AvailableResultQualifierValidValues[index:i].Text)
                         </div>
                     }
                 </div>
@@ -465,13 +468,23 @@
                                                                                   })
 
                 <div class="col-lg-4 col-md-5">
-                    @for (var i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
+                    @if (Model.AvailableFlowUnitValidValues.Count > 0)
                     {
-                        <div class="checkbox-inline">
-                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[i].Selected)
-                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
-                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, labelText:Model.AvailableFlowUnitValidValues[i].Text)
-                        </div>
+                        for (var i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
+                        {
+                            <div class="checkbox-inline">
+                                @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                                @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[i].Selected)
+                                @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                                @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
+                                @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                                @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, labelText:Model.AvailableFlowUnitValidValues[index:i].Text)
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-red">No flow units have been added to LinkoExchange from LinkoCTS.</span>
                     }
                 </div>
             </div>
@@ -689,7 +702,16 @@
         {
             <div class="box-footer">
                 <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"ProgramSettings", controllerName:"Authority")#ProgramSettings" formmethod="post" />
+                    <input type="submit" value="Save" class="btn btn-primary btn-sm pull-right" id="btnSaveProgramSettings" formaction="@Url.Action(actionName:"ProgramSettings", controllerName:"Authority")#ProgramSettings" formmethod="post" />
+
+                    @if (Model.AvailableFlowUnitValidValues.Count < 1)
+                    {
+                        <script>
+                            $("#btnSaveProgramSettings")
+                                .prop('disabled', true)
+                                .attr('title', 'At least one sample flow unit must be selected. Sync LinkoExchange from LinkoCTS to add flow units.');
+                        </script>
+                    }
                 </div>
             </div>
         }
@@ -704,44 +726,42 @@
             .ready(function()
             {
                 var tbWithIntValue = {
-                    '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault'
-                    , '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault'
-                    , '#InvitationExpiredHours': '#InvitationExpiredHoursDefault'
-                    , '#PasswordChangeRequiredDays': '#PasswordChangeRequiredDaysDefault'
-                    , '#PasswordHistoryMaxCount': '#PasswordHistoryMaxCountDefault'
-                    , '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
+                    '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault',
+                    '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault',
+                    '#InvitationExpiredHours': '#InvitationExpiredHoursDefault',
+                    '#PasswordChangeRequiredDays': '#PasswordChangeRequiredDaysDefault',
+                    '#PasswordHistoryMaxCount': '#PasswordHistoryMaxCountDefault',
+                    '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
                 };
 
-                $.each(tbWithIntValue
-                    , function(key, value)
-                    {
-                        $(key)
-                            .blur(function()
-                            {
-                                var tb = $(key);
-                                var hf = $(value);
-                                tb.val((isNaN(parseInt(tb.val())) || $.isBlank(tb.val()))
-                                       ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val()))
-                                       : parseInt(tb.val()));
-                            });
-                    });
+                $.each(tbWithIntValue, function(key, value)
+                {
+                    $(key)
+                        .blur(function()
+                        {
+                            var tb = $(key);
+                            var hf = $(value);
+                            tb.val((isNaN(parseInt(tb.val())) || $.isBlank(tb.val()))
+                                   ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val()))
+                                   : parseInt(tb.val()));
+                        });
+                });
 
                 var tbWithStringValue = {
-                    '#EmailContactInfoName': '#EmailContactInfoNameDefault'
-                    , '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
+                    '#EmailContactInfoName': '#EmailContactInfoNameDefault',
+                    '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
                 };
 
-                $.each(tbWithStringValue
-                    , function(key, value)
-                    {
-                        $(key)
-                            .blur(function()
-                            {
-                                var tb = $(key);
-                                var hf = $(value);
-                                tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
-                            });
-                    });
+                $.each(tbWithStringValue, function(key, value)
+                {
+                    $(key)
+                        .blur(function()
+                        {
+                            var tb = $(key);
+                            var hf = $(value);
+                            tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
+                        });
+                });
             });
 
         (function($)
