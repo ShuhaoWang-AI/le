@@ -17,7 +17,8 @@
                 <span>@Label.BoxTitleForgotUserName</span>
             </div>
 
-            @using (Html.BeginForm(actionName:"ForgotUserName", controllerName:"Account", method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
+            @using (Html.BeginForm(actionName:"ForgotUserName", controllerName:"Account", method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form", id = "LinkoExchangeForm"
+            }))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
@@ -43,4 +44,13 @@
 
 @section Scripts {
     @Scripts.Render(paths:"~/bundles/jqueryval")
+
+    <script>
+        $(document)
+            .keypress(function (evt) {
+                if (evt.which === 13) {
+                    $("#LinkoExchangeForm").submit();
+                }
+            });
+    </script> 
 }

@@ -28,7 +28,7 @@
             <h4 class="box-title">@Label.ChangEmailAddress</h4>
         </div>
         <section class="box-body" id="Form1">
-            @using (Html.BeginForm(actionName:"ChangeEmail", controllerName:"Account", method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
+            @using (Html.BeginForm(actionName:"ChangeEmail", controllerName:"Account", method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form", id = "LinkoExchangeForm"}))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
@@ -39,7 +39,7 @@
                         @Html.TextBoxFor(m => m.OldEmail, htmlAttributes:new
                                                                          {
                                                                              @class = "form-control",
-                                                                             @readonly = "readonly" 
+                                                                             @readonly = "readonly"
                                                                          })
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.NewEmail, htmlAttributes:new {@class = "col-md-3 required control-label"})
                     <div class="col-md-9">
-                        @Html.TextBoxFor(m => m.NewEmail, htmlAttributes:new {@class = "form-control", AutoComplete="off"})
+                        @Html.TextBoxFor(m => m.NewEmail, htmlAttributes:new {@class = "form-control", AutoComplete = "off"})
                         @Html.ValidationMessageFor(m => m.NewEmail, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
@@ -64,4 +64,15 @@
 
 @section Scripts {
     @Scripts.Render(paths:"~/bundles/jqueryval")
+
+    <script>
+        $(document)
+            .keypress(function(evt)
+            {
+                if (evt.which === 13)
+                {
+                    $("#LinkoExchangeForm").submit();
+                }
+            });
+    </script>
 }

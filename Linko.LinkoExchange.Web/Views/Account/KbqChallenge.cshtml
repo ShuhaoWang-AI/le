@@ -29,7 +29,7 @@
             <h4 class="box-title">@Label.TitleKBQChanllenge</h4>
         </div>
         <section class="box-body" id="Form1">
-            @using (Html.BeginForm(actionName:"KbqChallenge", controllerName:"Account", method:FormMethod.Post, routeValues:new {ViewBag.returnUrl}, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
+            @using (Html.BeginForm(actionName:"KbqChallenge", controllerName:"Account", method:FormMethod.Post, routeValues:new {ViewBag.returnUrl}, htmlAttributes:new {@class = "form-horizontal", role = "form", id = "LinkoExchangeForm" }))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
@@ -67,5 +67,14 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render(paths:"~/bundles/jqueryval")
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+
+    <script>
+                $(document)
+                    .keypress(function (evt) {
+                        if (evt.which === 13) {
+                            $("#LinkoExchangeForm").submit();
+                        }
+                    });
+    </script>
 }

@@ -310,4 +310,14 @@
             $("#PhoneNumber").val(null);
         }
     </script>
+    
+    <script>
+            $(document)
+                .keypress(function (evt) {
+                    if (evt.which === 13) {
+                        $("#btnSearchEmail").click();
+                    }
+                });
+    </script>
+
 }
