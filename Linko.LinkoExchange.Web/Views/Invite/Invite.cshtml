@@ -315,7 +315,11 @@
             $(document)
                 .keypress(function (evt) {
                     if (evt.which === 13) {
-                        $("#btnSearchEmail").click();
+                        if ($("#btnSearchEmail").is(':visible')) {
+                            $("#btnSearchEmail").click();
+                        } else if ($("#btnSendInvite").is(':visible')) {
+                            $("#btnSendInvite").click();
+                        }
                     }
                 });
     </script>
