@@ -6,13 +6,22 @@ using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
+
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class PDFGeneratorTests
     {
-        ReportPackageDto _reportPackageDto = new ReportPackageDto();
-        private int _monitoringPointCount = 2;
+        #region fields
+
+        private readonly int _monitoringPointCount = 2;
+        private readonly ReportPackageDto _reportPackageDto = new ReportPackageDto();
+
+        #endregion
 
         [TestInitialize]
         public void Init()
@@ -30,14 +39,12 @@ namespace Linko.LinkoExchange.Test
             _reportPackageDto.OrganizationZipCode = "02334";
             _reportPackageDto.SubmissionDateTimeLocal = DateTimeOffset.Now.DateTime;
             _reportPackageDto.SubmitterUserName = "Davlid Pelletier";
-            _reportPackageDto.SubmitterTitleRole = "Enironment Compliance Manager";
+            _reportPackageDto.SubmitterTitleRole = "Environment Compliance Manager";
 
             _reportPackageDto.RecipientOrganizationName = "City of Grand Rapids";
 
             _reportPackageDto.Comments = "This is comments content ";
-
         }
-
 
         [TestMethod]
         public void GeneralTest()
@@ -47,7 +54,7 @@ namespace Linko.LinkoExchange.Test
             PrepareCertifications();
             PrepareReportElementCategoryNames();
 
-            var pdfGenertator = new PdfGenerator(_reportPackageDto);
+            var pdfGenertator = new PdfGenerator(reportPackage:_reportPackageDto);
             pdfGenertator.CreateCopyOfRecordPdf();
         }
 
@@ -59,7 +66,7 @@ namespace Linko.LinkoExchange.Test
             PrepareCertifications();
             PrepareReportElementCategoryNames();
 
-            var pdfGenertator = new PdfGenerator(_reportPackageDto);
+            var pdfGenertator = new PdfGenerator(reportPackage:_reportPackageDto);
             pdfGenertator.CreateCopyOfRecordPdf();
         }
 
@@ -73,145 +80,164 @@ namespace Linko.LinkoExchange.Test
 
             // samples results
             {
-                int seed = (int)DateTime.Now.Ticks;
-                int days = seed * random.Next(10) % 90;
-                int months = seed * random.Next(10) % 12;
+                var seed = (int) DateTime.Now.Ticks;
+                var days = seed * random.Next(maxValue:10) % 90;
+                var months = seed * random.Next(maxValue:10) % 12;
 
-                sampleResults1.Add(new SampleResultDto
-                {
-                    ParameterName = "1,4-Dioxane",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults1.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "1,4-Dioxane",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-                sampleResults1.Add(new SampleResultDto
-                {
-                    ParameterName = "Benzidine",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults1.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "Benzidine",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-                sampleResults1.Add(new SampleResultDto
-                {
-                    ParameterName = "1,4-Dioxane",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults1.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "1,4-Dioxane",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-
-                sampleResults1.Add(new SampleResultDto
-                {
-                    ParameterName = "1,4-Dioxane",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults1.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "1,4-Dioxane",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
                 //// for sample 2
 
-                sampleResults2.Add(new SampleResultDto
-                {
-                    ParameterName = "1,4-Dioxane",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults2.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "1,4-Dioxane",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-                sampleResults2.Add(new SampleResultDto
-                {
-                    ParameterName = "bbb",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults2.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "bbb",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-                sampleResults2.Add(new SampleResultDto
-                {
-                    ParameterName = "1,4-Dioxane",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults2.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "1,4-Dioxane",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
 
-                sampleResults2.Add(new SampleResultDto
-                {
-                    ParameterName = "aa",
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
-                });
+                sampleResults2.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = "aa",
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = DateTimeOffset
+                                                .Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                                .AddMinutes(value:random.Next(maxValue:10))
+                                        });
             }
 
-            // sampels 
+            // samples 
             for (var i = 0; i < _monitoringPointCount; i++)
             {
-                int seed = (int)DateTime.Now.Ticks;
-                int days = seed * random.Next(90) % 90;
-                int month = (seed * random.Next(12) * random.Next()) % 12;
-                int hours = seed * random.Next(60) * random.Next() % 60;
-                int hours1 = seed * random.Next(60) * random.Next() % 60;
-                int minutes = seed * random.Next(60) * random.Next() % 60;
-                int minutes1 = seed * random.Next(60) * random.Next() % 60;
+                var seed = (int) DateTime.Now.Ticks;
+                var days = seed * random.Next(maxValue:90) % 90;
+                var month = seed * random.Next(maxValue:12) * random.Next() % 12;
+                var hours = seed * random.Next(maxValue:60) * random.Next() % 60;
+                var hours1 = seed * random.Next(maxValue:60) * random.Next() % 60;
+                var minutes = seed * random.Next(maxValue:60) * random.Next() % 60;
+                var minutes1 = seed * random.Next(maxValue:60) * random.Next() % 60;
 
-                sampleDtos.Add(new SampleDto
-                {
-                    StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours).AddMinutes(minutes),
-                    EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours + 2).AddMinutes(minutes1),
+                sampleDtos.Add(item:new SampleDto
+                                    {
+                                        StartDateTimeLocal =
+                                            DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours).AddMinutes(value:minutes),
+                                        EndDateTimeLocal = DateTimeOffset
+                                            .Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours + 2).AddMinutes(value:minutes1),
 
-                    CollectionMethodName = "a-collection method",
-                    LabSampleIdentifier = "123232",
-                    FlowEnteredValue = "0.18",
-                    FlowUnitName = "mgd",
-                    MonitoringPointId = 30 + i,
-                    MonitoringPointName = $"TestingMonitoringPoint_{i}",
-                    SampleResults = sampleResults1
-                });
+                                        CollectionMethodName = "a-collection method",
+                                        LabSampleIdentifier = "123232",
+                                        FlowEnteredValue = "0.18",
+                                        FlowUnitName = "mgd",
+                                        MonitoringPointId = 30 + i,
+                                        MonitoringPointName = $"TestingMonitoringPoint_{i}",
+                                        SampleResults = sampleResults1
+                                    });
 
-                sampleDtos.Add(new SampleDto
-                {
-                    StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours).AddMinutes(minutes),
-                    EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours + 2).AddMinutes(minutes1),
+                sampleDtos.Add(item:new SampleDto
+                                    {
+                                        StartDateTimeLocal =
+                                            DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours).AddMinutes(value:minutes),
+                                        EndDateTimeLocal = DateTimeOffset
+                                            .Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours + 2).AddMinutes(value:minutes1),
 
-                    CollectionMethodName = "b-collection method",
-                    LabSampleIdentifier = "123232",
-                    FlowEnteredValue = "0.19",
-                    FlowUnitName = "mgd",
-                    MonitoringPointId = 30 + i,
-                    MonitoringPointName = $"TestingMonitoringPoint_{i}",
-                    SampleResults = sampleResults2
-                });
+                                        CollectionMethodName = "b-collection method",
+                                        LabSampleIdentifier = "123232",
+                                        FlowEnteredValue = "0.19",
+                                        FlowUnitName = "mgd",
+                                        MonitoringPointId = 30 + i,
+                                        MonitoringPointName = $"TestingMonitoringPoint_{i}",
+                                        SampleResults = sampleResults2
+                                    });
             }
-
 
             _reportPackageDto.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
 
-            _reportPackageDto.SamplesAndResultsTypes.Add(new ReportPackageElementTypeDto
-            {
-                ReportElementTypeName = "Samples and Results",
-                ReportElementTypeContent = string.Empty,
-                ReportElementTypeId = 1,
-                ReportPackageElementCategoryId = 1,
-                Samples = sampleDtos
-            });
+            _reportPackageDto.SamplesAndResultsTypes.Add(item:new ReportPackageElementTypeDto
+                                                              {
+                                                                  ReportElementTypeName = "Samples and Results",
+                                                                  ReportElementTypeContent = string.Empty,
+                                                                  ReportElementTypeId = 1,
+                                                                  ReportPackageElementCategoryId = 1,
+                                                                  Samples = sampleDtos
+                                                              });
         }
+
         private void PrepareSampleDtos()
         {
             var sampleResults1 = new List<SampleResultDto>();
@@ -225,132 +251,133 @@ namespace Linko.LinkoExchange.Test
             // sample results 
             for (var i = 0; i < sampleResultCount; i++)
             {
-                int seed = (int)DateTime.Now.Ticks;
-                int days = seed * random.Next(10) % 90;
-                int months = seed * random.Next(10) % 12;
+                var seed = (int) DateTime.Now.Ticks;
+                var days = seed * random.Next(maxValue:10) % 90;
+                var months = seed * random.Next(maxValue:10) % 12;
 
-                var dt1 = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10));
-                dt1 = dt1.AddSeconds(-dt1.Second);
-                dt1 = dt1.AddMilliseconds(-dt1.Millisecond);
+                var dt1 = DateTimeOffset.Now.DateTime.AddMonths(months:months).AddDays(value:days).AddHours(value:random.Next(maxValue:3))
+                                        .AddMinutes(value:random.Next(maxValue:10));
+                dt1 = dt1.AddSeconds(value:-dt1.Second);
+                dt1 = dt1.AddMilliseconds(value:-dt1.Millisecond);
 
-                sampleResults1.Add(new SampleResultDto
-                {
-                    ParameterName = GetRandomeParameterName(),
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = dt1
-                });
+                sampleResults1.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = GetRandomeParameterName(),
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = dt1
+                                        });
 
+                var dt2 = DateTimeOffset.Now.DateTime.AddMonths(months:months + 2).AddDays(value:days + 3).AddHours(value:random.Next(maxValue:3))
+                                        .AddMinutes(value:random.Next(maxValue:10));
+                dt2 = dt2.AddSeconds(value:-dt1.Second);
+                dt2 = dt2.AddMilliseconds(value:-dt1.Millisecond);
 
-                var dt2 = DateTimeOffset.Now.DateTime.AddMonths(months + 2).AddDays(days + 3).AddHours(random.Next(3)).AddMinutes(random.Next(10));
-                dt2 = dt2.AddSeconds(-dt1.Second);
-                dt2 = dt2.AddMilliseconds(-dt1.Millisecond);
+                sampleResults2.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = GetRandomeParameterName(),
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = dt2
+                                        });
 
-                sampleResults2.Add(new SampleResultDto
-                {
-                    ParameterName = GetRandomeParameterName(),
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = dt2
-                });
+                sampleResults3.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = GetRandomeParameterName(),
+                                            MethodDetectionLimit = 0.02,
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = dt2
+                                        });
 
-
-                sampleResults3.Add(new SampleResultDto
-                {
-                    ParameterName = GetRandomeParameterName(),
-                    MethodDetectionLimit = 0.02,
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = dt2
-                });
-
-                sampleResults3.Add(new SampleResultDto
-                {
-                    ParameterName = GetRandomeParameterName(),
-                    IsCalcMassLoading = true,
-                    MethodDetectionLimit = 0.02,
-                    MassLoadingUnitName = "ppd",
-                    MassLoadingValue = random.NextDouble().ToString().Substring(0, 4),
-                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
-                    UnitName = "mg/L",
-                    AnalysisMethod = "200.7",
-                    AnalysisDateTimeLocal = dt2
-                });
+                sampleResults3.Add(item:new SampleResultDto
+                                        {
+                                            ParameterName = GetRandomeParameterName(),
+                                            IsCalcMassLoading = true,
+                                            MethodDetectionLimit = 0.02,
+                                            MassLoadingUnitName = "ppd",
+                                            MassLoadingValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            EnteredValue = random.NextDouble().ToString().Substring(startIndex:0, length:4),
+                                            UnitName = "mg/L",
+                                            AnalysisMethod = "200.7",
+                                            AnalysisDateTimeLocal = dt2
+                                        });
             }
 
-            // sampels
+            // samples
             for (var i = 0; i < _monitoringPointCount; i++)
             {
-                int seed = (int)DateTime.Now.Ticks;
-                int days = seed * random.Next(90) % 90;
-                int month = (seed * random.Next(12) * random.Next()) % 12;
-                int hours = seed * random.Next(60) * random.Next() % 60;
-                int minutes = seed * random.Next(60) * random.Next() % 60;
-                int minutes1 = seed * random.Next(60) * random.Next() % 60;
+                var seed = (int) DateTime.Now.Ticks;
+                var days = seed * random.Next(maxValue:90) % 90;
+                var month = seed * random.Next(maxValue:12) * random.Next() % 12;
+                var hours = seed * random.Next(maxValue:60) * random.Next() % 60;
+                var minutes = seed * random.Next(maxValue:60) * random.Next() % 60;
+                var minutes1 = seed * random.Next(maxValue:60) * random.Next() % 60;
 
                 var sample1 = new SampleDto
-                {
-                    StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours).AddMinutes(minutes),
-                    EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours + 2).AddMinutes(minutes1),
+                              {
+                                  StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours).AddMinutes(value:minutes),
+                                  EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours + 2).AddMinutes(value:minutes1),
 
-                    CollectionMethodName = GetRandomCollectionMethod(),
-                    LabSampleIdentifier = "123232",
-                    FlowEnteredValue = "0.18",
-                    FlowUnitName = "mgd",
-                    MonitoringPointId = 30 + i,
-                    MonitoringPointName = $"TestingMonitoringPoint_{i}",
-                    SampleResults = sampleResults1
-                };
-                sampleDtos.Add(sample1);
+                                  CollectionMethodName = GetRandomCollectionMethod(),
+                                  LabSampleIdentifier = "123232",
+                                  FlowEnteredValue = "0.18",
+                                  FlowUnitName = "mgd",
+                                  MonitoringPointId = 30 + i,
+                                  MonitoringPointName = $"TestingMonitoringPoint_{i}",
+                                  SampleResults = sampleResults1
+                              };
+                sampleDtos.Add(item:sample1);
 
                 var sample2 = new SampleDto
-                {
-                    StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours).AddMinutes(minutes),
-                    EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month).AddDays(days).AddHours(hours + 2).AddMinutes(minutes1),
+                              {
+                                  StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours).AddMinutes(value:minutes),
+                                  EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month).AddDays(value:days).AddHours(value:hours + 2).AddMinutes(value:minutes1),
 
-                    CollectionMethodName = GetRandomCollectionMethod(),
-                    LabSampleIdentifier = "123232",
-                    FlowEnteredValue = "0.19",
-                    FlowUnitName = "mgd",
-                    MonitoringPointId = 30 + i,
-                    MonitoringPointName = $"TestingMonitoringPoint_{i}",
-                    SampleResults = sampleResults3
-                };
+                                  CollectionMethodName = GetRandomCollectionMethod(),
+                                  LabSampleIdentifier = "123232",
+                                  FlowEnteredValue = "0.19",
+                                  FlowUnitName = "mgd",
+                                  MonitoringPointId = 30 + i,
+                                  MonitoringPointName = $"TestingMonitoringPoint_{i}",
+                                  SampleResults = sampleResults3
+                              };
 
-                sampleDtos.Add(sample2);
+                sampleDtos.Add(item:sample2);
 
                 var sample3 = new SampleDto
-                {
-                    StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month + 3).AddDays(days).AddHours(hours).AddMinutes(minutes),
-                    EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(month + 3).AddDays(days).AddHours(hours + 2).AddMinutes(minutes1),
+                              {
+                                  StartDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month + 3).AddDays(value:days).AddHours(value:hours).AddMinutes(value:minutes),
+                                  EndDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months:month + 3).AddDays(value:days).AddHours(value:hours + 2)
+                                                                   .AddMinutes(value:minutes1),
 
-                    CollectionMethodName = GetRandomCollectionMethod(),
-                    LabSampleIdentifier = "123232",
-                    FlowEnteredValue = "0.31",
-                    FlowUnitName = "mgd",
-                    MonitoringPointId = 30 + i,
-                    MonitoringPointName = $"TestingMonitoringPoint_{i}",
-                    SampleResults = sampleResults2
-                };
+                                  CollectionMethodName = GetRandomCollectionMethod(),
+                                  LabSampleIdentifier = "123232",
+                                  FlowEnteredValue = "0.31",
+                                  FlowUnitName = "mgd",
+                                  MonitoringPointId = 30 + i,
+                                  MonitoringPointName = $"TestingMonitoringPoint_{i}",
+                                  SampleResults = sampleResults2
+                              };
 
-                sampleDtos.Add(sample3);
+                sampleDtos.Add(item:sample3);
             }
 
             _reportPackageDto.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
 
-            _reportPackageDto.SamplesAndResultsTypes.Add(new ReportPackageElementTypeDto
-            {
-                ReportElementTypeName = "Samples and Results",
-                ReportElementTypeContent = string.Empty,
-                ReportElementTypeId = 1,
-                ReportPackageElementCategoryId = 1,
-                Samples = sampleDtos
-            });
+            _reportPackageDto.SamplesAndResultsTypes.Add(item:new ReportPackageElementTypeDto
+                                                              {
+                                                                  ReportElementTypeName = "Samples and Results",
+                                                                  ReportElementTypeContent = string.Empty,
+                                                                  ReportElementTypeId = 1,
+                                                                  ReportPackageElementCategoryId = 1,
+                                                                  Samples = sampleDtos
+                                                              });
         }
 
         private void PrepareAttachmentTypes()
@@ -360,19 +387,19 @@ namespace Linko.LinkoExchange.Test
             var fileStores = new List<FileStoreDto>();
             for (var i = 0; i < 5; i++)
             {
-                fileStores.Add(new FileStoreDto
-                {
-                    FileType = "image/jpg",
-                    ReportElementTypeName = $"Lab Analysis Report",
-                    Name = $"1st Quarter PCR_{i}",
-                    OriginalFileName = $"1st Quarter PCR_{i}"
-                });
+                fileStores.Add(item:new FileStoreDto
+                                    {
+                                        FileType = "image/jpg",
+                                        ReportElementTypeName = $"Lab Analysis Report",
+                                        Name = $"1st Quarter PCR_{i}",
+                                        OriginalFileName = $"1st Quarter PCR_{i}"
+                                    });
             }
 
-            _reportPackageDto.AttachmentTypes.Add(new ReportPackageElementTypeDto
-            {
-                FileStores = fileStores
-            });
+            _reportPackageDto.AttachmentTypes.Add(item:new ReportPackageElementTypeDto
+                                                       {
+                                                           FileStores = fileStores
+                                                       });
         }
 
         private void PrepareCertifications()
@@ -380,62 +407,63 @@ namespace Linko.LinkoExchange.Test
             _reportPackageDto.CertificationTypes = new List<ReportPackageElementTypeDto>();
 
             var ttoCertification = new ReportPackageElementTypeDto
-            {
-                ReportElementTypeName = "TTO Certification",
-                ReportElementTypeContent = "Based on my inquiry of the person or persons......."
-            };
+                                   {
+                                       ReportElementTypeName = "TTO Certification",
+                                       ReportElementTypeContent = "Based on my inquiry of the person or persons......."
+                                   };
 
             var signatureStatement = new ReportPackageElementTypeDto
-            {
-                ReportElementTypeName = "Signature Certification",
-                ReportElementTypeContent = "I certify ....."
-            };
+                                     {
+                                         ReportElementTypeName = "Signature Certification",
+                                         ReportElementTypeContent = "I certify ....."
+                                     };
 
-            _reportPackageDto.CertificationTypes.Add(ttoCertification);
-            _reportPackageDto.CertificationTypes.Add(signatureStatement);
+            _reportPackageDto.CertificationTypes.Add(item:ttoCertification);
+            _reportPackageDto.CertificationTypes.Add(item:signatureStatement);
         }
 
         private void PrepareReportElementCategoryNames()
         {
             _reportPackageDto.ReportPackageElementCategories = new List<ReportElementCategoryName>();
 
-            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.Attachments);
-            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.Certifications);
-            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.SamplesAndResults);
+            _reportPackageDto.ReportPackageElementCategories.Add(item:ReportElementCategoryName.Attachments);
+            _reportPackageDto.ReportPackageElementCategories.Add(item:ReportElementCategoryName.Certifications);
+            _reportPackageDto.ReportPackageElementCategories.Add(item:ReportElementCategoryName.SamplesAndResults);
         }
-
 
         private string GetRandomCollectionMethod()
         {
             var collectionMethods = new[]
                                     {
-                                        "24", "24 hour flow", "8HR", "AVG", "BLANK", "Calcd", "COMP", "DUP", "Each Batch", "Field", "FLOW", "G/C", "GRAB", "IM", "Meter reading", "Trip blank"
+                                        "24", "24 hour flow", "8HR", "AVG", "BLANK", "Calcd", "COMP", "DUP", "Each Batch", "Field", "FLOW", "G/C", "GRAB", "IM", "Meter reading",
+                                        "Trip blank"
                                     };
 
-            int seed = (int)DateTime.Now.Ticks;
-            Thread.Sleep(1000);
-            var random = new Random(seed);
-            var index = random.Next(0, collectionMethods.Length - 1);
+            var seed = (int) DateTime.Now.Ticks;
+            Thread.Sleep(millisecondsTimeout:1000);
+            var random = new Random(Seed:seed);
+            var index = random.Next(minValue:0, maxValue:collectionMethods.Length - 1);
             return collectionMethods[index];
         }
 
         private string GetRandomeParameterName()
         {
             var parameters = GetParameterNames();
-            Thread.Sleep(1000);
-            int seed = (int)DateTime.Now.Ticks;
-            var random = new Random(seed);
-            var index = random.Next(0, parameters.Length - 1);
-            Console.WriteLine(index);
+            Thread.Sleep(millisecondsTimeout:1000);
+            var seed = (int) DateTime.Now.Ticks;
+            var random = new Random(Seed:seed);
+            var index = random.Next(minValue:0, maxValue:parameters.Length - 1);
+            Console.WriteLine(value:index);
             return parameters[index];
         }
+
         private string[] GetParameterNames()
         {
-            var parameterNames = new string[]
+            var parameterNames = new[]
                                  {
                                      "1,1,1,2-Tetrachloroethane",
                                      "1,1,1-Trichloroethane",
-                                    "1,1-Dichloroethane",
+                                     "1,1-Dichloroethane",
                                      "1,1-Dichlorpropene",
                                      "1,2,3-Trichlorpropane",
 
@@ -468,7 +496,6 @@ namespace Linko.LinkoExchange.Test
 
                                      "gamma-BHC (Lindane)",
                                      "gamma-Chlordane",
-
 
                                      "Isopropyl ether",
 
@@ -511,8 +538,6 @@ namespace Linko.LinkoExchange.Test
                                  };
 
             return parameterNames;
-
         }
-
     }
 }

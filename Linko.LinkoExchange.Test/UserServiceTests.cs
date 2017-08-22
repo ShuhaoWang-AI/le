@@ -3,11 +3,14 @@ using System.Configuration;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Settings;
@@ -17,47 +20,51 @@ using Microsoft.AspNet.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Services.HttpContext;
+
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class UserServiceTests
     {
-        private UserService _userService;
+        #region fields
+
+        private readonly Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
+        private readonly IRequestCache _requestCache = Mock.Of<IRequestCache>();
+
+        private Mock<ICromerrAuditLogService> _cromerrLogger;
+        private Mock<IHttpContextService> _httpContext;
+        private Mock<ILogger> _logger;
+        private Mock<IOrganizationService> _orgService;
+        private Mock<IQuestionAnswerService> _qaService;
+        private IOrganizationService _realOrgService;
+        private ISettingService _realSettingService;
         private UserService _realUserService;
-        Mock<IHttpContextService> _httpContext;
-        Mock<ISessionCache> _sessionCache;
-        IRequestCache _requestCache = Mock.Of<IRequestCache>();
-        Mock<IOrganizationService> _orgService;
-        IOrganizationService _realOrgService;
-        Mock<ISettingService> _settingService;
-        ISettingService _realSettingService; 
-        ITimeZoneService _timeZones;
-        Mock<ApplicationUserManager> _userManager;
-        Mock<IQuestionAnswerService> _qaService;
-        Mock<ILogger> _logger;
-        Mock<ICromerrAuditLogService> _cromerrLogger;
-        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
-        public UserServiceTests()
-        {
-        }
+        private Mock<ISessionCache> _sessionCache;
+        private Mock<ISettingService> _settingService;
+        private ITimeZoneService _timeZones;
+        private Mock<ApplicationUserManager> _userManager;
+        private UserService _userService;
+
+        #endregion
 
         [TestInitialize]
         public void Initialize()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
 
             _httpContext = new Mock<IHttpContextService>();
-            _httpContext.Setup(x => x.CurrentUserProfileId()).Returns(2);
+            _httpContext.Setup(x => x.CurrentUserProfileId()).Returns(value:2);
 
             _sessionCache = new Mock<ISessionCache>();
-            _httpContext.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("2");
+            _httpContext.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns(value:"2");
 
             _orgService = new Mock<IOrganizationService>();
-            _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
+            _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(value:new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = 1});
 
             var userStore = new Mock<IUserStore<UserProfile>>();
             _userManager = new Mock<ApplicationUserManager>(userStore.Object);
@@ -66,35 +73,45 @@ namespace Linko.LinkoExchange.Test
             _cromerrLogger = new Mock<ICromerrAuditLogService>();
 
             //_settingService.GetGlobalSettings()
-            var globalSettingLookup = new Dictionary<SystemSettingType, string>();
-            globalSettingLookup.Add(SystemSettingType.SupportPhoneNumber, "555-555-5555");
-            globalSettingLookup.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
+            var globalSettingLookup = new Dictionary<SystemSettingType, string>
+                                      {
+                                          {SystemSettingType.SupportPhoneNumber, "555-555-5555"},
+                                          {SystemSettingType.SupportEmailAddress, "test@test.com"}
+                                      };
             _settingService = new Mock<ISettingService>();
-            _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
-            _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
+            _settingService.Setup(x => x.GetGlobalSettings()).Returns(value:globalSettingLookup);
+            _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns(value:"1");
 
-            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
-            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object);
-            _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
-                _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
-            _realUserService = new UserService(new LinkoExchangeContext(connectionString),_httpContext.Object, _realSettingService,
-                 _realOrgService, _requestCache, _timeZones, _logger.Object, new MapHelper(), _cromerrLogger.Object, _linkoExchangeEmailService.Object);
+            _timeZones = new TimeZoneService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), settings:_settingService.Object,
+                                             mapHelper:new MapHelper(), appCache:new Mock<IApplicationCache>().Object);
+            _realSettingService = new SettingService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), logger:_logger.Object, mapHelper:new MapHelper(),
+                                                     cache:new Mock<IRequestCache>().Object, globalSettings:new Mock<IGlobalSettings>().Object);
+            _realOrgService = new OrganizationService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
+                                                      settingService:_realSettingService, httpContext:new HttpContextService(),
+                                                      jurisdictionService:new JurisdictionService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
+                                                                                                  mapHelper:new MapHelper(), logService:_logger.Object), timeZoneService:_timeZones,
+                                                      mapHelper:new MapHelper());
+            _realUserService = new UserService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), httpContext:_httpContext.Object,
+                                               settingService:_realSettingService,
+                                               orgService:_realOrgService, requestCache:_requestCache, timeZones:_timeZones, logService:_logger.Object, mapHelper:new MapHelper(),
+                                               crommerAuditLogService:_cromerrLogger.Object, linkoExchangeEmailService:_linkoExchangeEmailService.Object);
 
-            _userService = new UserService(new LinkoExchangeContext(connectionString),
-                 _httpContext.Object, _settingService.Object,
-                 _orgService.Object, _requestCache, _timeZones,_logger.Object, new MapHelper(), _cromerrLogger.Object,_linkoExchangeEmailService.Object);
+            _userService = new UserService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
+                                           httpContext:_httpContext.Object, settingService:_settingService.Object,
+                                           orgService:_orgService.Object, requestCache:_requestCache, timeZones:_timeZones, logService:_logger.Object, mapHelper:new MapHelper(),
+                                           crommerAuditLogService:_cromerrLogger.Object, linkoExchangeEmailService:_linkoExchangeEmailService.Object);
         }
 
         [TestMethod]
         public void GetUserProfilesForOrgRegProgram()
         {
-            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
+            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:1, isRegApproved:null, isRegDenied:null, isEnabled:null, isRemoved:null);
         }
 
         [TestMethod]
         public void GetPendingRegistrationPendingUsersOrgRegProgram()
         {
-            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(2, false, false, true, false);
+            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:2, isRegApproved:false, isRegDenied:false, isEnabled:true, isRemoved:false);
         }
 
         [TestMethod]
@@ -102,8 +119,8 @@ namespace Linko.LinkoExchange.Test
         {
             var orgRegProgUserId = 7;
             var permissionGroupId = 1;
-            _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId, permissionGroupId);
-            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true, false);
+            _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId:orgRegProgUserId, permissionGroupId:permissionGroupId);
+            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId:orgRegProgUserId, isApproved:true, isSignatory:false);
         }
 
         [TestMethod]
@@ -111,202 +128,201 @@ namespace Linko.LinkoExchange.Test
         {
             var orgRegProgUserId = 7;
             var permissionGroupId = 65;
-            _realUserService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, false);
+            _realUserService.ApprovePendingRegistration(orgRegProgUserId:orgRegProgUserId, permissionGroupId:permissionGroupId, isApproved:false);
         }
-
 
         [TestMethod]
         public void GetPendingRegistrationsProgramUsers()
         {
             var orgRegProgUserId = 1;
-            _realUserService.GetPendingRegistrationProgramUsers(orgRegProgUserId);
+            _realUserService.GetPendingRegistrationProgramUsers(orgRegProgramId:orgRegProgUserId);
         }
 
         [TestMethod]
         public void UpdateUserSignatoryStatus()
         {
             var orgRegProgUserId = 7;
-            _userService.UpdateUserSignatoryStatus(orgRegProgUserId, true);
+            _userService.UpdateUserSignatoryStatus(orgRegProgUserId:orgRegProgUserId, isSignatory:true);
         }
 
         [TestMethod]
         public void UpdateUserState_RegistrationApproved()
         {
             var orgRegProgUserId = 1;
-            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
-            _userService.UpdateUserState(orgRegProgUserId, true, null, null, null);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:false, isRegDenied:false, isEnabled:false, isRemoved:false);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:true, isRegDenied:null, isEnabled:null, isRemoved:null);
         }
 
         [TestMethod]
         public void UpdateUserState_RegistrationDenied()
         {
             var orgRegProgUserId = 1;
-            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
-            _userService.UpdateUserState(orgRegProgUserId, null, true, null, null);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:false, isRegDenied:false, isEnabled:false, isRemoved:false);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:null, isRegDenied:true, isEnabled:null, isRemoved:null);
         }
 
         [TestMethod]
         public void UpdateUserState_Enabled()
         {
             var orgRegProgUserId = 1;
-            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
-            _userService.UpdateUserState(orgRegProgUserId, null, null, true, null);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:false, isRegDenied:false, isEnabled:false, isRemoved:false);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:null, isRegDenied:null, isEnabled:true, isRemoved:null);
         }
+
         [TestMethod]
         public void UpdateUserState_Removed()
         {
             var orgRegProgUserId = 1;
-            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:false, isRegDenied:false, isEnabled:false, isRemoved:false);
         }
 
         [TestMethod]
         public void UpdateUserState_UnRemove()
         {
             var orgRegProgUserId = 1;
-            _userService.RemoveUser(orgRegProgUserId);
-            _userService.UpdateUserState(orgRegProgUserId, null, null, null, false);
+            _userService.RemoveUser(orgRegProgUserId:orgRegProgUserId);
+            _userService.UpdateUserState(orgRegProgUserId:orgRegProgUserId, isRegApproved:null, isRegDenied:null, isEnabled:null, isRemoved:false);
         }
 
         [TestMethod]
         public void LockUserAccount()
         {
-            var resultDto = _userService.LockUnlockUserAccount(13, true, AccountLockEvent.ManualAction, true);
+            var resultDto = _userService.LockUnlockUserAccount(targetOrgRegProgUserId:13, isAttemptingLock:true, reason:AccountLockEvent.ManualAction,
+                                                               isAuthorizationRequired:true);
         }
 
         [TestMethod]
         public void UnLockUserAccount()
         {
-            var resultDto = _userService.LockUnlockUserAccount(13, false, AccountLockEvent.ManualAction, true);
+            var resultDto = _userService.LockUnlockUserAccount(targetOrgRegProgUserId:13, isAttemptingLock:false, reason:AccountLockEvent.ManualAction,
+                                                               isAuthorizationRequired:true);
         }
 
         [TestMethod]
         public void DisableUserAccount()
         {
-            _userService.EnableDisableUserAccount(1, true);
+            _userService.EnableDisableUserAccount(orgRegProgramUserId:1, isAttemptingDisable:true);
         }
 
         [TestMethod]
         public void ResetUser()
         {
-            var result = _userService.ResetUser(1, "markus.jeon@watertrax.com");
+            var result = _userService.ResetUser(targetOrgRegProgUserId:1, newEmailAddress:"markus.jeon@watertrax.com");
         }
 
         [TestMethod]
         public void UpdateProfile()
         {
-            var dto = new UserDto()
-            {
-                FirstName = "Billy",
-                LastName = "Goat",
-                TitleRole = "President",
-                BusinessName = "Acme Corp.",
-                UserProfileId = 1,
-                AddressLine1 = "1234 Main St",
-                AddressLine2 = "Apt 102",
-                CityName = "Toronto",
-                ZipCode = "55555",
-                PhoneNumber = "555-555-5555",
-                JurisdictionId = 4
-            };
+            var dto = new UserDto
+                      {
+                          FirstName = "Billy",
+                          LastName = "Goat",
+                          TitleRole = "President",
+                          BusinessName = "Acme Corp.",
+                          UserProfileId = 1,
+                          AddressLine1 = "1234 Main St",
+                          AddressLine2 = "Apt 102",
+                          CityName = "Toronto",
+                          ZipCode = "55555",
+                          PhoneNumber = "555-555-5555",
+                          JurisdictionId = 4
+                      };
 
-            _userService.UpdateProfile(dto);
+            _userService.UpdateProfile(dto:dto);
         }
 
         [TestMethod]
         public void UpdateEmail()
         {
-            var isWorked = _userService.UpdateEmail(1, "jbourne@test.com");
+            var isWorked = _userService.UpdateEmail(userProfileId:1, newEmailAddress:"jbourne@test.com");
         }
-
 
         [TestMethod]
         public void UpdateUserSignatoryStatus_Test()
         {
-            _userService.UpdateUserSignatoryStatus(1, true);
+            _userService.UpdateUserSignatoryStatus(orgRegProgUserId:1, isSignatory:true);
         }
-
 
         [TestMethod]
         public void EnableDisableUserAccount_Test()
         {
-            _userService.EnableDisableUserAccount(9, true);
+            _userService.EnableDisableUserAccount(orgRegProgramUserId:9, isAttemptingDisable:true);
         }
 
         [TestMethod]
         public void GetOrganizationRegulatoryProgramUser_Test()
         {
-            _userService.GetOrganizationRegulatoryProgramUser(5, true);
+            _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:5, isAuthorizationRequired:true);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_OrgRegProgram_Is_Admin_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns(value:"3");
 
-            int targetOrgRegProgUserId = 4;
+            var targetOrgRegProgUserId = 4;
             var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_OrgRegProgram_Not_Admin_False_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("4");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns(value:"4");
 
-            int targetOrgRegProgUserId = 3;
+            var targetOrgRegProgUserId = 3;
             var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_Authority_Is_Admin_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns(value:"3");
 
-            int targetOrgRegProgUserId = 4;
+            var targetOrgRegProgUserId = 4;
             var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetOrganizationRegulatoryProgramUser_Accessing_Self_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns(value:"3");
 
-            int targetOrgRegProgUserId = 3;
+            var targetOrgRegProgUserId = 3;
             var isAuthorized = _userService.CanUserExecuteApi("GetOrganizationRegulatoryProgramUser", targetOrgRegProgUserId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetOrganizationRegulatoryProgramUser_Accessing_Another_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns(value:"3");
 
-            int targetOrgRegProgUserId = 4;
+            var targetOrgRegProgUserId = 4;
             var isAuthorized = _userService.CanUserExecuteApi("GetOrganizationRegulatoryProgramUser", targetOrgRegProgUserId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
-
     }
 }

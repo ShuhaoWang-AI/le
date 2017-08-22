@@ -1,36 +1,42 @@
-﻿using System.Configuration;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Settings;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services.TimeZone;
-using System;
-using Moq;
+﻿using System;
+using System.Configuration;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class TimeZoneServiceTests
     {
-        private TimeZoneService _tZservice;
-        Mock<ISettingService> _settings;
+        #region fields
 
-        public TimeZoneServiceTests()
-        {
-        }
+        private Mock<ISettingService> _settings;
+        private TimeZoneService _tZservice;
+
+        #endregion
 
         [TestInitialize]
         public void Initialize()
         {
             _settings = new Mock<ISettingService>();
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 1, It.IsAny<SettingType>())).Returns("1");
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 2, It.IsAny<SettingType>())).Returns("4");
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("4");
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 1, It.IsAny<SettingType>())).Returns(value:"1");
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 2, It.IsAny<SettingType>())).Returns(value:"4");
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns(value:"4");
 
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), _settings.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
+            var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
+            _tZservice = new TimeZoneService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), settings:_settings.Object, mapHelper:new MapHelper(),
+                                             appCache:new Mock<IApplicationCache>().Object);
         }
 
         [TestMethod]
@@ -42,19 +48,17 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetCurrentUtcDateTime_Test()
         {
-            DateTime now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
             DateTimeOffset? registrationDate = now;
-            DateTime regDatePST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 1);
-            DateTime regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 2);
-            Assert.AreEqual(regDateEST, regDatePST.AddHours(3));
+            var regDatePST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:registrationDate.Value.UtcDateTime, orgId:1000, regProgramId:1);
+            var regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:registrationDate.Value.UtcDateTime, orgId:1000, regProgramId:2);
+            Assert.AreEqual(expected:regDateEST, actual:regDatePST.AddHours(value:3));
 
-
-            DateTimeOffset now2 = DateTimeOffset.UtcNow;
+            var now2 = DateTimeOffset.UtcNow;
             registrationDate = now2;
-            regDatePST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 1);
-            regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 2);
-            Assert.AreEqual(regDateEST, regDatePST.AddHours(3));
-
+            regDatePST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:registrationDate.Value.UtcDateTime, orgId:1000, regProgramId:1);
+            regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:registrationDate.Value.UtcDateTime, orgId:1000, regProgramId:2);
+            Assert.AreEqual(expected:regDateEST, actual:regDatePST.AddHours(value:3));
         }
 
         //=========================================================================
@@ -165,22 +169,21 @@ namespace Linko.LinkoExchange.Test
             var localTimeZoneId = 6;
 
             //8pm EST
-            DateTime dateTimeEST = new DateTime(2016, 11, 6, 20, 0, 0, 0, DateTimeKind.Unspecified);
-            var dateTimeOffsetLocalizedToServer = _tZservice.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(dateTimeEST, localTimeZoneId);
+            var dateTimeEST = new DateTime(year:2016, month:11, day:6, hour:20, minute:0, second:0, millisecond:0, kind:DateTimeKind.Unspecified);
+            var dateTimeOffsetLocalizedToServer = _tZservice.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime:dateTimeEST, timeZoneId:localTimeZoneId);
 
             //8pm EST = 5pm (17:00) PST (server time)
-            Assert.AreEqual(17, dateTimeOffsetLocalizedToServer.Hour);
-            Assert.AreEqual(0, dateTimeOffsetLocalizedToServer.Minute);
-            Assert.AreEqual(0, dateTimeOffsetLocalizedToServer.Second);
-            Assert.AreEqual(-8, dateTimeOffsetLocalizedToServer.Offset.Hours);
-
+            Assert.AreEqual(expected:17, actual:dateTimeOffsetLocalizedToServer.Hour);
+            Assert.AreEqual(expected:0, actual:dateTimeOffsetLocalizedToServer.Minute);
+            Assert.AreEqual(expected:0, actual:dateTimeOffsetLocalizedToServer.Second);
+            Assert.AreEqual(expected:-8, actual:dateTimeOffsetLocalizedToServer.Offset.Hours);
         }
 
         [TestMethod]
         public void DateTimeOffset_Now()
         {
             var now = DateTimeOffset.Now;
-            Assert.AreEqual(-7, now.Offset.Hours); //PDT
+            Assert.AreEqual(expected:-7, actual:now.Offset.Hours); //PDT
         }
     }
 }

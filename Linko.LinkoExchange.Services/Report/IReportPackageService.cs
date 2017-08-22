@@ -16,7 +16,10 @@ namespace Linko.LinkoExchange.Services.Report
         /// </summary>
         /// <param name="reportPackageId"> ReportPackageId </param>
         /// <param name="isIncludeAssociatedElementData"> Indicating attachments binary data is included or not </param>
-        /// <returns> ReportPackageDto Object </returns>
+        /// <param name="isAuthorizationRequired"> </param>
+        /// <returns>
+        ///     ReportPackageDto Object
+        /// </returns>
         ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData, bool isAuthorizationRequired = false);
 
         /// <summary>

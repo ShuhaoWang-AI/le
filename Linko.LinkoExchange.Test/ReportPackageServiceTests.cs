@@ -1,83 +1,91 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
+using System.Linq;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Unit;
+using Linko.LinkoExchange.Services.User;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.Report;
-using Linko.LinkoExchange.Services.Organization;
-using System;
-using Linko.LinkoExchange.Services.TimeZone;
-using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.CopyOfRecord;
-using Linko.LinkoExchange.Services.Sample;
-using Linko.LinkoExchange.Services.Unit;
-using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services.HttpContext;
-using System.Linq;
+
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class ReportPackageServiceTests
     {
-        ReportPackageService _reportPackageService;
-        Mock<IProgramService> _programService = new Mock<IProgramService>();
-        Mock<ICopyOfRecordService> _copyOfRecordService = new Mock<ICopyOfRecordService>();
-        Mock<ITimeZoneService> _timeZoneService = new Mock<ITimeZoneService>();
-        Mock<ILogger> _logger = new Mock<ILogger>();
-        Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
-        Mock<IUserService> _userService = new Mock<IUserService>(); 
-        Mock<ISettingService> _settingService = new Mock<ISettingService>();
-        Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
-        Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
-        Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
-        Mock<IApplicationCache> _mockAppCache = new Mock<IApplicationCache>();
-        Mock<ISessionCache> _mockSessionCache = new Mock<ISessionCache>();
-        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
-        Mock<IRequestCache> _mockRequestCache = new Mock<IRequestCache>(); 
-        private LinkoExchangeContext _dbContext;
+        #region fields
 
-        public ReportPackageServiceTests()
-        {
-        }
+        private readonly Mock<ICopyOfRecordService> _copyOfRecordService = new Mock<ICopyOfRecordService>();
+        private readonly Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
+        private readonly Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
+        private readonly Mock<ISettingService> _settingService = new Mock<ISettingService>();
+        private readonly Mock<IUserService> _userService = new Mock<IUserService>();
+
+        private Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
+        private Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
+        private Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
+        private Mock<ILogger> _logger = new Mock<ILogger>();
+        private Mock<IApplicationCache> _mockAppCache = new Mock<IApplicationCache>();
+        private Mock<IRequestCache> _mockRequestCache = new Mock<IRequestCache>();
+        private Mock<ISessionCache> _mockSessionCache = new Mock<ISessionCache>();
+        private Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
+        private Mock<IProgramService> _programService = new Mock<IProgramService>();
+        private Mock<ITimeZoneService> _timeZoneService = new Mock<ITimeZoneService>();
+        private LinkoExchangeContext _dbContext;
+        private ReportPackageService _reportPackageService;
+
+        #endregion
 
         [TestInitialize]
         public void Initialize()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _dbContext = new LinkoExchangeContext(connectionString);
+            var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
+            _dbContext = new LinkoExchangeContext(nameOrConnectionString:connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
 
             _mockAppCache = new Mock<IApplicationCache>();
-            _mockAppCache.Setup(c => c.Get("VolumeFlowRateLimitBasisId")).Returns("3");
-            _mockAppCache.Setup(c => c.Get("TimeZoneId-6")).Returns("Eastern Standard Time");
+            _mockAppCache.Setup(c => c.Get("VolumeFlowRateLimitBasisId")).Returns(value:"3");
+            _mockAppCache.Setup(c => c.Get("TimeZoneId-6")).Returns(value:"Eastern Standard Time");
 
             _mockRequestCache = new Mock<IRequestCache>();
-            _mockRequestCache.Setup(c => c.GetValue("TimeZone-1")).Returns("6");
+            _mockRequestCache.Setup(c => c.GetValue("TimeZone-1")).Returns(value:"6");
 
             var cachedFlowUnits = new List<UnitDto>();
-            cachedFlowUnits.Add(new UnitDto() { UnitId = 1, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
-            cachedFlowUnits.Add(new UnitDto() { UnitId = 2, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
-            cachedFlowUnits.Add(new UnitDto() { UnitId = 3, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
-            cachedFlowUnits.Add(new UnitDto() { UnitId = 4, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
-            cachedFlowUnits.Add(new UnitDto() { UnitId = 5, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
-            _mockRequestCache.Setup(c => c.GetValue("GetFlowUnitsFromCommaDelimitedString-gpd,mgd")).Returns(cachedFlowUnits);
+            cachedFlowUnits.Add(item:new UnitDto {UnitId = 1, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah"});
+            cachedFlowUnits.Add(item:new UnitDto {UnitId = 2, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah"});
+            cachedFlowUnits.Add(item:new UnitDto {UnitId = 3, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah"});
+            cachedFlowUnits.Add(item:new UnitDto {UnitId = 4, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah"});
+            cachedFlowUnits.Add(item:new UnitDto {UnitId = 5, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah"});
+            _mockRequestCache.Setup(c => c.GetValue("GetFlowUnitsFromCommaDelimitedString-gpd,mgd")).Returns(value:cachedFlowUnits);
 
-            var actualSettingService = new SettingService(_dbContext, _logger.Object, new MapHelper(), _mockRequestCache.Object, new Mock<IGlobalSettings>().Object);
-            var actualTimeZoneService = new TimeZoneService(_dbContext, actualSettingService, new MapHelper(), _mockAppCache.Object);
-            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
+            var actualSettingService = new SettingService(dbContext:_dbContext, logger:_logger.Object, mapHelper:new MapHelper(), cache:_mockRequestCache.Object,
+                                                          globalSettings:new Mock<IGlobalSettings>().Object);
+            var actualTimeZoneService = new TimeZoneService(dbContext:_dbContext, settings:actualSettingService, mapHelper:new MapHelper(), appCache:_mockAppCache.Object);
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
             authorityOrgRegProgramDto.OrganizationDto = new OrganizationDto();
@@ -89,56 +97,65 @@ namespace Linko.LinkoExchange.Test
             authorityOrgRegProgramDto.OrganizationDto.CityName = "Gotham";
             authorityOrgRegProgramDto.OrganizationDto.ZipCode = "90210";
 
-            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(authorityOrgRegProgramDto);
+            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(value:authorityOrgRegProgramDto);
 
-            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.ReportRepudiatedDays)).Returns("180");
-            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("6");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.ReportRepudiatedDays)).Returns(value:"180");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns(value:"6");
 
-            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoName)).Returns("Email C Name");
-            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoEmailAddress)).Returns("contactemail@auth.com");
-            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoPhone)).Returns("(555) 555-5555");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoName)).Returns(value:"Email C Name");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoEmailAddress)).Returns(value:"contactemail@auth.com");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoPhone)).Returns(value:"(555) 555-5555");
 
             var systemSettingLookup = new Dictionary<SystemSettingType, string>();
-            systemSettingLookup.Add(SystemSettingType.SystemEmailEmailAddress, "donteventrytoreply@linkotechnology.com");
-            systemSettingLookup.Add(SystemSettingType.SystemEmailFirstName, "Adam");
-            systemSettingLookup.Add(SystemSettingType.SystemEmailLastName, "Adminsky");
+            systemSettingLookup.Add(key:SystemSettingType.SystemEmailEmailAddress, value:"donteventrytoreply@linkotechnology.com");
+            systemSettingLookup.Add(key:SystemSettingType.SystemEmailFirstName, value:"Adam");
+            systemSettingLookup.Add(key:SystemSettingType.SystemEmailLastName, value:"Adminsky");
+
             //systemSettingLookup.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
-            systemSettingLookup.Add(SystemSettingType.EmailServer, "192.168.5.51");
-            systemSettingLookup.Add(SystemSettingType.FileAvailableToAttachMaxAgeMonths, "999");
-            _settingService.Setup(s => s.GetGlobalSettings()).Returns(systemSettingLookup);
+            systemSettingLookup.Add(key:SystemSettingType.EmailServer, value:"192.168.5.51");
+            systemSettingLookup.Add(key:SystemSettingType.FileAvailableToAttachMaxAgeMonths, value:"999");
+            _settingService.Setup(s => s.GetGlobalSettings()).Returns(value:systemSettingLookup);
 
-            _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns("some_token_string");
+            _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns(value:"some_token_string");
 
-            var actualUnitService = new UnitService(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, _mockRequestCache.Object);
-            var actualSampleService = new SampleService(_dbContext, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, _mockAppCache.Object);
+            var actualUnitService = new UnitService(dbContext:_dbContext, mapHelper:new MapHelper(), logger:_logger.Object, httpContextService:_httpContext.Object,
+                                                    timeZoneService:actualTimeZoneService, orgService:_orgService.Object, settingService:actualSettingService,
+                                                    requestCache:_mockRequestCache.Object);
+            var actualSampleService = new SampleService(dbContext:_dbContext, httpContext:_httpContext.Object, orgService:_orgService.Object, mapHelper:new MapHelper(),
+                                                        logger:_logger.Object, timeZoneService:actualTimeZoneService, settings:actualSettingService, unitService:actualUnitService,
+                                                        cache:_mockAppCache.Object);
 
-            var actualAuditLogService = new EmailAuditLogService(_dbContext, _requestCache.Object, new MapHelper(), _logger.Object);
-         //   var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _logger.Object);
-            var actualCromerrService = new CromerrAuditLogService(_dbContext, new MapHelper(), _httpContext.Object, _logger.Object);
-            var actualProgramService = new ProgramService(_dbContext, new MapHelper());
+            var actualAuditLogService = new EmailAuditLogService(linkoExchangeContext:_dbContext, requestCache:_requestCache.Object, mapHelper:new MapHelper(),
+                                                                 logger:_logger.Object);
+
+            //   var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _logger.Object);
+            var actualCromerrService = new CromerrAuditLogService(linkoExchangeContext:_dbContext, mapHelper:new MapHelper(), httpContext:_httpContext.Object,
+                                                                  logService:_logger.Object);
+            var actualProgramService = new ProgramService(applicationDbContext:_dbContext, mapHelper:new MapHelper());
 
             _reportPackageService = new ReportPackageService(
-                                                             actualProgramService,
-                                                             _copyOfRecordService.Object,
-                                                             actualTimeZoneService,
-                                                             _logger.Object,
-                                                             _dbContext,
-                                                             _httpContext.Object,
-                                                             _userService.Object, 
-                                                             _settingService.Object,
-                                                             _orgService.Object,
-                                                             actualSampleService,
-                                                             new MapHelper(),
-                                                             actualCromerrService,
-                                                             new Mock<IOrganizationService>().Object, 
-                                                             _linkoExchangeEmailService.Object
+                                                             programService:actualProgramService,
+                                                             copyOfRecordService:_copyOfRecordService.Object,
+                                                             timeZoneService:actualTimeZoneService,
+                                                             logger:_logger.Object,
+                                                             linkoExchangeContext:_dbContext,
+                                                             httpContextService:_httpContext.Object,
+                                                             userService:_userService.Object,
+                                                             settingService:_settingService.Object,
+                                                             orgService:_orgService.Object,
+                                                             sampleService:actualSampleService,
+                                                             mapHelper:new MapHelper(),
+                                                             crommerAuditLogService:actualCromerrService,
+                                                             organizationService:new Mock<IOrganizationService>().Object,
+                                                             linkoExchangeEmailService:_linkoExchangeEmailService.Object
                                                             );
         }
 
         [TestMethod]
         public void DeleteReportPackage()
         {
-            _reportPackageService.DeleteReportPackage(14);
+            _reportPackageService.DeleteReportPackage(reportPackageId:14);
+
             //_reportPackageService.DeleteReportPackage(9);
             //_reportPackageService.DeleteReportPackage(10);
         }
@@ -147,132 +164,135 @@ namespace Linko.LinkoExchange.Test
         public void CreateDraft()
         {
             var templateId = 1;
-            var startDateTimeLocal = new DateTime(2017, 4, 20);
-            var endDateTimeLocal = new DateTime(2017, 4, 28);
-            var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
+            var startDateTimeLocal = new DateTime(year:2017, month:4, day:20);
+            var endDateTimeLocal = new DateTime(year:2017, month:4, day:28);
+            var newId = _reportPackageService.CreateDraft(reportPackageTemplateId:templateId, startDateTimeLocal:startDateTimeLocal, endDateTimeLocal:endDateTimeLocal);
         }
 
         [TestMethod]
         public void CreateDraft_Using_Date_Plus_Time()
         {
             var templateId = 1;
-            var startDateTimeLocal = new DateTime(2017, 4, 20, 17, 30, 30, 30);
-            var endDateTimeLocal = new DateTime(2017, 4, 20, 17, 30, 30, 30);
-            var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
+            var startDateTimeLocal = new DateTime(year:2017, month:4, day:20, hour:17, minute:30, second:30, millisecond:30);
+            var endDateTimeLocal = new DateTime(year:2017, month:4, day:20, hour:17, minute:30, second:30, millisecond:30);
+            var newId = _reportPackageService.CreateDraft(reportPackageTemplateId:templateId, startDateTimeLocal:startDateTimeLocal, endDateTimeLocal:endDateTimeLocal);
         }
 
         [TestMethod]
         public void CreateDraft_Using_Empty_Template()
         {
             var emptyReportPackageTemplateId = 9;
-            var startDateTimeLocal = new DateTime(2017, 4, 20);
-            var endDateTimeLocal = new DateTime(2017, 4, 28);
-            var newId = _reportPackageService.CreateDraft(emptyReportPackageTemplateId, startDateTimeLocal, endDateTimeLocal);
+            var startDateTimeLocal = new DateTime(year:2017, month:4, day:20);
+            var endDateTimeLocal = new DateTime(year:2017, month:4, day:28);
+            var newId = _reportPackageService.CreateDraft(reportPackageTemplateId:emptyReportPackageTemplateId, startDateTimeLocal:startDateTimeLocal,
+                                                          endDateTimeLocal:endDateTimeLocal);
         }
 
         [TestMethod]
         public void CreateDraft_Using_Certification_Only__Template()
         {
             var emptyReportPackageTemplateId = 10;
-            var startDateTimeLocal = new DateTime(2017, 4, 20);
-            var endDateTimeLocal = new DateTime(2017, 4, 28);
-            var newId = _reportPackageService.CreateDraft(emptyReportPackageTemplateId, startDateTimeLocal, endDateTimeLocal);
+            var startDateTimeLocal = new DateTime(year:2017, month:4, day:20);
+            var endDateTimeLocal = new DateTime(year:2017, month:4, day:28);
+            var newId = _reportPackageService.CreateDraft(reportPackageTemplateId:emptyReportPackageTemplateId, startDateTimeLocal:startDateTimeLocal,
+                                                          endDateTimeLocal:endDateTimeLocal);
         }
 
         [TestMethod]
         public void GetReportPackage()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(13, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(reportPackageId:13, isIncludeAssociatedElementData:false);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UnauthorizedAccessException))]
+        [ExpectedException(exceptionType:typeof(UnauthorizedAccessException))]
         public void GetReportPackage_UnauthorizedAccessException()
         {
             //Fetch existing
-            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("4");
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"4");
+            var existingReportPackage = _reportPackageService.GetReportPackage(reportPackageId:8, isIncludeAssociatedElementData:false);
         }
 
         [TestMethod]
         public void GetReportPackage_With_Associated_Element_Children()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(21, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(reportPackageId:21, isIncludeAssociatedElementData:true);
         }
 
         [TestMethod]
         public void SaveReportPackage_Add_Samples()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(13, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(reportPackageId:13, isIncludeAssociatedElementData:false);
 
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
-            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto {ReportPackageElementTypeId = 25};
             sampleReportPackageElementType.Samples = new List<SampleDto>();
-            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 52 });
-            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 53 });
-            existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
+            sampleReportPackageElementType.Samples.Add(item:new SampleDto {SampleId = 52});
+            sampleReportPackageElementType.Samples.Add(item:new SampleDto {SampleId = 53});
+            existingReportPackage.SamplesAndResultsTypes.Add(item:sampleReportPackageElementType);
+            var existingId = _reportPackageService.SaveReportPackage(reportPackageDto:existingReportPackage, isUseTransaction:true);
         }
 
         [TestMethod]
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(15, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(reportPackageId:15, isIncludeAssociatedElementData:true);
 
             existingReportPackage.Comments = "Comments .. test.";
 
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
-            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto {ReportPackageElementTypeId = 25};
             sampleReportPackageElementType.Samples = new List<SampleDto>();
-            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 52 });
+            sampleReportPackageElementType.Samples.Add(item:new SampleDto {SampleId = 52});
+
             //sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 53 });
-            existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
+            existingReportPackage.SamplesAndResultsTypes.Add(item:sampleReportPackageElementType);
 
             //Add attachment associations
             existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
-            var attachmentReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
+            var attachmentReportPackageElementType = new ReportPackageElementTypeDto {ReportPackageElementTypeId = 26};
             attachmentReportPackageElementType.FileStores = new List<FileStoreDto>();
-            attachmentReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 2 });
+            attachmentReportPackageElementType.FileStores.Add(item:new FileStoreDto {FileStoreId = 2});
+
             //filesReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 4 });
-            existingReportPackage.AttachmentTypes.Add(attachmentReportPackageElementType);
+            existingReportPackage.AttachmentTypes.Add(item:attachmentReportPackageElementType);
 
             //Add certification associations
             existingReportPackage.CertificationTypes = new List<ReportPackageElementTypeDto>();
-            var certsReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 34 };
+            var certsReportPackageElementType = new ReportPackageElementTypeDto {ReportPackageElementTypeId = 34};
             certsReportPackageElementType.FileStores = new List<FileStoreDto>();
-            certsReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 2 });
+            certsReportPackageElementType.FileStores.Add(item:new FileStoreDto {FileStoreId = 2});
+
             //filesReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 4 });
-            existingReportPackage.CertificationTypes.Add(certsReportPackageElementType);
+            existingReportPackage.CertificationTypes.Add(item:certsReportPackageElementType);
 
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
+            var existingId = _reportPackageService.SaveReportPackage(reportPackageDto:existingReportPackage, isUseTransaction:true);
         }
-
 
         [TestMethod]
         public void UpdateStatus()
         {
             //Change status
-            _reportPackageService.UpdateStatus(8, ReportStatusName.Submitted, false);
-
+            _reportPackageService.UpdateStatus(reportPackageId:8, reportStatus:ReportStatusName.Submitted, isUseTransaction:false);
         }
 
         [TestMethod]
         public void GetFilesForSelection()
         {
-            var eligibleFiles = _reportPackageService.GetFilesForSelection(1);
-
+            var eligibleFiles = _reportPackageService.GetFilesForSelection(reportPackageElementTypeId:1);
         }
 
         [TestMethod]
         public void GetSamplesForSelection()
         {
             var originalCount = 78665;
+
             //68824 = "GetFlowUnitsFromCommaDelimitedString" commented out
             //64501 = optimized linq
             //60351 = logging removed + only checking for last submitted if associated with any reports
@@ -281,21 +301,21 @@ namespace Linko.LinkoExchange.Test
             //25011 = app caching time zone name fetch
             //16030 = GetFlowUnitsFromCommaDelimitedString caching List<UnitDto>
 
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
 
-            var eligibleSamples = _reportPackageService.GetSamplesForSelection(1);
+            var eligibleSamples = _reportPackageService.GetSamplesForSelection(reportPackageElementTypeId:1);
 
             watch.Stop();
 
             var elapsedMs = watch.ElapsedMilliseconds;
 
-            decimal percentageImprovement = Math.Round(Decimal.Divide((originalCount - elapsedMs), originalCount)*100, 2);
+            var percentageImprovement = Math.Round(d:decimal.Divide(d1:originalCount - elapsedMs, d2:originalCount) * 100, decimals:2);
         }
 
         [TestMethod]
         public void GetReportPackagesByStatusName_Draft()
         {
-            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.RepudiatedPendingReview);
+            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(reportStatusName:ReportStatusName.RepudiatedPendingReview);
         }
 
         [TestMethod]
@@ -309,107 +329,104 @@ namespace Linko.LinkoExchange.Test
             //5                       A hold time was exceeded
             //6                       Other(please comment)
 
-            _reportPackageService.RepudiateReport(21, 6, "Other(please comment)", "Technical error");
-
+            _reportPackageService.RepudiateReport(reportPackageId:21, repudiationReasonId:6, repudiationReasonName:"Other(please comment)", comments:"Technical error");
         }
 
         [TestMethod]
         public void ReviewSubmission()
         {
-            _reportPackageService.ReviewSubmission(8);
+            _reportPackageService.ReviewSubmission(reportPackageId:8);
         }
 
         [TestMethod]
         public void ReviewRepudiation()
         {
-            _reportPackageService.ReviewRepudiation(8, "This repudiation has been reviewed!");
+            _reportPackageService.ReviewRepudiation(reportPackageId:8, comments:"This repudiation has been reviewed!");
         }
 
         [TestMethod]
         public void IsRequiredReportPackageElementTypesIncluded()
         {
-            var isGood = _reportPackageService.IsRequiredReportPackageElementTypesIncluded(11);
+            var isGood = _reportPackageService.IsRequiredReportPackageElementTypesIncluded(reportPackageId:11);
         }
 
         [TestMethod]
         public void Test_CreatePDF()
         {
             var templateId = 1;
-            var startDateTimeLocal = new DateTime(2017, 4, 20);
-            var endDateTimeLocal = new DateTime(2018, 4, 28);
-            var reportPackageId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
-
-
+            var startDateTimeLocal = new DateTime(year:2017, month:4, day:20);
+            var endDateTimeLocal = new DateTime(year:2018, month:4, day:28);
+            var reportPackageId = _reportPackageService.CreateDraft(reportPackageTemplateId:templateId, startDateTimeLocal:startDateTimeLocal, endDateTimeLocal:endDateTimeLocal);
         }
 
         [TestMethod]
         public void UpdateLastSentDateTime()
         {
-            _reportPackageService.UpdateLastSentDateTime(1, DateTimeOffset.Now, 1, "Testing First Name");
+            _reportPackageService.UpdateLastSentDateTime(reportPackageId:1, sentDateTime:DateTimeOffset.Now, lastSenderUserId:1, lastSenderFirstName:"Testing First Name");
         }
 
         [TestMethod]
         public void IsSimilarReportPackageSubmittedAfter()
         {
-            var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(4);
+            var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(reportPackageId:4);
         }
 
         [TestMethod]
         public void CanRepudiateReportPackage()
         {
-            var result = _reportPackageService.CanRepudiateReportPackage(4);
+            var result = _reportPackageService.CanRepudiateReportPackage(reportPackageId:4);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetReportPackage_AsAuthority_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"1");
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
             var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetReportPackage_AsAuthority_False_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"99");
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
             var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetReportPackage_AsIndustry_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("13");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"13");
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
             var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetReportPackage_AsIndustry_False_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"99");
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
             var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -418,23 +435,23 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = 4;
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
             //Set flags of the user to allow authorization
             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(orpu => orpu.UserProfileId == userProfileId
-                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+                                              .Single(orpu => orpu.UserProfileId == userProfileId
+                                                              && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             orgRegProgramUser.IsSignatory = true;
             orgRegProgramUser.IsEnabled = true;
             orgRegProgramUser.IsRemoved = false;
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -443,23 +460,23 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = 4;
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
             //Set flags of the user to block authorization
             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(orpu => orpu.UserProfileId == userProfileId
-                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+                                              .Single(orpu => orpu.UserProfileId == userProfileId
+                                                              && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             orgRegProgramUser.IsSignatory = false; //UNAUTHORIZED
             orgRegProgramUser.IsEnabled = true;
             orgRegProgramUser.IsRemoved = false;
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -468,23 +485,23 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = 4;
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
             //Set flags of the user to block authorization
             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(orpu => orpu.UserProfileId == userProfileId
-                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+                                              .Single(orpu => orpu.UserProfileId == userProfileId
+                                                              && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             orgRegProgramUser.IsSignatory = true;
             orgRegProgramUser.IsEnabled = false; //UNAUTHORIZED
             orgRegProgramUser.IsRemoved = false;
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -493,23 +510,23 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = 4;
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
             //Set flags of the user to block authorization
             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(orpu => orpu.UserProfileId == userProfileId
-                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+                                              .Single(orpu => orpu.UserProfileId == userProfileId
+                                                              && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             orgRegProgramUser.IsSignatory = true;
             orgRegProgramUser.IsEnabled = true;
             orgRegProgramUser.IsRemoved = true; //UNAUTHORIZED
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -518,14 +535,14 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = -99; //WRONG USER PROFILE
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
@@ -534,14 +551,14 @@ namespace Linko.LinkoExchange.Test
             //Setup mocks
             var orgRegProgramId = 13;
             var userProfileId = 2;
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(value:userProfileId.ToString());
 
-            int reportPackageId = 1;
+            var reportPackageId = 1;
 
             var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
     }
 }

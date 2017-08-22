@@ -1,45 +1,57 @@
 ﻿using System.Configuration;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Services.Mapping;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class PermissionGroupTests
     {
+        #region fields
+
         private PermissionService _pService;
 
-        public PermissionGroupTests()
-        {
-        }
+        #endregion
 
         [TestInitialize]
         public void Initialize()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _pService = new PermissionService(new ProgramService(new LinkoExchangeContext(connectionString), new MapHelper()), new LinkoExchangeContext(connectionString), new MapHelper());
+            var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
+            _pService = new PermissionService(
+                                              programService:new ProgramService(
+                                                                                applicationDbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
+                                                                                mapHelper:new MapHelper()
+                                                                               ),
+                                              dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
+                                              mapHelper:new MapHelper()
+                                             );
         }
 
         [TestMethod]
         public void GetRoles()
         {
-            var roles = _pService.GetRoles(1);
+            var roles = _pService.GetRoles(orgRegProgramId:1);
         }
 
         [TestMethod]
         public void GetApprovalPeople()
         {
             var dto = new OrganizationRegulatoryProgramDto
-            {
-                OrganizationId = 1000, 
-                OrganizationRegulatoryProgramId = 1001
-            }; 
+                      {
+                          OrganizationId = 1000,
+                          OrganizationRegulatoryProgramId = 1001
+                      };
 
-            var approvers = _pService.GetApprovalPeople(dto, true);
+            var approvers = _pService.GetApprovalPeople(approverOrganizationRegulatoryProgram:dto, isInvitedToIndustry:true);
         }
     }
 }

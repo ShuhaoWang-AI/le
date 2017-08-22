@@ -1,47 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Unit;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.Organization;
-using System;
-using Linko.LinkoExchange.Services.TimeZone;
-using Linko.LinkoExchange.Services.Sample;
-using System.Reflection;
-using Linko.LinkoExchange.Services.Unit;
-using System.Diagnostics;
-using Linko.LinkoExchange.Core.Resources;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services.HttpContext;
+
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class SampleServiceTests
     {
-        SampleService _sampleService;
-        Mock<IHttpContextService> _httpContext;
-        Mock<IOrganizationService> _orgService;
-        Mock<ILogger> _logger;
-        Mock<ITimeZoneService> _timeZoneService;
-        Mock<ISettingService> _settingsService;
-        Mock<IUnitService> _unitService;
+        #region fields
 
-        public SampleServiceTests()
-        {
-        }
+        private Mock<IHttpContextService> _httpContext;
+        private Mock<ILogger> _logger;
+        private Mock<IOrganizationService> _orgService;
+        private SampleService _sampleService;
+        private Mock<ISettingService> _settingsService;
+        private Mock<ITimeZoneService> _timeZoneService;
+        private Mock<IUnitService> _unitService;
+
+        #endregion
 
         [TestInitialize]
         public void Initialize()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            var connection = new LinkoExchangeContext(connectionString);
+            var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
+            var connection = new LinkoExchangeContext(nameOrConnectionString:connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
@@ -49,116 +53,37 @@ namespace Linko.LinkoExchange.Test
             _settingsService = new Mock<ISettingService>();
             _unitService = new Mock<IUnitService>();
 
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object), new MapHelper(), new Mock<IApplicationCache>().Object);
-            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object);
+            var actualTimeZoneService = new TimeZoneService(dbContext:connection,
+                                                            settings:new SettingService(dbContext:connection, logger:_logger.Object, mapHelper:new MapHelper(),
+                                                                                        cache:new Mock<IRequestCache>().Object, globalSettings:new Mock<IGlobalSettings>().Object),
+                                                            mapHelper:new MapHelper(), appCache:new Mock<IApplicationCache>().Object);
+            var actualSettings = new SettingService(dbContext:connection, logger:_logger.Object, mapHelper:new MapHelper(), cache:new Mock<IRequestCache>().Object,
+                                                    globalSettings:new Mock<IGlobalSettings>().Object);
 
-            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
-            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1, OrganizationId = 1000 });
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"1");
+            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>()))
+                       .Returns(value:new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = 1, OrganizationId = 1000});
 
-            var actualUnitService = new UnitService(connection,
-                new MapHelper(),
-                _logger.Object,
-                _httpContext.Object,
-                actualTimeZoneService,
-                _orgService.Object,
-                actualSettings,
-                new Mock<IRequestCache>().Object);
+            var actualUnitService = new UnitService(dbContext:connection,
+                                                    mapHelper:new MapHelper(),
+                                                    logger:_logger.Object,
+                                                    httpContextService:_httpContext.Object,
+                                                    timeZoneService:actualTimeZoneService,
+                                                    orgService:_orgService.Object,
+                                                    settingService:actualSettings,
+                                                    requestCache:new Mock<IRequestCache>().Object);
 
-            _sampleService = new SampleService(connection, 
-                _httpContext.Object, 
-                _orgService.Object, 
-                new MapHelper(), 
-                _logger.Object,
-                actualTimeZoneService,
-                actualSettings,
-                actualUnitService,
-                new Mock<IApplicationCache>().Object);
+            _sampleService = new SampleService(dbContext:connection,
+                                               httpContext:_httpContext.Object,
+                                               orgService:_orgService.Object,
+                                               mapHelper:new MapHelper(),
+                                               logger:_logger.Object,
+                                               timeZoneService:actualTimeZoneService,
+                                               settings:actualSettings,
+                                               unitService:actualUnitService,
+                                               cache:new Mock<IApplicationCache>().Object);
         }
 
-        #region Private helper functions
-        private SampleDto GetTestSampleDto()
-        {
-            var sampleDto = new SampleDto();
-            //sampleDto.Name = "Sample XYZ"; //THIS IS NOT SET FROM UI
-            sampleDto.MonitoringPointId = 135;
-            sampleDto.MonitoringPointName = "Process";
-            sampleDto.CollectionMethodId = 1;
-            sampleDto.CollectionMethodName = "24";
-            sampleDto.CtsEventTypeId = 1;
-            sampleDto.CtsEventTypeName = "SNC-P";
-            sampleDto.CtsEventCategoryName = "Sample Category 1";
-            sampleDto.FlowUnitId = 5;
-            sampleDto.FlowUnitName = "gpd";
-            sampleDto.FlowEnteredValue = "25000";
-            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-7);
-            sampleDto.EndDateTimeLocal = DateTime.Now;
-            sampleDto.IsReadyToReport = false;
-            sampleDto.MassLoadingCalculationDecimalPlaces = 2;
-            sampleDto.MassLoadingConversionFactorPounds = 8.34;
-            sampleDto.IsMassLoadingResultToUseLessThanSign = true;
-            sampleDto.ResultQualifierValidValues = "<,>,ND,NF";
-
-            var flowUnitValidValues = new List<UnitDto>();
-            flowUnitValidValues.Add(new UnitDto() { UnitId = 5, Name = "gpd", IsFlowUnit = true });
-            flowUnitValidValues.Add(new UnitDto() { UnitId = 8, Name = "mgd", IsFlowUnit = true });
-
-            sampleDto.FlowUnitValidValues = flowUnitValidValues;
-
-            var resultDtos = new List<SampleResultDto>();
-
-            var resultDto = new SampleResultDto()
-            {
-                ParameterId = 14,
-                ParameterName = "1,2-Dibromo-3-chloropropane",
-                Qualifier = "<",
-                UnitId = 7,
-                UnitName = "mg/L",
-                EnteredValue = "0.25",
-                EnteredMethodDetectionLimit = "0.20",
-                AnalysisMethod = "Analysis Method 2",
-                AnalysisDateTimeLocal = DateTime.Now,
-                IsApprovedEPAMethod = true,
-                IsCalcMassLoading = true,
-                MassLoadingQualifier = "<",
-                MassLoadingUnitId = 10,
-                MassLoadingUnitName = "ppd",
-                MassLoadingValue = "52125.00",
-            };
-            resultDtos.Add(resultDto);
-            resultDto = new SampleResultDto()
-            {
-                ParameterId = 263,
-                ParameterName = "Trichloroethane",
-                Qualifier = "<",
-                UnitId = 11,
-                UnitName = "su",
-                EnteredValue = "0.99100",
-                EnteredMethodDetectionLimit = "",
-                AnalysisMethod = "Analysis Method 5",
-                AnalysisDateTimeLocal = DateTime.Now,
-                IsApprovedEPAMethod = false,
-                IsCalcMassLoading = false,
-            };
-            resultDtos.Add(resultDto);
-
-            sampleDto.SampleResults = resultDtos;
-
-            return sampleDto;
-        }
-
-        [TestMethod]
-
-        public void Remove_All_Samples_From_Db()
-        {
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
-            foreach (var sampleDto in sampleDtos)
-            {
-                _sampleService.DeleteSample(sampleDto.SampleId.Value);
-            }
-        }
-
-        #endregion
-        
         [TestMethod]
         public void SaveSample()
         {
@@ -170,8 +95,8 @@ namespace Linko.LinkoExchange.Test
             //Persist
             try
             {
-               var id =  _sampleService.SaveSample(sampleDto);
-               Assert.IsTrue(condition:(id > 0), message:"Sample didn't save");
+                var id = _sampleService.SaveSample(sampleDto:sampleDto);
+                Assert.IsTrue(condition:id > 0, message:"Sample didn't save");
             }
             catch
             {
@@ -185,13 +110,11 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = new SampleDto();
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Sample Type is required.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Sample Type is required.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -202,13 +125,11 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventTypeId = 1;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Collection Method is required.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Collection Method is required.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -220,13 +141,11 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CollectionMethodId = 1;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Start Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Start Date/Time is required.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -239,13 +158,11 @@ namespace Linko.LinkoExchange.Test
             sampleDto.StartDateTimeLocal = DateTime.Now;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("End Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"End Date/Time is required.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -255,17 +172,15 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = new SampleDto();
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CollectionMethodId = 1;
-            sampleDto.StartDateTimeLocal = DateTime.SpecifyKind(DateTime.Now.AddDays(1), DateTimeKind.Unspecified);
-            sampleDto.EndDateTimeLocal = DateTime.SpecifyKind(DateTime.Now.AddDays(-1), DateTimeKind.Unspecified);
+            sampleDto.StartDateTimeLocal = DateTime.SpecifyKind(value:DateTime.Now.AddDays(value:1), kind:DateTimeKind.Unspecified);
+            sampleDto.EndDateTimeLocal = DateTime.SpecifyKind(value:DateTime.Now.AddDays(value:-1), kind:DateTimeKind.Unspecified);
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Sample dates cannot be future dates.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -275,17 +190,15 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = new SampleDto();
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CollectionMethodId = 1;
-            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-1);
-            sampleDto.EndDateTimeLocal = DateTime.Now.AddDays(1);
+            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(value:-1);
+            sampleDto.EndDateTimeLocal = DateTime.Now.AddDays(value:1);
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Sample dates cannot be future dates.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -294,7 +207,7 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.IsReadyToReport = false;
-            _sampleService.SaveSample(sampleDto);
+            _sampleService.SaveSample(sampleDto:sampleDto);
         }
 
         [TestMethod]
@@ -302,14 +215,13 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.IsReadyToReport = true;
-            try {
-                _sampleService.SaveSample(sampleDto);
+            try
+            {
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"You must provide valid a flow value to calculate mass loading results.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -322,13 +234,11 @@ namespace Linko.LinkoExchange.Test
             sampleDto.IsReadyToReport = false;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("Flow value and flow unit must be provided together.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"Flow value and flow unit must be provided together.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -337,24 +247,22 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             var sampleResults = new List<SampleResultDto>();
-            var invalidResultDto = new SampleResultDto()
-            {
-                Qualifier = "ND",
-                EnteredValue = "99",
-                UnitId = 1
-            };
-            sampleResults.Add(invalidResultDto);
+            var invalidResultDto = new SampleResultDto
+                                   {
+                                       Qualifier = "ND",
+                                       EnteredValue = "99",
+                                       UnitId = 1
+                                   };
+            sampleResults.Add(item:invalidResultDto);
             sampleDto.SampleResults = sampleResults;
             sampleDto.IsReadyToReport = true;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                
-                Assert.AreEqual("ND or NF qualifiers cannot be followed by a value.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"ND or NF qualifiers cannot be followed by a value.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -363,25 +271,23 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             var sampleResults = new List<SampleResultDto>();
-            var invalidResultDto = new SampleResultDto()
-            {
-                Qualifier = ">",
-                EnteredValue = "99",
-                UnitId = 1,
-                IsCalcMassLoading = true
-            };
-            sampleResults.Add(invalidResultDto);
+            var invalidResultDto = new SampleResultDto
+                                   {
+                                       Qualifier = ">",
+                                       EnteredValue = "99",
+                                       UnitId = 1,
+                                       IsCalcMassLoading = true
+                                   };
+            sampleResults.Add(item:invalidResultDto);
             sampleDto.SampleResults = sampleResults;
             sampleDto.IsReadyToReport = true;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-
-                Assert.AreEqual("All mass loading calculations must be associated with a valid unit.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"All mass loading calculations must be associated with a valid unit.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -390,27 +296,25 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             var sampleResults = new List<SampleResultDto>();
-            var invalidResultDto = new SampleResultDto()
-            {
-                Qualifier = ">",
-                EnteredValue = "99",
-                UnitId = 1,
-                IsCalcMassLoading = true,
-                MassLoadingUnitId = 1,
-                MassLoadingValue = null
-            };
-            sampleResults.Add(invalidResultDto);
+            var invalidResultDto = new SampleResultDto
+                                   {
+                                       Qualifier = ">",
+                                       EnteredValue = "99",
+                                       UnitId = 1,
+                                       IsCalcMassLoading = true,
+                                       MassLoadingUnitId = 1,
+                                       MassLoadingValue = null
+                                   };
+            sampleResults.Add(item:invalidResultDto);
             sampleDto.SampleResults = sampleResults;
             sampleDto.IsReadyToReport = true;
             try
             {
-                _sampleService.SaveSample(sampleDto);
+                _sampleService.SaveSample(sampleDto:sampleDto);
             }
             catch (RuleViolationException rve)
             {
-
-                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
-
+                Assert.AreEqual(expected:"You must provide valid a flow value to calculate mass loading results.", actual:rve.ValidationIssues[index:0].ErrorMessage);
             }
         }
 
@@ -418,71 +322,69 @@ namespace Linko.LinkoExchange.Test
         public void GetSampleDetails_With_Results_Valid()
         {
             var sampleId = -1;
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
                 sampleId = sampleDto.SampleId.Value;
                 break;
             }
 
-            var firstSampleDto = _sampleService.GetSampleDetails(sampleId);
+            var firstSampleDto = _sampleService.GetSampleDetails(sampleId:sampleId);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UnauthorizedAccessException))]
+        [ExpectedException(exceptionType:typeof(UnauthorizedAccessException))]
         public void GetSampleDetails_UnauthorizedAccessException()
         {
             var sampleId = 52;
-            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("4");
-            var firstSampleDto = _sampleService.GetSampleDetails(sampleId);
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"4");
+            var firstSampleDto = _sampleService.GetSampleDetails(sampleId:sampleId);
         }
 
         [TestMethod]
         public void Delete_Sample_With_Results_Valid()
         {
             var sampleId = -1;
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
                 sampleId = sampleDto.SampleId.Value;
                 break;
             }
 
-            _sampleService.DeleteSample(sampleId);
+            _sampleService.DeleteSample(sampleId:sampleId);
         }
 
         [TestMethod]
         public void Get_Samples_And_Test_Validity_DRAFT()
         {
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
-                var isValid = _sampleService.IsValidSample(sampleDto, false);
+                var isValid = _sampleService.IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false);
             }
         }
 
         [TestMethod]
         public void Get_Samples_And_Test_Validity_READYTOSUBMIT()
         {
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
-                var isValid = _sampleService.IsValidSample(sampleDto, false);
+                var isValid = _sampleService.IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false);
             }
         }
 
         [TestMethod]
         public void GetSamples_Only_Reported_Status()
         {
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.Reported);
-            
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.Reported);
         }
 
         [TestMethod]
         public void GetSamples_Only_ReadyToReport_Not_Reported_Status()
         {
-            var sampleDtos = _sampleService.GetSamples(SampleStatusName.ReadyToReport);
-
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.ReadyToReport);
         }
 
         [TestMethod]
@@ -497,33 +399,34 @@ namespace Linko.LinkoExchange.Test
             sampleDto.SampleStatusName = SampleStatusName.ReadyToReport;
 
             //Persist
-            int sampleId = _sampleService.SaveSample(sampleDto);
+            var sampleId = _sampleService.SaveSample(sampleDto:sampleDto);
 
             //Get
-            var fetchedSampleDto = _sampleService.GetSampleDetails(sampleId);
+            var fetchedSampleDto = _sampleService.GetSampleDetails(sampleId:sampleId);
 
             //Compare
-            CompareSampleDtos(sampleDto, fetchedSampleDto, false);
-
+            CompareSampleDtos(dto1:sampleDto, dto2:fetchedSampleDto, isAfterUpdate:false);
         }
 
         [TestMethod]
         public void Update_Existing_Sample()
         {
-            int sampleId = 52;
+            var sampleId = 52;
+
             //Fetch
-            var sampleDto = _sampleService.GetSampleDetails(sampleId);
+            var sampleDto = _sampleService.GetSampleDetails(sampleId:sampleId);
 
             //Change (just increment by 1)
-            sampleDto.FlowEnteredValue = (Convert.ToInt32(sampleDto.FlowEnteredValue) + 1).ToString();
+            sampleDto.FlowEnteredValue = (Convert.ToInt32(value:sampleDto.FlowEnteredValue) + 1).ToString();
 
             //Remove 1 result
             var newList = new List<SampleResultDto>();
             foreach (var item in sampleDto.SampleResults)
             {
-                newList.Add(item);
+                newList.Add(item:item);
             }
-            newList.RemoveAt(1);
+
+            newList.RemoveAt(index:1);
 
             ////Add a result
             //var resultDto = new SampleResultDto()
@@ -563,63 +466,56 @@ namespace Linko.LinkoExchange.Test
 
             sampleDto.SampleResults = newList;
 
-
             //Persist
-            _sampleService.SaveSample(sampleDto);
+            _sampleService.SaveSample(sampleDto:sampleDto);
 
             //Fetch
-            var sampleDto2 = _sampleService.GetSampleDetails(sampleId);
+            var sampleDto2 = _sampleService.GetSampleDetails(sampleId:sampleId);
 
             //Compare
-            CompareSampleDtos(sampleDto, sampleDto2, true);
+            CompareSampleDtos(dto1:sampleDto, dto2:sampleDto2, isAfterUpdate:true);
         }
 
         [TestMethod]
         public void Missing_Resource_Manager_Entry_Test()
         {
             var keyString = "blahblahblah";
-            var missingPhrase = Label.ResourceManager.GetString(keyString);
+            var missingPhrase = Label.ResourceManager.GetString(name:keyString);
 
-            Assert.IsNull(missingPhrase);
+            Assert.IsNull(value:missingPhrase);
         }
 
         private void CompareSampleDtos(SampleDto dto1, SampleDto dto2, bool isAfterUpdate)
         {
-            Type type = dto1.GetType();
-            PropertyInfo[] properties = type.GetProperties();
+            var type = dto1.GetType();
+            var properties = type.GetProperties();
 
-            foreach (PropertyInfo property in properties)
+            foreach (var property in properties)
             {
                 var fieldName = property.Name;
-                var beforeValue = property.GetValue(dto1, null);
-                var afterValue = property.GetValue(dto2, null);
+                var beforeValue = property.GetValue(obj:dto1, index:null);
+                var afterValue = property.GetValue(obj:dto2, index:null);
 
-                Debug.WriteLine($"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
+                Debug.WriteLine(message:$"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
 
                 if (fieldName == "SampleId" && !isAfterUpdate) //set within service code
                 {
                     //Not passed in for Create New
-                    Assert.IsNull(beforeValue);
+                    Assert.IsNull(value:beforeValue);
                     int newId;
-                    Assert.IsTrue(afterValue != null && Int32.TryParse(afterValue.ToString(), out newId) && newId > 0);
+                    Assert.IsTrue(condition:afterValue != null && int.TryParse(s:afterValue.ToString(), result:out newId) && newId > 0);
                 }
                 else if (fieldName == "Name" && !isAfterUpdate) //set within service code
                 {
-                    Assert.IsNull(beforeValue);
-                    Assert.AreEqual(dto1.CtsEventTypeName, afterValue);
+                    Assert.IsNull(value:beforeValue);
+                    Assert.AreEqual(expected:dto1.CtsEventTypeName, actual:afterValue);
                 }
                 else if (fieldName == "LastModificationDateTimeLocal") //set within service code
-                {
-
-                }
+                { }
                 else if (fieldName == "LastModifierFullName" && !isAfterUpdate) //set within service code
-                {
-
-                }
+                { }
                 else if (fieldName == "ByOrganizationTypeName" && !isAfterUpdate) //set within service code 
-                {
-
-                }
+                { }
                 else if (fieldName == "FlowUnitValidValues")
                 {
                     var fetchedFlowUnitsEnumerator = dto2.FlowUnitValidValues.GetEnumerator();
@@ -629,8 +525,8 @@ namespace Linko.LinkoExchange.Test
                         var fetchedFlowUnit = fetchedFlowUnitsEnumerator.Current;
 
                         //Compare Results -- just name and id
-                        Assert.AreEqual(unitDto.UnitId, fetchedFlowUnit.UnitId);
-                        Assert.AreEqual(unitDto.Name, fetchedFlowUnit.Name);
+                        Assert.AreEqual(expected:unitDto.UnitId, actual:fetchedFlowUnit.UnitId);
+                        Assert.AreEqual(expected:unitDto.Name, actual:fetchedFlowUnit.Name);
                     }
                 }
                 else if (fieldName == "SampleResults")
@@ -642,15 +538,15 @@ namespace Linko.LinkoExchange.Test
                         var fetchedSampleResult = fetchedResultsEnumerator.Current;
 
                         //Compare Results
-                        Type sampleResultDto = resultDto.GetType();
-                        PropertyInfo[] resultProperties = sampleResultDto.GetProperties();
-                        foreach (PropertyInfo resultProperty in resultProperties)
+                        var sampleResultDto = resultDto.GetType();
+                        var resultProperties = sampleResultDto.GetProperties();
+                        foreach (var resultProperty in resultProperties)
                         {
                             var resultFieldName = resultProperty.Name;
-                            var resultBeforeValue = resultProperty.GetValue(resultDto, null);
-                            var resultAfterValue = resultProperty.GetValue(fetchedSampleResult, null);
+                            var resultBeforeValue = resultProperty.GetValue(obj:resultDto, index:null);
+                            var resultAfterValue = resultProperty.GetValue(obj:fetchedSampleResult, index:null);
 
-                            Debug.WriteLine($"Name: {resultFieldName}, Before Value: {resultBeforeValue}, After Value: {resultAfterValue}");
+                            Debug.WriteLine(message:$"Name: {resultFieldName}, Before Value: {resultBeforeValue}, After Value: {resultAfterValue}");
 
                             if (resultFieldName == "ConcentrationSampleResultId" || resultFieldName == "MassLoadingSampleResultId")
                             {
@@ -660,25 +556,18 @@ namespace Linko.LinkoExchange.Test
                             {
                                 //ignore
                             }
-                            else if (resultFieldName.Contains("DateTimeLocal"))
-                            {
-
-                            }
+                            else if (resultFieldName.Contains(value:"DateTimeLocal")) { }
                             else
                             {
-                                Assert.AreEqual(resultBeforeValue, resultAfterValue);
+                                Assert.AreEqual(expected:resultBeforeValue, actual:resultAfterValue);
                             }
                         }
-
                     }
-
                 }
                 else
                 {
-
-                    Assert.AreEqual(beforeValue, afterValue);
+                    Assert.AreEqual(expected:beforeValue, actual:afterValue);
                 }
-
             }
         }
 
@@ -686,51 +575,139 @@ namespace Linko.LinkoExchange.Test
         public void CanUserExecuteApi_GetSampleDetails_AsAuthority_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
 
-            int sampleId = 2;
+            var sampleId = 2;
             var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetSampleDetails_AsAuthority_False_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"99");
 
-            int sampleId = 2;
+            var sampleId = 2;
             var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetSampleDetails_AsIndustry_True_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("13");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"13");
 
-            int sampleId = 2;
+            var sampleId = 2;
             var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
 
-            Assert.IsTrue(isAuthorized);
+            Assert.IsTrue(condition:isAuthorized);
         }
 
         [TestMethod]
         public void CanUserExecuteApi_GetSampleDetails_AsIndustry_False_Test()
         {
             //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns(value:"industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(value:"99");
 
-            int sampleId = 2;
+            var sampleId = 2;
             var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
 
-            Assert.IsFalse(isAuthorized);
+            Assert.IsFalse(condition:isAuthorized);
         }
+
+        #region Private helper functions
+
+        private SampleDto GetTestSampleDto()
+        {
+            var sampleDto = new SampleDto
+                            {
+                                //Name = "Sample XYZ"; //THIS IS NOT SET FROM UI
+                                MonitoringPointId = 135,
+                                MonitoringPointName = "Process",
+                                CollectionMethodId = 1,
+                                CollectionMethodName = "24",
+                                CtsEventTypeId = 1,
+                                CtsEventTypeName = "SNC-P",
+                                CtsEventCategoryName = "Sample Category 1",
+                                FlowUnitId = 5,
+                                FlowUnitName = "gpd",
+                                FlowEnteredValue = "25000",
+                                StartDateTimeLocal = DateTime.Now.AddDays(value:-7),
+                                EndDateTimeLocal = DateTime.Now,
+                                IsReadyToReport = false,
+                                MassLoadingCalculationDecimalPlaces = 2,
+                                MassLoadingConversionFactorPounds = 8.34,
+                                IsMassLoadingResultToUseLessThanSign = true,
+                                ResultQualifierValidValues = "<,>,ND,NF"
+                            };
+
+            var flowUnitValidValues = new List<UnitDto>
+                                      {
+                                          new UnitDto {UnitId = 5, Name = "gpd", IsFlowUnit = true},
+                                          new UnitDto {UnitId = 8, Name = "mgd", IsFlowUnit = true}
+                                      };
+
+            sampleDto.FlowUnitValidValues = flowUnitValidValues;
+
+            var resultDtos = new List<SampleResultDto>();
+
+            var resultDto = new SampleResultDto
+                            {
+                                ParameterId = 14,
+                                ParameterName = "1,2-Dibromo-3-chloropropane",
+                                Qualifier = "<",
+                                UnitId = 7,
+                                UnitName = "mg/L",
+                                EnteredValue = "0.25",
+                                EnteredMethodDetectionLimit = "0.20",
+                                AnalysisMethod = "Analysis Method 2",
+                                AnalysisDateTimeLocal = DateTime.Now,
+                                IsApprovedEPAMethod = true,
+                                IsCalcMassLoading = true,
+                                MassLoadingQualifier = "<",
+                                MassLoadingUnitId = 10,
+                                MassLoadingUnitName = "ppd",
+                                MassLoadingValue = "52125.00"
+                            };
+            resultDtos.Add(item:resultDto);
+            resultDto = new SampleResultDto
+                        {
+                            ParameterId = 263,
+                            ParameterName = "Trichloroethane",
+                            Qualifier = "<",
+                            UnitId = 11,
+                            UnitName = "su",
+                            EnteredValue = "0.99100",
+                            EnteredMethodDetectionLimit = "",
+                            AnalysisMethod = "Analysis Method 5",
+                            AnalysisDateTimeLocal = DateTime.Now,
+                            IsApprovedEPAMethod = false,
+                            IsCalcMassLoading = false
+                        };
+            resultDtos.Add(item:resultDto);
+
+            sampleDto.SampleResults = resultDtos;
+
+            return sampleDto;
+        }
+
+        [TestMethod]
+        public void Remove_All_Samples_From_Db()
+        {
+            var sampleDtos = _sampleService.GetSamples(status:SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                _sampleService.DeleteSample(sampleId:sampleDto.SampleId.Value);
+            }
+        }
+
+        #endregion
     }
 }

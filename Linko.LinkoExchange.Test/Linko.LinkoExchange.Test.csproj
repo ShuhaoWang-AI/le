@@ -116,7 +116,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AuthenticationServiceTests.cs" />
-    <Compile Include="EmailServiceTests.cs" />
     <Compile Include="InvitationServiceTests.cs" />
     <Compile Include="FileStoreServiceTests.cs" />
     <Compile Include="ReportTemplateServiceTests.cs" />

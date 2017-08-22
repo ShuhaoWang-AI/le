@@ -15,6 +15,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
+// ReSharper disable ArgumentsStyleNamedExpression
+// ReSharper disable ArgumentsStyleOther
+// ReSharper disable ArgumentsStyleLiteral
+// ReSharper disable ArgumentsStyleStringLiteral
+
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
@@ -22,28 +27,28 @@ namespace Linko.LinkoExchange.Test
     {
         #region fields
 
+        private readonly Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
+        private readonly Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
+        private readonly Mock<ISettingService> _settings = new Mock<ISettingService>();
+
         private Mock<ICromerrAuditLogService> _crommerAuditLogService;
         private EncryptionService _encrypter;
-        private readonly Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
         private Mock<IMapHelper> _mapHelper;
-        private readonly Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         private IPasswordHasher _passwordHasher;
         private QuestionAnswerService _questionAnswerService;
         private Mock<ISessionCache> _sessionCache;
-        private readonly Mock<ISettingService> _settings = new Mock<ISettingService>();
-
-        #endregion
-
-        #region constructors and destructor
 
         #endregion
 
         [TestInitialize]
         public void Initialize()
         {
-            var globalSettings = new Dictionary<SystemSettingType, string>();
-            globalSettings.Add(key:SystemSettingType.SupportPhoneNumber, value:"555-555-5555");
-            globalSettings.Add(key:SystemSettingType.SupportEmailAddress, value:"test@test.com");
+            var globalSettings =
+                new Dictionary<SystemSettingType, string>
+                {
+                    {SystemSettingType.SupportPhoneNumber, "555-555-5555"},
+                    {SystemSettingType.SupportEmailAddress, "test@test.com"}
+                };
             _settings.Setup(s => s.GetGlobalSettings()).Returns(value:globalSettings);
 
             _sessionCache = new Mock<ISessionCache>();
