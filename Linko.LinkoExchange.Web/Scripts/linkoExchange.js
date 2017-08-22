@@ -14,12 +14,12 @@
     if (selection.length > 0)
     {
         $.ajax({
-            type: "POST",
-            url: postUrl,
-            data: JSON.stringify({ returnUrl: returnUrl, items: selection }),
-            dataType: "JSON",
-            contentType: "application/json; charset=utf-8",
-            success: function(returnData)
+            type: "POST"
+            , url: postUrl
+            , data: JSON.stringify({ returnUrl: returnUrl, items: selection })
+            , dataType: "JSON"
+            , contentType: "application/json; charset=utf-8"
+            , success: function(returnData)
             {
                 if ($.trim(returnData.message).length > 0)
                 {
@@ -140,58 +140,10 @@ $(document)
     {
         setTelephoneMask();
 
-        $("#LinkoExchangeForm")
-            .submit(function(e)
-            {
-                var isFormValid = true;
-
-                try
-                {
-                    isFormValid = $(this).valid();
-                }
-                catch (e)
-                {}
-
-                if (isFormValid)
-                {
-                    $("input[type='submit']").prop("disabled", true);
-                    $("input[type='button']").prop("disabled", true);
-                    //setTimeout(function()
-                    //    {
-                    //        $("input[type='submit']").prop('disabled', false);
-                    //        $("input[type='button']").prop('disabled', false);
-                    //    }
-                    //    , 2000);
-                }
-            });
+        $("#LinkoExchangeForm").submit(disableButtonsOnSubmit);
 
         // Get all textareas that have a "maxlength" property.
-        $("textarea[maxlength]")
-            .on("keyup blur", function()
-            {
-                //Counts all the newline characters (\r = return for macs, \r\n for Windows, \n for Linux/unix)
-                var newLineCharacterRegexMatch = /\r?\n|\r/g;
-
-                // Store the maxlength and value of the field.
-                var maxlength = $(this).attr("maxlength");
-                var val = $(this).val();
-
-                //count newline characters
-                var regexResult = val.match(newLineCharacterRegexMatch);
-                var newLineCount = regexResult ? regexResult.length : 0;
-
-                //replace newline characters with nothing
-                var replacedValue = val.replace(newLineCharacterRegexMatch, "");
-
-                //return the length of text without newline characters + doubled newline character count
-                var length = replacedValue.length + (newLineCount * 2);
-
-                // Trim the field if it has content over the maxlength.
-                if (length > maxlength)
-                {
-                    $(this).val(val.slice(0, val.length - (length - maxlength)));
-                }
-            });
+        $("textarea[maxlength]").on("keyup blur", limitTextAreaMaxCharacters);
     });
 
 $(document)
@@ -201,7 +153,7 @@ $(document)
         var evt = (e) ? e : ((event) ? event : null);
         var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
 
-        if (evt.which === 13 && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button" && node.type.toLowerCase() !== "submit")
+        if (evt.which === 13 && node.type && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button" && node.type.toLowerCase() !== "submit")
         {
             return false;
         }
@@ -222,6 +174,56 @@ function disableAutoComplete()
 {
     $("input[type='text'").attr("autocomplete", "off");
     $("input[type='tel'").attr("autocomplete", "off");
+}
+
+function disableButtonsOnSubmit()
+{
+    var isFormValid = true;
+
+    try
+    {
+        isFormValid = $(this).valid();
+    }
+    catch (e)
+    {}
+
+    if (isFormValid)
+    {
+        $("input[type='submit']").prop("disabled", true);
+        $("input[type='button']").prop("disabled", true);
+        //setTimeout(function()
+        //    {
+        //        $("input[type='submit']").prop('disabled', false);
+        //        $("input[type='button']").prop('disabled', false);
+        //    }
+        //    , 2000);
+    }
+}
+
+function limitTextAreaMaxCharacters()
+{
+    //Counts all the newline characters (\r = return for macs, \r\n for Windows, \n for Linux/unix)
+    var newLineCharacterRegexMatch = /\r?\n|\r/g;
+
+    // Store the maxlength and value of the field.
+    var maxlength = $(this).attr("maxlength");
+    var val = $(this).val();
+
+    //count newline characters
+    var regexResult = val.match(newLineCharacterRegexMatch);
+    var newLineCount = regexResult ? regexResult.length : 0;
+
+    //replace newline characters with nothing
+    var replacedValue = val.replace(newLineCharacterRegexMatch, "");
+
+    //return the length of text without newline characters + doubled newline character count
+    var length = replacedValue.length + (newLineCount * 2);
+
+    // Trim the field if it has content over the maxlength.
+    if (length > maxlength)
+    {
+        $(this).val(val.slice(0, val.length - (length - maxlength)));
+    }
 }
 
 function setTelephoneMask()
