@@ -288,9 +288,10 @@ namespace Linko.LinkoExchange.Services.Organization
                 var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
                                                                                             && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
-                if (childOrgRegProgs != null && !string.IsNullOrEmpty(value:searchString))
+                if (!string.IsNullOrEmpty(value:searchString))
                 {
                     childOrgRegProgs = childOrgRegProgs.Where(x =>
+
                                                                   // ReSharper disable once ArgumentsStyleNamedExpression
                                                                       x.ReferenceNumber.Contains(searchString)
 
@@ -313,32 +314,24 @@ namespace Linko.LinkoExchange.Services.Organization
                                                                       || x.Organization.ZipCode.Contains(searchString));
                 }
 
-                if (childOrgRegProgs != null)
+                var dtos = new List<OrganizationRegulatoryProgramDto>();
+                foreach (var childOrgRegProg in childOrgRegProgs.ToList())
                 {
-                    var dtoList = new List<OrganizationRegulatoryProgramDto>();
-                    foreach (var orgRegProg in childOrgRegProgs.ToList())
-                    {
-                        var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:orgRegProg);
-                        dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
-                                                     .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
-                                           > 0;
-                        dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
-                                                       .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
-                                                                   && o.IsRegistrationApproved
-                                                                   && o.IsEnabled
-                                                                   && o.PermissionGroup.Name == "Administrator"
-                                                             )
-                                             > 0;
-                        dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(jurisdictionId:orgRegProgram.Organization.JurisdictionId)?.Code ?? "";
-                        dtoList.Add(item:dto);
-                    }
+                    var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:childOrgRegProg);
+                    dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
+                                                 .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
+                                       > 0;
+                    dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
+                                                   .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId
+                                                               && o.IsRegistrationApproved
+                                                               && o.IsEnabled
+                                                               && o.PermissionGroup.Name == "Administrator"
+                                                         )
+                                         > 0;
+                    dtos.Add(item:dto);
+                }
 
-                    return dtoList;
-                }
-                else
-                {
-                    return null;
-                }
+                return dtos.Count > 0 ? dtos : null;
             }
             catch (DbEntityValidationException ex)
             {

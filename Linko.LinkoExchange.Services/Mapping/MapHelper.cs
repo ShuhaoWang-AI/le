@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
             dto.CityName = organization.CityName;
-            dto.State = organization.Jurisdiction?.Code;
+            dto.State = organization.Jurisdiction?.Code ?? "";
             dto.OrganizationId = organization.OrganizationId;
             dto.OrganizationTypeId = organization.OrganizationTypeId;
 

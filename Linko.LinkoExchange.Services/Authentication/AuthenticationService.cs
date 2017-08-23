@@ -1385,9 +1385,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
 
                     // Prepare Registration Approval Emails
-                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser:registeredUser,
-                                                                       registeredOrganizationRegulatoryProgram:registeredOrganizationRegulatoryProgram,
-                                                                       inviterOrganizationRegulatoryProgram:inviterOrganizationRegulatoryProgram, authorityOrg:authorityOrg);
+                    emailEntries.AddRange(collection:PrepareApprovalEmailForRegistration(registeredUser:registeredUser,
+                                                                                         registeredOrganizationRegulatoryProgram:registeredOrganizationRegulatoryProgram,
+                                                                                         inviterOrganizationRegulatoryProgram:inviterOrganizationRegulatoryProgram,
+                                                                                         authorityOrg:authorityOrg));
 
                     // Do COMERR Log
                     DoComerrLogForRegistration(registrationType:registrationType, registeredUser:registeredUser,
