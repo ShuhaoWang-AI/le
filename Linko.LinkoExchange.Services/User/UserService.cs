@@ -1508,8 +1508,11 @@ namespace Linko.LinkoExchange.Services.User
             user.IsRegistrationApproved = isApproved;
             user.IsRegistrationDenied = !isApproved;
 
-            // Call UpdateUserSignatoryStatus to set IsSignatory flag to avoid duplicated code for emails and Cromerr
-            UpdateUserSignatoryStatus(orgRegProgUserId:orgRegProgUserId, isSignatory:isSignatory, isAuthorizationRequired:true);
+            if (isApproved)
+            {
+                // Call UpdateUserSignatoryStatus to set IsSignatory flag to avoid duplicated code for emails and Cromerr
+                UpdateUserSignatoryStatus(orgRegProgUserId:orgRegProgUserId, isSignatory:isSignatory, isAuthorizationRequired:true);
+            }
             _dbContext.SaveChanges();
         }
 
