@@ -479,9 +479,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
-                _settingService.GetOrganizationSettingsById(organizationId:invitationRecipientProgram.RegulatorOrganizationId
-                                                                           ?? invitationRecipientProgram
-                                                                               .OrganizationId); // always get the authority settings as currently industry don't have settings 
+                _settingService.GetOrganizationSettingsById(organizationId:invitationRecipientProgram.RegulatorOrganizationId ?? invitationRecipientProgram.OrganizationId); 
+            // always get the authority settings as currently industry don't have settings 
 
             var invitationExpirationHours = ValueParser.TryParseInt(value:ConfigurationManager.AppSettings[name:"DefaultInviteExpirationHours"], defaultValue:72);
             if (inivitationRecipintOrganizationSettings.Settings.Any())
@@ -758,8 +757,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return isNotExpiredYet;
         }
 
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
-                                                                      string answer, int failedCount, string newPassword)
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId, string answer, int failedCount, string newPassword)
         {
             var authenticationResult = new AuthenticationResultDto();
 
@@ -1332,9 +1330,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     // Prepare Registration Approval Emails
-                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
-                                                                       inviterOrganizationRegulatoryProgram:authorityOrgRegProg,
-                                                                       authorityOrg:authorityOrgRegProg.OrganizationDto);
+                    emailEntries.AddRange(collection:PrepareApprovalEmailForRegistration(registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
+                                                                              inviterOrganizationRegulatoryProgram:authorityOrgRegProg,
+                                                                              authorityOrg:authorityOrgRegProg.OrganizationDto));
 
                     // Do COMERR Log
                     DoComerrLogForRegistration(registrationType:registrationType, registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
