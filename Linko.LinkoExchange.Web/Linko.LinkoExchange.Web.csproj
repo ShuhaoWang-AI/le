@@ -530,6 +530,7 @@
     <Compile Include="ViewModels\Shared\PendingUserApprovalViewModel.cs" />
     <Compile Include="ViewModels\Shared\SelectedParentChildCombination.cs" />
     <Compile Include="ViewModels\User\AnswerViewModel.cs" />
+    <Compile Include="ViewModels\User\KBQViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionAnswerPairViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionViewModel.cs" />
     <Compile Include="ViewModels\User\RegistrationViewModel.cs" />
