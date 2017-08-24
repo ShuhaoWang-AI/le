@@ -10,7 +10,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.HttpContext; 
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.AspNet.Identity;
@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IHttpContextService _httpContext;
         private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
         private readonly IOrganizationService _orgService;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly IPasswordHasher _passwordHasher; 
 
         #endregion
 
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _globalSettings = settingService.GetGlobalSettings();
             _orgService = orgService;
             _crommerAuditLogService = crommerAuditLogService;
-            _linkoExchangeEmailService = linkoExchangeEmailService;
+            _linkoExchangeEmailService = linkoExchangeEmailService; 
         }
 
         #endregion
@@ -348,6 +348,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     answer.Content = _encryption.EncryptString(readableString:answer.Content.Trim());
                 }
 
+                answerToUpdate.QuestionId = answer.QuestionId; 
                 answerToUpdate.Content = answer.Content;
                 answerToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
@@ -490,6 +491,39 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             {
                 return _encryption.EncryptString(readableString:answer.Trim()) == questionAnswer.Content;
             }
+        }
+
+        /// <summary>
+        /// Validates the user KBQ to update.
+        /// </summary>
+        /// <param name="userProfileId">The user profile identifier.</param>
+        /// <param name="kbq">The KBQ.</param>
+        /// <returns></returns>
+        public RegistrationResult ValidateUserKbqToUpdate(int userProfileId, AnswerDto kbq)
+        {
+            if (string.IsNullOrWhiteSpace(kbq.Content))
+            {
+                return RegistrationResult.MissingKBQAnswer;
+            }
+
+            // check if the quetionId is duplicated 
+            if(_dbContext.UserQuestionAnswers.Any(i=> i.UserProfileId == userProfileId && i.QuestionId == kbq.QuestionId && i.UserQuestionAnswerId != kbq.UserQuestionAnswerId)) 
+            {
+                return RegistrationResult.DuplicatedKBQ;
+            }
+
+            // check if the content is duplicated with others 
+            var userQuestionAnswers = _dbContext.UserQuestionAnswers.Where(i=>i.UserProfileId == userProfileId && i.QuestionId != kbq.QuestionId).ToList();
+            foreach (var uqa in userQuestionAnswers)
+            {
+                var verifyKbqAnser = _passwordHasher.VerifyHashedPassword(uqa.Content, kbq.Content);
+                if (verifyKbqAnser == PasswordVerificationResult.Success)
+                {
+                    return RegistrationResult.DuplicatedKBQAnswer;
+                }
+            }
+
+            return RegistrationResult.Success;
         }
 
         public RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions)

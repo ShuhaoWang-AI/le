@@ -171,6 +171,57 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model:pristineUser);
         }
 
+        [PortalAuthorize("authority", "industry")]
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [Route(template:"Profile/UpdateOneKbq")]
+        public JsonResult UpdateOneKbq(KBQViewModel kbqViewModel)
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(s:profileIdStr ?? "0");
+
+            var questionAnswerDto = new AnswerDto
+            {
+                QuestionId = kbqViewModel.QuestionId,
+                UserQuestionAnswerId = kbqViewModel.QuestionAnswerId,
+                Content = kbqViewModel.Content,
+            };
+
+            string message="";
+
+            var validateResult = _questionAnswerService.ValidateUserKbqToUpdate(userProfileId, questionAnswerDto);
+            if (validateResult == RegistrationResult.MissingKBQAnswer)
+            {
+                message = "Question answer cannot be empty.";
+            }
+            else if (validateResult == RegistrationResult.DuplicatedKBQ)
+            {
+                message = "Question cannot be duplicated with others.";
+            }
+            else if (validateResult == RegistrationResult.DuplicatedKBQAnswer)
+            {
+                message = "Question answer cannot be duplicated with others.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                return Json(data:new
+                {
+                    result = "false",
+                    message = message
+                });
+            }
+
+            _questionAnswerService.UpdateAnswer(questionAnswerDto);
+            
+            var result = new
+            {
+                result ="true",
+                message ="Knowledge Based Question updated successfully."
+            };
+
+            return Json(data:result); 
+        }
         private bool NeedToValidKbq()
         {
             var previousUri = HttpContext.Request.UrlReferrer;
@@ -191,28 +242,28 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "userprofile"
-                && Request.HttpMethod != "POST"
-                && NeedToValidKbq())
-            {
-                var kbqPass = TempData[key:"KbqPass"] as string;
-                if (!string.IsNullOrWhiteSpace(value:kbqPass) && kbqPass.ToLower() == "true")
-                {
-                    base.OnActionExecuting(filterContext:filterContext);
-                }
-                else
-                {
-                    filterContext.Result = new RedirectToRouteResult(
-                                                                     routeValues:new RouteValueDictionary
-                                                                                 {
-                                                                                     {"action", "KbqChallenge"},
-                                                                                     {"controller", "Account"},
-                                                                                     {"returnUrl", filterContext.HttpContext.Request.Url}
-                                                                                 }
-                                                                    );
-                }
-            }
-            else
+            //if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "userprofile"
+            //    && Request.HttpMethod != "POST"
+            //    && NeedToValidKbq())
+            //{
+            //    var kbqPass = TempData[key:"KbqPass"] as string;
+            //    if (!string.IsNullOrWhiteSpace(value:kbqPass) && kbqPass.ToLower() == "true")
+            //    {
+            //        base.OnActionExecuting(filterContext:filterContext);
+            //    }
+            //    else
+            //    {
+            //        filterContext.Result = new RedirectToRouteResult(
+            //                                                         routeValues:new RouteValueDictionary
+            //                                                                     {
+            //                                                                         {"action", "KbqChallenge"},
+            //                                                                         {"controller", "Account"},
+            //                                                                         {"returnUrl", filterContext.HttpContext.Request.Url}
+            //                                                                     }
+            //                                                        );
+            //    }
+            //}
+            //else
             {
                 base.OnActionExecuting(filterContext:filterContext);
             }

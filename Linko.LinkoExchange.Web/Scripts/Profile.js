@@ -1,5 +1,4 @@
-﻿
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
     $(".editabledDiv input").attr("readonly", true);
     $(".editabledDiv select").attr("readonly", "disabled");
@@ -12,17 +11,17 @@ $(document).ready(function () {
     $(".box-primary >.box-header").find("i.fa.fa-minus").removeClass('fa-minus');
     $(".box-primary >.box-header").find("i.fa").addClass('fa-plus');
 
-    if (profileCollapsed.toLowerCase() == 'false') {
+    if (profileCollapsed.toLowerCase() === 'false') {
         $("#user-info-panel .box-primary").removeClass("collapsed-box");
         $("#user-info-panel .box-primary >.box-header").find("i.fa.fa-plus").removeClass('fa-plus');
         $("#user-info-panel .box-primary >.box-header").find("i.fa").addClass('fa-minus');
     }
-    if (kbqCollapsed.toLowerCase() == 'false') {
+    if (kbqCollapsed.toLowerCase() === 'false') {
         $("#kbq-panel .box-primary").removeClass("collapsed-box");
         $("#kbq-panel .box-primary >.box-header").find("i.fa.fa-plus").removeClass('fa-plus');
         $("#kbq-panel .box-primary >.box-header ").find("i.fa").addClass('fa-minus');
     }
-    if (sqCollapsed.toLowerCase() == "false") {
+    if (sqCollapsed.toLowerCase() === "false") {
         $("#sq-panel .box-primary").removeClass("collapsed-box");
         $("#sq-panel .box-primary >.box-header").find("i.fa.fa-plus").removeClass('fa-plus');
         $("#sq-panel .box-primary >.box-header").find("i.fa").addClass('fa-minus');
@@ -30,15 +29,15 @@ $(document).ready(function () {
 
     $(document).find("#kbq-panel select").on("change", function () {
         $(this).closest(".form-group").next().find("input[type=text]").val("");
-    })
+    });
 
     $(document).find("#sq-panel select").on("change", function () {
         $(this).closest(".form-group").next().find("input[type=text]").val("");
-    })
+    });
 
     $(document).on('click', ".edit-button", function () {
         $(this).hide();
-        if ($(this).attr("id") == 'kbqEditBtn') {
+        if ($(this).attr("id") === 'kbqEditBtn') {
             $(this).closest(".box").find(".kbq-answer").val("");
             $("#kbq-panel input[type='text'").show();
             $("#kbq-panel input[type='password'").hide();
@@ -52,7 +51,7 @@ $(document).ready(function () {
         })
         $(this).closest(".box").find(".editabledDiv select").attr('readonly', null);
         $(this).closest(".box").find(".editabledDiv select").attr('disabled', null);
-    })
+    });
 
     $(document).on("click", "#profileSubmit", function () {
         $("input[id=profileCollapsed").val("false");
@@ -69,7 +68,7 @@ $(document).ready(function () {
         } else {
             $("input[id=kbqCollapsed").val("true");
         }
-    })
+    });
 
     $(document).on("click", "#kbqSubmit", function () {
         $("#kbq-panel input[type='password'").show();
@@ -90,7 +89,7 @@ $(document).ready(function () {
         } else {
             $("input[id=profileCollapsed").val("true");
         }
-    })
+    });
 
     $(document).on("click", "#sqSubmit", function () {
         $("input[id=sqCollapsed").val("false");
@@ -107,6 +106,127 @@ $(document).ready(function () {
         } else {
             $("input[id=profileCollapsed").val("true");
         }
-    })
+    });
+
+    kbqUpdateInit();
+    
+    // implementations 
+    function kbqUpdateInit() {
+        $('.fa-save').hide();
+        $('.fa-edit').on('click', clickEdit);
+        $('.fa-save').on('click', clickSave);
+        $('.fa-times-circle').on('click', clickCancel);
+
+        setKbqAnswerEntryKey();
+    }
+
+    function setKbqAnswerEntryKey() {
+        var qaDivs = $("#kbq-panel").find(".kbq-div");
+        qaDivs.map(function (idx, ele) {
+            $(ele).on("keyup", function (evt) {
+                if (evt.which === 13) {
+                    clickSave.apply($(ele).find('.fa-save'));
+                }
+            });
+        });
+    };
+
+    function clickCancel() {
+        var qaDiv = $(this).closest(".kbq-div"); 
+        qaDiv.find("select").attr('readonly', "disabled");
+        qaDiv.find("select").attr("disabled", "true");
+
+        qaDiv.find("input[type='password']").show();
+        qaDiv.find("input[type='text']").hide();
+
+        $(this).hide();
+        $(this).siblings(".fa-save").hide();
+        $(this).siblings(".fa-edit").show();
+    }
+
+    function clickSave() {
+
+        var qaDiv = $(this).closest(".kbq-div");
+        var questionIndex = qaDiv.find("select")[0].selectedIndex + 1;
+        var answer = qaDiv.find("input[type='text']")[0].value;
+        var questionAnswerId = qaDiv.find("input[type='hidden']")[1].value;
+
+        if (!answer) {
+            return;
+        }
+
+        qaDiv.find(".fa-times-circle").hide();
+        qaDiv.find(".fa-spinner").show();
+
+        // update this question, and value   
+        var qa = {
+            questionId: questionIndex,
+            questionAnswerId: questionAnswerId,
+            content: answer
+        };
+
+        $.post("/User/Profile/UpdateOneKbq", qa, function (data) {
+            qaDiv.find(".fa-spinner").hide();
+            if (data && data.result === "true") {
+
+                $('.fa-save').hide();
+                $('.fa-save').siblings('.fa-edit').show();
+                $('.fa-times-circle').hide(); 
+
+                $("#summaryDiv").empty();
+
+                var succeedDiv = $("#succeedPanel").clone();
+                succeedDiv.find('ul').append("<li>" + data.message + "</li>");
+                $('#summaryDiv').append(succeedDiv);
+                succeedDiv.show();
+
+                // disable the list the text
+                qaDiv.find("select").attr('readonly', "disabled");
+                qaDiv.find("select").attr("disabled", "true");
+
+                qaDiv.find("input[type='password']").show();
+                qaDiv.find("input[type='text']").hide();
+
+            } else {
+                // display the error
+                $("#summaryDiv").empty();
+                var errorPanel = $("#errorPanel").clone();
+                errorPanel.find('ul').append("<li>" + data.message + "</li>");
+                $('#summaryDiv').append(errorPanel);
+                errorPanel.show();
+            }
+        });
+    }
+
+    function clickEdit() {
+        var qaDiv = $(this).closest(".kbq-div");
+
+        qaDiv.find("select").attr('readonly', null);
+        qaDiv.find("select").attr('disabled', null);
+
+        qaDiv.find("input[type='password']").hide();
+        qaDiv.find("input[type='text']").val("");
+
+        qaDiv.find("input[type='text']").show();
+        qaDiv.find("input[type='text']").prop('readonly', function (i, value) {
+            return !value;
+        });
+        qaDiv.find("input[type='text']").removeAttr("readonly");
+        $(this).hide();
+        $(this).siblings('.fa-save').show();
+        $(this).siblings('.fa-times-circle').show();
+    }
+
+    $(document).on('change', "select", function () {
+        var i = $(this)[0].selectedIndex;
+        var ch = $(this).children().each(function (index) {
+            $(this).prop('selected', index === i);
+            if (index === i) {
+                $(this).attr('selected', 'selected');
+            } else {
+                $(this).removeAttr('selected');
+            }
+        });
+    });
 
 });

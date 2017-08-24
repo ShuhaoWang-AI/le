@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="questionAnswers"> </param>
         /// <returns> </returns>
         CreateOrUpdateAnswersResult CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers);
-
+ 
         /// <summary>
         ///     Add a collection of question and answer pairs.
         /// </summary>
@@ -93,6 +93,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="kbqQuestions"> </param>
         /// <returns> </returns>
         RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions);
+
+        /// <summary>
+        /// Validates the user KBQ to update.
+        /// </summary>
+        /// <param name="userProfileId">The user profile identifier.</param>
+        /// <param name="kbq">The KBQ.</param>
+        /// <returns></returns>
+        RegistrationResult ValidateUserKbqToUpdate(int userProfileId, AnswerDto kbq);
 
         /// <summary>
         ///     - Check for duplicated security questions
