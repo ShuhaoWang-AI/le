@@ -21,7 +21,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
-    public class InvitationService : IInvitationService
+    public class InvitationService:IInvitationService
     {
         #region fields
 
@@ -201,209 +201,221 @@ namespace Linko.LinkoExchange.Services.Invitation
         {
             _logger.Info(message:$"Enter InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
 
-            OrganizationRegulatoryProgramUserDto existingUser;
-
-            //See if any existing users belong to this program
-            var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress:email);
-            if (existingProgramUsers.Any())
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                existingUser = existingProgramUsers.First();
-                email = existingUser.UserProfileDto.Email;
-                firstName = existingUser.UserProfileDto.FirstName;
-                lastName = existingUser.UserProfileDto.LastName;
-
-                var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
-                if (existingUserForThisProgram != null)
+                try
                 {
-                    if (existingUserForThisProgram.IsRegistrationApproved)
-                    {
-                        // user is currently active in target OrganizationRegulatoryProgram
-                        _logger.Info(message:$"SendInvitation Failed. User with email={email} already exists within OrgRegProgramId={targetOrgRegProgramId}");
+                    OrganizationRegulatoryProgramUserDto existingUser;
 
-                        var validationIssues = new List<RuleViolation>();
-                        var message = $"Invite failed to send. User with email={email} is already associated with this account";
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                        throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                    //See if any existing users belong to this program
+                    var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress:email);
+                    if (existingProgramUsers.Any())
+                    {
+                        existingUser = existingProgramUsers.First();
+                        email = existingUser.UserProfileDto.Email;
+                        firstName = existingUser.UserProfileDto.FirstName;
+                        lastName = existingUser.UserProfileDto.LastName;
+
+                        var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
+                        if (existingUserForThisProgram != null)
+                        {
+                            if (existingUserForThisProgram.IsRegistrationApproved)
+                            {
+                                // user is currently active in target OrganizationRegulatoryProgram
+                                _logger.Info(message:$"SendInvitation Failed. User with email={email} already exists within OrgRegProgramId={targetOrgRegProgramId}");
+
+                                var validationIssues = new List<RuleViolation>();
+                                var message = $"Invite failed to send. User with email={email} is already associated with this account";
+                                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                            }
+                            else
+                            {
+                                // user was removed from target OrganizationRegulatoryProgram
+                                existingUser = existingUserForThisProgram;
+
+                                // Per discussion between Sundoro, Rajeeb, Shuhao, during re-invitation,
+                                // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
+                                var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId
+                                                                                                     == existingUser.OrganizationRegulatoryProgramUserId);
+                                user.IsRemoved = false;
+                                _dbContext.SaveChanges();
+                            }
+                        }
                     }
                     else
                     {
-                        // user was removed from target OrganizationRegulatoryProgram
-                        existingUser = existingUserForThisProgram;
-
-                        // Per discussion between Sundoro, Rajeeb, Shuhao, during re-invitation,
-                        // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
-                        var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId
-                                                                                             == existingUser.OrganizationRegulatoryProgramUserId);
-                        user.IsRemoved = false;
-                        _dbContext.SaveChanges();
+                        existingUser = new OrganizationRegulatoryProgramUserDto
+                                       {
+                                           UserProfileDto = new UserDto
+                                                            {
+                                                                Email = email,
+                                                                FirstName = firstName,
+                                                                LastName = lastName,
+                                                                UserName = "n/a",
+                                                                UserProfileId = 0
+                                                            }
+                                       };
                     }
-                }
-            }
-            else
-            {
-                existingUser = new OrganizationRegulatoryProgramUserDto
-                               {
-                                   UserProfileDto = new UserDto
-                                                    {
-                                                        Email = email,
-                                                        FirstName = firstName,
-                                                        LastName = lastName,
-                                                        UserName = "n/a",
-                                                        UserProfileId = 0
-                                                    }
-                               };
-            }
 
-            //For Authority inviting Industry, check if an active Admin user does not already exist within that IU
-            if (invitationType == InvitationType.AuthorityToIndustry)
-            {
-                var orgRegProgram = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:targetOrgRegProgramId);
-                if (orgRegProgram.HasActiveAdmin)
+                    //For Authority inviting Industry, check if an active Admin user does not already exist within that IU
+                    if (invitationType == InvitationType.AuthorityToIndustry)
+                    {
+                        var orgRegProgram = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:targetOrgRegProgramId);
+                        if (orgRegProgram.HasActiveAdmin)
+                        {
+                            _logger.Info(message:$"SendInvitation Failed. Industry already has Admin User. OrgRegProgramId={targetOrgRegProgramId}");
+
+                            var validationIssues = new List<RuleViolation>();
+                            var message = "Invite failed to send. This industry already has an Administrator User.";
+                            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                            throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                        }
+                    }
+
+                    //Check available license count
+                    var remaining = _organizationService.GetRemainingUserLicenseCount(orgRegProgramId:targetOrgRegProgramId);
+
+                    if (remaining < 1)
+                    {
+                        _logger.Info(message:$"SendInvitation Failed. No more remaining user licenses. OrgRegProgramId={targetOrgRegProgramId}, InviteType={invitationType}");
+
+                        var validationIssues = new List<RuleViolation>();
+                        var message = "No more User Licenses are available for this organization. Disable another User and try again.";
+                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                        throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                    }
+
+                    var invitationId = Guid.NewGuid().ToString();
+
+                    _requestCache.SetValue(key:CacheKey.Token, value:invitationId);
+
+                    var senderOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+
+                    var invitationDto = new InvitationDto
+                                        {
+                                            InvitationId = invitationId,
+                                            InvitationDateTimeUtc = DateTime.UtcNow,
+                                            EmailAddress = email,
+                                            FirstName = firstName,
+                                            LastName = lastName,
+                                            RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId,
+                                            SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId
+                                        };
+
+                    CreateInvitation(dto:invitationDto);
+
+                    // Call SaveChanges to make sure data is good before sending emails.
+                    _dbContext.SaveChanges();
+
+                    //Send invite with link
+                    var contentReplacements = new Dictionary<string, string>();
+                    var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
+                    var authority = _organizationService.GetAuthority(orgRegProgramId:targetOrgRegProgramId);
+                    contentReplacements.Add(key:"firstName", value:firstName);
+                    contentReplacements.Add(key:"lastName", value:lastName);
+
+                    var authorityName =
+                        _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId, settingType:SettingType.EmailContactInfoName);
+                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                                      settingType:SettingType.EmailContactInfoEmailAddress);
+                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                                      settingType:SettingType.EmailContactInfoPhone);
+
+                    contentReplacements.Add(key:"authorityName", value:authorityName);
+                    contentReplacements.Add(key:"authorityOrganizationName", value:authority.OrganizationDto.OrganizationName);
+                    contentReplacements.Add(key:"emailAddress", value:authorityEmail);
+                    contentReplacements.Add(key:"phoneNumber", value:authorityPhone);
+                    contentReplacements.Add(key:"supportEmail", value:authorityEmail);
+                    contentReplacements.Add(key:"supportPhoneNumber", value:authorityPhone);
+
+                    if (invitationType == InvitationType.AuthorityToIndustry
+                        || invitationType == InvitationType.IndustryToIndustry)
+                    {
+                        contentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
+                        contentReplacements.Add(key:"addressLine1", value:targetOrgRegProgram.Organization.AddressLine1);
+                        contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName);
+                        contentReplacements.Add(key:"stateName",
+                                                value:_jurisdictionService.GetJurisdictionById(jurisdictionId:targetOrgRegProgram.Organization.JurisdictionId)?.Code ?? "");
+                    }
+
+                    var baseUrl = _httpContextService.GetRequestBaseUrl();
+                    var url = baseUrl + "Account/Register?token=" + invitationId;
+                    contentReplacements.Add(key:"link", value:url);
+
+                    var thisUserOrgRegProgUserId = Convert.ToInt32(value:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
+                    var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+                    var actorUser = _userService.GetUserProfileById(userProfileId:actorProgramUser.UserProfileId);
+
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                    var cromerrContentReplacements = new Dictionary<string, string>();
+
+                    cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId == 0 ? default(int?) : existingUser.UserProfileId;
+                    cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
+
+                    cromerrContentReplacements.Add(key:"userName", value:existingUser.UserProfileDto.UserName);
+
+                    cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
+                    cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = authority.OrganizationId;
+                    cromerrAuditLogEntryDto.UserFirstName = firstName;
+                    cromerrAuditLogEntryDto.UserLastName = lastName;
+                    cromerrAuditLogEntryDto.UserEmailAddress = email;
+                    cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
+                    cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
+
+                    cromerrContentReplacements.Add(key:"authorityName", value:authority.OrganizationDto.OrganizationName);
+                    cromerrContentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
+                    cromerrContentReplacements.Add(key:"regulatoryProgram", value:authority.RegulatoryProgramDto.Name);
+                    cromerrContentReplacements.Add(key:"firstName", value:firstName);
+                    cromerrContentReplacements.Add(key:"lastName", value:lastName);
+                    cromerrContentReplacements.Add(key:"emailAddress", value:email);
+                    cromerrContentReplacements.Add(key:"inviterFirstName", value:actorUser.FirstName);
+                    cromerrContentReplacements.Add(key:"inviterLastName", value:actorUser.LastName);
+                    cromerrContentReplacements.Add(key:"inviterUserName", value:actorUser.UserName);
+                    cromerrContentReplacements.Add(key:"inviterEmailAddress", value:actorUser.Email);
+
+                    _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteSent, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements).Wait();
+
+                    //Invitation email logs only for the program that is invited to   
+
+                    EmailType emailType;
+                    switch (invitationType)
+                    {
+                        case InvitationType.AuthorityToAuthority:
+                            emailType = EmailType.Registration_InviteAuthorityUser;
+                            break;
+                        case InvitationType.AuthorityToIndustry:
+                            emailType = EmailType.Registration_AuthorityInviteIndustryUser;
+                            break;
+                        case InvitationType.IndustryToIndustry:
+                            emailType = EmailType.Registration_IndustryInviteIndustryUser;
+                            break;
+                        default:
+                            throw new Exception(message:"ERROR: unknown EmailType");
+                    }
+
+                    var emailEntry = _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:existingUser, emailType:emailType, contentReplacements:contentReplacements);
+                    emailEntry.RecipientOrgulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
+                    emailEntry.RecipientOrganizationId = targetOrgRegProgram.OrganizationId;
+                    emailEntry.RecipientRegulatorOrganizationId = cromerrAuditLogEntryDto.RegulatorOrganizationId;
+
+                    var emailEntries = new List<EmailEntry> {emailEntry};
+
+                    // Do email audit log.
+                    _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+                    transaction.Commit();
+
+                    // Send emails.
+                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+                }
+                catch
                 {
-                    _logger.Info(message:$"SendInvitation Failed. Industry already has Admin User. OrgRegProgramId={targetOrgRegProgramId}");
-
-                    var validationIssues = new List<RuleViolation>();
-                    var message = "Invite failed to send. This industry already has an Administrator User.";
-                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                    transaction.Rollback();
+                    throw;
                 }
             }
-
-            //Check available license count
-            var remaining = _organizationService.GetRemainingUserLicenseCount(orgRegProgramId:targetOrgRegProgramId);
-
-            if (remaining < 1)
-            {
-                _logger.Info(message:$"SendInvitation Failed. No more remaining user licenses. OrgRegProgramId={targetOrgRegProgramId}, InviteType={invitationType}");
-
-                var validationIssues = new List<RuleViolation>();
-                var message = "No more User Licenses are available for this organization. Disable another User and try again.";
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
-
-            var invitationId = Guid.NewGuid().ToString();
-
-            _requestCache.SetValue(key:CacheKey.Token, value:invitationId);
-
-            var senderOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-
-            var invitationDto = new InvitationDto
-                                {
-                                    InvitationId = invitationId,
-                                    InvitationDateTimeUtc = DateTime.UtcNow,
-                                    EmailAddress = email,
-                                    FirstName = firstName,
-                                    LastName = lastName,
-                                    RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId,
-                                    SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId
-                                };
-
-            CreateInvitation(dto:invitationDto);
-
-            // Call SaveChanges to make sure data is good before sending emails.
-            _dbContext.SaveChanges();
-
-            //Send invite with link
-            var contentReplacements = new Dictionary<string, string>();
-            var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
-            var authority = _organizationService.GetAuthority(orgRegProgramId:targetOrgRegProgramId);
-            contentReplacements.Add(key:"firstName", value:firstName);
-            contentReplacements.Add(key:"lastName", value:lastName);
-
-            var authorityName =
-                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId, settingType:SettingType.EmailContactInfoName);
-            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                              settingType:SettingType.EmailContactInfoEmailAddress);
-            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                              settingType:SettingType.EmailContactInfoPhone);
-
-            contentReplacements.Add(key:"authorityName", value:authorityName);
-            contentReplacements.Add(key:"authorityOrganizationName", value:authority.OrganizationDto.OrganizationName);
-            contentReplacements.Add(key:"emailAddress", value:authorityEmail);
-            contentReplacements.Add(key:"phoneNumber", value:authorityPhone);
-            contentReplacements.Add(key:"supportEmail", value:authorityEmail);
-            contentReplacements.Add(key:"supportPhoneNumber", value:authorityPhone);
-
-            if (invitationType == InvitationType.AuthorityToIndustry
-                || invitationType == InvitationType.IndustryToIndustry)
-            {
-                contentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
-                contentReplacements.Add(key:"addressLine1", value:targetOrgRegProgram.Organization.AddressLine1);
-                contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName);
-                contentReplacements.Add(key:"stateName",
-                                        value:_jurisdictionService.GetJurisdictionById(jurisdictionId:targetOrgRegProgram.Organization.JurisdictionId)?.Code ?? "");
-            }
-
-            var baseUrl = _httpContextService.GetRequestBaseUrl();
-            var url = baseUrl + "Account/Register?token=" + invitationId;
-            contentReplacements.Add(key:"link", value:url);
-
-            var thisUserOrgRegProgUserId = Convert.ToInt32(value:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
-            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-            var actorUser = _userService.GetUserProfileById(userProfileId:actorProgramUser.UserProfileId);
-
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            var cromerrContentReplacements = new Dictionary<string, string>();
-
-            cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId == 0 ? default(int?) : existingUser.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
-
-            cromerrContentReplacements.Add(key:"userName", value:existingUser.UserProfileDto.UserName);
-
-            cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = authority.OrganizationId;
-            cromerrAuditLogEntryDto.UserFirstName = firstName;
-            cromerrAuditLogEntryDto.UserLastName = lastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-
-            cromerrContentReplacements.Add(key:"authorityName", value:authority.OrganizationDto.OrganizationName);
-            cromerrContentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
-            cromerrContentReplacements.Add(key:"regulatoryProgram", value:authority.RegulatoryProgramDto.Name);
-            cromerrContentReplacements.Add(key:"firstName", value:firstName);
-            cromerrContentReplacements.Add(key:"lastName", value:lastName);
-            cromerrContentReplacements.Add(key:"emailAddress", value:email);
-            cromerrContentReplacements.Add(key:"inviterFirstName", value:actorUser.FirstName);
-            cromerrContentReplacements.Add(key:"inviterLastName", value:actorUser.LastName);
-            cromerrContentReplacements.Add(key:"inviterUserName", value:actorUser.UserName);
-            cromerrContentReplacements.Add(key:"inviterEmailAddress", value:actorUser.Email);
-
-            _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteSent, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements).Wait();
-
-            //Invitation email logs only for the program that is invited to   
-
-            EmailType emailType;
-            switch (invitationType)
-            {
-                case InvitationType.AuthorityToAuthority:
-                    emailType = EmailType.Registration_InviteAuthorityUser;
-                    break;
-                case InvitationType.AuthorityToIndustry:
-                    emailType = EmailType.Registration_AuthorityInviteIndustryUser;
-                    break;
-                case InvitationType.IndustryToIndustry:
-                    emailType = EmailType.Registration_IndustryInviteIndustryUser;
-                    break;
-                default: throw new Exception(message:"ERROR: unknown EmailType");
-            }
-
-            var emailEntry = _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:existingUser, emailType:emailType, contentReplacements:contentReplacements);
-            emailEntry.RecipientOrgulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
-            emailEntry.RecipientOrganizationId = targetOrgRegProgram.OrganizationId;
-            emailEntry.RecipientRegulatorOrganizationId = cromerrAuditLogEntryDto.RegulatorOrganizationId;
-            
-            var emailEntries = new List<EmailEntry> {emailEntry};
-
-            // Do email audit log.
-            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
-
-            //TODO: transaction.Commit();
-                    
-            // Send emails.
-            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
 
             _logger.Info(message:$"Leaving InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
         }

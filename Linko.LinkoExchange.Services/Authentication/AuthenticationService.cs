@@ -31,7 +31,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService:IAuthenticationService
     {
         #region fields
 
@@ -716,7 +716,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
 
                     registrationResult.Result = RegistrationResult.Success;
-
                 }
                 catch
                 {
@@ -887,28 +886,41 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
-                //create history record
-                var history = _dbContext.UserPasswordHistories.Create();
-                history.UserProfileId = userProfileId;
-                history.PasswordHash = passwordHash;
-                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                _dbContext.UserPasswordHistories.Add(entity:history);
-                _dbContext.SaveChanges();
-
-                //Set new password
-                _userService.SetHashedPassword(userProfileId:userProfileId, passwordHash:passwordHash);
-
-                //Unlock user
-                var userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
-                await _userManager.UnlockUserAccount(userId:userOwinId);
-
-                authenticationResult.Success = true;
-                authenticationResult.Result = AuthenticationResult.Success;
-
-                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                using (var transaction = _dbContext.BeginTransaction())
                 {
-                    var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
-                    await _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto);
+                    try
+                    {
+                        //create history record
+                        var history = _dbContext.UserPasswordHistories.Create();
+                        history.UserProfileId = userProfileId;
+                        history.PasswordHash = passwordHash;
+                        history.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                        _dbContext.UserPasswordHistories.Add(entity:history);
+                        _dbContext.SaveChanges();
+
+                        //Set new password
+                        _userService.SetHashedPassword(userProfileId:userProfileId, passwordHash:passwordHash);
+
+                        //Unlock user
+                        var userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
+                        await _userManager.UnlockUserAccount(userId:userOwinId);
+
+                        authenticationResult.Success = true;
+                        authenticationResult.Result = AuthenticationResult.Success;
+
+                        foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                        {
+                            var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
+                            _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto).Wait();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
 
