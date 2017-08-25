@@ -394,8 +394,16 @@ namespace Linko.LinkoExchange.Services.Invitation
             emailEntry.RecipientOrgulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
             emailEntry.RecipientOrganizationId = targetOrgRegProgram.OrganizationId;
             emailEntry.RecipientRegulatorOrganizationId = cromerrAuditLogEntryDto.RegulatorOrganizationId;
+            
+            var emailEntries = new List<EmailEntry> {emailEntry};
 
-            _linkoExchangeEmailService.SendEmails(emailEntries:new List<EmailEntry> {emailEntry});
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            //TODO: transaction.Commit();
+                    
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
 
             _logger.Info(message:$"Leaving InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
         }

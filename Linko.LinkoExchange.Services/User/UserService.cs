@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly LinkoExchangeContext _dbContext;
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IHttpContextService _httpContext;
-        private readonly ILinkoExchangeEmailService _linkoExchangeEmaiService;
+        private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
         private readonly ILogger _logService;
         private readonly IMapHelper _mapHelper;
         private readonly IOrganizationService _orgService;
@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Services.User
             _logService = logService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
-            _linkoExchangeEmaiService = linkoExchangeEmailService;
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         #endregion
@@ -432,7 +432,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Email the user
             var emailEntries = new List<EmailEntry>();
-            var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements, orgRegProg:orgRegProgram);
+            var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements, orgRegProg:orgRegProgram);
             emailEntries.Add(item:emailEntry);
 
             //Email all IU Admins
@@ -466,14 +466,21 @@ namespace Linko.LinkoExchange.Services.User
                                                           {"phoneNumber", phoneNumber}
                                                       };
 
-                    emailEntries.Add(item:
-                                     _linkoExchangeEmaiService.GetEmailEntryForUser(user:adminProfile, emailType:adminEmailType, contentReplacements:contentReplacementsForAdmin,
-                                                                                    orgRegProg:orgRegProgram));
+                    emailEntries.Add(item:_linkoExchangeEmailService.GetEmailEntryForUser(user:adminProfile, emailType:adminEmailType,
+                                                                                          contentReplacements:contentReplacementsForAdmin,
+                                                                                          orgRegProg:orgRegProgram));
                 }
             }
 
             _dbContext.SaveChanges();
-            _linkoExchangeEmaiService.SendEmails(emailEntries:emailEntries);
+
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            //TODO: transaction.Commit();
+
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 
         public ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false)
@@ -551,9 +558,8 @@ namespace Linko.LinkoExchange.Services.User
                 {
                     user.OldEmailAddress = user.Email;
                     user.Email = newEmailAddress;
-                    var entries =
-                        _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(userProfile:user, emailType:EmailType.Profile_EmailChanged,
-                                                                                   contentReplacements:contentReplacements).ToList();
+                    var entries = _linkoExchangeEmailService
+                        .GetAllProgramEmailEntiresForUser(userProfile:user, emailType:EmailType.Profile_EmailChanged, contentReplacements:contentReplacements).ToList();
 
                     emailEntries.AddRange(collection:entries);
                     var emailEntriesForOldEmailAddress = entries.Select(i => i.Clone(overrideEmailAddress:user.OldEmailAddress)).ToList();
@@ -605,9 +611,8 @@ namespace Linko.LinkoExchange.Services.User
             _requestCache.SetValue(key:CacheKey.Token, value:token);
 
             //_emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements); 
-            emailEntries.AddRange(collection:
-                                  _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(userProfile:user, emailType:EmailType.Profile_ResetProfileRequired,
-                                                                                             contentReplacements:contentReplacements));
+            emailEntries.AddRange(collection:_linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:user, emailType:EmailType.Profile_ResetProfileRequired,
+                                                                                                         contentReplacements:contentReplacements));
 
             //Log to Cromerr
             var actorOrgRegProgUserId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
@@ -654,8 +659,13 @@ namespace Linko.LinkoExchange.Services.User
                 _crommerAuditLogService.Log(eventType:CromerrEvent.UserAccess_AccountResetInitiated, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
 
-            // Send emails
-            _linkoExchangeEmaiService.SendEmails(emailEntries:emailEntries);
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            //TODO: transaction.Commit();
+
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
 
             return new ResetUserResultDto
                    {
@@ -703,8 +713,8 @@ namespace Linko.LinkoExchange.Services.User
                         adminEmailList.Add(item:adminEmail);
 
                         var userDto = GetUserProfileById(userProfileId:admin.UserProfileId);
-                        var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
-                                                                                        contentReplacements:contentReplacements, orgRegProg:program);
+                        var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
+                                                                                         contentReplacements:contentReplacements, orgRegProg:program);
                         emailEntries.Add(item:emailEntry);
                     }
                 }
@@ -751,8 +761,8 @@ namespace Linko.LinkoExchange.Services.User
                         adminEmailList.Add(item:adminUserProfile.Email);
 
                         var userDto = GetUserProfileById(userProfileId:admin.UserProfileId);
-                        var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
-                                                                                        contentReplacements:contentReplacements, orgRegProg:authority);
+                        var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
+                                                                                         contentReplacements:contentReplacements, orgRegProg:authority);
                         emailEntries.Add(item:emailEntry);
                     }
                 }
@@ -779,8 +789,8 @@ namespace Linko.LinkoExchange.Services.User
                                               {"authoritySupportPhoneNumber", authorityPhone}
                                           };
 
-                    var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user:user, emailType:EmailType.UserAccess_AccountLockout,
-                                                                                    contentReplacements:contentReplacements, orgRegProg:program);
+                    var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:EmailType.UserAccess_AccountLockout,
+                                                                                     contentReplacements:contentReplacements, orgRegProg:program);
                     emailEntries.Add(item:emailEntry);
                 }
                 else
@@ -836,13 +846,18 @@ namespace Linko.LinkoExchange.Services.User
                             break;
                     }
 
-                    var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements, orgRegProg:program);
+                    var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements, orgRegProg:program);
                     emailEntries.Add(item:emailEntry);
                 }
             }
 
-            // Send emails
-            _linkoExchangeEmaiService.SendEmails(emailEntries:emailEntries);
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            //TODO: transaction.Commit();
+
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 
         public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)
@@ -1208,9 +1223,16 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add(key:"authorityList", value:authorityList);
             contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
             contentReplacements.Add(key:"supportEmail", value:supportEmail);
-            var emailEntries = _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(user:dto, emailType:EmailType.Profile_ProfileChanged,
-                                                                                          contentReplacements:contentReplacements);
-            _linkoExchangeEmaiService.SendEmails(emailEntries:emailEntries);
+            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(user:dto, emailType:EmailType.Profile_ProfileChanged,
+                                                                                           contentReplacements:contentReplacements);
+
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            //TODO: transaction.Commit();
+
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 
         public RegistrationResult ValidateUserProfileData(UserDto userProfile)
@@ -1430,16 +1452,18 @@ namespace Linko.LinkoExchange.Services.User
                                               {"supportEmail", supportEmail}
                                           };
 
-                var emailEntries =
-                    _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.Profile_EmailChanged,
-                                                                               contentReplacements:contentReplacements).ToList();
+                var emailEntries = _linkoExchangeEmailService
+                    .GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.Profile_EmailChanged, contentReplacements:contentReplacements).ToList();
                 var emailEntriesForOldEmailAddress = emailEntries.Select(i => i.Clone(overrideEmailAddress:userProfile.OldEmailAddress)).ToList();
                 emailEntries.AddRange(collection:emailEntriesForOldEmailAddress);
 
-                //Send out emails;
-                _linkoExchangeEmaiService.SendEmails(emailEntries:emailEntries);
+                // Do email audit log.
+                _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
 
                 transaction.Commit();
+
+                // Send emails.
+                _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
                 return true;
             }
             catch
@@ -1471,8 +1495,8 @@ namespace Linko.LinkoExchange.Services.User
             userDto.UserProfileDto.CreationDateTimeUtc =
                 _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:userDto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime,
                                                                       orgRegProgramId:currentOrgRegProgramId);
-            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:userDto.RegistrationDateTimeUtc.Value.UtcDateTime,
-                                                                                                    orgRegProgramId:currentOrgRegProgramId);
+            userDto.RegistrationDateTimeUtc =
+                _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:userDto.RegistrationDateTimeUtc.Value.UtcDateTime, orgRegProgramId:currentOrgRegProgramId);
 
             return userDto;
         }
@@ -1647,15 +1671,19 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add(key:"link", value:link);
                 }
 
-                _linkoExchangeEmaiService.SendEmails(emailEntries:new List<EmailEntry>
-                                                                  {
-                                                                      _linkoExchangeEmaiService.GetEmailEntryForOrgRegProgramUser(user:programUser,
-                                                                                                                                  emailType:emailType,
-                                                                                                                                  contentReplacements:
-                                                                                                                                  contentReplacements)
-                                                                  });
+                var emailEntries = new List<EmailEntry>
+                                   {
+                                       _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:programUser, emailType:emailType, contentReplacements:contentReplacements)
+                                   };
+
+                // Do email audit log.
+                _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
 
                 transaction.Commit();
+
+                // Send emails.
+                _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+
                 return new RegistrationResultDto {Result = RegistrationResult.Success};
             }
             catch

@@ -238,19 +238,28 @@ namespace Linko.LinkoExchange.Services.Report
                     WriteCrommerrLog(reportPackageDto:reportPackageDto, submitterIpAddress:submitterIpAddress, copyOfRecordDto:copyOfRecordDto);
 
                     _dbContext.SaveChanges();
+                    var emailEntries = new List<EmailEntry>();
+                    if (reportPackageDto != null && copyOfRecordDto != null)
+                    {
+                        emailEntries = GetSignAndSubmitEmailEntries(reportPackage:reportPackageDto, copyOfRecordDto:copyOfRecordDto);
+                
+                        // Do email audit log.
+                        _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+                    }
+
                     transaction.Commit();
+
+                    if (reportPackageDto != null && copyOfRecordDto != null)
+                    {
+                        // Send emails.
+                        _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+                    }
                 }
                 catch
                 {
                     transaction.Rollback();
                     throw;
                 }
-            }
-
-            if (reportPackageDto != null && copyOfRecordDto != null)
-            {
-                //// Send emails 
-                SendSignAndSubmitEmail(reportPackage:reportPackageDto, copyOfRecordDto:copyOfRecordDto);
             }
 
             _logger.Info(message:
@@ -1769,9 +1778,12 @@ namespace Linko.LinkoExchange.Services.Report
                                                                                                               contentReplacements:contentReplacements,
                                                                                                               orgRegProg:authorityOrganizationRegulatoryProgramDto)));
 
+                    // Do email audit log.
+                    _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
                     transaction.Commit();
 
-                    // Send emails after all others completed.
+                    // Send emails.
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
                 }
                 catch
@@ -1781,8 +1793,8 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:
-                         $"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, "
+                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
         }
 
         /// <summary>
@@ -2089,7 +2101,7 @@ namespace Linko.LinkoExchange.Services.Report
             _crommerAuditLogService.Log(eventType:CromerrEvent.Report_Submitted, dto:cromerrAuditLogEntryDto, contentReplacements:crommerContentReplacements);
         }
 
-        private void SendSignAndSubmitEmail(ReportPackageDto reportPackage, CopyOfRecordDto copyOfRecordDto)
+        private List<EmailEntry> GetSignAndSubmitEmailEntries(ReportPackageDto reportPackage, CopyOfRecordDto copyOfRecordDto)
         {
             _logger.Info(message:"Enter ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", argument:reportPackage.ReportPackageId);
 
@@ -2186,9 +2198,9 @@ namespace Linko.LinkoExchange.Services.Report
                                       .Select(user => _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:EmailType.Report_Submission_AU,
                                                                                                       contentReplacements:emailContentReplacements,
                                                                                                       orgRegProg:authorityOrganizationRegulatoryProgramDto)));
-
-            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+            
             _logger.Info(message:"Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", argument:reportPackage.ReportPackageId);
+            return emailEntries;
         }
 
         private string GenerateXmlString(CopyOfRecordDataXml dataXmlObj, ReportPackageDto reportPackageDto)

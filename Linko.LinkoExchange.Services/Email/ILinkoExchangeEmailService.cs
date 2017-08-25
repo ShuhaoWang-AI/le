@@ -7,6 +7,7 @@ namespace Linko.LinkoExchange.Services.Email
 {
     public interface ILinkoExchangeEmailService
     {
+        void WriteEmailAuditLogs(List<EmailEntry> emailEntries);
         void SendEmails(List<EmailEntry> emailEntries);
         List<EmailEntry> GetAllProgramEmailEntiresForUser(UserProfile userProfile, EmailType emailType, Dictionary<string, string> contentReplacements);
         List<EmailEntry> GetAllProgramEmailEntiresForUser(UserDto user, EmailType emailType, Dictionary<string, string> contentReplacements);

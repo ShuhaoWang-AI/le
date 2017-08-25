@@ -59,21 +59,73 @@ namespace Linko.LinkoExchange.Services.Email
         #endregion
 
         #region interface implementations
+        
+        public void WriteEmailAuditLogs(List<EmailEntry> emailEntries)
+        {
+            if (emailEntries != null && emailEntries.Any())
+            {
+                foreach (var emailEntry in emailEntries)
+                {
+                    var sendTo = emailEntry.RecipientEmailAddress;
+                    var template = GetTemplate(emailType:emailEntry.EmailType).Result;
+                    if (template == null)
+                    {
+                        throw new Exception(message:$"Email Audit Log template is missing for EmailType: {emailEntry.EmailType}");
+                    }
+
+                    var msg = GetMailMessage(sendTo:sendTo, emailTemplate:template, replacements:emailEntry.ContentReplacements, senderEmail:_senderEmailAddres).Result;
+                    emailEntry.MailMessage = msg;
+
+                    if (string.IsNullOrWhiteSpace(value:_emailServer))
+                    {
+                        _emailServer = _settingService.GetGlobalSettings()[key:SystemSettingType.EmailServer];
+                    }
+
+                    if (string.IsNullOrWhiteSpace(value:_emailServer))
+                    {
+                        _logger.Fatal(message:"EmailServer value in tSystemSetting table is null or blank.");
+                        throw new ArgumentException(message:"EmailServer value is missing.");
+                    }
+
+                    var logEntry = GetEmailAuditLog(emailEntry:emailEntry, emailTemplateId:template.AuditLogTemplateId);
+                    _emailAuditLogService.Log(logEntry:logEntry);
+                    emailEntry.AuditLogId = logEntry.EmailAuditLogId;
+                }
+
+                _dbContext.SaveChanges();
+            }
+        }
 
         public void SendEmails(List<EmailEntry> emailEntries)
         {
             if (emailEntries != null && emailEntries.Any())
             {
-                foreach (var entry in emailEntries)
+                foreach (var emailEntry in emailEntries)
                 {
-                    WriteEmailAuditLog(emailEntry:entry);
-                }
+                    try
+                    {
+                        using (var smtpClient = new SmtpClient(host:_emailServer))
+                        {
+                            smtpClient.Send(message:emailEntry.MailMessage);
+                            _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {emailEntry.AuditLogId}, "
+                                                 + $"Recipient User name:{emailEntry.RecipientUserName}, Recipient Email Address:{emailEntry.RecipientEmailAddress}, "
+                                                 + $"Subject:{emailEntry.MailMessage.Subject}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var errors = new List<string> {ex.Message};
+                        while (ex.InnerException != null)
+                        {
+                            ex = ex.InnerException;
+                            errors.Add(item:ex.Message);
+                        }
 
-                _dbContext.SaveChanges();
-
-                foreach (var entry in emailEntries)
-                {
-                    SendEmailInner(entry:entry);
+                        _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {emailEntry.AuditLogId}, "
+                                             + $"Recipient User name:{emailEntry.RecipientUserName}, Recipient Email Address:{emailEntry.RecipientEmailAddress}, "
+                                             + $"Subject:{emailEntry.MailMessage.Subject}");
+                        _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
+                    }
                 }
             }
         }
@@ -186,61 +238,6 @@ namespace Linko.LinkoExchange.Services.Email
 
         #endregion
 
-        private void SendEmailInner(EmailEntry entry)
-        {
-            try
-            {
-                using (var smtpClient = new SmtpClient(host:_emailServer))
-                {
-                    smtpClient.Send(message:entry.MailMessage);
-                    _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {entry.AuditLogId}, "
-                                         + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
-                                         + $"Subject:{entry.MailMessage.Subject}");
-                }
-            }
-            catch (Exception ex)
-            {
-                var errors = new List<string> {ex.Message};
-                while (ex.InnerException != null)
-                {
-                    ex = ex.InnerException;
-                    errors.Add(item:ex.Message);
-                }
-
-                _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {entry.AuditLogId}, "
-                                     + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
-                                     + $"Subject:{entry.MailMessage.Subject}");
-                _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
-            }
-        }
-
-        private void WriteEmailAuditLog(EmailEntry emailEntry)
-        {
-            var sendTo = emailEntry.RecipientEmailAddress;
-            var template = GetTemplate(emailType:emailEntry.EmailType).Result;
-            if (template == null)
-            {
-                throw new Exception(message:$"Email Audit Log template is missing for EmailType: {emailEntry.EmailType}");
-            }
-
-            var msg = GetMailMessage(sendTo:sendTo, emailTemplate:template, replacements:emailEntry.ContentReplacements, senderEmail:_senderEmailAddres).Result;
-            emailEntry.MailMessage = msg;
-
-            if (string.IsNullOrWhiteSpace(value:_emailServer))
-            {
-                _emailServer = _settingService.GetGlobalSettings()[key:SystemSettingType.EmailServer];
-            }
-
-            if (string.IsNullOrWhiteSpace(value:_emailServer))
-            {
-                _logger.Fatal(message:"EmailServer value in tSystemSetting table is null or blank.");
-                throw new ArgumentException(message:"EmailServer value is missing.");
-            }
-
-            var logEntry = GetEmailAuditLog(emailEntry:emailEntry, emailTemplateId:template.AuditLogTemplateId);
-            _emailAuditLogService.Log(logEntry:logEntry);
-            emailEntry.AuditLogId = logEntry.EmailAuditLogId;
-        }
 
         private EmailAuditLogEntryDto GetEmailAuditLog(EmailEntry emailEntry, int emailTemplateId)
         {

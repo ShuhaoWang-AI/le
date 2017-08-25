@@ -227,13 +227,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="claims"> The claims to set </param>
         public void SetCurrentUserClaims(IDictionary<string, string> claims)
         {
-            if (claims == null || claims.Count < 1)
+            if (claims != null && claims.Count >= 1)
             {
-                return;
-            }
-            else
-            {
-
                 var currentClaims = GetClaims();
                 if (currentClaims != null)
                 {
@@ -381,9 +376,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                         _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_PasswordChanged, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
                     }
 
+                    // Do email audit log.
+                    _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+                    transaction.Commit();
+
                     // Send emails.
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
-                    transaction.Commit();
                 }
                 catch
                 {
@@ -707,11 +706,17 @@ namespace Linko.LinkoExchange.Services.Authentication
                     _invitationService.DeleteInvitation(invitationId:invitationDto.InvitationId, isSystemAction:true);
 
                     _dbContext.SaveChanges();
+
+                    // Do email audit log.
+                    _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
                     transaction.Commit();
-                    registrationResult.Result = RegistrationResult.Success;
 
                     //Send pending registration emails  
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+
+                    registrationResult.Result = RegistrationResult.Success;
+
                 }
                 catch
                 {
@@ -1892,6 +1897,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.ForgotPassword_ForgotPassword,
                                                                             contentReplacements:contentReplacements);
 
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            // Send emails.
             _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 
@@ -1903,16 +1912,22 @@ namespace Linko.LinkoExchange.Services.Authentication
             var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
             var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add(key:"userName", value:userProfile.UserName);
-            contentReplacements.Add(key:"link", value:link);
-            contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
-            contentReplacements.Add(key:"supportEmail", value:supportEmail);
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"userName", userProfile.UserName},
+                                          {"link", link},
+                                          {"supportPhoneNumber", supportPhoneNumber},
+                                          {"supportEmail", supportEmail}
+                                      };
 
             // ForgotUserName_ForgotUserName email logs for all programs
-            var emailEntries =
-                _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.ForgotUserName_ForgotUserName,
-                                                                            contentReplacements:contentReplacements);
+            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.ForgotUserName_ForgotUserName,
+                                                                                           contentReplacements:contentReplacements);
+
+            // Do email audit log.
+            _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+
+            // Send emails.
             _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
         }
 

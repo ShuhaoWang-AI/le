@@ -294,10 +294,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                                                                                                                      emailType:EmailType.Profile_SecurityQuestionsChanged,
                                                                                                                      contentReplacements:contentReplacements));
                     }
-
-                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+                    
+                    // Do email audit log.
+                    _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
 
                     transaction.Commit();
+
+                    // Send emails.
+                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
 
                     return CreateOrUpdateAnswersResult.Success;
                 }
