@@ -4,14 +4,16 @@ using FluentValidation.Attributes;
 namespace Linko.LinkoExchange.Web.ViewModels.User
 {
     [Validator(validatorType:typeof(OneKbqValidator))]
-    public class KBQViewModel
+    public class KbqViewModel
     {
+        public string QuestionLabel {get;set; }
+        public string AnswerLabel {get;set; }
         public int QuestionAnswerId {get;set;} 
         public int QuestionId {get;set; }
         public string Content {get;set; }
     }
 
-    public class OneKbqValidator : AbstractValidator<KBQViewModel>
+    public class OneKbqValidator : AbstractValidator<KbqViewModel>
     {
         #region constructors and destructor
 

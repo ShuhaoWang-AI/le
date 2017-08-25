@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Web.Hosting;
-using System.Web.Mvc;
+using System.Web.Mvc; 
 using System.Web.Routing;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Authentication;
@@ -174,7 +174,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [PortalAuthorize("authority", "industry")]
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [Route(template:"Profile/UpdateOneKbq")]
-        public JsonResult UpdateOneKbq(KBQViewModel kbqViewModel)
+        public JsonResult UpdateOneKbq(KbqViewModel kbqViewModel)
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;

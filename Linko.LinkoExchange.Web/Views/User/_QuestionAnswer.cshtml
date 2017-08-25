@@ -1,0 +1,61 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.User
+@model KbqViewModel
+
+@{
+    var kbqQuestionPool   =  (List<QuestionViewModel>) ViewData["QuestionAnswers"]; 
+}
+<div class="kbq-div">
+    <!-- question 1 -->
+    <div class="form-group">
+        <div class="col-md-2 control-label"> 
+            <label for= @Model.QuestionLabel.Replace(" ","")> @Model.QuestionLabel </label>
+        </div>
+        <div class="col-md-8 kbq">  
+            @Html.DropDownList(Model.QuestionLabel.Replace(" ", ""),
+                                    selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                    {
+                                        Text = i.Content,
+                                        Value = i.QuestionId.Value.ToString(),
+                                        Selected = Model.QuestionId == i.QuestionId.Value
+                                    }),
+                                    htmlAttributes: new
+                                    {
+                                        @class = "form-control",
+                                        disabled = "disabled"
+                                    }) 
+        </div>
+        <div class="col-md-2 tools">
+            <i tabindex="0" title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
+            <i title="Save changes" class="fa fa-2x fa-save"></i>
+            <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
+            <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
+        </div>
+    </div>
+
+    <!-- answer 1 -->
+    <div class="form-group">
+        <div class="col-md-2 control-label "> 
+            <label class="control-label required" for=@Model.AnswerLabel.Replace(" ","") aria-required="true"> @Model.AnswerLabel </label>
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+
+            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+            <input type="hidden" name="@Html.NameFor(x => Model.QuestionAnswerId)" value="@Model.QuestionAnswerId" />
+
+            @Html.EditorFor(m => m.Content,
+                                    additionalViewData: new
+                                    {
+                                        htmlAttributes = new
+                                        {
+                                            @class = "form-control",
+                                            autocomplete = "off",
+                                            maxlength = 50
+                                        }
+                                    }) 
+        </div>
+
+        <div class="col-md-2"></div>
+    </div>
+</div>

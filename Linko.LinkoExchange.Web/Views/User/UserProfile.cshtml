@@ -11,10 +11,10 @@ Please refer to this SO post:
 
 https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
 
--->
-
+--> 
 @using Linko.LinkoExchange.Web.ViewModels.Shared
-@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
+@using Linko.LinkoExchange.Web.ViewModels.User
+@model UserViewModel
 
 @{
     ViewBag.Title = "Profile";
@@ -23,6 +23,52 @@ https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-
     var inValidProfile = ViewBag.InValidProfile;
     var inValidKBQ = ViewBag.InValidKBQ;
     var inValidSQ = ViewBag.InValidSQ;
+
+    var kbqArr = new List<KbqViewModel>();
+    kbqArr.AddRange(new[]
+    {
+        new KbqViewModel
+        {
+             QuestionAnswerId = Model.UserKBQ.UserQuestionAnserId_KBQ1,
+             Content = Model.UserKBQ.KBQAnswer1,
+             QuestionId = Model.UserKBQ.KBQ1,
+             QuestionLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQ1).ToHtmlString(),
+             AnswerLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQAnswer1).ToHtmlString()
+        },
+        new KbqViewModel
+        {
+             QuestionAnswerId = Model.UserKBQ.UserQuestionAnserId_KBQ2,
+             Content = Model.UserKBQ.KBQAnswer2,
+             QuestionId = Model.UserKBQ.KBQ2,
+             QuestionLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQ2).ToHtmlString(),
+             AnswerLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQAnswer2).ToHtmlString()
+        },
+        new KbqViewModel
+        {
+             QuestionAnswerId = Model.UserKBQ.UserQuestionAnserId_KBQ3,
+             Content = Model.UserKBQ.KBQAnswer3,
+             QuestionId = Model.UserKBQ.KBQ3,
+             QuestionLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQ3).ToHtmlString(),
+             AnswerLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQAnswer3).ToHtmlString()
+        },
+        new KbqViewModel
+        {
+             QuestionAnswerId = Model.UserKBQ.UserQuestionAnserId_KBQ4,
+             Content = Model.UserKBQ.KBQAnswer4,
+             QuestionId = Model.UserKBQ.KBQ4,
+             QuestionLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQ4).ToHtmlString(),
+             AnswerLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQAnswer4).ToHtmlString()
+        },
+        new KbqViewModel
+        {
+             QuestionAnswerId = Model.UserKBQ.UserQuestionAnserId_KBQ5,
+             Content = Model.UserKBQ.KBQAnswer5,
+             QuestionId = Model.UserKBQ.KBQ5,
+             QuestionLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQ5).ToHtmlString(),
+             AnswerLabel = Html.DisplayNameFor(m=>m.UserKBQ.KBQAnswer5).ToHtmlString()
+        }
+    });
+
 }
 
 <section>
@@ -59,7 +105,6 @@ https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-
     .tools:hover,
     .kbq:hover + .tools{
         display:inline-block; 
-        
     }
 
 </style>
@@ -477,9 +522,7 @@ https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-
             </section>
             <div class="box-footer">
                 <div class="form-group">
-                    <div class="btn btn-primary btn-sm edit-button pull-right" id="profileEditBtn">
-                        Edit
-                    </div>
+                    <input type="button" value="Edit" class="btn btn-primary btn-sm edit-button pull-right" id="profileEditBtn"/>
                     <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"UserProfile", controllerName:"User", routeValues:new {part = "Profile"})#user-info-panel" formmethod="post" />
                 </div>
             </div>
@@ -541,338 +584,13 @@ https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-
                 <br />
                 <br />
                 <div class="editabledDiv">
-
-                    <div class="kbq-div">
-                        <!-- question 1 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQ1)
-                            </div>
-                            <div class="col-md-8 kbq">
-                                @Html.DropDownListFor(
-                                                      m => m.UserKBQ.KBQ1,
-                                    selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                           {
-                                                                               Text = i.Content,
-                                                                               Value = i.QuestionId.Value.ToString(),
-                                                                               Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
-                                                                           }),
-                                    htmlAttributes:new
-                                                   {
-                                                       @class = "form-control",
-                                                       disabled = "disabled"
-                                                   })
-
-                                @Html.HiddenFor(m => m.UserKBQ.KBQ1)
-                            </div>
-                            <div class="col-md-2 tools">
-                                <i title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
-                                <i title="Save changes" class="fa fa-2x fa-save"></i>
-                                <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
-                                <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
-                            </div>
-                        </div>
-
-                        <!-- answer 1 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label ">
-                                @Html.LabelFor(m => m.UserKBQ.KBQAnswer1)
-                            </div>
-
-                            <div class="col-md-8">
-                                <input class="disabled form-control" type="password" value="*******" />
-
-                                <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                                <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ1)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ1" />
-
-                                @Html.EditorFor(m => m.UserKBQ.KBQAnswer1,
-                                    additionalViewData:new
-                                                       {
-                                                           htmlAttributes = new
-                                                                            {
-                                                                                @class = "form-control",
-                                                                                autocomplete = "off",
-                                                                                maxlength = 50
-                                                                            }
-                                                       })
-                                @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, validationMessage:"",
-                                    htmlAttributes:new
-                                                   {
-                                                       @class = "text-danger"
-                                                   }) 
-                            </div>
-
-                            <div class="col-md-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="kbq-div">
-                        <!-- question 2 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQ2)
-                            </div>
-                            <div class="col-md-8 kbq">
-                                @Html.DropDownListFor(
-                                                  m => m.UserKBQ.KBQ2,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ2 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control",
-                                                   disabled = "disabled"
-                                               })
-                                @Html.HiddenFor(m => m.UserKBQ.KBQ2)
-                            </div>
-                            <div class="col-md-2 tools">
-                                <i title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
-                                <i title="Save changes" class="fa fa-2x fa-save"></i>
-                                <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
-                                <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
-                            </div>
-                        </div>
-
-                        <!-- answer 2 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQAnswer2,
-                                htmlAttributes:new
-                                               {
-                                                   @class = "control-label required"
-                                               })
-                            </div>
-
-                            <div class="col-md-8">
-                                <input class="disabled form-control" type="password" value="*******" />
-
-                                <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                                <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ2)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ2" />
-
-                                @Html.EditorFor(m => m.UserKBQ.KBQAnswer2,
-                                additionalViewData:new
-                                                   {
-                                                       htmlAttributes = new
-                                                                        {
-                                                                            @class = "form-control",
-                                                                            autocomplete = "off",
-                                                                            maxlength = 50
-                                                                        }
-                                                   })
-                                @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, validationMessage:"",
-                                htmlAttributes:new
-                                               {
-                                                   @class = "text-danger"
-                                               })
-                            </div>
-                            <div class="col-md-2 tools">
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="kbq-div">
-                        <!-- question 3 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQ3)
-                            </div>
-                            <div class="col-md-8 kbq">
-                                @Html.DropDownListFor(
-                                                      m => m.UserKBQ.KBQ3,
-                                    selectList: kbqQuestionPool.Select(i => new SelectListItem
-                                    {
-                                        Text = i.Content,
-                                        Value = i.QuestionId.Value.ToString(),
-                                        Selected = Model.UserKBQ.KBQ3 == i.QuestionId.Value
-                                    }),
-                                    htmlAttributes: new
-                                    {
-                                        @class = "form-control",
-                                        disabled = "disabled"
-                                    })
-                                @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
-                            </div>
-                            <div class="col-md-2 tools">
-                                <i title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
-                                <i title="Save changes" class="fa fa-2x fa-save"></i>
-                                <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
-                                <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
-                            </div>
-                        </div>
-
-                        <!-- answer 3 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQAnswer3,
-                                    htmlAttributes: new
-                                    {
-                                        @class = "control-label required"
-                                    })
-                            </div>
-
-                            <div class="col-md-8">
-                                <input class="disabled form-control" type="password" value="*******" />
-
-                                <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                                <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ3)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ3" />
-
-                                @Html.EditorFor(m => m.UserKBQ.KBQAnswer3,
-                                    additionalViewData: new
-                                    {
-                                        htmlAttributes = new
-                                        {
-                                            @class = "form-control",
-                                            autocomplete = "off",
-                                            maxlength = 50
-                                        }
-                                    })
-                                @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, validationMessage: "",
-                                    htmlAttributes: new
-                                    {
-                                        @class = "text-danger"
-                                    })
-                            </div>
-                            <div class="col-md-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="kbq-div">
-                        <!-- question 4 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQ4)
-                            </div>
-                            <div class="col-md-8 kbq">
-                                @Html.DropDownListFor(
-                                                  m => m.UserKBQ.KBQ4,
-                                selectList: kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
-                                }),
-                                htmlAttributes: new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                                @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
-                            </div>
-                            <div class="col-md-2 tools">
-                                <i title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
-                                <i title="Save changes" class="fa fa-2x fa-save"></i>
-                                <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
-                                <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
-                            </div>
-                        </div>
-
-                        <!-- answer 4 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQAnswer4,
-                                htmlAttributes: new
-                                {
-                                    @class = "control-label required"
-                                })
-                            </div>
-
-                            <div class="col-md-8">
-                                <input class="disabled form-control" type="password" value="*******" />
-
-                                <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                                <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ4)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ4" />
-
-                                @Html.EditorFor(m => m.UserKBQ.KBQAnswer4,
-                                additionalViewData: new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control",
-                                        autocomplete = "off",
-                                        maxlength = 50
-                                    }
-                                })
-                                @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, validationMessage: "",
-                                htmlAttributes: new
-                                {
-                                    @class = "text-danger"
-                                })
-                            </div>
-                            <div class="col-md-2"></div>
-                        </div>
-                    </div> 
-
-                    <div class="kbq-div">
-                        <!-- question 5 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQ5)
-                            </div>
-                            <div class="col-md-8 kbq">
-                                @Html.DropDownListFor(
-                                                  m => m.UserKBQ.KBQ5,
-                                selectList: kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ5 == i.QuestionId.Value
-                                }),
-                                htmlAttributes: new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                                @Html.HiddenFor(m => m.UserKBQ.KBQ5)
-                            </div>
-                            <div class="col-md-2 tools">
-                                <i title="Update Knowledge Based Questions" class="fa fa-2x fa-edit"></i>
-                                <i title="Save changes" class="fa fa-2x fa-save"></i>
-                                <i title="Cancel changes" class="fa fa-2x fa-times-circle" style="display:none; margin-left:3px;"></i>
-                                <i class="fa fa-2x fa-spinner fa-spin" style="display:none; margin-left:3px;"></i>
-                            </div>
-                        </div>
-
-                        <!-- answer 5 -->
-                        <div class="form-group">
-                            <div class="col-md-2 control-label">
-                                @Html.LabelFor(m => m.UserKBQ.KBQAnswer5,
-                                htmlAttributes: new
-                                {
-                                    @class = "control-label required"
-                                })
-                            </div>
-
-                            <div class="col-md-8">
-                                <input class="disabled form-control" type="password" value="*******" />
-
-                                <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-                                <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ5)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ5" />
-
-                                @Html.EditorFor(m => m.UserKBQ.KBQAnswer5,
-                                additionalViewData: new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control",
-                                        autocomplete = "off",
-                                        maxlength = 50
-                                    }
-                                })
-                                @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, validationMessage: "",
-                                htmlAttributes: new
-                                {
-                                    @class = "text-danger"
-                                })
-                            </div>
-
-                            <div class="col-md-2 tools">
-                            </div>
-                        </div>
-                    </div>
+                    @{
+                        var kbqPool = new ViewDataDictionary {{"QuestionAnswers", kbqQuestionPool}};
+                        foreach(var kbq in kbqArr)
+                        {
+                            Html.RenderPartial("_QuestionAnswer", kbq, kbqPool);
+                        }
+                    }
                 </div>
             </section>
             <div class="box-footer">

@@ -5,7 +5,7 @@
 
     $("#user-info-panel input[type='password'").val("Tiger12345");
     $(".profileDiv input[type='submit'").hide();
-    $("#kbq-panel input[type='text'").hide();
+    $("#kbq-panel input[type='text'").hide(); 
 
     $(".box-primary").addClass("collapsed-box");
     $(".box-primary >.box-header").find("i.fa.fa-minus").removeClass('fa-minus');
@@ -125,7 +125,11 @@
         qaDivs.map(function (idx, ele) {
             $(ele).on("keyup", function (evt) {
                 if (evt.which === 13) {
-                    clickSave.apply($(ele).find('.fa-save'));
+                    if ($(evt.target).is(".text-box")) {
+                        clickSave.apply($(ele).find('.fa-save'));
+                    } else if ($(evt.target).is(".fa-edit")) {
+                        clickEdit.apply(evt.target);
+                    } 
                 }
             });
         });
@@ -135,6 +139,8 @@
         var qaDiv = $(this).closest(".kbq-div"); 
         qaDiv.find("select").attr('readonly', "disabled");
         qaDiv.find("select").attr("disabled", "true");
+        qaDiv.find("input[type='text").attr('disabled', "disabled");
+        qaDiv.find("input[type='password").attr('disabled', "disabled");
 
         qaDiv.find("input[type='password']").show();
         qaDiv.find("input[type='text']").hide();
@@ -149,7 +155,7 @@
         var qaDiv = $(this).closest(".kbq-div");
         var questionIndex = qaDiv.find("select")[0].selectedIndex + 1;
         var answer = qaDiv.find("input[type='text']")[0].value;
-        var questionAnswerId = qaDiv.find("input[type='hidden']")[1].value;
+        var questionAnswerId = qaDiv.find("input[type='hidden']")[0].value;
 
         if (!answer) {
             return;
