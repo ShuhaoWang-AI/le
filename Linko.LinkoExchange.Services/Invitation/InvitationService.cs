@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -44,15 +43,10 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         #region constructors and destructor
 
-        public InvitationService(LinkoExchangeContext dbContext,
-                                 ISettingService settingService, IUserService userService, IRequestCache requestCache,
-                                 IOrganizationService organizationService, IHttpContextService httpContext,
-                                 ITimeZoneService timeZones, ILogger logger,
-                                 IProgramService programService, IMapHelper mapHelper,
-                                 ICromerrAuditLogService crommerAuditLogService,
-                                 ILinkoExchangeEmailService linkoExchangeEmailService,
-                                 IJurisdictionService jurisdictionService
-        )
+        public InvitationService(LinkoExchangeContext dbContext, ISettingService settingService, IUserService userService, IRequestCache requestCache,
+                                 IOrganizationService organizationService, IHttpContextService httpContext, ITimeZoneService timeZones, ILogger logger,
+                                 IProgramService programService, IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService,
+                                 ILinkoExchangeEmailService linkoExchangeEmailService, IJurisdictionService jurisdictionService)
         {
             _dbContext = dbContext;
             _settingService = settingService;
@@ -84,10 +78,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             var invitationDto = _mapHelper.GetInvitationDtoFromInvitation(invitation:invitation);
-            var senderProgram =
-                _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitation.SenderOrganizationRegulatoryProgramId);
-            var recipientProgram =
-                _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitation.RecipientOrganizationRegulatoryProgramId);
+            var senderProgram = _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitation.SenderOrganizationRegulatoryProgramId);
+            var recipientProgram = _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitation.RecipientOrganizationRegulatoryProgramId);
 
             if (senderProgram == null || recipientProgram == null)
             {
@@ -108,9 +100,11 @@ namespace Linko.LinkoExchange.Services.Invitation
                 if (user != null && user.IsAccountResetRequired)
                 {
                     //Reset/Re-reg scenario
-                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                    cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
-                    cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                                  {
+                                                      RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
+                                                      OrganizationId = recipientProgram.OrganizationId
+                                                  };
                     cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = user.UserName;
@@ -119,11 +113,13 @@ namespace Linko.LinkoExchange.Services.Invitation
                     cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
                     cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
                     cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-                    var contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add(key:"firstName", value:user.FirstName);
-                    contentReplacements.Add(key:"lastName", value:user.LastName);
-                    contentReplacements.Add(key:"userName", value:user.UserName);
-                    contentReplacements.Add(key:"emailAddress", value:user.Email);
+                    var contentReplacements = new Dictionary<string, string>
+                                              {
+                                                  {"firstName", user.FirstName},
+                                                  {"lastName", user.LastName},
+                                                  {"userName", user.UserName},
+                                                  {"emailAddress", user.Email}
+                                              };
 
                     _crommerAuditLogService.Log(eventType:CromerrEvent.UserAccess_AccountResetExpired, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
                 }
@@ -176,9 +172,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             var authority = org.RegulatorOrganization ?? org.Organization;
 
-            var invites = _dbContext.Invitations
-                                    .Where(i => i.SenderOrganizationRegulatoryProgramId == senderOrgRegProgramId
-                                                && i.RecipientOrganizationRegulatoryProgramId == targetOrgRegProgramId);
+            var invites = _dbContext.Invitations.Where(i => i.SenderOrganizationRegulatoryProgramId == senderOrgRegProgramId
+                                                            && i.RecipientOrganizationRegulatoryProgramId == targetOrgRegProgramId);
 
             foreach (var invite in invites)
             {
@@ -191,9 +186,9 @@ namespace Linko.LinkoExchange.Services.Invitation
                                                                                 settingType:SettingType.InvitationExpiredHours));
 
                 //Need to modify date time to local
-                dto.InvitationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(
-                                                                                                  utcDateTime:dto.InvitationDateTimeUtc.UtcDateTime,
-                                                                                                  orgId:authority.OrganizationId, regProgramId:org.RegulatoryProgramId);
+                dto.InvitationDateTimeUtc =
+                    _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:dto.InvitationDateTimeUtc.UtcDateTime, orgId:authority.OrganizationId,
+                                                                          regProgramId:org.RegulatoryProgramId);
                 dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(hours:addExpiryHours);
 
                 dtos.Add(item:dto);
@@ -237,8 +232,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                         // Per discussion between Sundoro, Rajeeb, Shuhao, during re-invitation,
                         // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
-                        var user = _dbContext.OrganizationRegulatoryProgramUsers
-                                             .Single(u => u.OrganizationRegulatoryProgramUserId == existingUser.OrganizationRegulatoryProgramUserId);
+                        var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId
+                                                                                             == existingUser.OrganizationRegulatoryProgramUserId);
                         user.IsRemoved = false;
                         _dbContext.SaveChanges();
                     }
@@ -420,24 +415,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                 _dbContext.Invitations.Add(entity:newInvitation);
                 _dbContext.SaveChanges();
             }
-            catch (DbEntityValidationException ex)
-            {
-                var validationIssues = new List<RuleViolation>();
-                foreach (var item in ex.EntityValidationErrors)
-                {
-                    var entry = item.Entry;
-                    var entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (var subItem in item.ValidationErrors)
-                    {
-                        var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    }
-                }
-
-                _logger.Info(message:$"CreateInvitation. DbEntityValidationException. Email={dto.EmailAddress}");
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
             catch
             {
                 _logger.Info(message:$"CreateInvitation. Error creating invitation. Email={dto.EmailAddress}");
@@ -468,9 +445,11 @@ namespace Linko.LinkoExchange.Services.Invitation
                 var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
                 var actorUser = _userService.GetUserProfileById(userProfileId:actorProgramUserDto.UserProfileId);
 
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                cromerrAuditLogEntryDto.RegulatoryProgramId = recipientOrganizationRegulatoryProgram.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = recipientOrganizationRegulatoryProgram.OrganizationId;
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                              {
+                                                  RegulatoryProgramId = recipientOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                  OrganizationId = recipientOrganizationRegulatoryProgram.OrganizationId
+                                              };
                 cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientOrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 var existingUserUserName = "n/a";
                 if (existingUser != null)
@@ -485,18 +464,20 @@ namespace Linko.LinkoExchange.Services.Invitation
                 cromerrAuditLogEntryDto.UserEmailAddress = invitation.EmailAddress;
                 cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-                var contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add(key:"authorityName", value:authorityName);
-                contentReplacements.Add(key:"organizationName", value:recipientOrganizationRegulatoryProgram.Organization.Name);
-                contentReplacements.Add(key:"regulatoryProgram", value:recipientOrganizationRegulatoryProgram.RegulatoryProgram.Name);
-                contentReplacements.Add(key:"firstName", value:invitation.FirstName);
-                contentReplacements.Add(key:"lastName", value:invitation.LastName);
-                contentReplacements.Add(key:"userName", value:existingUserUserName);
-                contentReplacements.Add(key:"emailAddress", value:invitation.EmailAddress);
-                contentReplacements.Add(key:"actorFirstName", value:actorUser.FirstName);
-                contentReplacements.Add(key:"actorLastName", value:actorUser.LastName);
-                contentReplacements.Add(key:"actorUserName", value:actorUser.UserName);
-                contentReplacements.Add(key:"actorEmailAddress", value:actorUser.Email);
+                var contentReplacements = new Dictionary<string, string>
+                                          {
+                                              {"authorityName", authorityName},
+                                              {"organizationName", recipientOrganizationRegulatoryProgram.Organization.Name},
+                                              {"regulatoryProgram", recipientOrganizationRegulatoryProgram.RegulatoryProgram.Name},
+                                              {"firstName", invitation.FirstName},
+                                              {"lastName", invitation.LastName},
+                                              {"userName", existingUserUserName},
+                                              {"emailAddress", invitation.EmailAddress},
+                                              {"actorFirstName", actorUser.FirstName},
+                                              {"actorLastName", actorUser.LastName},
+                                              {"actorUserName", actorUser.UserName},
+                                              {"actorEmailAddress", actorUser.Email}
+                                          };
 
                 _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteDeleted, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }

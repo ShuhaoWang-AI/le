@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -94,6 +93,98 @@ namespace Linko.LinkoExchange.Services.Report
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            var retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetReportPackage":
+                {
+                    var reportPackageId = id[0];
+                    var reportPackage = _dbContext.ReportPackages
+                                                  .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+                    if (reportPackage == null)
+                    {
+                        return false;
+                    }
+
+                    //Check authorized access as either one of:
+                    //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
+                    //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        if (currentOrgRegProgramId == _orgService.GetAuthority(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
+                        {
+                            //Authority accessing an IU under their control => OK
+                            retVal = true;
+                        }
+                    }
+                    else
+                    {
+                        if (currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId)
+                        {
+                            //Industry accessing their own report package => OK
+                            retVal = true;
+                        }
+                    }
+                }
+
+                    break;
+
+                case "SignAndSubmitReportPackage":
+                case "RepudiateReport":
+                {
+                    var reportPackageId = id[0];
+
+                    //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
+                    var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
+                                                                             .Any(rp => rp.ReportPackageId == reportPackageId
+                                                                                        && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                    if (isReportPackageForThisOrgRegProgramExist)
+                    {
+                        //Get current user
+                        var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                                                          .SingleOrDefault(orpu => orpu.UserProfileId == currentUserId
+                                                                                   && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        //Does this user belong to this org reg program?
+                        if (orgRegProgramUser == null)
+                        {
+                            return false;
+                        }
+
+                        //Check if user has signatory rights
+                        if (!orgRegProgramUser.IsSignatory)
+                        {
+                            return false;
+                        }
+
+                        //Check if user is removed or disabled
+                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
+                        {
+                            return false;
+                        }
+
+                        retVal = true;
+                    }
+                }
+
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         ///     Note:  before call this function,  make sure to update draft first.
         /// </summary>
@@ -149,39 +240,9 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
                 }
-                catch (DbEntityValidationException ex)
+                catch
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -633,42 +694,9 @@ namespace Linko.LinkoExchange.Services.Report
                     _logger.Info(message:$"Leave ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
                     return reportPackagegDto;
                 }
-                catch (DbEntityValidationException ex)
+                catch
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error(s): {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
                     throw;
                 }
             }
@@ -858,42 +886,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     newReportPackageId = newReportPackage.ReportPackageId;
                 }
-                catch (DbEntityValidationException ex)
+                catch
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
                     throw;
                 }
             }
@@ -1153,31 +1148,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                 return reportPackage.ReportPackageId;
             }
-            catch (DbEntityValidationException ex)
-            {
-                if (isUseTransaction)
-                {
-                    transaction.Rollback();
-                }
-
-                var errors = new List<string> {ex.Message};
-
-                foreach (var item in ex.EntityValidationErrors)
-                {
-                    var entry = item.Entry;
-                    var entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (var subItem in item.ValidationErrors)
-                    {
-                        var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                        errors.Add(item:message);
-                    }
-                }
-
-                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                throw;
-            }
             catch
             {
                 if (isUseTransaction)
@@ -1264,47 +1234,12 @@ namespace Linko.LinkoExchange.Services.Report
                     transaction.Commit();
                 }
             }
-            catch (DbEntityValidationException ex)
+            catch
             {
                 if (isUseTransaction)
                 {
                     transaction.Rollback();
                 }
-
-                var errors = new List<string> {ex.Message};
-
-                foreach (var item in ex.EntityValidationErrors)
-                {
-                    var entry = item.Entry;
-                    var entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (var subItem in item.ValidationErrors)
-                    {
-                        var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                        errors.Add(item:message);
-                    }
-                }
-
-                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                throw;
-            }
-            catch (Exception ex)
-            {
-                if (isUseTransaction)
-                {
-                    transaction.Rollback();
-                }
-
-                var errors = new List<string> {ex.Message};
-
-                while (ex.InnerException != null)
-                {
-                    ex = ex.InnerException;
-                    errors.Add(item:ex.Message);
-                }
-
-                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                 throw;
             }
@@ -1839,32 +1774,9 @@ namespace Linko.LinkoExchange.Services.Report
                     // Send emails after all others completed.
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
                 }
-                catch (DbEntityValidationException ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
                 catch
                 {
                     transaction.Rollback();
-
                     throw;
                 }
             }
@@ -1912,38 +1824,15 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
-                catch (DbEntityValidationException ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
                 catch
                 {
                     transaction.Rollback();
-
                     throw;
                 }
             }
 
-            _logger.Info(message:
-                         $"Leave ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"Leave ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, "
+                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
         }
 
         /// <summary>
@@ -1985,38 +1874,15 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
-                catch (DbEntityValidationException ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
                 catch
                 {
                     transaction.Rollback();
-
                     throw;
                 }
             }
 
-            _logger.Info(message:
-                         $"Leave ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"Leave ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, "
+                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
         }
 
         /// <summary>
@@ -2164,98 +2030,6 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            var retVal = false;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "GetReportPackage":
-                {
-                    var reportPackageId = id[0];
-                    var reportPackage = _dbContext.ReportPackages
-                                                  .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
-
-                    if (reportPackage == null)
-                    {
-                        return false;
-                    }
-
-                    //Check authorized access as either one of:
-                    //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
-                    //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        if (currentOrgRegProgramId == _orgService.GetAuthority(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
-                        {
-                            //Authority accessing an IU under their control => OK
-                            retVal = true;
-                        }
-                    }
-                    else
-                    {
-                        if (currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId)
-                        {
-                            //Industry accessing their own report package => OK
-                            retVal = true;
-                        }
-                    }
-                }
-
-                    break;
-
-                case "SignAndSubmitReportPackage":
-                case "RepudiateReport":
-                {
-                    var reportPackageId = id[0];
-
-                    //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
-                    var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
-                                                                             .Any(rp => rp.ReportPackageId == reportPackageId
-                                                                                        && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                    if (isReportPackageForThisOrgRegProgramExist)
-                    {
-                        //Get current user
-                        var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                                                          .SingleOrDefault(orpu => orpu.UserProfileId == currentUserId
-                                                                                   && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                        //Does this user belong to this org reg program?
-                        if (orgRegProgramUser == null)
-                        {
-                            return false;
-                        }
-
-                        //Check if user has signatory rights
-                        if (!orgRegProgramUser.IsSignatory)
-                        {
-                            return false;
-                        }
-
-                        //Check if user is removed or disabled
-                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
-                        {
-                            return false;
-                        }
-
-                        retVal = true;
-                    }
-                }
-
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
 
         private CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
         {

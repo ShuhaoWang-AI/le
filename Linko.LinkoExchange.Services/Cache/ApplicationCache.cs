@@ -30,7 +30,7 @@ namespace Linko.LinkoExchange.Services.Cache
         public void Insert(string key, object item, int hours)
         {
             _httpContextService.Current.Cache.Insert(key:key, value:item, dependencies:null, absoluteExpiration:DateTime.Now.AddHours(value:hours),
-                                             slidingExpiration:System.Web.Caching.Cache.NoSlidingExpiration);
+                                                     slidingExpiration:System.Web.Caching.Cache.NoSlidingExpiration);
         }
 
         #endregion

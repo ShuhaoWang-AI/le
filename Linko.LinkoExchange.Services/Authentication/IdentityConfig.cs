@@ -64,7 +64,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             //                                                                       BodyFormat = "Your security code is {0}"
             //                                                                   });
 
-            EmailService = new EmailService();
+            //EmailService = new EmailService();
         }
 
         #endregion
@@ -148,10 +148,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         #endregion
 
+        #region interface implementations
+
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(UserProfile userProfile)
         {
             return userProfile.GenerateUserIdentityAsync(manager:(ApplicationUserManager) UserManager);
         }
+
+        #endregion
 
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)
         {

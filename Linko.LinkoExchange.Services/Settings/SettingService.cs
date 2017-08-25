@@ -390,22 +390,13 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
-            try
-            {
-                var authority = GetAuthority(orgRegProgramId:orgRegProgramId);
-                var orgTypeId = authority.Organization.OrganizationType.OrganizationTypeId;
+            var authority = GetAuthority(orgRegProgramId:orgRegProgramId);
+            var orgTypeId = authority.Organization.OrganizationType.OrganizationTypeId;
 
-                return _dbContext.OrganizationRegulatoryProgramSettings
-                                 .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
-                                              && s.SettingTemplate.Name == settingType.ToString()
-                                              && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
-            }
-            catch (DbEntityValidationException ex)
-            {
-                HandleEntityException(ex:ex);
-            }
-
-            return null;
+            return _dbContext.OrganizationRegulatoryProgramSettings
+                             .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                                          && s.SettingTemplate.Name == settingType.ToString()
+                                          && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
         }
 
         public string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType)
@@ -469,27 +460,6 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 transaction.Dispose();
             }
-        }
-
-        private void HandleEntityException(DbEntityValidationException ex)
-        {
-            // ReSharper disable once ArgumentsStyleNamedExpression
-            _logger.Error(ex, message:ex.Message);
-
-            var validationIssues = new List<RuleViolation>();
-            foreach (var item in ex.EntityValidationErrors)
-            {
-                var entry = item.Entry;
-                var entityTypeName = entry.Entity.GetType().Name;
-
-                foreach (var subItem in item.ValidationErrors)
-                {
-                    var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                }
-            }
-
-            throw new RuleViolationException(message:"", validationIssues:validationIssues);
         }
     }
 }

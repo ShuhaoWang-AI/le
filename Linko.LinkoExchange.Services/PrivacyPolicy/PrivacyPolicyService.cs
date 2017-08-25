@@ -13,13 +13,17 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
 
         #endregion
 
-        #region Implementation of IPrivacyPolicyService
+        #region constructors and destructor
 
         public PrivacyPolicyService(LinkoExchangeContext dbContext, ILogger logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
+
+        #endregion
+
+        #region interface implementations
 
         /// <summary>
         ///     Always get the latest privacy policy
@@ -29,7 +33,7 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
         {
             _logger.Info(message:$"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 
-            var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i=>i.EffectiveDateTimeUtc).First();  
+            var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i => i.EffectiveDateTimeUtc).First();
 
             _logger.Info(message:$"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 

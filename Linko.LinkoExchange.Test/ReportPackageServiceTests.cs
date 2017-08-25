@@ -130,7 +130,7 @@ namespace Linko.LinkoExchange.Test
 
             //   var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _logger.Object);
             var actualCromerrService = new CromerrAuditLogService(linkoExchangeContext:_dbContext, mapHelper:new MapHelper(), httpContext:_httpContext.Object,
-                                                                  logService:_logger.Object);
+                                                                  logger:_logger.Object);
             var actualProgramService = new ProgramService(applicationDbContext:_dbContext, mapHelper:new MapHelper());
 
             _reportPackageService = new ReportPackageService(

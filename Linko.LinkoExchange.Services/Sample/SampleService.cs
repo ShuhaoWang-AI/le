@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
@@ -65,6 +64,46 @@ namespace Linko.LinkoExchange.Services.Sample
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            bool retVal;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetSampleDetails":
+                {
+                    var sampleId = id[0];
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
+                        var authorityOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:_dbContext.Samples
+                                                                                                          .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
+                                                                  .OrganizationRegulatoryProgramId;
+
+                        retVal = currentOrgRegProgramId == authorityOrgRegProgramId;
+                    }
+                    else
+                    {
+                        //currentOrgRegProgramId must match the ForOrganizationRegulatoryProgramId of the sample
+                        //(this also handles unknown sampleId's)
+                        var isSampleWithThisOwnerExist = _dbContext.Samples.Any(s => s.SampleId == sampleId && s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        retVal = isSampleWithThisOwnerExist;
+                    }
+                }
+
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         ///     Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
         ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
@@ -103,46 +142,9 @@ namespace Linko.LinkoExchange.Services.Sample
                         transaction.Commit();
                     }
                 }
-                catch (RuleViolationException)
+                catch
                 {
                     transaction.Rollback();
-                    throw;
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
                     throw;
                 }
             }
@@ -377,46 +379,9 @@ namespace Linko.LinkoExchange.Services.Sample
                         return sampleDto;
                     }
                 }
-                catch (RuleViolationException)
+                catch
                 {
                     transaction.Rollback();
-                    throw;
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                            errors.Add(item:message);
-                        }
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-                    transaction.Rollback();
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
                     throw;
                 }
             }
@@ -777,46 +742,6 @@ namespace Linko.LinkoExchange.Services.Sample
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            bool retVal;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "GetSampleDetails":
-                {
-                    var sampleId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
-                        var authorityOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:_dbContext.Samples
-                                                                                                          .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
-                                                                  .OrganizationRegulatoryProgramId;
-
-                        retVal = currentOrgRegProgramId == authorityOrgRegProgramId;
-                    }
-                    else
-                    {
-                        //currentOrgRegProgramId must match the ForOrganizationRegulatoryProgramId of the sample
-                        //(this also handles unknown sampleId's)
-                        var isSampleWithThisOwnerExist = _dbContext.Samples.Any(s => s.SampleId == sampleId && s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                        retVal = isSampleWithThisOwnerExist;
-                    }
-                }
-
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
 
         /// <summary>
         ///     Maps Sample Dto to Sample and saves to database. No validation.

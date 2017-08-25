@@ -245,11 +245,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
-                catch (RuleViolationException)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
                 catch
                 {
                     transaction.Rollback();
@@ -283,7 +278,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                          .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
                                                          .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
-                    if (rpTemplatesUsingThis.Count() > 0)
+                    if (rpTemplatesUsingThis.Any())
                     {
                         var warningMessage = "This Report Package Element is in use in the following Report Package Templates and cannot be deleted:";
                         var validationIssues = new List<RuleViolation>();
@@ -311,11 +306,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                     return elementTypeDto;
                 }
-                catch (RuleViolationException)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
                 catch
                 {
                     transaction.Rollback();
@@ -331,7 +321,6 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> True = Report Element Type is included in at least 1 Report Package Template, False otherwise. </returns>
         public bool IsReportElementTypeInUse(int reportElementTypeId)
         {
-            bool isInUse;
             _logger.Info(message:$"Enter ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}");
 
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
@@ -344,7 +333,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                  .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
                                                  .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
-            isInUse = rpTemplatesUsingThis.Any();
+            var isInUse = rpTemplatesUsingThis.Any();
             _logger.Info(message:$"Leaving ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}, isInUse={isInUse}");
 
             return isInUse;

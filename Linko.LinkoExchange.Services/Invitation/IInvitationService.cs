@@ -19,7 +19,6 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// <param name="invitationId"> The invitation Id </param>
         /// <returns> The invitation </returns>
         InvitationDto GetInvitation(string invitationId);
-        
 
         /// <summary>
         ///     Returns all records in the Invitation table
@@ -44,12 +43,12 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// 
         ///     Various validation items are performed and logging occurs upon successful execution.
         /// </summary>
-        /// <param name="orgRegProgramId"></param>
-        /// <param name="email"></param>
-        /// <param name="firstName"></param>
-        /// <param name="lastName"></param>
-        /// <param name="invitationType"></param>
-        /// <returns></returns>
+        /// <param name="orgRegProgramId"> </param>
+        /// <param name="email"> </param>
+        /// <param name="firstName"> </param>
+        /// <param name="lastName"> </param>
+        /// <param name="invitationType"> </param>
+        /// <returns> </returns>
         void SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType);
 
         /// <summary>

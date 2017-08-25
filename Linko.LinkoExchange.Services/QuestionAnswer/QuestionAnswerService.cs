@@ -94,28 +94,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 _dbContext.UserQuestionAnswers.Add(entity:answer);
             }
 
-            try
-            {
-                _dbContext.SaveChanges();
-            }
-            catch (DbEntityValidationException ex)
-            {
-                var validationIssues = new List<RuleViolation>();
-
-                foreach (var item in ex.EntityValidationErrors)
-                {
-                    var entry = item.Entry;
-                    var entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (var subItem in item.ValidationErrors)
-                    {
-                        var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    }
-                }
-
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
+            _dbContext.SaveChanges();
         }
 
         /// <summary>
@@ -247,7 +226,80 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                         CreateOrUpdateUserQuestionAnswer(userProfileId:userProfileId, answerDto:questionAnswer);
                     }
 
+                    var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+
+                    // Cromerr audit log
+                    var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers.Include(orpu => orpu.OrganizationRegulatoryProgram)
+                                                          .Where(orpu => orpu.UserProfileId == userProfileId);
+
+                    foreach (var orgRegProgramUser in allOrgRegProgramUsers)
+                    {
+                        var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                                      {
+                                                          RegulatoryProgramId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                          OrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.OrganizationId
+                                                      };
+                        cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
+                                                                          ?? cromerrAuditLogEntryDto.OrganizationId;
+                        cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
+                        cromerrAuditLogEntryDto.UserName = userProfile.UserName;
+                        cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
+                        cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
+                        cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
+                        cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                        cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                        var cromerrContentReplacements = new Dictionary<string, string>
+                                                         {
+                                                             {"firstName", userProfile.FirstName},
+                                                             {"lastName", userProfile.LastName},
+                                                             {"userName", userProfile.UserName},
+                                                             {"emailAddress", userProfile.Email}
+                                                         };
+
+                        if (questionCountKbq > 0)
+                        {
+                            _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_KBQChanged, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements);
+                        }
+                        if (questionCountSq > 0)
+                        {
+                            _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_SQChanged, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements);
+                        }
+                    }
+
+                    //Send Emails
+                    var contentReplacements = new Dictionary<string, string>();
+                    var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
+                    var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
+
+                    var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId:userProfileId);
+                    contentReplacements.Add(key:"firstName", value:userProfile.FirstName);
+                    contentReplacements.Add(key:"lastName", value:userProfile.LastName);
+
+                    contentReplacements.Add(key:"authorityList", value:authorityList);
+                    contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
+                    contentReplacements.Add(key:"supportEmail", value:supportEmail);
+
+                    // Profile_KBQChanged, and Profile_SecurityQuestionsChanged emails are logged for all programs 
+                    var emailEntries = new List<EmailEntry>();
+
+                    if (questionCountKbq > 0)
+                    {
+                        emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.Profile_KBQChanged,
+                                                                                                   contentReplacements:contentReplacements);
+                    }
+
+                    if (questionCountSq > 0)
+                    {
+                        emailEntries.AddRange(collection:_linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile,
+                                                                                                                     emailType:EmailType.Profile_SecurityQuestionsChanged,
+                                                                                                                     contentReplacements:contentReplacements));
+                    }
+
+                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+
                     transaction.Commit();
+
+                    return CreateOrUpdateAnswersResult.Success;
                 }
                 catch
                 {
@@ -255,78 +307,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     throw;
                 }
             }
-
-            var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
-
-            // Cromerr audit log
-            var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers.Include(orpu => orpu.OrganizationRegulatoryProgram)
-                                                  .Where(orpu => orpu.UserProfileId == userProfileId);
-
-            foreach (var orgRegProgramUser in allOrgRegProgramUsers)
-            {
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
-                                              {
-                                                  RegulatoryProgramId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
-                                                  OrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.OrganizationId
-                                              };
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-                cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
-                cromerrAuditLogEntryDto.UserName = userProfile.UserName;
-                cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
-                cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
-                cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
-                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                var cromerrContentReplacements = new Dictionary<string, string>
-                                                 {
-                                                     {"firstName", userProfile.FirstName},
-                                                     {"lastName", userProfile.LastName},
-                                                     {"userName", userProfile.UserName},
-                                                     {"emailAddress", userProfile.Email}
-                                                 };
-
-                if (questionCountKbq > 0)
-                {
-                    _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_KBQChanged, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements);
-                }
-                if (questionCountSq > 0)
-                {
-                    _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_SQChanged, dto:cromerrAuditLogEntryDto, contentReplacements:cromerrContentReplacements);
-                }
-            }
-
-            //Send Emails
-            var contentReplacements = new Dictionary<string, string>();
-            var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
-            var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
-
-            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId:userProfileId);
-            contentReplacements.Add(key:"firstName", value:userProfile.FirstName);
-            contentReplacements.Add(key:"lastName", value:userProfile.LastName);
-
-            contentReplacements.Add(key:"authorityList", value:authorityList);
-            contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
-            contentReplacements.Add(key:"supportEmail", value:supportEmail);
-
-            // Profile_KBQChanged, and Profile_SecurityQuestionsChanged emails are logged for all programs 
-            var emailEntries = new List<EmailEntry>();
-
-            if (questionCountKbq > 0)
-            {
-                emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.Profile_KBQChanged,
-                                                                                           contentReplacements:contentReplacements);
-            }
-
-            if (questionCountSq > 0)
-            {
-                emailEntries.AddRange(collection:_linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile:userProfile,
-                                                                                                             emailType:EmailType.Profile_SecurityQuestionsChanged,
-                                                                                                             contentReplacements:contentReplacements));
-            }
-
-            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
-
-            return CreateOrUpdateAnswersResult.Success;
         }
 
         public void UpdateAnswer(AnswerDto answer)
@@ -352,28 +332,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 answerToUpdate.Content = answer.Content;
                 answerToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
-                try
-                {
-                    _dbContext.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    var validationIssues = new List<RuleViolation>();
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
-                            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                        }
-                    }
-
-                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-                }
+                _dbContext.SaveChanges();
             }
             else
             {
@@ -388,8 +347,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         {
             var usersQaList = new List<QuestionAnswerPairDto>();
             var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question.QuestionType)
-                                     .Where(a => a.UserProfileId == userProfileId
-                                                 && a.Question.QuestionType.Name == questionType.ToString()).ToList();
+                                     .Where(a => a.UserProfileId == userProfileId && a.Question.QuestionType.Name == questionType.ToString()).ToList();
 
             if (foundQAs.Any())
             {
@@ -597,28 +555,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 questionToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 questionToUpdate.LastModifierUserId = Convert.ToInt32(value:_httpContext.CurrentUserProfileId());
 
-                try
-                {
-                    _dbContext.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    var validationIssues = new List<RuleViolation>();
-
-                    foreach (var item in ex.EntityValidationErrors)
-                    {
-                        var entry = item.Entry;
-                        var entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (var subItem in item.ValidationErrors)
-                        {
-                            var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                        }
-                    }
-
-                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-                }
+                _dbContext.SaveChanges();
             }
             else
             {

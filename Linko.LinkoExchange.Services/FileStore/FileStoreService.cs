@@ -89,6 +89,74 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            var retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "UpdateFileStore":
+                case "DeleteFileStore":
+                {
+                    var fileStoreId = id[0];
+                    retVal = IsFileStoreWithThisOwnerExist(fileStoreId:fileStoreId, orgRegProgramId:currentOrgRegProgramId);
+                }
+                    break;
+
+                case "GetFileStoreById":
+                {
+                    var fileStoreId = id[0];
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        var fileStore = _dbContext.FileStores
+                                                  .Include(fs => fs.OrganizationRegulatoryProgram)
+                                                  .Include(fs => fs.OrganizationRegulatoryProgram.RegulatorOrganization)
+                                                  .SingleOrDefault(fs => fs.FileStoreId == fileStoreId);
+
+                        if (fileStore != null)
+                        {
+                            //check if current user is authority of file store owner
+                            var authorityOrganization = fileStore.OrganizationRegulatoryProgram.RegulatorOrganization ?? fileStore.OrganizationRegulatoryProgram.Organization;
+
+                            var currentOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                                                                 .Single(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                            var isCurrentOrgRegProgramTheAuthority = currentOrgRegProgram.OrganizationId == authorityOrganization.OrganizationId
+                                                                     && currentOrgRegProgram.RegulatoryProgramId == fileStore.OrganizationRegulatoryProgram.RegulatoryProgramId;
+
+                            if (isCurrentOrgRegProgramTheAuthority)
+                            {
+                                var isFileIncludedInSubmittedReport = _dbContext.FileStores
+                                                                                .Include(fs => fs.ReportFiles.Select(rf => rf.ReportPackageElementType.ReportPackageElementCategory
+                                                                                                                             .ReportPackage.ReportStatus))
+                                                                                .Single(fs => fs.FileStoreId == fileStoreId)
+                                                                                .ReportFiles.Select(rf => rf.ReportPackageElementType)
+                                                                                .Select(rpet => rpet.ReportPackageElementCategory)
+                                                                                .Select(rpec => rpec.ReportPackage)
+                                                                                .Any(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                                                                                           || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
+
+                                retVal = isFileIncludedInSubmittedReport;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        retVal = IsFileStoreWithThisOwnerExist(fileStoreId:fileStoreId, orgRegProgramId:currentOrgRegProgramId);
+                    }
+                }
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         public List<string> GetValidAttachmentFileExtensions()
         {
             _logger.Info(message:"Enter FileStoreService.GetValidAttachmentFileExtensions.");
@@ -212,17 +280,9 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     return fileStore.FileStoreId;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -298,17 +358,9 @@ namespace Linko.LinkoExchange.Services.FileStore
                     _dbContext.Commit(transaction:transaction);
                     _logger.Info(message:"Leave FileStoreService.UpdateFileStore.");
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -344,17 +396,9 @@ namespace Linko.LinkoExchange.Services.FileStore
                     _dbContext.Commit(transaction:transaction);
                     _logger.Info(message:"Leave FileStoreService.DeleteFileStore.");
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -377,74 +421,6 @@ namespace Linko.LinkoExchange.Services.FileStore
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            var retVal = false;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "UpdateFileStore":
-                case "DeleteFileStore":
-                {
-                    var fileStoreId = id[0];
-                    retVal = IsFileStoreWithThisOwnerExist(fileStoreId:fileStoreId, orgRegProgramId:currentOrgRegProgramId);
-                }
-                    break;
-
-                case "GetFileStoreById":
-                {
-                    var fileStoreId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        var fileStore = _dbContext.FileStores
-                                                  .Include(fs => fs.OrganizationRegulatoryProgram)
-                                                  .Include(fs => fs.OrganizationRegulatoryProgram.RegulatorOrganization)
-                                                  .SingleOrDefault(fs => fs.FileStoreId == fileStoreId);
-
-                        if (fileStore != null)
-                        {
-                            //check if current user is authority of file store owner
-                            var authorityOrganization = fileStore.OrganizationRegulatoryProgram.RegulatorOrganization ?? fileStore.OrganizationRegulatoryProgram.Organization;
-
-                            var currentOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
-                                                                 .Single(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                            var isCurrentOrgRegProgramTheAuthority = currentOrgRegProgram.OrganizationId == authorityOrganization.OrganizationId
-                                                                     && currentOrgRegProgram.RegulatoryProgramId == fileStore.OrganizationRegulatoryProgram.RegulatoryProgramId;
-
-                            if (isCurrentOrgRegProgramTheAuthority)
-                            {
-                                var isFileIncludedInSubmittedReport = _dbContext.FileStores
-                                                                                .Include(fs => fs.ReportFiles.Select(rf => rf.ReportPackageElementType.ReportPackageElementCategory
-                                                                                                                             .ReportPackage.ReportStatus))
-                                                                                .Single(fs => fs.FileStoreId == fileStoreId)
-                                                                                .ReportFiles.Select(rf => rf.ReportPackageElementType)
-                                                                                .Select(rpet => rpet.ReportPackageElementCategory)
-                                                                                .Select(rpec => rpec.ReportPackage)
-                                                                                .Any(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
-                                                                                           || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
-
-                                retVal = isFileIncludedInSubmittedReport;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        retVal = IsFileStoreWithThisOwnerExist(fileStoreId:fileStoreId, orgRegProgramId:currentOrgRegProgramId);
-                    }
-                }
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
 
         private bool IsFileStoreWithThisOwnerExist(int fileStoreId, int orgRegProgramId)
         {

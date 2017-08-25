@@ -56,6 +56,62 @@ namespace Linko.LinkoExchange.Services.Parameter
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            var retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetParameterGroup":
+                {
+                    //
+                    //Authorize the correct Authority owner
+                    //
+
+                    var parameterGroupId = id[0];
+                    var parameterGroup = _dbContext.ParameterGroups
+                                                   .SingleOrDefault(pg => pg.ParameterGroupId == parameterGroupId);
+
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
+                        {
+                            retVal = true;
+                        }
+                        else
+                        {
+                            retVal = false;
+                        }
+                    }
+                    else
+                    {
+                        //
+                        //Authorize Industries of the Authority owner only
+                        //
+                        var authorityOfCurrentUser = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId);
+                        if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == authorityOfCurrentUser.OrganizationRegulatoryProgramId)
+                        {
+                            retVal = true;
+                        }
+                        else
+                        {
+                            retVal = false;
+                        }
+                    }
+                }
+
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         ///     Gets all parameters associated with this Authority with optional parameters to filter the returned collection
         /// </summary>
@@ -96,6 +152,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             if (!string.IsNullOrEmpty(value:startsWith))
             {
                 startsWith = startsWith.TrimStart();
+
                 // ReSharper disable once ArgumentsStyleNamedExpression
                 foundParams = foundParams.Where(param => param.Name.StartsWith(startsWith));
             }
@@ -402,7 +459,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                     transaction.Commit();
                 }
-                catch 
+                catch
                 {
                     transaction.Rollback();
                     throw;
@@ -482,6 +539,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                                                      .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+
                                                                   // ReSharper disable once ArgumentsStyleNamedExpression
                                                                   && !string.IsNullOrEmpty(ss.IUSampleFrequency))
                                                      .Select(x => x.IUSampleFrequency)
@@ -580,62 +638,6 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            var retVal = false;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "GetParameterGroup":
-                {
-                    //
-                    //Authorize the correct Authority owner
-                    //
-
-                    var parameterGroupId = id[0];
-                    var parameterGroup = _dbContext.ParameterGroups
-                                                   .SingleOrDefault(pg => pg.ParameterGroupId == parameterGroupId);
-
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
-                        {
-                            retVal = true;
-                        }
-                        else
-                        {
-                            retVal = false;
-                        }
-                    }
-                    else
-                    {
-                        //
-                        //Authorize Industries of the Authority owner only
-                        //
-                        var authorityOfCurrentUser = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId);
-                        if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == authorityOfCurrentUser.OrganizationRegulatoryProgramId)
-                        {
-                            retVal = true;
-                        }
-                        else
-                        {
-                            retVal = false;
-                        }
-                    }
-                }
-
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
 
         /// <summary>
         ///     Overrides the given parameter's default unit with one found for the parameter at a given monitoring point

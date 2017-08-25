@@ -17,7 +17,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.Email
 {
-    public class LinkoExchangeEmailServiceSimple:ILinkoExchangeEmailService
+    public class LinkoExchangeEmailServiceSimple : ILinkoExchangeEmailService
     {
         #region fields
 
@@ -70,141 +70,13 @@ namespace Linko.LinkoExchange.Services.Email
                 }
 
                 _dbContext.SaveChanges();
+
                 foreach (var entry in emailEntries)
                 {
                     SendEmailInner(entry:entry);
                 }
             }
         }
-
-        #endregion
-
-        private void SendEmailInner(EmailEntry entry)
-        {
-            try
-            {
-                using (var smtpClient = new SmtpClient(host:_emailServer))
-                {
-                    smtpClient.Send(message:entry.MailMessage);
-                    _logger.Info( message: $"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {entry.AuditLogId}, "
-                                           + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
-                                           + $"Subject:{entry.MailMessage.Subject}");
-                }
-            }
-            catch (Exception ex)
-            {
-                var errors = new List<string> {ex.Message};
-                while (ex.InnerException != null)
-                {
-                    ex = ex.InnerException;
-                    errors.Add(item:ex.Message);
-                }
-
-                _logger.Info( message: $"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {entry.AuditLogId}, "
-                                       + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
-                                       + $"Subject:{entry.MailMessage.Subject}");
-                _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
-            }
-        }
-
-        private void WriteEmailAuditLog(EmailEntry emailEntry)
-        {
-            var sendTo = emailEntry.RecipientEmailAddress;
-            var template = GetTemplate(emailType:emailEntry.EmailType).Result;
-            if (template == null)
-            {
-                return;
-            }
-
-            var msg = GetMailMessage(sendTo:sendTo, emailTemplate:template, replacements:emailEntry.ContentReplacements, senderEmail:_senderEmailAddres).Result;
-            emailEntry.MailMessage = msg;
-
-            if (string.IsNullOrWhiteSpace(value:_emailServer))
-            {
-                _emailServer = _settingService.GetGlobalSettings()[key:SystemSettingType.EmailServer];
-            }
-
-            if (string.IsNullOrWhiteSpace(value:_emailServer))
-            {
-                throw new ArgumentException(message:"EmailServer");
-            }
-
-            var logEntry = GetEmailAuditLog(emailEntry:emailEntry, emailTemplateId:template.AuditLogTemplateId);
-            _emailAuditLogService.Log(logEntry:logEntry);
-            emailEntry.AuditLogId = logEntry.EmailAuditLogId;
-        }
-
-        private EmailAuditLogEntryDto GetEmailAuditLog(EmailEntry emailEntry, int emailTemplateId)
-        {
-            var entry = new EmailAuditLogEntryDto
-                        {
-                            RecipientFirstName = emailEntry.RecipientFirstName,
-                            RecipientLastName = emailEntry.RecipientLastName,
-                            RecipientUserName = emailEntry.RecipientUserName,
-                            RecipientUserProfileId = emailEntry.RecipientUserProfileId,
-                            RecipientRegulatoryProgramId = emailEntry.RecipientOrgulatoryProgramId,
-                            RecipientOrganizationId = emailEntry.RecipientOrganizationId,
-                            RecipientRegulatorOrganizationId = emailEntry.RecipientRegulatorOrganizationId,
-                            SenderEmailAddress = _senderEmailAddres,
-                            SenderFirstName = _senderFistName,
-                            SenderLastName = _senderLastName,
-                            SenderUserProfileId = null,
-                            Body = emailEntry.MailMessage.Body,
-                            Subject = emailEntry.MailMessage.Subject,
-                            RecipientEmailAddress = emailEntry.RecipientEmailAddress,
-                            SentDateTimeUtc = DateTimeOffset.Now,
-                            AuditLogTemplateId = emailTemplateId
-                        };
-
-            if (entry.RecipientRegulatorOrganizationId.HasValue == false)
-            {
-                entry.RecipientRegulatorOrganizationId = entry.RecipientOrganizationId;
-            }
-
-            if (entry.RecipientUserProfileId == 0)
-            {
-                entry.RecipientUserProfileId = null;
-            }
-
-            return entry;
-        }
-
-        private Task<AuditLogTemplate> GetTemplate(EmailType emailType)
-        {
-            var emailTemplateName = $"Email_{emailType}";
-            return Task.FromResult(result:_dbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName));
-        }
-
-        private Task<MailMessage> GetMailMessage(string sendTo, AuditLogTemplate emailTemplate,
-                                                 IDictionary<string, string> replacements, string senderEmail)
-        {
-            var keyValues = replacements.Select(i => new KeyValuePair<string, string>(key:"{" + i.Key + "}", value:i.Value ?? "")).ToList();
-
-            replacements = keyValues.ToDictionary(i => i.Key, i => i.Value);
-
-            var mailDefinition = new MailDefinition
-                                 {
-                                     IsBodyHtml = true,
-                                     From = senderEmail,
-                                     Subject = ReplaceUsingTemplates(originText:emailTemplate.SubjectTemplate, replacements:keyValues)
-                                 };
-
-            var emailMessage = mailDefinition.CreateMailMessage(recipients:sendTo, replacements:(IDictionary) replacements,
-                                                                body:emailTemplate.MessageTemplate, owner:new Control());
-            return Task.FromResult(result:emailMessage);
-        }
-
-        private string ReplaceUsingTemplates(string originText, IEnumerable<KeyValuePair<string, string>> replacements)
-        {
-            foreach (var kv in replacements)
-            {
-                originText = originText.Replace(oldValue:kv.Key, newValue:kv.Value);
-            }
-
-            return originText;
-        }
-
-        #region Implementation of ILinkoExchangeEmailService
 
         public EmailEntry GetEmailEntryForOrgRegProgramUser(OrganizationRegulatoryProgramUserDto user, EmailType emailType, Dictionary<string, string> contentReplacements)
         {
@@ -313,5 +185,130 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
         #endregion
+
+        private void SendEmailInner(EmailEntry entry)
+        {
+            try
+            {
+                using (var smtpClient = new SmtpClient(host:_emailServer))
+                {
+                    smtpClient.Send(message:entry.MailMessage);
+                    _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {entry.AuditLogId}, "
+                                         + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
+                                         + $"Subject:{entry.MailMessage.Subject}");
+                }
+            }
+            catch (Exception ex)
+            {
+                var errors = new List<string> {ex.Message};
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                    errors.Add(item:ex.Message);
+                }
+
+                _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {entry.AuditLogId}, "
+                                     + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
+                                     + $"Subject:{entry.MailMessage.Subject}");
+                _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
+            }
+        }
+
+        private void WriteEmailAuditLog(EmailEntry emailEntry)
+        {
+            var sendTo = emailEntry.RecipientEmailAddress;
+            var template = GetTemplate(emailType:emailEntry.EmailType).Result;
+            if (template == null)
+            {
+                throw new Exception(message:$"Email Audit Log template is missing for EmailType: {emailEntry.EmailType}");
+            }
+
+            var msg = GetMailMessage(sendTo:sendTo, emailTemplate:template, replacements:emailEntry.ContentReplacements, senderEmail:_senderEmailAddres).Result;
+            emailEntry.MailMessage = msg;
+
+            if (string.IsNullOrWhiteSpace(value:_emailServer))
+            {
+                _emailServer = _settingService.GetGlobalSettings()[key:SystemSettingType.EmailServer];
+            }
+
+            if (string.IsNullOrWhiteSpace(value:_emailServer))
+            {
+                _logger.Fatal(message:"EmailServer value in tSystemSetting table is null or blank.");
+                throw new ArgumentException(message:"EmailServer value is missing.");
+            }
+
+            var logEntry = GetEmailAuditLog(emailEntry:emailEntry, emailTemplateId:template.AuditLogTemplateId);
+            _emailAuditLogService.Log(logEntry:logEntry);
+            emailEntry.AuditLogId = logEntry.EmailAuditLogId;
+        }
+
+        private EmailAuditLogEntryDto GetEmailAuditLog(EmailEntry emailEntry, int emailTemplateId)
+        {
+            var entry = new EmailAuditLogEntryDto
+                        {
+                            RecipientFirstName = emailEntry.RecipientFirstName,
+                            RecipientLastName = emailEntry.RecipientLastName,
+                            RecipientUserName = emailEntry.RecipientUserName,
+                            RecipientUserProfileId = emailEntry.RecipientUserProfileId,
+                            RecipientRegulatoryProgramId = emailEntry.RecipientOrgulatoryProgramId,
+                            RecipientOrganizationId = emailEntry.RecipientOrganizationId,
+                            RecipientRegulatorOrganizationId = emailEntry.RecipientRegulatorOrganizationId,
+                            SenderEmailAddress = _senderEmailAddres,
+                            SenderFirstName = _senderFistName,
+                            SenderLastName = _senderLastName,
+                            SenderUserProfileId = null,
+                            Body = emailEntry.MailMessage.Body,
+                            Subject = emailEntry.MailMessage.Subject,
+                            RecipientEmailAddress = emailEntry.RecipientEmailAddress,
+                            SentDateTimeUtc = DateTimeOffset.Now,
+                            AuditLogTemplateId = emailTemplateId
+                        };
+
+            if (entry.RecipientRegulatorOrganizationId.HasValue == false)
+            {
+                entry.RecipientRegulatorOrganizationId = entry.RecipientOrganizationId;
+            }
+
+            if (entry.RecipientUserProfileId == 0)
+            {
+                entry.RecipientUserProfileId = null;
+            }
+
+            return entry;
+        }
+
+        private Task<AuditLogTemplate> GetTemplate(EmailType emailType)
+        {
+            var emailTemplateName = $"Email_{emailType}";
+            return Task.FromResult(result:_dbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName));
+        }
+
+        private Task<MailMessage> GetMailMessage(string sendTo, AuditLogTemplate emailTemplate, IDictionary<string, string> replacements, string senderEmail)
+        {
+            var keyValues = replacements.Select(i => new KeyValuePair<string, string>(key:"{" + i.Key + "}", value:i.Value ?? "")).ToList();
+
+            replacements = keyValues.ToDictionary(i => i.Key, i => i.Value);
+
+            var mailDefinition = new MailDefinition
+                                 {
+                                     IsBodyHtml = true,
+                                     From = senderEmail,
+                                     Subject = ReplaceUsingTemplates(originText:emailTemplate.SubjectTemplate, replacements:keyValues)
+                                 };
+
+            var emailMessage = mailDefinition.CreateMailMessage(recipients:sendTo, replacements:(IDictionary) replacements,
+                                                                body:emailTemplate.MessageTemplate, owner:new Control());
+            return Task.FromResult(result:emailMessage);
+        }
+
+        private string ReplaceUsingTemplates(string originText, IEnumerable<KeyValuePair<string, string>> replacements)
+        {
+            foreach (var kv in replacements)
+            {
+                originText = originText.Replace(oldValue:kv.Key, newValue:kv.Value);
+            }
+
+            return originText;
+        }
     }
 }

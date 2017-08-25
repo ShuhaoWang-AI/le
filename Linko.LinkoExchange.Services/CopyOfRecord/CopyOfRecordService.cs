@@ -57,52 +57,37 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             _logger.Info(message:$"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
 
-            try
-            {
-                var coreBytes = CreateZipFileData(attachments:attachments, copyOfRecordPdfFileDto:copyOfRecordPdfFileDto, copyOfRecordDataXmlFileDto:copyOfRecordDataXmlFileDto);
+            var coreBytes = CreateZipFileData(attachments:attachments, copyOfRecordPdfFileDto:copyOfRecordPdfFileDto, copyOfRecordDataXmlFileDto:copyOfRecordDataXmlFileDto);
 
-                var copyOfRecord = new Core.Domain.CopyOfRecord
-                                   {
-                                       Hash = HashHelper.ComputeSha256Hash(data:coreBytes),
-                                       HashAlgorithm = HashAlgorithm.Sha256.ToString(),
-                                       SignatureAlgorithm = DigitalSignatureAlgorithm.Sha1.ToString(),
-                                       Data = new byte[coreBytes.Length]
-                                   };
+            var copyOfRecord = new Core.Domain.CopyOfRecord
+                               {
+                                   Hash = HashHelper.ComputeSha256Hash(data:coreBytes),
+                                   HashAlgorithm = HashAlgorithm.Sha256.ToString(),
+                                   SignatureAlgorithm = DigitalSignatureAlgorithm.Sha1.ToString(),
+                                   Data = new byte[coreBytes.Length]
+                               };
 
-                Array.Copy(sourceArray:coreBytes, destinationArray:copyOfRecord.Data, length:coreBytes.Length);
-                copyOfRecord.Signature = SignaData(hash:copyOfRecord.Hash);
-                copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
-                copyOfRecord.ReportPackageId = reportPackageId;
-                _dbContext.CopyOfRecords.Add(entity:copyOfRecord);
-                _dbContext.SaveChanges();
+            Array.Copy(sourceArray:coreBytes, destinationArray:copyOfRecord.Data, length:coreBytes.Length);
+            copyOfRecord.Signature = SignaData(hash:copyOfRecord.Hash);
+            copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
+            copyOfRecord.ReportPackageId = reportPackageId;
+            _dbContext.CopyOfRecords.Add(entity:copyOfRecord);
+            _dbContext.SaveChanges();
 
-                var copyOfRecordDto = new CopyOfRecordDto
-                                      {
-                                          ReportPackageId = copyOfRecord.ReportPackageId,
-                                          Signature = copyOfRecord.Signature,
-                                          SignatureAlgorithm = copyOfRecord.SignatureAlgorithm,
-                                          Hash = copyOfRecord.Hash,
-                                          HashAlgorithm = copyOfRecord.HashAlgorithm,
-                                          CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
-                                      };
+            var copyOfRecordDto = new CopyOfRecordDto
+                                  {
+                                      ReportPackageId = copyOfRecord.ReportPackageId,
+                                      Signature = copyOfRecord.Signature,
+                                      SignatureAlgorithm = copyOfRecord.SignatureAlgorithm,
+                                      Hash = copyOfRecord.Hash,
+                                      HashAlgorithm = copyOfRecord.HashAlgorithm,
+                                      CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
+                                  };
 
-                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
-                _logger.Info(message:message);
+            var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
+            _logger.Info(message:message);
 
-                return copyOfRecordDto;
-            }
-            catch (Exception ex)
-            {
-                var errors = new List<string> {ex.Message};
-                while (ex.InnerException != null)
-                {
-                    ex = ex.InnerException;
-                    errors.Add(item:ex.Message);
-                }
-
-                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-                throw;
-            }
+            return copyOfRecordDto;
         }
 
         public CopyOfRecordValidationResultDto ValidCopyOfRecordData(int reportPackageId)

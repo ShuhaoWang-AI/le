@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
@@ -81,6 +80,7 @@ namespace Linko.LinkoExchange.Services.Permission
             var approvals = _dbContext.OrganizationRegulatoryProgramUsers
                                       .Include(i => i.PermissionGroup)
                                       .Where(u => u.IsRemoved == false
+
                                                   // ReSharper disable once ArgumentsStyleNamedExpression
                                                   && authorityOrganizationIds.Contains(u.OrganizationRegulatoryProgram.OrganizationId)
                                                   && u.IsRemoved == false
@@ -109,52 +109,40 @@ namespace Linko.LinkoExchange.Services.Permission
 
         public IEnumerable<UserDto> GetApprovalPeople(OrganizationRegulatoryProgramDto approverOrganizationRegulatoryProgram, bool isInvitedToIndustry)
         {
-            try
+            var isInviterOrgIndustry = approverOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
+
+            var users = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
+                                  .Where(u => u.IsRemoved == false
+                                              && u.OrganizationRegulatoryProgram.IsEnabled
+                                              && u.OrganizationRegulatoryProgram.IsRemoved == false
+                                              && u.IsEnabled
+                                              && u.IsRegistrationApproved
+                                              && u.IsRegistrationDenied == false
+                                              && u.OrganizationRegulatoryProgramId == approverOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+
+            if (!isInvitedToIndustry)
             {
-                var isInviterOrgIndustry = approverOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
-
-                var users = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
-                                      .Where(u => u.IsRemoved == false
-                                                  && u.OrganizationRegulatoryProgram.IsEnabled
-                                                  && u.OrganizationRegulatoryProgram.IsRemoved == false
-                                                  && u.IsEnabled
-                                                  && u.IsRegistrationApproved
-                                                  && u.IsRegistrationDenied == false
-                                                  && u.OrganizationRegulatoryProgramId == approverOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
-
-                if (!isInvitedToIndustry)
-                {
-                    // if registering for authority then only administrators can approve or deny
-                    users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
-                }
-                else if (isInviterOrgIndustry && isInvitedToIndustry)
-                {
-                    // if registering for industry and inviter organization is also industry then only administrators can approve or deny
-                    users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
-                }
-                else
-                {
-                    // if registering for industry and inviter organization is authority then all user can approve or deny
-                }
-
-                var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
-
-                // ReSharper disable once ArgumentsStyleNamedExpression
-                var userProfiles = _dbContext.Users
-                                             .Where(i => userProfileIds.Contains(i.UserProfileId) && i.IsAccountLocked == false && i.IsAccountResetRequired == false).ToList();
-                var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(userProfile:i));
-
-                return userDtos;
+                // if registering for authority then only administrators can approve or deny
+                users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
             }
-            catch (Exception ex)
+            else if (isInviterOrgIndustry && isInvitedToIndustry)
             {
-                var linkoException = new LinkoExchangeException
-                                     {
-                                         ErrorType = LinkoExchangeError.OrganizationSetting,
-                                         Errors = new List<string> {ex.Message}
-                                     };
-                throw linkoException;
+                // if registering for industry and inviter organization is also industry then only administrators can approve or deny
+                users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
             }
+            else
+            {
+                // if registering for industry and inviter organization is authority then all user can approve or deny
+            }
+
+            var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
+
+            // ReSharper disable once ArgumentsStyleNamedExpression
+            var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId) && i.IsAccountLocked == false && i.IsAccountResetRequired == false)
+                                         .ToList();
+            var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(userProfile:i));
+
+            return userDtos;
         }
 
         /// <summary>

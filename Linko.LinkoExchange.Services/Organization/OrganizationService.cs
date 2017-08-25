@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Validation;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Extensions;
-using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
@@ -50,6 +48,75 @@ namespace Linko.LinkoExchange.Services.Organization
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            var retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrgRegProgUserId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
+            var currentOrganizationId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationId));
+            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
+                                                       .RegulatoryProgramId;
+            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetOrganizationRegulatoryProgram":
+                case "UpdateEnableDisableFlag":
+                {
+                    //
+                    //Authorize the correct Authority for this Org Reg Program
+                    //
+
+                    var targetOrgRegProgId = id[0];
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        if (currentOrgRegProgramId == targetOrgRegProgId)
+                        {
+                            retVal = true;
+                        }
+                        else
+                        {
+                            var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                                                                .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramId == targetOrgRegProgId);
+
+                            //this will also handle scenarios where targetOrgRegProgId doesn't even exist
+                            if (targetOrgRegProgram != null
+                                && targetOrgRegProgram.RegulatoryProgramId == currentRegulatoryProgramId
+                                && targetOrgRegProgram.RegulatorOrganizationId == currentOrganizationId)
+                            {
+                                retVal = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Authorize Industry Admins only
+
+                        var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
+                                                                    .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
+                                                                    .PermissionGroup;
+
+                        var isAdmin = currentUsersPermissionGroup.Name.ToLower().StartsWith(value:"admin")
+                                      && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrgRegProgId;
+
+                        if (isAdmin)
+                        {
+                            //This is an authorized industry admin within the target organization regulatory program
+                            retVal = true;
+                        }
+                    }
+                }
+
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations()
         {
             var userProfileId = Convert.ToInt32(value:_httpContext.Current.User.Identity.UserProfileId());
@@ -70,13 +137,8 @@ namespace Linko.LinkoExchange.Services.Organization
                                                    && u.IsRegistrationApproved
                                                    && u.OrganizationRegulatoryProgram.IsEnabled
                                                    && u.OrganizationRegulatoryProgram.IsRemoved == false);
-
-            if (orpUsers == null)
-            {
-                return null;
-            }
-
-            return orpUsers.Select(i => { return _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:i.OrganizationRegulatoryProgram); });
+            
+            return orpUsers.Select(i => _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:i.OrganizationRegulatoryProgram));
         }
 
         /// <summary>
@@ -86,73 +148,64 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <returns> The organizationId </returns>
         public IEnumerable<AuthorityDto> GetUserRegulators(int userId, bool isIncludeRemoved = false)
         {
-            try
+            var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
+                                     .FindAll(u => u.UserProfileId == userId
+                                                   &&
+
+                                                   // u.IsEnabled == true &&
+                                                   //u.IsRegistrationApproved &&
+                                                   //u.OrganizationRegulatoryProgram.IsEnabled &&
+                                                   u.OrganizationRegulatoryProgram.IsRemoved == false);
+
+            if (!isIncludeRemoved)
             {
-                var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
-                                         .FindAll(u => u.UserProfileId == userId
-                                                       &&
-
-                                                       // u.IsEnabled == true &&
-                                                       //u.IsRegistrationApproved &&
-                                                       //u.OrganizationRegulatoryProgram.IsEnabled &&
-                                                       u.OrganizationRegulatoryProgram.IsRemoved == false);
-
-                if (!isIncludeRemoved)
-                {
-                    orpUsers = orpUsers.FindAll(u => !u.IsRemoved);
-                }
-
-                var orgs = new List<AuthorityDto>();
-                foreach (var orpUser in orpUsers)
-                {
-                    OrganizationRegulatoryProgram authority;
-                    var thisOrgRegProgram = orpUser.OrganizationRegulatoryProgram;
-                    if (thisOrgRegProgram.RegulatorOrganization != null)
-                    {
-                        authority = _dbContext.OrganizationRegulatoryPrograms
-                                              .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganization.OrganizationId
-                                                           && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
-                    }
-                    else
-                    {
-                        authority = thisOrgRegProgram;
-                    }
-
-                    if (authority?.Organization.OrganizationType.Name == "Authority")
-                    {
-                        //Check for duplicates before adding
-                        if (!orgs.Any(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId))
-                        {
-                            var authorityDto = _mapHelper.GetAuthorityDtoFromOrganization(organization:authority.Organization);
-                            authorityDto.RegulatoryProgramId = authority.RegulatoryProgramId;
-                            authorityDto.OrganizationRegulatoryProgramId = authority.OrganizationRegulatoryProgramId;
-                            authorityDto.EmailContactInfoName =
-                                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                             settingType:SettingType.EmailContactInfoName);
-                            authorityDto.EmailContactInfoEmailAddress =
-                                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                             settingType:SettingType.EmailContactInfoEmailAddress);
-                            authorityDto.EmailContactInfoPhone =
-                                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                             settingType:SettingType.EmailContactInfoPhone);
-                            orgs.Add(item:authorityDto);
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception(message:string.Format(format:"ERROR: Organization {0} in Program {1} does not have a regulator and is not itself of type 'Authority'. ",
-                                                                  arg0:authority.OrganizationId, arg1:orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId));
-                    }
-                }
-
-                return orgs;
-            }
-            catch (DbEntityValidationException ex)
-            {
-                HandleEntityException(ex:ex);
+                orpUsers = orpUsers.FindAll(u => !u.IsRemoved);
             }
 
-            return null;
+            var orgs = new List<AuthorityDto>();
+            foreach (var orpUser in orpUsers)
+            {
+                OrganizationRegulatoryProgram authority;
+                var thisOrgRegProgram = orpUser.OrganizationRegulatoryProgram;
+                if (thisOrgRegProgram.RegulatorOrganization != null)
+                {
+                    authority = _dbContext.OrganizationRegulatoryPrograms
+                                          .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganization.OrganizationId
+                                                       && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
+                }
+                else
+                {
+                    authority = thisOrgRegProgram;
+                }
+
+                if (authority?.Organization.OrganizationType.Name.ToLower() == OrganizationTypeName.Authority.ToString().ToLower())
+                {
+                    //Check for duplicates before adding
+                    if (!orgs.Any(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId))
+                    {
+                        var authorityDto = _mapHelper.GetAuthorityDtoFromOrganization(organization:authority.Organization);
+                        authorityDto.RegulatoryProgramId = authority.RegulatoryProgramId;
+                        authorityDto.OrganizationRegulatoryProgramId = authority.OrganizationRegulatoryProgramId;
+                        authorityDto.EmailContactInfoName =
+                            _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                         settingType:SettingType.EmailContactInfoName);
+                        authorityDto.EmailContactInfoEmailAddress =
+                            _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                         settingType:SettingType.EmailContactInfoEmailAddress);
+                        authorityDto.EmailContactInfoPhone =
+                            _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                         settingType:SettingType.EmailContactInfoPhone);
+                        orgs.Add(item:authorityDto);
+                    }
+                }
+                else
+                {
+                    throw new Exception(message:string.Format(format:"ERROR: Organization {0} in Program {1} does not have a regulator and is not itself of type 'Authority'. ",
+                                                              arg0:authority.OrganizationId, arg1:orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId));
+                }
+            }
+
+            return orgs;
         }
 
         public string GetUserAuthorityListForEmailContent(int userProfileId)
@@ -181,19 +234,11 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <returns> Collection of organization </returns>
         public OrganizationDto GetOrganization(int organizationId)
         {
-            OrganizationDto returnDto = null;
-            try
-            {
-                var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
-                returnDto = _mapHelper.GetOrganizationDtoFromOrganization(organization:foundOrg);
-                var jurisdiction = _jurisdictionService.GetJurisdictionById(jurisdictionId:foundOrg.JurisdictionId);
+            var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
+            var returnDto = _mapHelper.GetOrganizationDtoFromOrganization(organization:foundOrg);
+            var jurisdiction = _jurisdictionService.GetJurisdictionById(jurisdictionId:foundOrg.JurisdictionId);
 
-                returnDto.State = jurisdiction?.Code ?? "";
-            }
-            catch (DbEntityValidationException ex)
-            {
-                HandleEntityException(ex:ex);
-            }
+            returnDto.State = jurisdiction?.Code ?? "";
 
             return returnDto;
         }
@@ -282,75 +327,54 @@ namespace Linko.LinkoExchange.Services.Organization
 
         public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string searchString = null)
         {
-            try
-            {
-                var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
-                var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
-                                                                                            && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+            var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
+                                                                                        && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
-                if (!string.IsNullOrEmpty(value:searchString))
-                {
-                    childOrgRegProgs = childOrgRegProgs.Where(x =>
+            if (!string.IsNullOrEmpty(value:searchString))
+            {
+                childOrgRegProgs = childOrgRegProgs.Where(x =>
+
+                                                              // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  x.ReferenceNumber.Contains(searchString)
 
                                                                   // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      x.ReferenceNumber.Contains(searchString)
+                                                                  || x.Organization.Name.Contains(searchString)
 
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.Name.Contains(searchString)
+                                                                  // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  || x.Organization.AddressLine1.Contains(searchString)
 
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.AddressLine1.Contains(searchString)
+                                                                  // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  || x.Organization.AddressLine2.Contains(searchString)
 
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.AddressLine2.Contains(searchString)
+                                                                  // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  || x.Organization.CityName.Contains(searchString)
 
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.CityName.Contains(searchString)
+                                                                  // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  || x.Organization.Jurisdiction != null && x.Organization.Jurisdiction.Code.Contains(searchString)
 
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.Jurisdiction != null && x.Organization.Jurisdiction.Code.Contains(searchString)
-
-                                                                      // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                      || x.Organization.ZipCode.Contains(searchString));
-                }
-
-                var dtos = new List<OrganizationRegulatoryProgramDto>();
-                foreach (var childOrgRegProg in childOrgRegProgs.ToList())
-                {
-                    var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:childOrgRegProg);
-                    dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
-                                                 .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
-                                       > 0;
-                    dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
-                                                   .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId
-                                                               && o.IsRegistrationApproved
-                                                               && o.IsEnabled
-                                                               && o.PermissionGroup.Name == "Administrator"
-                                                         )
-                                         > 0;
-                    dtos.Add(item:dto);
-                }
-
-                return dtos.Count > 0 ? dtos : null;
+                                                                  // ReSharper disable once ArgumentsStyleNamedExpression
+                                                                  || x.Organization.ZipCode.Contains(searchString));
             }
-            catch (DbEntityValidationException ex)
+
+            var dtos = new List<OrganizationRegulatoryProgramDto>();
+            foreach (var childOrgRegProg in childOrgRegProgs.ToList())
             {
-                var validationIssues = new List<RuleViolation>();
-                foreach (var item in ex.EntityValidationErrors)
-                {
-                    var entry = item.Entry;
-                    var entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (var subItem in item.ValidationErrors)
-                    {
-                        var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    }
-                }
-
-                //_logger.Info("???");
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:childOrgRegProg);
+                dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
+                                             .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
+                                   > 0;
+                dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
+                                               .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId
+                                                           && o.IsRegistrationApproved
+                                                           && o.IsEnabled
+                                                           && o.PermissionGroup.Name == "Administrator"
+                                                     )
+                                     > 0;
+                dtos.Add(item:dto);
             }
+
+            return dtos.Count > 0 ? dtos : null;
         }
 
         public int GetRemainingUserLicenseCount(int orgRegProgramId)
@@ -444,95 +468,5 @@ namespace Linko.LinkoExchange.Services.Organization
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            var retVal = false;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentOrgRegProgUserId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
-            var currentOrganizationId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationId));
-            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
-                                                       .RegulatoryProgramId;
-            var currentPortalName = _httpContext.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "GetOrganizationRegulatoryProgram":
-                case "UpdateEnableDisableFlag":
-                {
-                    //
-                    //Authorize the correct Authority for this Org Reg Program
-                    //
-
-                    var targetOrgRegProgId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        if (currentOrgRegProgramId == targetOrgRegProgId)
-                        {
-                            retVal = true;
-                        }
-                        else
-                        {
-                            var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
-                                                                .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramId == targetOrgRegProgId);
-
-                            //this will also handle scenarios where targetOrgRegProgId doesn't even exist
-                            if (targetOrgRegProgram != null
-                                && targetOrgRegProgram.RegulatoryProgramId == currentRegulatoryProgramId
-                                && targetOrgRegProgram.RegulatorOrganizationId == currentOrganizationId)
-                            {
-                                retVal = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //
-                        //Authorize Industry Admins only
-                        //
-
-                        var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
-                                                                    .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
-                                                                    .PermissionGroup;
-
-                        var isAdmin = currentUsersPermissionGroup.Name.ToLower().StartsWith(value:"admin")
-                                      && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrgRegProgId;
-
-                        if (isAdmin)
-                        {
-                            //This is an authorized industry admin within the target organization regulatory program
-                            retVal = true;
-                        }
-                    }
-                }
-
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
-
-        private void HandleEntityException(DbEntityValidationException ex)
-        {
-            var validationIssues = new List<RuleViolation>();
-            foreach (var item in ex.EntityValidationErrors)
-            {
-                var entry = item.Entry;
-                var entityTypeName = entry.Entity.GetType().Name;
-
-                foreach (var subItem in item.ValidationErrors)
-                {
-                    var message = string.Format(format:"Error '{0}' occurred in {1} at {2}", arg0:subItem.ErrorMessage, arg1:entityTypeName, arg2:subItem.PropertyName);
-                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                }
-            }
-
-            //_logger.Info("???");
-            throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-        }
     }
 }

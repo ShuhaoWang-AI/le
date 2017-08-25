@@ -183,7 +183,6 @@
     <Compile Include="Dto\SettingDto.cs" />
     <Compile Include="Dto\TimeZoneDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
-    <Compile Include="Email\EmailService.cs" />
     <Compile Include="Dto\UserDto.cs" />
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />

@@ -88,80 +88,80 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             if (linkoExchangeContext == null)
             {
-                throw new ArgumentNullException(paramName:"linkoExchangeContext");
+                throw new ArgumentNullException(paramName:nameof(linkoExchangeContext));
             }
             if (userManager == null)
             {
-                throw new ArgumentNullException(paramName:"userManager");
+                throw new ArgumentNullException(paramName:nameof(userManager));
             }
             if (signInManager == null)
             {
-                throw new ArgumentNullException(paramName:"signInManager");
+                throw new ArgumentNullException(paramName:nameof(signInManager));
             }
             if (authenticationManager == null)
             {
-                throw new ArgumentNullException(paramName:"authenticationManager");
+                throw new ArgumentNullException(paramName:nameof(authenticationManager));
             }
             if (settingService == null)
             {
-                throw new ArgumentNullException(paramName:"settingService");
+                throw new ArgumentNullException(paramName:nameof(settingService));
             }
             if (organizationService == null)
             {
-                throw new ArgumentNullException(paramName:"organizationService");
+                throw new ArgumentNullException(paramName:nameof(organizationService));
             }
             if (programService == null)
             {
-                throw new ArgumentNullException(paramName:"programService");
+                throw new ArgumentNullException(paramName:nameof(programService));
             }
             if (invitationService == null)
             {
-                throw new ArgumentNullException(paramName:"invitationService");
+                throw new ArgumentNullException(paramName:nameof(invitationService));
             }
 
             if (permissionService == null)
             {
-                throw new ArgumentNullException(paramName:"permissionService");
+                throw new ArgumentNullException(paramName:nameof(permissionService));
             }
             if (userService == null)
             {
-                throw new ArgumentNullException(paramName:"userService");
+                throw new ArgumentNullException(paramName:nameof(userService));
             }
             if (sessionCache == null)
             {
-                throw new ArgumentNullException(paramName:"sessionCache");
+                throw new ArgumentNullException(paramName:nameof(sessionCache));
             }
             if (requestCache == null)
             {
-                throw new ArgumentNullException(paramName:"requestCache");
+                throw new ArgumentNullException(paramName:nameof(requestCache));
             }
             if (httpContext == null)
             {
-                throw new ArgumentNullException(paramName:"httpContext");
+                throw new ArgumentNullException(paramName:nameof(httpContext));
             }
             if (logger == null)
             {
-                throw new ArgumentNullException(paramName:"logger");
+                throw new ArgumentNullException(paramName:nameof(logger));
             }
             if (questionAnswerService == null)
             {
-                throw new ArgumentNullException(paramName:"questionAnswerService");
+                throw new ArgumentNullException(paramName:nameof(questionAnswerService));
             }
             if (mapHelper == null)
             {
-                throw new ArgumentNullException(paramName:"mapHelper");
+                throw new ArgumentNullException(paramName:nameof(mapHelper));
             }
             if (crommerAuditLogService == null)
             {
-                throw new ArgumentNullException(paramName:"crommerAuditLogService");
+                throw new ArgumentNullException(paramName:nameof(crommerAuditLogService));
             }
             if (termConditionService == null)
             {
-                throw new ArgumentNullException(paramName:"termConditionService");
+                throw new ArgumentNullException(paramName:nameof(termConditionService));
             }
             if (linkoExchangeEmailService == null)
             {
-                throw new ArgumentNullException(paramName:"linkoExchangeEmailService");
+                throw new ArgumentNullException(paramName:nameof(linkoExchangeEmailService));
             }
 
             _dbContext = linkoExchangeContext;
@@ -231,20 +231,24 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 return;
             }
-
-            var currentClaims = GetClaims();
-            if (currentClaims != null)
+            else
             {
-                var owinUserId = currentClaims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId).Value;
-                var itor = claims.GetEnumerator();
 
-                while (itor.MoveNext())
+                var currentClaims = GetClaims();
+                if (currentClaims != null)
                 {
-                    currentClaims.Add(item:new Claim(type:itor.Current.Key, value:itor.Current.Value));
-                }
+                    var owinUserId = currentClaims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId)?.Value;
+                    using (var itor = claims.GetEnumerator())
+                    {
+                        while (itor.MoveNext())
+                        {
+                            currentClaims.Add(item:new Claim(type:itor.Current.Key, value:itor.Current.Value));
+                        }
+                    }
 
-                ClearClaims(userId:owinUserId);
-                SaveClaims(userId:owinUserId, claims:currentClaims);
+                    ClearClaims(userId:owinUserId);
+                    SaveClaims(userId:owinUserId, claims:currentClaims);
+                }
             }
         }
 
@@ -262,123 +266,132 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var emailEntries = new List<EmailEntry>();
             var authenticationResult = new AuthenticationResultDto();
-            try
+
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                var applicationUser = _userManager.FindById(userId:userId);
-                if (applicationUser == null)
+                try
                 {
-                    authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.UserNotFound;
-                    return Task.FromResult(result:authenticationResult);
-                }
+                    var applicationUser = _userManager.FindById(userId:userId);
+                    if (applicationUser == null)
+                    {
+                        authenticationResult.Success = false;
+                        authenticationResult.Result = AuthenticationResult.UserNotFound;
+                        return Task.FromResult(result:authenticationResult);
+                    }
 
-                var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
-                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+                    var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
+                    var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
-                SetPasswordPolicy(organizationSettings:organizationSettings);
+                    SetPasswordPolicy(organizationSettings:organizationSettings);
 
-                // Use PasswordValidator
-                var validateResult = _userManager.PasswordValidator.ValidateAsync(item:newPassword).Result;
-                if (validateResult.Succeeded == false)
-                {
-                    authenticationResult.Success = false;
-                    authenticationResult.Errors = validateResult.Errors;
-                    return Task.FromResult(result:authenticationResult);
-                }
+                    // Use PasswordValidator
+                    var validateResult = _userManager.PasswordValidator.ValidateAsync(item:newPassword).Result;
+                    if (validateResult.Succeeded == false)
+                    {
+                        authenticationResult.Success = false;
+                        authenticationResult.Errors = validateResult.Errors;
+                        return Task.FromResult(result:authenticationResult);
+                    }
 
-                // Check if the new password is one of the password used last # numbers
-                if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId, organizationSettings:organizationSettings))
-                {
-                    var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
-                    authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                    authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
-                    return Task.FromResult(result:authenticationResult);
-                }
+                    // Check if the new password is one of the password used last # numbers
+                    if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId, organizationSettings:organizationSettings))
+                    {
+                        var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings:organizationSettings, orgTypeName:null);
+                        authenticationResult.Success = false;
+                        authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
+                        authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
+                        return Task.FromResult(result:authenticationResult);
+                    }
 
-                _userManager.RemovePassword(userId:userId);
-                _userManager.AddPassword(userId:userId, password:newPassword);
+                    _userManager.RemovePassword(userId:userId);
+                    _userManager.AddPassword(userId:userId, password:newPassword);
 
-                //create history record
-                var history = _dbContext.UserPasswordHistories.Create();
-                history.UserProfileId = applicationUser.UserProfileId;
-                history.PasswordHash = _passwordHasher.HashPassword(password:newPassword);
-                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                _dbContext.UserPasswordHistories.Add(entity:history);
-                _dbContext.SaveChanges();
+                    //create history record
+                    var history = _dbContext.UserPasswordHistories.Create();
+                    history.UserProfileId = applicationUser.UserProfileId;
+                    history.PasswordHash = _passwordHasher.HashPassword(password:newPassword);
+                    history.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                    _dbContext.UserPasswordHistories.Add(entity:history);
+                    _dbContext.SaveChanges();
 
-                //Send Email
-                var contentReplacements = new Dictionary<string, string>();
-                var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
-                var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
+                    //Send Email
+                    var contentReplacements = new Dictionary<string, string>();
+                    var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
+                    var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
-                var authorityList = _organizationService.GetUserAuthorityListForEmailContent(userProfileId:applicationUser.UserProfileId);
-                contentReplacements.Add(key:"firstName", value:applicationUser.FirstName);
-                contentReplacements.Add(key:"lastName", value:applicationUser.LastName);
-                contentReplacements.Add(key:"authorityList", value:authorityList);
-                contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
-                contentReplacements.Add(key:"supportEmail", value:supportEmail);
-
-                var emailEntry = new EmailEntry
-                                 {
-                                     EmailType = EmailType.Profile_PasswordChanged,
-                                     ContentReplacements = contentReplacements,
-                                     RecipientEmailAddress = applicationUser.Email,
-                                     RecipientFirstName = applicationUser.FirstName,
-                                     RecipientLastName = applicationUser.LastName
-                                 };
-
-                var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
-                if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
-                {
-                    var currentOrganizationRegulatoryProgram =
-                        _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:int.Parse(s:currentOrganizationRegulatoryProgramId));
-                    emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId;
-                    emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
-                    emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId;
-                }
-
-                emailEntries.Add(item:emailEntry);
-
-                //Cromerr
-                //Need to log for all associated regulatory program orgs
-                var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
-                                                .Include(path:"OrganizationRegulatoryProgram")
-                                                .Where(u => u.UserProfileId == applicationUser.UserProfileId).ToList();
-                foreach (var actorProgramUser in orgRegProgUsers)
-                {
-                    _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
-
-                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                    cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                    cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
-                                                                      ?? cromerrAuditLogEntryDto.OrganizationId;
-                    cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
-                    cromerrAuditLogEntryDto.UserName = applicationUser.UserName;
-                    cromerrAuditLogEntryDto.UserFirstName = applicationUser.FirstName;
-                    cromerrAuditLogEntryDto.UserLastName = applicationUser.LastName;
-                    cromerrAuditLogEntryDto.UserEmailAddress = applicationUser.Email;
-                    cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-                    cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                    contentReplacements = new Dictionary<string, string>();
+                    var authorityList = _organizationService.GetUserAuthorityListForEmailContent(userProfileId:applicationUser.UserProfileId);
                     contentReplacements.Add(key:"firstName", value:applicationUser.FirstName);
                     contentReplacements.Add(key:"lastName", value:applicationUser.LastName);
-                    contentReplacements.Add(key:"userName", value:applicationUser.UserName);
-                    contentReplacements.Add(key:"emailAddress", value:applicationUser.Email);
+                    contentReplacements.Add(key:"authorityList", value:authorityList);
+                    contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
+                    contentReplacements.Add(key:"supportEmail", value:supportEmail);
 
-                    _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_PasswordChanged, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
+                    var emailEntry = new EmailEntry
+                                     {
+                                         EmailType = EmailType.Profile_PasswordChanged,
+                                         ContentReplacements = contentReplacements,
+                                         RecipientEmailAddress = applicationUser.Email,
+                                         RecipientFirstName = applicationUser.FirstName,
+                                         RecipientLastName = applicationUser.LastName
+                                     };
+
+                    var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
+                    if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
+                    {
+                        var currentOrganizationRegulatoryProgram =
+                            _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:int.Parse(s:currentOrganizationRegulatoryProgramId));
+                        emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId;
+                        emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
+                        emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId;
+                    }
+
+                    emailEntries.Add(item:emailEntry);
+
+                    //Cromerr
+                    //Need to log for all associated regulatory program orgs
+                    var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
+                                                    .Include(path:"OrganizationRegulatoryProgram")
+                                                    .Where(u => u.UserProfileId == applicationUser.UserProfileId).ToList();
+                    foreach (var actorProgramUser in orgRegProgUsers)
+                    {
+                        _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
+
+                        var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                                      {
+                                                          RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                          OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId
+                                                      };
+                        cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
+                                                                          ?? cromerrAuditLogEntryDto.OrganizationId;
+                        cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
+                        cromerrAuditLogEntryDto.UserName = applicationUser.UserName;
+                        cromerrAuditLogEntryDto.UserFirstName = applicationUser.FirstName;
+                        cromerrAuditLogEntryDto.UserLastName = applicationUser.LastName;
+                        cromerrAuditLogEntryDto.UserEmailAddress = applicationUser.Email;
+                        cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                        cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                        contentReplacements = new Dictionary<string, string>
+                                              {
+                                                  {"firstName", applicationUser.FirstName},
+                                                  {"lastName", applicationUser.LastName},
+                                                  {"userName", applicationUser.UserName},
+                                                  {"emailAddress", applicationUser.Email}
+                                              };
+
+                        _crommerAuditLogService.Log(eventType:CromerrEvent.Profile_PasswordChanged, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
+                    }
+
+                    // Send emails.
+                    _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
                 }
             }
-            catch (Exception ex)
-            {
-                authenticationResult.Success = false;
-                var errors = new List<string> {ex.Message};
-                authenticationResult.Errors = errors;
-            }
 
-            // Send emails.
-            _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
             return Task.FromResult(result:authenticationResult);
         }
 
@@ -479,7 +492,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(organizationRegulatoryProgramId:invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
-                _settingService.GetOrganizationSettingsById(organizationId:invitationRecipientProgram.RegulatorOrganizationId ?? invitationRecipientProgram.OrganizationId); 
+                _settingService.GetOrganizationSettingsById(organizationId:invitationRecipientProgram.RegulatorOrganizationId ?? invitationRecipientProgram.OrganizationId);
+
             // always get the authority settings as currently industry don't have settings 
 
             var invitationExpirationHours = ValueParser.TryParseInt(value:ConfigurationManager.AppSettings[name:"DefaultInviteExpirationHours"], defaultValue:72);
@@ -699,20 +713,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     //Send pending registration emails  
                     _linkoExchangeEmailService.SendEmails(emailEntries:emailEntries);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    var errors = new List<string> {ex.Message};
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
-
-                    registrationResult.Result = RegistrationResult.Failed;
-                    registrationResult.Errors = errors;
                     transaction.Rollback();
                     throw;
                 }
@@ -1241,14 +1243,16 @@ namespace Linko.LinkoExchange.Services.Authentication
             var organizationId = organization.OrganizationId;
             var portalName = organization.OrganizationType.Name;
 
-            var claims = new Dictionary<string, string>();
-            claims.Add(key:CacheKey.UserRole, value:userRole);
-            claims.Add(key:CacheKey.RegulatoryProgramName, value:regProgramName);
-            claims.Add(key:CacheKey.OrganizationRegulatoryProgramUserId, value:orgRegProgUserId.ToString());
-            claims.Add(key:CacheKey.OrganizationRegulatoryProgramId, value:orgRegProgId.ToString());
-            claims.Add(key:CacheKey.OrganizationName, value:organizationName);
-            claims.Add(key:CacheKey.OrganizationId, value:organizationId.ToString());
-            claims.Add(key:CacheKey.PortalName, value:portalName);
+            var claims = new Dictionary<string, string>
+                         {
+                             {CacheKey.UserRole, userRole},
+                             {CacheKey.RegulatoryProgramName, regProgramName},
+                             {CacheKey.OrganizationRegulatoryProgramUserId, orgRegProgUserId.ToString()},
+                             {CacheKey.OrganizationRegulatoryProgramId, orgRegProgId.ToString()},
+                             {CacheKey.OrganizationName, organizationName},
+                             {CacheKey.OrganizationId, organizationId.ToString()},
+                             {CacheKey.PortalName, portalName}
+                         };
 
             SetCurrentUserClaims(claims:claims);
 
@@ -1257,9 +1261,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             var programUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:orgRegProgUser);
             var user = _userService.GetUserProfileById(userProfileId:programUserDto.UserProfileId);
 
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId;
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                          {
+                                              RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                              OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId
+                                          };
             cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = orgRegProgUser.UserProfileId;
             cromerrAuditLogEntryDto.UserName = user.UserName;
@@ -1268,12 +1274,14 @@ namespace Linko.LinkoExchange.Services.Authentication
             cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
             cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add(key:"organizationName", value:programUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
-            contentReplacements.Add(key:"firstName", value:user.FirstName);
-            contentReplacements.Add(key:"lastName", value:user.LastName);
-            contentReplacements.Add(key:"userName", value:user.UserName);
-            contentReplacements.Add(key:"emailAddress", value:user.Email);
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"organizationName", programUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName},
+                                          {"firstName", user.FirstName},
+                                          {"lastName", user.LastName},
+                                          {"userName", user.UserName},
+                                          {"emailAddress", user.Email}
+                                      };
 
             _crommerAuditLogService.Log(eventType:CromerrEvent.Login_Success, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
         }
@@ -1330,9 +1338,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     // Prepare Registration Approval Emails
-                    emailEntries.AddRange(collection:PrepareApprovalEmailForRegistration(registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
-                                                                              inviterOrganizationRegulatoryProgram:authorityOrgRegProg,
-                                                                              authorityOrg:authorityOrgRegProg.OrganizationDto));
+                    emailEntries.AddRange(collection:PrepareApprovalEmailForRegistration(registeredUser:registeredUser,
+                                                                                         registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
+                                                                                         inviterOrganizationRegulatoryProgram:authorityOrgRegProg,
+                                                                                         authorityOrg:authorityOrgRegProg.OrganizationDto));
 
                     // Do COMERR Log
                     DoComerrLogForRegistration(registrationType:registrationType, registeredUser:registeredUser, registeredOrganizationRegulatoryProgram:prevRegisteredOrgRegProg,
@@ -1550,9 +1559,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 var orgRegProgram = orgRegProgUser.OrganizationRegulatoryProgram;
 
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = orgRegProgram.OrganizationId;
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                              {
+                                                  RegulatoryProgramId = orgRegProgram.RegulatoryProgramId,
+                                                  OrganizationId = orgRegProgram.OrganizationId
+                                              };
                 cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = user.UserName;
@@ -1561,11 +1572,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                var contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add(key:"firstName", value:user.FirstName);
-                contentReplacements.Add(key:"lastName", value:user.LastName);
-                contentReplacements.Add(key:"userName", value:user.UserName);
-                contentReplacements.Add(key:"emailAddress", value:user.Email);
+                var contentReplacements = new Dictionary<string, string>
+                                          {
+                                              {"firstName", user.FirstName},
+                                              {"lastName", user.LastName},
+                                              {"userName", user.UserName},
+                                              {"emailAddress", user.Email}
+                                          };
 
                 _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
@@ -1630,9 +1643,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             foreach (var programUser in programUsers)
             {
                 var user = programUser.UserProfileDto;
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                              {
+                                                  RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
+                                                  OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId
+                                              };
                 cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = user.UserName;
@@ -1641,11 +1656,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                var contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add(key:"firstName", value:user.FirstName);
-                contentReplacements.Add(key:"lastName", value:user.LastName);
-                contentReplacements.Add(key:"userName", value:user.UserName);
-                contentReplacements.Add(key:"emailAddress", value:user.Email);
+                var contentReplacements = new Dictionary<string, string>
+                                          {
+                                              {"firstName", user.FirstName},
+                                              {"lastName", user.LastName},
+                                              {"userName", user.UserName},
+                                              {"emailAddress", user.Email}
+                                          };
 
                 _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
@@ -1732,15 +1749,17 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             // get userDto's role, organizations, programs, current organization, current program.....
 
-            var claims = new List<Claim>();
-            claims.Add(item:new Claim(type:ClaimTypes.NameIdentifier, value:userProfile.Id));
-            claims.Add(item:new Claim(type:CacheKey.OwinUserId, value:userProfile.Id));
-            claims.Add(item:new Claim(type:CacheKey.UserProfileId, value:userProfile.UserProfileId.ToString()));
-            claims.Add(item:new Claim(type:CacheKey.FirstName, value:userProfile.FirstName));
-            claims.Add(item:new Claim(type:CacheKey.LastName, value:userProfile.LastName));
-            claims.Add(item:new Claim(type:CacheKey.UserName, value:userProfile.UserName));
-            claims.Add(item:new Claim(type:CacheKey.Email, value:userProfile.Email));
-            claims.Add(item:new Claim(type:CacheKey.SessionId, value:_httpContext.Current.Session.SessionID));
+            var claims = new List<Claim>
+                         {
+                             new Claim(type:ClaimTypes.NameIdentifier, value:userProfile.Id),
+                             new Claim(type:CacheKey.OwinUserId, value:userProfile.Id),
+                             new Claim(type:CacheKey.UserProfileId, value:userProfile.UserProfileId.ToString()),
+                             new Claim(type:CacheKey.FirstName, value:userProfile.FirstName),
+                             new Claim(type:CacheKey.LastName, value:userProfile.LastName),
+                             new Claim(type:CacheKey.UserName, value:userProfile.UserName),
+                             new Claim(type:CacheKey.Email, value:userProfile.Email),
+                             new Claim(type:CacheKey.SessionId, value:_httpContext.Current.Session.SessionID)
+                         };
 
             return claims;
         }

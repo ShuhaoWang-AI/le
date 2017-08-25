@@ -59,6 +59,44 @@ namespace Linko.LinkoExchange.Services.Report
 
         #region interface implementations
 
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            var retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetReportPackageTemplate":
+                    var reportPackageTemplateId = id[0];
+                    if (currentPortalName.Equals(value:"authority"))
+                    {
+                        //this will also handle scenarios where ReportPackageTemplateId doesn't even exist (regardless of ownership)
+                        var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTempates
+                                                                        .Any(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId
+                                                                                    && rpt.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        retVal = isTemplateForThisAuthorityExist;
+                    }
+                    else
+                    {
+                        var isTemplateAssigned = _dbContext.ReportPackageTemplateAssignments
+                                                           .Any(rpta => rpta.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                                        && rpta.ReportPackageTemplateId == reportPackageTemplateId);
+
+                        retVal = isTemplateAssigned;
+                    }
+
+                    break;
+
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            return retVal;
+        }
+
         /// <summary>
         ///     Delete data from other tables before delete from  ReportPackageTempates
         ///     1. Delete from tReportPackageTemplateAssignment
@@ -93,18 +131,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _logger.Info(message:"Leave ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={0}", argument:reportPackageTemplateId);
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -357,18 +386,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     return rptId;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string> {ex.Message};
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(item:ex.Message);
-                    }
-
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     throw;
                 }
             }
@@ -417,44 +437,6 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         #endregion
-
-        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
-        {
-            var retVal = false;
-
-            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
-            currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
-
-            switch (apiName)
-            {
-                case "GetReportPackageTemplate":
-                    var reportPackageTemplateId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
-                    {
-                        //this will also handle scenarios where ReportPackageTemplateId doesn't even exist (regardless of ownership)
-                        var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTempates
-                                                                        .Any(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId
-                                                                                    && rpt.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                        retVal = isTemplateForThisAuthorityExist;
-                    }
-                    else
-                    {
-                        var isTemplateAssigned = _dbContext.ReportPackageTemplateAssignments
-                                                           .Any(rpta => rpta.OrganizationRegulatoryProgramId == currentOrgRegProgramId
-                                                                        && rpta.ReportPackageTemplateId == reportPackageTemplateId);
-
-                        retVal = isTemplateAssigned;
-                    }
-
-                    break;
-
-                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
-            }
-
-            return retVal;
-        }
 
         #region private section
 

@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContext;
-        private readonly ILogger _logService;
+        private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
 
         #endregion
@@ -29,12 +29,12 @@ namespace Linko.LinkoExchange.Services.AuditLog
             LinkoExchangeContext linkoExchangeContext,
             IMapHelper mapHelper,
             IHttpContextService httpContext,
-            ILogger logService)
+            ILogger logger)
         {
             _dbContext = linkoExchangeContext;
             _mapHelper = mapHelper;
             _httpContext = httpContext;
-            _logService = logService;
+            _logger = logger;
         }
 
         #endregion
@@ -48,7 +48,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             {
                 return;
             }
-
+            
             var comment = await GetComment(commentTemplate:auditLogTemplate, replacements:contentReplacements);
 
             var cromerrAuditLogEntry = _mapHelper.GetCromerrAuditLogFromCromerrAuditLogEntryDto(dto:dto);
@@ -57,14 +57,14 @@ namespace Linko.LinkoExchange.Services.AuditLog
             cromerrAuditLogEntry.LogDateTimeUtc = DateTimeOffset.Now;
 
             _dbContext.CromerrAuditLogs.Add(entity:cromerrAuditLogEntry);
-
+            
             try
             {
                 _dbContext.SaveChanges();
             }
             catch
             {
-                _logService.Info(message:$"CromerrAuditLogService.Log. eventType={eventType}.");
+                _logger.Info(message:$"CromerrAuditLogService.Log. eventType={eventType}.");
                 throw;
             }
         }
@@ -77,17 +77,19 @@ namespace Linko.LinkoExchange.Services.AuditLog
                 return;
             }
 
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = orgRegProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = user.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = user.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                          {
+                                              RegulatoryProgramId = orgRegProgram.RegulatoryProgramId,
+                                              OrganizationId = orgRegProgram.OrganizationId,
+                                              RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId,
+                                              UserProfileId = user.UserProfileId,
+                                              UserName = user.UserName,
+                                              UserFirstName = user.FirstName,
+                                              UserLastName = user.LastName,
+                                              UserEmailAddress = user.Email,
+                                              IPAddress = _httpContext.CurrentUserIPAddress(),
+                                              HostName = _httpContext.CurrentUserHostName()
+                                          };
 
             var contentReplacements = new Dictionary<string, string>
                                       {
@@ -120,9 +122,8 @@ namespace Linko.LinkoExchange.Services.AuditLog
             var authorityOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId;
             var authorityName = _dbContext.Organizations.Single(o => o.OrganizationId == authorityOrganizationId).Name;
             var dtos = new List<CromerrAuditLogEntryDto>();
-            var entries = _dbContext.CromerrAuditLogs
-                                    .Where(l => l.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
-                                                && l.RegulatorOrganizationId == orgRegProgram.OrganizationId);
+            var entries = _dbContext.CromerrAuditLogs.Where(l => l.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
+                                                                 && l.RegulatorOrganizationId == orgRegProgram.OrganizationId);
 
             //Sort is required by EF before paging operations
             if (isSortAscending)
