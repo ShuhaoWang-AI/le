@@ -242,28 +242,28 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            //if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "userprofile"
-            //    && Request.HttpMethod != "POST"
-            //    && NeedToValidKbq())
-            //{
-            //    var kbqPass = TempData[key:"KbqPass"] as string;
-            //    if (!string.IsNullOrWhiteSpace(value:kbqPass) && kbqPass.ToLower() == "true")
-            //    {
-            //        base.OnActionExecuting(filterContext:filterContext);
-            //    }
-            //    else
-            //    {
-            //        filterContext.Result = new RedirectToRouteResult(
-            //                                                         routeValues:new RouteValueDictionary
-            //                                                                     {
-            //                                                                         {"action", "KbqChallenge"},
-            //                                                                         {"controller", "Account"},
-            //                                                                         {"returnUrl", filterContext.HttpContext.Request.Url}
-            //                                                                     }
-            //                                                        );
-            //    }
-            //}
-            //else
+            if (filterContext.RouteData.Values[key: "action"].ToString().ToLower() == "userprofile"
+                && Request.HttpMethod != "POST"
+                && NeedToValidKbq())
+            {
+                var kbqPass = TempData[key:"KbqPass"] as string;
+                if (!string.IsNullOrWhiteSpace(value: kbqPass) && kbqPass.ToLower() == "true")
+                {
+                    base.OnActionExecuting(filterContext: filterContext);
+                }
+                else
+                {
+                    filterContext.Result = new RedirectToRouteResult(
+                                                                     routeValues: new RouteValueDictionary
+                                                                                 {
+                                                                                     {"action", "KbqChallenge"},
+                                                                                     {"controller", "Account"},
+                                                                                     {"returnUrl", filterContext.HttpContext.Request.Url}
+                                                                                 }
+                                                                    );
+                }
+            }
+            else
             {
                 base.OnActionExecuting(filterContext:filterContext);
             }
