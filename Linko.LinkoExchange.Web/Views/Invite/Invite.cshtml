@@ -2,7 +2,7 @@
 @model Linko.LinkoExchange.Web.ViewModels.Shared.InviteViewModel
 
 @{
-    ViewBag.Title = "Invite";
+    ViewBag.Title = "Invite"; 
 }
 
 <section>
@@ -169,6 +169,14 @@
                                                                                        })
                     </div>
                 </div>
+            </div> 
+            
+            <div id="additionInfoDiv" style="display:none">
+                 <div class="col-md-offset-1">
+                     <label class="control-label">
+                         Inivite User to @ViewBag.OrganizationName   @ViewBag.PortalName portal ?
+                     </label>
+                 </div>
             </div>
         </section>
         <div class="box-footer">
@@ -223,10 +231,8 @@
                                 emailAddress: $("#EmailAddress").val(),
                                 orgRegProgramIdString: $("#OrgRegProgramId").val()
                             },
-                            function(data, status)
-                            {
-                                //alert("Data: " + data + "\nStatus: " + status);
-
+                            function(data)
+                            { 
                                 $("#btnSearchEmail").hide();
                                 $("#btnCancelInvite").show();
 
@@ -238,6 +244,8 @@
                                 $("#boxHeader").html("Search Result");
 
                                 $("#EmailAddress").prop('readonly', true);
+
+                                $('#additionInfoDiv').show();
 
                                 if (data.FirstName == null && data.LastName == null)
                                 {

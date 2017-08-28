@@ -53,6 +53,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             model.InvitationType = (InvitationType) Enum.Parse(enumType:typeof(InvitationType), value:invitationType);
+
+            ViewBag.OrganizationName = _httpContextService.GetClaimValue(CacheKey.OrganizationName); 
+            ViewBag.PortalName = _httpContextService.GetClaimValue(CacheKey.PortalName); 
+
             return View(model:model);
         }
 
