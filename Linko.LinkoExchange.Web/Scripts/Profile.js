@@ -116,11 +116,11 @@
         $('.fa-edit').on('click', clickEdit);
         $('.fa-save').on('click', clickSave);
         $('.fa-undo').on('click', clickCancel);
-
-        setKbqAnswerEntryKey();
+ 
+        setKeyEventHandler(); 
     }
 
-    function setKbqAnswerEntryKey() {
+    function setKeyEventHandler() {
         var qaDivs = $("#kbq-panel").find(".kbq-div");
         qaDivs.map(function (idx, ele) {
             $(ele).on("keyup", function (evt) {
@@ -129,11 +129,29 @@
                         clickSave.apply($(ele).find('.fa-save'));
                     } else if ($(evt.target).is(".fa-edit")) {
                         clickEdit.apply(evt.target);
-                    } 
+                    }
+                } else if($(evt.target).is(".text-box")){
+                    editChanged.apply(evt.target);
                 }
             });
         });
+
+        setEditEventHandler(); 
     };
+
+    function setEditEventHandler() {
+        var inputs = $("#kbq-panel").find("input[type='text']");
+
+        inputs.each(function (idx, obj) {
+            obj.onchange = editChanged;
+            $(obj).val(obj.value).change();
+        }); 
+    }
+
+    function editChanged() {
+        var qaDiv = $(this).closest(".kbq-div");
+        qaDiv.find(".field-validation-error").text("");
+    }
 
     function clickCancel() {
         var qaDiv = $(this).closest(".kbq-div"); 
@@ -148,6 +166,7 @@
         $(this).hide();
         $(this).siblings(".fa-save").hide();
         $(this).siblings(".fa-edit").show();
+        qaDiv.find(".field-validation-error").text("");
     }
 
     function clickSave() {
@@ -160,8 +179,7 @@
         if (!answer) {
             return;
         }
-
-        qaDiv.find(".fa-undo").hide();
+         
         qaDiv.find(".fa-spinner").show();
 
         // update this question, and value   
@@ -200,6 +218,9 @@
                 errorPanel.find('ul').append("<li>" + data.message + "</li>");
                 $('#summaryDiv').append(errorPanel);
                 errorPanel.show();
+                
+                //display error message below the edit textbox 
+                qaDiv.find(".field-validation-error").text(data.message);
             }
         });
     }
