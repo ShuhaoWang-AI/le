@@ -115,7 +115,7 @@
         $('.fa-save').hide();
         $('.fa-edit').on('click', clickEdit);
         $('.fa-save').on('click', clickSave);
-        $('.fa-times-circle').on('click', clickCancel);
+        $('.fa-undo').on('click', clickCancel);
 
         setKbqAnswerEntryKey();
     }
@@ -139,8 +139,8 @@
         var qaDiv = $(this).closest(".kbq-div"); 
         qaDiv.find("select").attr('readonly', "disabled");
         qaDiv.find("select").attr("disabled", "true");
-        qaDiv.find("input[type='text").attr('disabled', "disabled");
-        qaDiv.find("input[type='password").attr('disabled', "disabled");
+        qaDiv.find("input[type='text']").attr('disabled', "disabled");
+        qaDiv.find("input[type='password']").attr('disabled', "disabled");
 
         qaDiv.find("input[type='password']").show();
         qaDiv.find("input[type='text']").hide();
@@ -161,7 +161,7 @@
             return;
         }
 
-        qaDiv.find(".fa-times-circle").hide();
+        qaDiv.find(".fa-undo").hide();
         qaDiv.find(".fa-spinner").show();
 
         // update this question, and value   
@@ -177,7 +177,7 @@
 
                 $('.fa-save').hide();
                 $('.fa-save').siblings('.fa-edit').show();
-                $('.fa-times-circle').hide(); 
+                $('.fa-undo').hide(); 
 
                 $("#summaryDiv").empty();
 
@@ -218,9 +218,10 @@
             return !value;
         });
         qaDiv.find("input[type='text']").removeAttr("readonly");
+        qaDiv.find("input[type='text']").removeAttr("disabled");
         $(this).hide();
         $(this).siblings('.fa-save').show();
-        $(this).siblings('.fa-times-circle').show();
+        $(this).siblings('.fa-undo').show();
     }
 
     $(document).on('change', "select", function () {
