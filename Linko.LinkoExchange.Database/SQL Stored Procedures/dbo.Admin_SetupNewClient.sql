@@ -148,6 +148,18 @@ BEGIN TRANSACTION
         AND otrp.RegulatoryProgramId = @RegulatoryProgramId;
 
 
+    -- Add records to tOrganizationRegulatoryProgramModule
+    INSERT INTO dbo.tOrganizationRegulatoryProgramModule (OrganizationRegulatoryProgramId, ModuleId)
+	SELECT orp.OrganizationRegulatoryProgramId, m.ModuleId
+    FROM dbo.tModule m
+        CROSS JOIN dbo.tOrganizationRegulatoryProgram orp
+        INNER JOIN dbo.tOrganizationTypeRegulatoryProgram otrp ON otrp.OrganizationTypeRegulatoryProgramId = m.OrganizationTypeRegulatoryProgramId
+    WHERE orp.OrganizationId = @OrganizationId
+        AND orp.RegulatoryProgramId = otrp.RegulatoryProgramId
+        AND otrp.OrganizationTypeId = @OrganizationTypeId
+        AND otrp.RegulatoryProgramId = @RegulatoryProgramId;
+
+
     -- Add records to tOrganizationRegulatoryProgramUser
     DECLARE @OrganizationRegulatoryProgramId int;
     SELECT @OrganizationRegulatoryProgramId = OrganizationRegulatoryProgramId 
@@ -165,6 +177,17 @@ BEGIN TRANSACTION
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
+        );
+    
+
+    -- Add 'Samples and Results' to tReportElementType
+    INSERT INTO dbo.tReportElementType (Name, Description, ReportElementCategoryId, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Samples and Results'
+            , 'Sample results'
+            , 1
+            , @OrganizationRegulatoryProgramId
         );
 
 COMMIT TRANSACTION
