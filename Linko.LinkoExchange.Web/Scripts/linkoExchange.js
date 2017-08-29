@@ -226,106 +226,59 @@ function limitTextAreaMaxCharacters()
     }
 }
 
-function setTelephoneMask()
-{
+function setTelephoneMask() {
     init("tel");
 
-    function init(eleType)
-    {
-        var key = "input[type='" + eleType + "'";
-        $(key)
-            .each(function(idx, obj)
-            {
-                obj.onkeypress = digitalKeysInit;
-                obj.onkeyup = phoneNumberMask;
-                obj.change = phoneNumberMask;
-                $(obj).val(obj.value).change();
-            });
+    function init(eleType) {
+        var key = "input[type='" + eleType + "']";
+        $(key).each(function (idx, obj) {
+            obj.onchange = onValueChanged;
+            $(obj).val(obj.value).change();
+        });
     }
 
-    function digitalKeysInit(keyEvent)
-    {
-        var ret;
-        if ((keyEvent.charCode >= 48 && keyEvent.charCode <= 57)
-            || keyEvent.keyCode === 9
-            || keyEvent.keyCode === 10
-            || keyEvent.keyCode === 13
-            || keyEvent.keyCode === 8
-            || keyEvent.keyCode === 116
-            || keyEvent.keyCode === 46
-            || (keyEvent.keyCode <= 40 && keyEvent.keyCode >= 37))
-        {
-            ret = true;
+    function onValueChanged() {
+        var value = this.value;
+        var isNumber = /^[0-9]+$/.test(value);
+        if (isNumber && (value.length === 7 || value.length === 10)) {
+            phoneNumberMask.call(this);
         }
-        else
-        {
-            ret = false;
-        }
-        return ret;
     }
 
-    function phoneNumberMask()
-    {
+    function phoneNumberMask() {
         var digitalMask10 = "(XXX) XXX-XXXX";
         var digitalMask7 = "XXX-XXXX";
 
-        var textInput = this.value;
-        var telephoneNumbers = [];
+        var telephoneNumbers = this.value.split('');
         var formatOutPut = "";
 
-        for (var i = 0; i < textInput.length; i++)
-        {
-            if (!isNaN(textInput.charAt(i)) && textInput.charAt(i) !== " ")
-            {
-                telephoneNumbers.push(textInput.charAt(i));
-            }
-        }
-
         // format the string
-        if (telephoneNumbers.length === 7)
-        {
-            for (var j = 0; j < digitalMask7.length; j++)
-            {
-                if (digitalMask7.charAt(j) === "X")
-                {
-                    if (telephoneNumbers.length === 0)
-                    {
+        if (telephoneNumbers.length === 7) {
+            for (var j = 0; j < digitalMask7.length; j++) {
+                if (digitalMask7.charAt(j) === "X") {
+                    if (telephoneNumbers.length === 0) {
                         formatOutPut = formatOutPut + digitalMask7.charAt(j);
-                    }
-                    else
-                    {
+                    } else {
                         formatOutPut = formatOutPut + telephoneNumbers.shift();
                     }
-                }
-                else
-                {
+                } else {
                     formatOutPut = formatOutPut + digitalMask7.charAt(j);
                 }
             }
         }
-        else if (telephoneNumbers.length === 10)
-        {
-            for (var j = 0; j < digitalMask10.length; j++)
-            {
-                if (digitalMask10.charAt(j) === "X")
-                {
-                    if (telephoneNumbers.length === 0)
-                    {
+        else if (telephoneNumbers.length === 10) {
+            for (var j = 0; j < digitalMask10.length; j++) {
+                if (digitalMask10.charAt(j) === "X") {
+                    if (telephoneNumbers.length === 0) {
                         formatOutPut = formatOutPut + digitalMask10.charAt(j);
-                    }
-                    else
-                    {
+                    } else {
                         formatOutPut = formatOutPut + telephoneNumbers.shift();
                     }
-                }
-                else
-                {
+                } else {
                     formatOutPut = formatOutPut + digitalMask10.charAt(j);
                 }
             }
-        }
-        else
-        {
+        } else {
             formatOutPut = telephoneNumbers.join("");
         }
 
