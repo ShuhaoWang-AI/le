@@ -95,12 +95,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions);
 
         /// <summary>
-        /// Validates the user KBQ to update.
+        /// Validates the user question answer.
         /// </summary>
         /// <param name="userProfileId">The user profile identifier.</param>
-        /// <param name="kbq">The KBQ.</param>
+        /// <param name="questionAnswerDto">The question answer dto.</param>
         /// <returns></returns>
-        RegistrationResult ValidateUserKbqToUpdate(int userProfileId, AnswerDto kbq);
+        IEnumerable<RegistrationResult> ValidateUserQuestionAnswer(int userProfileId, AnswerDto questionAnswerDto);
 
         /// <summary>
         ///     - Check for duplicated security questions

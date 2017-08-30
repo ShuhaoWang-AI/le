@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -10,14 +9,14 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.HttpContext; 
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.AspNet.Identity;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
-    public class QuestionAnswerService : IQuestionAnswerService
+    public class QuestionAnswerService:IQuestionAnswerService
     {
         #region fields
 
@@ -28,7 +27,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IHttpContextService _httpContext;
         private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
         private readonly IOrganizationService _orgService;
-        private readonly IPasswordHasher _passwordHasher; 
+        private readonly IPasswordHasher _passwordHasher;
 
         #endregion
 
@@ -51,7 +50,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _globalSettings = settingService.GetGlobalSettings();
             _orgService = orgService;
             _crommerAuditLogService = crommerAuditLogService;
-            _linkoExchangeEmailService = linkoExchangeEmailService; 
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         #endregion
@@ -294,7 +293,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                                                                                                                      emailType:EmailType.Profile_SecurityQuestionsChanged,
                                                                                                                      contentReplacements:contentReplacements));
                     }
-                    
+
                     // Do email audit log.
                     _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
 
@@ -332,7 +331,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     answer.Content = _encryption.EncryptString(readableString:answer.Content.Trim());
                 }
 
-                answerToUpdate.QuestionId = answer.QuestionId; 
+                answerToUpdate.QuestionId = answer.QuestionId;
                 answerToUpdate.Content = answer.Content;
                 answerToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
@@ -456,36 +455,17 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         }
 
         /// <summary>
-        /// Validates the user KBQ to update.
+        /// Validates the user question answer.
         /// </summary>
         /// <param name="userProfileId">The user profile identifier.</param>
-        /// <param name="kbq">The KBQ.</param>
+        /// <param name="questionAnswerDto">The question answer dto.</param>
         /// <returns></returns>
-        public RegistrationResult ValidateUserKbqToUpdate(int userProfileId, AnswerDto kbq)
+        public IEnumerable<RegistrationResult> ValidateUserQuestionAnswer(int userProfileId, AnswerDto questionAnswerDto)
         {
-            if (string.IsNullOrWhiteSpace(kbq.Content))
-            {
-                return RegistrationResult.MissingKBQAnswer;
-            }
-
-            // check if the quetionId is duplicated 
-            if(_dbContext.UserQuestionAnswers.Any(i=> i.UserProfileId == userProfileId && i.QuestionId == kbq.QuestionId && i.UserQuestionAnswerId != kbq.UserQuestionAnswerId)) 
-            {
-                return RegistrationResult.DuplicatedKBQ;
-            }
-
-            // check if the content is duplicated with others 
-            var userQuestionAnswers = _dbContext.UserQuestionAnswers.Where(i=>i.UserProfileId == userProfileId && i.QuestionId != kbq.QuestionId).ToList();
-            foreach (var uqa in userQuestionAnswers)
-            {
-                var verifyKbqAnser = _passwordHasher.VerifyHashedPassword(uqa.Content, kbq.Content);
-                if (verifyKbqAnser == PasswordVerificationResult.Success)
-                {
-                    return RegistrationResult.DuplicatedKBQAnswer;
-                }
-            }
-
-            return RegistrationResult.Success;
+             if(questionAnswerDto.QuestionTypeName == QuestionTypeName.KBQ) 
+                return ValidateKbq(userProfileId, questionAnswerDto); 
+             else
+                return ValidateSecurityQuestion(userProfileId, questionAnswerDto);
         }
 
         public RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions)
@@ -568,6 +548,91 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 //_logger.Error("SubmitPOMDetails. Null question or missing QuestionId.");
                 throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }
+        }
+
+        private IEnumerable<RegistrationResult> ValidateKbq(int userProfileId, AnswerDto kbq)
+        {
+            var results = new List<RegistrationResult>(); 
+
+            // check if the quetionId is duplicated 
+            if (_dbContext.UserQuestionAnswers.Any(i => i.UserProfileId == userProfileId && i.QuestionId == kbq.QuestionId && i.UserQuestionAnswerId != kbq.UserQuestionAnswerId))
+            {
+                results.Add(RegistrationResult.DuplicatedKBQ);
+            }
+
+            if (string.IsNullOrWhiteSpace(value:kbq.Content))
+            {
+                if (kbq.QuestionTypeName == QuestionTypeName.KBQ)
+                {
+                    results.Add(RegistrationResult.MissingKBQAnswer);
+                }
+            }
+            else
+            {
+                // check if the content is duplicated with others 
+                if (kbq.QuestionTypeName == QuestionTypeName.KBQ)
+                {
+                    var userQuestionAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId && i.UserQuestionAnswerId != kbq.UserQuestionAnswerId
+                                                                                        && i.Question.QuestionType.Name == QuestionTypeName.KBQ.ToString()).ToList();
+                    foreach (var uqa in userQuestionAnswers)
+                    {
+                        var verifyKbqAnser = _passwordHasher.VerifyHashedPassword(hashedPassword:uqa.Content, providedPassword:kbq.Content);
+                        if (verifyKbqAnser == PasswordVerificationResult.Success)
+                        {
+                            results.Add(RegistrationResult.DuplicatedKBQAnswer);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(!results.Any())
+            {
+                results.Add(RegistrationResult.Success); 
+            }
+
+            return results;  
+        }
+
+        private IEnumerable<RegistrationResult> ValidateSecurityQuestion(int userProfileId, AnswerDto securityQuestion)
+        {
+             var results = new List<RegistrationResult>(); 
+             
+            // check if the quetionId is duplicated 
+            if (_dbContext.UserQuestionAnswers.Any(i =>
+                                                       i.UserProfileId == userProfileId
+                                                       && i.QuestionId == securityQuestion.QuestionId
+                                                       && i.UserQuestionAnswerId != securityQuestion.UserQuestionAnswerId))
+            {
+                results.Add(RegistrationResult.DuplicatedSecurityQuestion);
+            }
+
+            
+            if (string.IsNullOrWhiteSpace(value:securityQuestion.Content))
+            {
+                results.Add(RegistrationResult.MissingSecurityQuestionAnswer);
+            } 
+            else
+            {
+                // check if the content is duplicated with others 
+                var userQuestionAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId && i.UserQuestionAnswerId != securityQuestion.UserQuestionAnswerId
+                                                                                    && i.Question.QuestionType.Name == QuestionTypeName.SQ.ToString()).ToList();
+                foreach (var uqa in userQuestionAnswers)
+                {
+                    if (StringCipher.Decrypt(cipherText:uqa.Content).Equals(value:securityQuestion.Content))
+                    {
+                        results.Add(RegistrationResult.DuplicatedSecurityQuestionAnswer);
+                        break;
+                    }
+                }
+            }
+            
+            if(!results.Any())
+            {
+                results.Add(RegistrationResult.Success); 
+            }
+
+            return results;  
         }
     }
 }

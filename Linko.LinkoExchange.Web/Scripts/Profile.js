@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-
+      
     $(".editabledDiv input").attr("readonly", true);
     $(".editabledDiv select").attr("readonly", "disabled");
 
@@ -108,10 +108,10 @@
         }
     });
 
-    kbqUpdateInit();
+    questionAnswerEventHandlerInit();
     
     // implementations 
-    function kbqUpdateInit() {
+    function questionAnswerEventHandlerInit() {
         $('.fa-save').hide();
         $('.fa-edit').on('click', clickEdit);
         $('.fa-save').on('click', clickSave);
@@ -121,7 +121,7 @@
     }
 
     function setKeyEventHandler() {
-        var qaDivs = $("#kbq-panel").find(".kbq-div");
+        var qaDivs = $(".question-answer-div");
         qaDivs.map(function (idx, ele) {
             $(ele).on("keyup", function (evt) {
                 if (evt.which === 13) {
@@ -140,7 +140,7 @@
     };
 
     function setEditEventHandler() {
-        var inputs = $("#kbq-panel").find("input[type='text']");
+        var inputs = $(".question-answer-div").find("input[type='text']");
 
         inputs.each(function (idx, obj) {
             obj.onchange = editChanged;
@@ -148,21 +148,50 @@
         }); 
     }
 
+
     function editChanged() {
-        var qaDiv = $(this).closest(".kbq-div");
-        qaDiv.find(".field-validation-error").text("");
+        var qaDiv = $(this).closest(".question-answer-div");
+
+        var questionAnswerId = qaDiv.find("#questionAnswerId").val();
+        var answerErrorDivId = "#Content" + questionAnswerId + "-error";
+
+        if (!this.value) {
+            qaDiv.find(answerErrorDivId).text("Question answer cannot be empty.");
+            return;
+        } else {
+            qaDiv.find(answerErrorDivId).text("");
+        }
     }
 
     function clickCancel() {
-        var qaDiv = $(this).closest(".kbq-div"); 
+        var qaDiv = $(this).closest(".question-answer-div");
         qaDiv.find("select").attr('readonly', "disabled");
         qaDiv.find("select").attr("disabled", "true");
         qaDiv.find("input[type='text']").attr('disabled', "disabled");
         qaDiv.find("input[type='password']").attr('disabled', "disabled");
 
-        qaDiv.find("input[type='password']").show();
-        qaDiv.find("input[type='text']").hide();
+        // restore the last selected question, and last text box value 
+        var lastSelected = qaDiv.find("#lastSelected").val();
+        var options = qaDiv.find("select").find("option");
+        options.each(function (idx, ele) {
+            if (ele.value !== lastSelected) {
+                $(ele).removeAttr('selected');
+            } else {
+                $(ele).attr('selected', 'selected');
+            }
+        });
 
+        var password = qaDiv.find("input[type='password']");
+        if (password.length > 0) {
+            password.show();
+            qaDiv.find("input[type='text']").hide();
+        } else {
+            // restore the textbox lastValue
+            var lastValue = qaDiv.find("#lastValue").val();
+            qaDiv.find("input[type='text']").val(lastValue);
+            qaDiv.find("input[type='text']").show();
+        }
+        
         $(this).hide();
         $(this).siblings(".fa-save").hide();
         $(this).siblings(".fa-edit").show();
@@ -171,68 +200,125 @@
 
     function clickSave() {
 
-        var qaDiv = $(this).closest(".kbq-div");
-        var questionIndex = qaDiv.find("select")[0].selectedIndex + 1;
+        var qaDiv = $(this).closest(".question-answer-div");
+        var select = qaDiv.find("select")[0];
+        var options = select.options;
+        var questionIndex = options[select.selectedIndex].value;
         var answer = qaDiv.find("input[type='text']")[0].value;
-        var questionAnswerId = qaDiv.find("input[type='hidden']")[0].value;
+        var questionAnswerId = qaDiv.find("#questionAnswerId").val();
+
+        var questionErrorDivId = "#Question" + questionAnswerId + "-error";
+        var answerErrorDivId = "#Content" + questionAnswerId + "-error";
 
         if (!answer) {
+            qaDiv.find(answerErrorDivId).text("Question answer cannot be empty.");
             return;
         }
-         
+
         qaDiv.find(".fa-spinner").show();
 
         // update this question, and value   
         var qa = {
             questionId: questionIndex,
             questionAnswerId: questionAnswerId,
-            content: answer
+            content: answer,
+            questionTypeName: "KBQ"
         };
 
-        $.post("/User/Profile/UpdateOneKbq", qa, function (data) {
+        var inKbq = true;
+        var url = "/User/Profile/UpdateQuestionAnswer";
+        if ($.contains($("#sq-panel")[0], qaDiv[0])) {
+            inKbq = false;
+            qa.questionTypeName = "SQ";
+        }
+
+        $.post(url, qa, function (data) {
             qaDiv.find(".fa-spinner").hide();
             if (data && data.result === "true") {
 
-                $('.fa-save').hide();
-                $('.fa-save').siblings('.fa-edit').show();
-                $('.fa-undo').hide(); 
+                qaDiv.find('.fa-save').hide();
+                qaDiv.find('.fa-save').siblings('.fa-edit').show();
+                qaDiv.find('.fa-undo').hide();
 
-                $("#summaryDiv").empty();
+                $("#succeedPanel").find("ul").empty();
+                var succeedPanel = qaDiv.find(".succeedPanel");
+                if (succeedPanel.length < 1) {
+                    succeedPanel = $("#succeedPanel").clone();
+                    succeedPanel.removeAttr("id");
+                    succeedPanel.addClass("succeedPanel");
+                }
 
-                var succeedDiv = $("#succeedPanel").clone();
-                succeedDiv.find('ul').append("<li>" + data.message + "</li>");
-                $('#summaryDiv').append(succeedDiv);
-                succeedDiv.show();
+                succeedPanel.find('ul').append("<li>" + data.message + "</li>");
+
+                var summaryDiv = qaDiv.closest('.box-primary').find(".summaryDiv");
+                summaryDiv.empty();
+                summaryDiv.append(succeedPanel);
+
+                succeedPanel.show();
 
                 // disable the list the text
                 qaDiv.find("select").attr('readonly', "disabled");
                 qaDiv.find("select").attr("disabled", "true");
+                qaDiv.find("input[type='text']").attr("readonly", "readonly");
+                if (inKbq) {
+                    qaDiv.find("input[type='password']").show();
+                    qaDiv.find("input[type='text']").hide();
+                }
 
-                qaDiv.find("input[type='password']").show();
-                qaDiv.find("input[type='text']").hide();
+                // update the selected question, and text box value
+                qaDiv.find("#lastValue").val(answer);
+                qaDiv.find("#lastSelected").val(questionIndex);
 
             } else {
                 // display the error
-                $("#summaryDiv").empty();
-                var errorPanel = $("#errorPanel").clone();
-                errorPanel.find('ul').append("<li>" + data.message + "</li>");
-                $('#summaryDiv').append(errorPanel);
+                var errorPanel = qaDiv.find(".errorPanel");
+                if (errorPanel.length < 1) {
+                    errorPanel = $("#errorPanel").clone();
+                    errorPanel.removeAttr("id");
+                    errorPanel.addClass("errorPanel");
+                }
+
+                var errors = data.answerErrors.concat(data.questionErrors);
+                var messages = errors.map(function (m) {
+                    return "<li>" + m + "</li>";
+                });
+
+                errorPanel.find('ul').append(messages);
+
+                var summaryDiv = qaDiv.closest('.box-primary').find(".summaryDiv");
+                summaryDiv.empty();
+                summaryDiv.append(errorPanel);
                 errorPanel.show();
-                
-                //display error message below the edit textbox 
-                qaDiv.find(".field-validation-error").text(data.message);
-            }
+
+                //display error message below the edit textbox   
+
+                var answerErrors = data.answerErrors.join(",");
+                var questionErrors = data.questionErrors.join(",");
+                if (answerErrors.length > 0) {
+                    qaDiv.find(answerErrorDivId).text(answerErrors);
+                }
+
+                if (questionErrors.length > 0) {
+                    qaDiv.find(questionErrorDivId).text(questionErrors);
+                }
+            };
         });
     }
 
     function clickEdit() {
-        var qaDiv = $(this).closest(".kbq-div");
+        var qaDiv = $(this).closest(".question-answer-div");
 
         qaDiv.find("select").attr('readonly', null);
         qaDiv.find("select").attr('disabled', null);
 
         qaDiv.find("input[type='password']").hide();
-        qaDiv.find("input[type='text']").val("");
+        
+        if ($.contains($("#kbq-panel")[0], qaDiv[0])) {
+
+            var oldValues = qaDiv.find("input[type='text']").val();
+            qaDiv.find("input[type='text']").val("");
+            qaDiv.find("#lastValue").val(oldValues); 
+        }
 
         qaDiv.find("input[type='text']").show();
         qaDiv.find("input[type='text']").prop('readonly', function (i, value) {

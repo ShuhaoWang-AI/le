@@ -1,66 +1,82 @@
-﻿@using Linko.LinkoExchange.Web.ViewModels.User
-@model KbqViewModel
+﻿@using Linko.LinkoExchange.Services.Dto
+@using Linko.LinkoExchange.Web.ViewModels.User
+@model QuestionAnswerViewModel
 
 @{
-    var kbqQuestionPool = (List<QuestionViewModel>) ViewData["QuestionAnswers"];
+    var questionPool = (List<QuestionViewModel>) ViewData[key:"QuestionAnswers"];
+    var editHint = (string) ViewData[key:"EditHint"];
 }
-<div class="kbq-div">
-    <!-- question 1 -->
+<div class="question-answer-div">
+    <!-- question -->
     <div class="form-group">
         <div class="col-md-2 control-label">
-            <label for=@Model.QuestionLabel.Replace(" ", "")> @Model.QuestionLabel </label>
+            <label for=@Model.QuestionLabel.Replace(oldValue:" ", newValue:"")> @Model.QuestionLabel </label>
         </div>
         <div class="col-md-8 kbq">
-            @Html.DropDownList(Model.QuestionLabel.Replace(" ", ""),
-                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                       {
-                                                           Text = i.Content,
-                                                           Value = i.QuestionId.Value.ToString(),
-                                                           Selected = Model.QuestionId == i.QuestionId.Value
-                                                       }),
+            @Html.DropDownList(name:Model.QuestionLabel.Replace(oldValue:" ", newValue:""),
+                selectList:questionPool.Select(i => new SelectListItem
+                                                    {
+                                                        Text = i.Content,
+                                                        Value = i.QuestionId.Value.ToString(),
+                                                        Selected = Model.QuestionId == i.QuestionId.Value
+                                                    }),
                 htmlAttributes:new
                                {
                                    @class = "form-control",
                                    disabled = "disabled"
                                })
+            <input type="hidden" id="lastSelected" value="@Model.QuestionId" />
+            @Html.ValidationMessage(modelName:"Question" + Model.QuestionAnswerId,
+                                    validationMessage:"",
+                                    htmlAttributes:new
+                                    {
+                                        @class = "text-danger field-validation-error",
+                                        ID="Question" + Model.QuestionAnswerId + "-error"
+                                    })
         </div>
         <div class="col-md-2 tools">
-            <i class="fa fa-2x fa-edit" tabindex="0" title="Update Knowledge Based Question"></i>
+            <i class="fa fa-2x fa-edit" tabindex="0" title="@editHint"></i>
             <i class="fa fa-2x fa-save" title="Save changes"></i>
             <i class="fa fa-2x fa-undo" style="display: none; margin-left: 3px;" title="Cancel changes"></i>
             <i class="fa fa-2x fa-spin fa-spinner" style="display: none; margin-left: 3px;"></i>
         </div>
     </div>
 
-    <!-- answer 1 -->
+    <!-- answer -->
     <div class="form-group">
         <div class="col-md-2 control-label ">
-            <label class="control-label required" for=@Model.AnswerLabel.Replace(" ", "") aria-required="true"> @Model.AnswerLabel </label>
+            <label class="control-label required" for=@Model.AnswerLabel.Replace(oldValue:" ", newValue:"") aria-required="true"> @Model.AnswerLabel </label>
         </div>
 
         <div class="col-md-8">
-            <input class="disabled form-control" type="password" value="*******" />
+            @if (Model.QuestionTypeName == QuestionTypeName.KBQ)
+            {
+                <input class="disabled form-control" type="password" value="*******" />
+            }
+             
+            <input type="hidden" id="questionAnswerId" value="@Model.QuestionAnswerId" />
+            <input type="hidden" id="lastValue" value="@Model.Content" />
 
-            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
-            <input type="hidden" name="@Html.NameFor(x => Model.QuestionAnswerId)" value="@Model.QuestionAnswerId" />
-            @Html.Editor("Content" + Model.QuestionAnswerId,
+            @Html.Editor(expression:"Content" + Model.QuestionAnswerId,
                 additionalViewData:new
                                    {
                                        htmlAttributes = new
                                                         {
-                                                            @class = "form-control",
-                                                            autocomplete = "off",
-                                                            maxlength = 50
+                                                            Class = "form-control",
+                                                            Autocomplete = "off",
+                                                            Maxlength = 50,
+                                                            Value = Model.Content
                                                         }
                                    })
 
             @Html.ValidationMessage(
-                                    "Content" + Model.QuestionAnswerId + "-error",
+                                    "Content" + Model.QuestionAnswerId,
                 validationMessage:"",
                 htmlAttributes:new
-                               {
-                                   @class = "text-danger field-validation-error"
-                               })
+                {
+                    @class = "text-danger field-validation-error",
+                    Id = "Content" + Model.QuestionAnswerId + "-error",
+                })
         </div>
 
         <div class="col-md-2"></div>
