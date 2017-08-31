@@ -173,8 +173,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [PortalAuthorize("authority", "industry")]
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        [Route(template:"Profile/UpdateOneKbq")]
-        public JsonResult UpdateOneKbq(KbqViewModel kbqViewModel)
+        [Route(template:"Profile/UpdateQuestionAnswer")]
+        public JsonResult UpdateQuestionAnswer(QuestionAnswerViewModel questionAnswerViewModel)
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
@@ -182,42 +182,56 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var questionAnswerDto = new AnswerDto
             {
-                QuestionId = kbqViewModel.QuestionId,
-                UserQuestionAnswerId = kbqViewModel.QuestionAnswerId,
-                Content = kbqViewModel.Content,
+                QuestionId = questionAnswerViewModel.QuestionId,
+                UserQuestionAnswerId = questionAnswerViewModel.QuestionAnswerId,
+                Content = questionAnswerViewModel.Content,
+                QuestionTypeName = questionAnswerViewModel.QuestionTypeName
             };
+            
+            var validateResults = _questionAnswerService.ValidateUserQuestionAnswer(userProfileId, questionAnswerDto); 
+            
+            var answerErrors = new List<string>();  
+            var questionErrors =  new List<string>(); 
 
-            string message="";
+            foreach(var validateResult in validateResults)
+            {
+                switch (validateResult)
+                {
+                    case RegistrationResult.DuplicatedKBQ:
+                    case RegistrationResult.DuplicatedSecurityQuestion:
+                        questionErrors.Add("Question cannot be duplicated with others."); 
+                        break;
+                    case RegistrationResult.MissingKBQAnswer:
+                    case RegistrationResult.MissingSecurityQuestionAnswer:
+                        answerErrors.Add("Question answer cannot be empty."); 
+                        break;
+                    case RegistrationResult.DuplicatedKBQAnswer:
+                    case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+                        answerErrors.Add("Question answer cannot be duplicated with others."); 
+                        break;
+                }
+            }
 
-            var validateResult = _questionAnswerService.ValidateUserKbqToUpdate(userProfileId, questionAnswerDto);
-            if (validateResult == RegistrationResult.MissingKBQAnswer)
-            {
-                message = "Question answer cannot be empty.";
-            }
-            else if (validateResult == RegistrationResult.DuplicatedKBQ)
-            {
-                message = "Question cannot be duplicated with others.";
-            }
-            else if (validateResult == RegistrationResult.DuplicatedKBQAnswer)
-            {
-                message = "Question answer cannot be duplicated with others.";
-            }
-
-            if (!string.IsNullOrWhiteSpace(message))
+            if (answerErrors.Any() || questionErrors.Any())
             {
                 return Json(data:new
                 {
-                    result = "false",
-                    message = message
+                    result = "false", 
+                    questionErrors = questionErrors,
+                    answerErrors = answerErrors
                 });
             }
 
-            _questionAnswerService.UpdateAnswer(questionAnswerDto);
-            
+            _questionAnswerService.UpdateAnswer(questionAnswerDto); 
+            var questionType = "Security Question"; 
+            if(questionAnswerViewModel.QuestionTypeName == QuestionTypeName.KBQ)
+            {
+                questionType = "Knowledge Based Question";
+            }
             var result = new
             {
                 result ="true",
-                message ="Knowledge Based Question updated successfully."
+                message =$"{questionType} updated successfully."
             };
 
             return Json(data:result); 
