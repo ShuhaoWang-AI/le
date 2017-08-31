@@ -55,7 +55,7 @@
             }
              
             <input type="hidden" id="questionAnswerId" value="@Model.QuestionAnswerId" />
-            <input type="hidden" id="lastValue" value="@Model.Content" />
+            <input type="hidden" class="lastValue" id="lastValue" value="@Model.Content" />
 
             @Html.Editor(expression:"Content" + Model.QuestionAnswerId,
                 additionalViewData:new
