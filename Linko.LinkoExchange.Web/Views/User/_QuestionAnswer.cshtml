@@ -25,7 +25,7 @@
                                    @class = "form-control",
                                    disabled = "disabled"
                                })
-            <input type="hidden" id="lastSelected" value="@Model.QuestionId" />
+            <input type="hidden" class="lastSelected" id="lastSelected" value="@Model.QuestionId" />
             @Html.ValidationMessage(modelName:"Question" + Model.QuestionAnswerId,
                                     validationMessage:"",
                                     htmlAttributes:new

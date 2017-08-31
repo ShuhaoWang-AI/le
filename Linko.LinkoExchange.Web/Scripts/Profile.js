@@ -27,12 +27,29 @@
         $("#sq-panel .box-primary >.box-header").find("i.fa").addClass('fa-minus');
     }
 
-    $(document).find("#kbq-panel select").on("change", function () {
-        $(this).closest(".form-group").next().find("input[type=text]").val("");
-    });
+    $(".question-answer-div").find("select").on("change", function () {
+        
+        //check if selected option is duplicated with others 
+        var thisOldSelected = $(this).siblings(".lastSelected").val();
+        var lastSelecteds = $(this).closest('.editabledDiv').find('.lastSelected');
+        var indexes = $.makeArray(lastSelecteds.map(function (e, ele) {
+            return ele.value;
+        }));
 
-    $(document).find("#sq-panel select").on("change", function () {
-        $(this).closest(".form-group").next().find("input[type=text]").val("");
+        var p = indexes.indexOf(thisOldSelected);
+        indexes.splice(p, 1);
+
+        var currentIndex = this.options[this.selectedIndex].value;
+        var filtered = indexes.filter(function (i) {
+            return i === currentIndex;
+        });
+     
+        if (filtered.length > 0) {
+            $(this).siblings(".field-validation-error").text('Question cannot be duplicated with others.'); 
+        } else {
+            $(this).closest(".form-group").next().find("input[type=text]").val("");
+            $(this).siblings(".field-validation-error").text('');
+        }
     });
 
     $(document).on('click', ".edit-button", function () {
