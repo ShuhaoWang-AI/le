@@ -84,7 +84,7 @@
                                                                                                                              })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
-                <div class="alert alert-dismissible alert-success">
+                <div class="alert alert-dismissible alert-success" id="div-success-message">
                     <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                     <h5>
                         <i class="fa fa-check icon"></i>
@@ -658,6 +658,9 @@
                 $("#LinkoExchangeForm")
                     .submit(function(event)
                     {
+                        //clear potentially existing success message box from previous action result
+                        $("#div-success-message").remove();
+
                         var isFormValid = true;
 
                         try
