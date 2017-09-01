@@ -285,3 +285,7 @@ function setTelephoneMask() {
         this.value = formatOutPut;
     }
 }
+
+function isEmptyOrSpaces(str) {
+    return str === null || str.match(/^ *$/) !== null;
+}

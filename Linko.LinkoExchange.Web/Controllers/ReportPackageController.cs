@@ -384,8 +384,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                    Qualifier = vm.Qualifier,
                                                                    UnitId = vm.UnitId,
                                                                    Value = vm.EnteredValue,
-                                                                   UnitName = vm.UnitName
-                                                               }).ToList();
+                                                                   UnitName = vm.UnitName,
+                                                                   ConcentrationResultCompliance = vm.ConcentrationResultCompliance,
+                                                                   ConcentrationResultComplianceIconColor = vm.ConcentrationResultComplianceIconColor,
+                                                                   ConcentrationResultComplianceComment = vm.ConcentrationResultComplianceComment,
+                                                                   MassResultCompliance = vm.MassResultCompliance,
+                                                                   MassResultComplianceIconColor = vm.MassResultComplianceIconColor,
+                                                                   MassResultComplianceComment = vm.MassResultComplianceComment
+                                                                }).ToList();
 
             var result = sampleresults.ToDataSourceResult(request:request, selector:vm => new
                                                                                           {
@@ -402,8 +408,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                               vm.AnalysisMethod,
                                                                                               vm.EnteredMethodDetectionLimit,
                                                                                               AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString(),
-                                                                                              vm.IsApprovedEPAMethodText
-                                                                                          });
+                                                                                              vm.IsApprovedEPAMethodText,
+                                                                                              vm.ConcentrationResultCompliance,
+                                                                                              vm.ConcentrationResultComplianceIconColor,
+                                                                                              vm.ConcentrationResultComplianceComment,
+                                                                                              vm.MassResultCompliance,
+                                                                                              vm.MassResultComplianceIconColor,
+                                                                                              vm.MassResultComplianceComment,
+                                                                                              vm.IsCalcMassLoading
+                                                                                            });
 
             return Json(data:result);
         }

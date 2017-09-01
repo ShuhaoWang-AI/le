@@ -46,7 +46,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.LimitBasisId)
                 .WillCascadeOnDelete(value:false);
 
-            Property(x => x.IsAlertsOnly).IsOptional();
+            Property(x => x.IsAlertOnly).IsOptional();
         }
 
         #endregion

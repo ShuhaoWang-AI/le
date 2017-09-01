@@ -45,7 +45,7 @@
         public int LimitBasisId { get; set; }
         public virtual LimitBasis LimitBasis { get; set; }
 
-        public bool IsAlertsOnly { get; set; }
+        public bool IsAlertOnly { get; set; }
 
         #endregion
     }

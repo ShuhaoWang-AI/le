@@ -1333,8 +1333,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                       Name = c.Name,
                                                                       DefaultUnitId = c.DefaultUnit.UnitId,
                                                                       DefaultUnitName = c.DefaultUnit.Name,
-                                                                      IsCalcMassLoading = c.IsCalcMassLoading
-                                                                  }).OrderBy(c => c.Name).ToList();
+                                                                      IsCalcMassLoading = c.IsCalcMassLoading,
+                                                                      ConcentrationMaxValue = c.ConcentrationMaxValue,
+                                                                      ConcentrationMinValue = c.ConcentrationMinValue,
+                                                                      MassLoadingMaxValue = c.MassLoadingMaxValue,
+                                                                      MassLoadingMinValue = c.MassLoadingMinValue
+                                                     }).OrderBy(c => c.Name).ToList();
                 return Json(data:new
                                  {
                                      hasError = false,
@@ -1566,8 +1570,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                         Name = c.Name,
                                                                         DefaultUnitId = c.DefaultUnit.UnitId,
                                                                         DefaultUnitName = c.DefaultUnit.Name,
-                                                                        IsCalcMassLoading = c.IsCalcMassLoading
-                                                                    }).OrderBy(c => c.Name).ToList();
+                                                                        IsCalcMassLoading = c.IsCalcMassLoading,
+                                                                        ConcentrationMaxValue = c.ConcentrationMaxValue,
+                                                                        ConcentrationMinValue = c.ConcentrationMinValue,
+                                                                        MassLoadingMaxValue = c.MassLoadingMaxValue,
+                                                                        MassLoadingMinValue = c.MassLoadingMinValue
+                                                       }).OrderBy(c => c.Name).ToList();
         }
 
         #endregion

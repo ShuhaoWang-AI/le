@@ -640,38 +640,57 @@ namespace Linko.LinkoExchange.Services.Parameter
         #endregion
 
         /// <summary>
-        ///     Overrides the given parameter's default unit with one found for the parameter at a given monitoring point
-        ///     and effective date range. Also updates the default setting for IsCalcMassLoading based on "Mass Daily" limit(s) found
+        /// Overrides the given parameter's default unit with one found for the parameter at a given monitoring point
+        /// and effective date range. Also updates the default setting for IsCalcMassLoading based on "Mass Daily" limit(s) found
         /// </summary>
-        /// <param name="paramDto"> </param>
-        /// <param name="monitoringPointId"> </param>
-        /// <param name="sampleEndDateTimeLocal"> </param>
+        /// <param name="paramDto"></param>
+        /// <param name="monitoringPointId"></param>
+        /// <param name="sampleEndDateTimeUtc"></param>
         private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleEndDateTimeLocal)
         {
             var parameterId = paramDto.ParameterId;
 
-            _logger.Info(message:$"Enter ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
+            _logger.Info($"Enter ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
 
             //Check MonitoringPointParameter table
             var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
-                                                          .Include(mppl => mppl.DefaultUnit)
-                                                          .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
-                                                                                  && mppl.ParameterId == parameterId
-                                                                                  && mppl.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                                                  && mppl.RetirementDateTime >= sampleEndDateTimeLocal);
+                .Include(mppl => mppl.DefaultUnit)
+                .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
+                    && mppl.ParameterId == parameterId
+                    && mppl.EffectiveDateTime <= sampleEndDateTimeLocal
+                    && mppl.RetirementDateTime >= sampleEndDateTimeLocal);
 
             if (foundMonitoringPointParameter?.DefaultUnit != null)
             {
-                paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(unit:foundMonitoringPointParameter.DefaultUnit);
-                paramDto.IsCalcMassLoading = _dbContext.MonitoringPointParameterLimits
-                                                       .Include(mppl => mppl.LimitBasis)
-                                                       .Include(mppl => mppl.LimitType)
-                                                       .Any(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameter.MonitoringPointParameterId
-                                                                    && mppl.LimitBasis.Name == LimitBasisName.MassLoading.ToString()
-                                                                    && mppl.LimitType.Name == LimitTypeName.Daily.ToString());
+                paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(foundMonitoringPointParameter.DefaultUnit);
+
+                var foundLimits = _dbContext.MonitoringPointParameterLimits
+                    .Include(mppl => mppl.LimitBasis)
+                    .Include(mppl => mppl.LimitType)
+                    .Where(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameter.MonitoringPointParameterId
+                            && !mppl.IsAlertOnly) //Future feature? Need this filter?
+                    .ToList();
+
+                paramDto.IsCalcMassLoading = foundLimits
+                    .Any(mppl => mppl.LimitBasis.Name == LimitBasisName.MassLoading.ToString() && mppl.LimitType.Name == LimitTypeName.Daily.ToString());
+
+                foreach (var limit in foundLimits)
+                {
+                    if (limit.LimitBasis.Name == LimitBasisName.Concentration.ToString() && limit.LimitType.Name == LimitTypeName.Daily.ToString())
+                    {
+                        paramDto.ConcentrationMinValue = limit.MinimumValue;
+                        paramDto.ConcentrationMaxValue = limit.MaximumValue;
+                    }
+                    else if (limit.LimitBasis.Name == LimitBasisName.MassLoading.ToString() && limit.LimitType.Name == LimitTypeName.Daily.ToString())
+                    {
+                        paramDto.MassLoadingMinValue = limit.MinimumValue;
+                        paramDto.MassLoadingMaxValue = limit.MaximumValue;
+                    }
+                }
             }
 
-            _logger.Info(message:$"Leaving ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
+            _logger.Info($"Leaving ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
+
         }
     }
 }

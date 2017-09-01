@@ -30,6 +30,12 @@ namespace Linko.LinkoExchange.Services.Dto
         public string MassLoadingValue { get; set; }
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
+        public bool ConcentrationResultCompliance { get; set; }
+        public string ConcentrationResultComplianceIconColor { get; set; }
+        public string ConcentrationResultComplianceComment { get; set; }
+        public bool MassResultCompliance { get; set; }
+        public string MassResultComplianceIconColor { get; set; }
+        public string MassResultComplianceComment { get; set; }
 
         #endregion
     }

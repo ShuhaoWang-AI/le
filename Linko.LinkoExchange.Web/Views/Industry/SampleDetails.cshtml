@@ -426,7 +426,7 @@
                             </td>
                             <td>@sampleResult.ParameterName</td>
                             <td>
-                                <select class="form-control input-sm no-margin no-padding" id="Qualifier_@sampleResult.ParameterId" style="width: 100%">
+                                <select class="form-control input-sm no-margin no-padding onchange-calc-compliance" id="Qualifier_@sampleResult.ParameterId" style="width: 100%">
                                     @foreach (var q in Model.AvailableResultQualifierValidValues)
                                     {
                                         if (q.Value.Equals(value:sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue:"NUMERIC")))
@@ -442,13 +442,16 @@
                             </td>
                             <td>
                                 <div class="input-group input-group-sm" style="min-width: 125px">
-                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value" autocomplete="off">
+                                    <input class="form-control input-sm onchange-calc-compliance" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value" autocomplete="off">
                                     <input id="UnitId_@sampleResult.ParameterId" type="hidden" value="@sampleResult.UnitId">
                                     <span id="UnitName_@sampleResult.ParameterId" class="input-group-addon">@sampleResult.UnitName</span>
+                                    <span id="ResultCompliance_@sampleResult.ParameterId" class="input-group-addon">
+                                        <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Results are in compliance."></i>
+                                    </span>
                                 </div>
                             </td>
                             <td>
-                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" autocomplete="off" style="width: 80px" value="@sampleResult.EnteredMethodDetectionLimit">
+                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" style="width: 80px" value="@sampleResult.EnteredMethodDetectionLimit" autocomplete="off">
                             </td>
                             <td>
                                 <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" autocomplete="off" value="@sampleResult.AnalysisMethod">
@@ -520,14 +523,21 @@
                                 <input id="MassResultId_@sampleResult.ParameterId" type="hidden" value=@(sampleResult.MassLoadingSampleResultId.HasValue ? sampleResult.MassLoadingSampleResultId.Value.ToString() : "")>
                             </td>
                             <td>
-                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue:"").Length == 0)
-                                {
-                                    <strong id="MassResult_@sampleResult.ParameterId"></strong>
-                                }
-                                else
-                                {
-                                    <strong id="MassResult_@sampleResult.ParameterId">@sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName</strong>
-                                }
+                                <span style="float: right; white-space: nowrap;">
+                                    @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue: "").Length == 0)
+                                    {
+                                        <strong id="MassResult_@sampleResult.ParameterId"></strong>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <strong id="MassResult_@sampleResult.ParameterId">@sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName</strong>
+                                        </span>
+                                    }
+                                    <span id="MassResultCompliance_@sampleResult.ParameterId">
+                                        <i class="fa fa-lg fa-exclamation-circle" style="color:orange" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Mass loading result compliance unknown. No limit was found."></i>
+                                    </span>
+                                </span>
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button">
@@ -859,16 +869,13 @@
                 if (clChecked)
                 {
                     var qualifier = $("#Qualifier_" + paramId).val();
-                    var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
                     var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
                     var isMassLoadingResultToUseLessThanSign = (
                         $("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
                     var massLoadingCalculationDecimalPlaces =
                         parseInt($("#MassLoadingCalculationDecimalPlaces").val());
                     var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
-                    var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
                     var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
-                    var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
 
                     if (qualifier === "ND" || qualifier === "NF")
                     {
@@ -888,17 +895,14 @@
                         }
                         else
                         {
+                            var massLoadingValue = getMassLoadingValue(paramId);
+
                             $("#MassResult_" + paramId)
                                 .html(" "
-                                    + (result
-                                        * sampleFlowResult
-                                        * massLoadingMultiplier
-                                        * flowUnitConversionFactor
-                                        * resultUnitConversionFactor)
-                                    .toFixed(massLoadingCalculationDecimalPlaces)
+                                    + massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces)
                                     + " "
-                                    + massLoadingUnit)
-                                .css('color', 'green');
+                                    + massLoadingUnit);
+                            //.css('color', 'green');
                         }
                     }
                     else if (qualifier === "<")
@@ -915,18 +919,15 @@
                         }
                         else
                         {
+                            var massLoadingValue = getMassLoadingValue(paramId);
+
                             $("#MassResult_" + paramId)
                                 .html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
                                     + " "
-                                    + (result
-                                        * sampleFlowResult
-                                        * massLoadingMultiplier
-                                        * flowUnitConversionFactor
-                                        * resultUnitConversionFactor)
-                                    .toFixed(massLoadingCalculationDecimalPlaces)
+                                    + massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces)
                                     + " "
-                                    + massLoadingUnit)
-                                .css('color', 'green');
+                                    + massLoadingUnit);
+                            //.css('color', 'green');
                         }
                     }
                 }
@@ -934,6 +935,8 @@
                 {
                     $("#MassResult_" + paramId).html("");
                 }
+
+                displayMassLoadingCompliance(paramId);
             }
 
             $("#FlowValue")
@@ -945,6 +948,13 @@
                             var paramId = this.id.replace('CalcLoading_', '');
                             displayMassLoading(paramId);
                         });
+
+                    $("input[id^='Result_']")
+                        .each(function()
+                        {
+                            var paramId = this.id.replace('Result_', '');
+                            displayConcentrationCompliance(paramId);
+                        });
                 });
 
             $("select[name='FlowUnitId']")
@@ -955,6 +965,13 @@
                         {
                             var paramId = this.id.replace('CalcLoading_', '');
                             displayMassLoading(paramId);
+                        });
+
+                    $("input[id^='Result_']")
+                        .each(function()
+                        {
+                            var paramId = this.id.replace('Result_', '');
+                            displayConcentrationCompliance(paramId);
                         });
                 });
 
@@ -975,6 +992,7 @@
                     }
 
                     displayMassLoading(paramId);
+                    displayConcentrationCompliance(paramId);
                 });
 
 
@@ -982,6 +1000,7 @@
                 .on('blur', "input[id^='Result_']", function()
                 {
                     var paramId = this.id.replace('Result_', '');
+                    displayConcentrationCompliance(paramId);
                     displayMassLoading(paramId);
                 });
 
@@ -1165,7 +1184,7 @@
                         @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
 
                     var qualifierCtrl =
-                        '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
+                        '<select class="form-control input-sm no-margin no-padding onchange-calc-compliance" id="Qualifier_'
                             + value.Id
                             + '" style="width: 100%">';
 
@@ -1188,19 +1207,14 @@
                     qualifierCtrl += '</select>';
 
                     data[2] = qualifierCtrl;
-                    data[3] =
-                        '<div class="input-group input-group-sm" style="min-width:125px">'
-                        + '<input class="form-control input-sm" id="Result_'
-                        + value.Id
-                        + '" type="text" value=""  autocomplete="false"><input id="UnitId_'
-                        + value.Id
-                        + '" type="hidden" value="'
-                        + value.DefaultUnitId
-                        + '"><span id="UnitName_'
-                        + value.Id
-                        + '" class="input-group-addon">'
-                        + value.DefaultUnitName
-                        + '</span></div>';
+
+                    data[3] = $("#unitsAndResultComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
+                        .html()
+                        .replace(/{{parameterId}}/g, value.Id)
+                        .replace(/{{unitId}}/g, value.DefaultUnitId)
+                        .replace(/{{unitName}}/g, value.DefaultUnitName)
+                        .replace(/{{complianceIconAndMessage}}/g, "");
+
                     data[4] = '<input class="form-control input-sm" id="MDL_'
                         + value.Id
                         + '" type="text" style="width: 80px" value="" autocomplete="false">';
@@ -1230,8 +1244,10 @@
                             + value.Id
                             + '"/>';
                     }
-                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
-                    data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="" />';
+                    data[10] = $("#massResultAndComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
+                        .html()
+                        .replace(/{{parameterId}}/g, value.Id);
                     data[11] = null;
 
                     //console.debug("data : " + data);
@@ -1242,6 +1258,9 @@
                         .node();
 
                     $(rowNode).css('color', 'green');
+
+                    displayConcentrationCompliance(value.Id);
+                    displayMassLoadingCompliance(value.Id);
                 });
 
                 // need to reinitialize iCheck otherwise newly added checkbox doesn't work
@@ -1342,12 +1361,22 @@
 
                                     $(rowNode).css('color', 'green');
                                 });
+
+                                $("input[id^='Result_']")
+                                    .each(function()
+                                    {
+                                        var paramId = this.id.replace('Result_', '');
+                                        displayConcentrationCompliance(paramId);
+                                        displayMassLoadingCompliance(paramId);
+                                    });
                             }
                         }
                         //, error: function()
                         //    {}
                     });
                 });
+
+
         </script>
     }
 
@@ -1365,7 +1394,253 @@
                         $(this).val(value);
                     });
 
+                //display compliance information for already saved results
+                $("input[id^='Result_']")
+                    .each(function()
+                    {
+                        var paramId = this.id.replace('Result_', '');
+                        displayConcentrationCompliance(paramId);
+                        displayMassLoadingCompliance(paramId);
+                    });
+
                 disableAutoComplete();
             });
     </script>
+
+    <script>
+
+        function displayConcentrationCompliance(parameterId)
+        {
+            var qualifier = $("#Qualifier_" + parameterId).val();
+            var result = $("#Result_" + parameterId).val();
+
+            var concentrationMaxValue = null;
+            var concentrationMinValue = null;
+
+            //find limit from global parameter JSON blob
+            var allParameters = $.parseJSON($("#AllParameters").val());
+            var foundParameters = $.grep(allParameters, function(e)
+            {
+                return e.Id == parameterId;
+            });
+            if (foundParameters.length == 0)
+            {
+                // parameter with that Id not found
+                alert('ERROR: could not find parameter with Id = ' + parameterId);
+            }
+            else if (foundParameters.length == 1)
+            {
+                concentrationMaxValue = foundParameters[0].ConcentrationMaxValue;
+                concentrationMinValue = foundParameters[0].ConcentrationMinValue;
+            }
+            else
+            {
+                // multiple matching parameters found
+                alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + parameterId);
+            }
+
+            var complianceIconAndMessage = "";
+            var complianceTemplateToDisplay;
+            //If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
+            if (concentrationMaxValue != null)
+            {
+                if (concentrationMinValue != null)
+                {
+                    //range limit
+                    if (qualifier != "ND"
+                        && qualifier != "NF"
+                        && !isEmptyOrSpaces(result)
+                        && (result > concentrationMaxValue || result < concentrationMinValue))
+                    {
+                        complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
+                    }
+                    else
+                    {
+                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                    }
+                }
+                else
+                {
+                    //max limit only
+                    if (qualifier != "ND"
+                        && qualifier != "NF"
+                        && !isEmptyOrSpaces(result)
+                        && result > concentrationMaxValue)
+                    {
+                        complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
+                    }
+                    else
+                    {
+                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                    }
+                }
+            }
+            else
+            {
+                //no limits
+                complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+            }
+
+            complianceIconAndMessage = $(complianceTemplateToDisplay)
+                .html()
+                .replace("{{parameterName}}", foundParameters[0].Name)
+                .replace("{{resultValue}}", result)
+                .replace("{{maxLimit}}", concentrationMaxValue);
+
+            $("#ResultCompliance_" + parameterId).html(complianceIconAndMessage);
+
+            //alert('Calculate compliance using qualifier = ' + qualifier + ' and result = ' + result + ' and max value = ' + concentrationMaxValue + '!');
+        }
+
+        function displayMassLoadingCompliance(paramId)
+        {
+            //if not calculating mass loading, do not display a mass compliance badge
+            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+            if (!clChecked)
+            {
+                $("#MassResultCompliance_" + paramId).html("");
+                return;
+            }
+
+            var massLoadingValue = getMassLoadingValue(paramId);
+            var qualifier = $("#Qualifier_" + paramId).val();
+            var massLoadingMaxValue = null;
+            var massLoadingMinValue = null;
+
+            //find limit from global parameter JSON blob
+            var allParameters = $.parseJSON($("#AllParameters").val());
+            var foundParameters = $.grep(allParameters, function(e)
+            {
+                return e.Id == paramId;
+            });
+            if (foundParameters.length == 0)
+            {
+                // parameter with that Id not found
+                alert('ERROR: could not find parameter with Id = ' + paramId);
+            }
+            else if (foundParameters.length == 1)
+            {
+                massLoadingMaxValue = foundParameters[0].MassLoadingMaxValue;
+                massLoadingMinValue = foundParameters[0].MassLoadingMinValue;
+            }
+            else
+            {
+                // multiple matching parameters found
+                alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + paramId);
+            }
+
+            var complianceIconAndMessage = "";
+            var complianceTemplateToDisplay;
+            //If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
+            if (massLoadingMaxValue != null)
+            {
+                if (massLoadingMinValue != null)
+                {
+                    //range limit
+                    if (qualifier != "ND"
+                        && qualifier != "NF"
+                        && (massLoadingValue > massLoadingMaxValue || massLoadingValue < massLoadingMinValue))
+                    {
+                        complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
+                    }
+                    else
+                    {
+                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                    }
+                }
+                else
+                {
+                    //max limit only
+                    if (qualifier != "ND"
+                        && qualifier != "NF"
+                        && massLoadingValue > massLoadingMaxValue)
+                    {
+                        complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
+                    }
+                    else
+                    {
+                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                    }
+                }
+            }
+            else
+            {
+                //no limits
+                complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+            }
+
+            complianceIconAndMessage = $(complianceTemplateToDisplay)
+                .html()
+                .replace("{{parameterName}}", foundParameters[0].Name)
+                .replace("{{resultValue}}", massLoadingValue)
+                .replace("{{minLimit}}", massLoadingMinValue)
+                .replace("{{maxLimit}}", massLoadingMaxValue);
+
+            $("#MassResultCompliance_" + paramId).html(complianceIconAndMessage);
+
+            //alert("Comparing mass loading value = '" + massLoadingValue + "' to min ='" + massLoadingMinValue + "' and max = '"  + massLoadingMaxValue + "'");
+        }
+
+        function getMassLoadingValue(paramId)
+        {
+            var result = parseFloat($("#Result_" + paramId).val());
+            var sampleFlowResult = parseFloat($("#FlowValue").val());
+            var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
+            var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
+            var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
+            var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
+            var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
+
+            var massLoadingValue = result
+                * sampleFlowResult
+                * massLoadingMultiplier
+                * flowUnitConversionFactor
+                * resultUnitConversionFactor;
+
+            return massLoadingValue;
+        }
+
+
+    </script>
+
+    <!-- html templates -->
+
+    <script type="text/template" id="unitsAndResultComplianceTemplate">
+        <span class="input-group input-group-sm" style="min-width:125px">
+            <input class="form-control input-sm onchange-calc-compliance" id="Result_{{parameterId}}" type="text" value="" style="text-align: right;" autocomplete="false" />
+            <input id="UnitId_{{parameterId}}" type="hidden" value="{{unitId}}" />
+            <span id="UnitName_{{parameterId}}" class="input-group-addon">{{unitName}}</span>
+            <span id="ResultCompliance_{{parameterId}}" class="input-group-addon">
+                {{complianceIconAndMessage}}
+            </span>
+        </span>
+    </script>
+
+    <script type="text/template" id="goodComplianceIconAndMessage">
+        <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Results are in compliance."></i>
+    </script>
+
+    <script type="text/template" id="unknownComplianceIconAndMessage">
+        <i class="fa fa-lg fa-exclamation-circle" style="color: orange" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="Result compliance unknown. No limit was found."></i>
+    </script>
+
+    <script type="text/template" id="bad-aboveMaxComplianceIconAndMessage">
+        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} exceeds limit of {{maxLimit}}."></i>
+    </script>
+
+    <script type="text/template" id="bad-outsideRangeComplianceIconAndMessage">
+        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is outside of range {{minLimit}} to {{maxLimit}}."></i>
+    </script>
+
+    <script type="text/template" id="massResultAndComplianceTemplate">
+        <span style="float: right; white-space: nowrap;">
+            <span>
+                <strong id="MassResult_{{parameterId}}"></strong>
+            </span>
+            <span id="MassResultCompliance_{{parameterId}}">
+                <i class="fa fa-lg fa-exclamation-circle" style="color:orange" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Mass loading result compliance unknown. No limit was found."></i>
+            </span>
+        </span>
+    </script>
+
 }}

@@ -24,6 +24,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public bool IsRemoved { get; set; }
         public bool IsCalcMassLoading { get; set; }
 
+        public double? ConcentrationMaxValue { get; set; }
+        public double? ConcentrationMinValue { get; set; }
+        public double? MassLoadingMaxValue { get; set; }
+        public double? MassLoadingMinValue { get; set; }
+
         #endregion
     }
 }

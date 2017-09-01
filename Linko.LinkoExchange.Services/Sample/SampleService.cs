@@ -452,6 +452,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (isIncludeChildObjects)
             {
+                var sampleEndDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.EndDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
                 foreach (var sampleResult in sample.SampleResults)
                 {
                     //Handle "special case" Sample Results. These do not get mapped to their own
@@ -508,6 +509,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.UnitName = sampleResult.UnitName;
 
                             SetSampleResultDatesAndLastModified(sampleResult:sampleResult, resultDto:ref resultDto, timeZoneId:timeZoneId);
+
                         }
                         else
                         {
@@ -517,6 +519,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.MassLoadingValue = sampleResult.EnteredValue;
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;
                             resultDto.MassLoadingUnitName = sampleResult.UnitName;
+
                         }
                     }
                     else
@@ -525,9 +528,20 @@ namespace Linko.LinkoExchange.Services.Sample
                         //  will be ignored until we change the code..." - mj
                     }
                 }
+
+                var sampleResultList = resultDtoList.Values.ToList();
+
+                //Check compliance on all of these
+                for (int i = 0; i < sampleResultList.Count(); i++)
+                {
+                    var resultDto = sampleResultList[i];
+                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleEndDateTimeLocal, LimitBasisName.Concentration);
+                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleEndDateTimeLocal, LimitBasisName.MassLoading);
+                }
+
+                dto.SampleResults = sampleResultList;
             }
 
-            dto.SampleResults = resultDtoList.Values.ToList();
 
             if (isLoggingEnabled)
             {
@@ -535,6 +549,171 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             return dto;
+        }
+
+        private void CheckResultCompliance(ref SampleResultDto sampleResultDto, int monitoringPointId, DateTime sampleDateTime, LimitBasisName limitBasisName)
+        {
+            //Set compliance as unknown initially by default
+            if (limitBasisName == LimitBasisName.Concentration)
+            {
+                sampleResultDto.ConcentrationResultCompliance = false;
+                sampleResultDto.ConcentrationResultComplianceIconColor = "orange";
+                sampleResultDto.ConcentrationResultComplianceComment = $"Result compliance is unknown. No limit was found.";
+            }
+            else if (limitBasisName == LimitBasisName.MassLoading)
+            {
+                sampleResultDto.MassResultCompliance = false;
+                sampleResultDto.MassResultComplianceIconColor = "orange";
+                sampleResultDto.MassResultComplianceComment = $"Result compliance is unknown. No limit was found.";
+            }
+
+            //Get possible limits
+            var parameterId = sampleResultDto.ParameterId;
+
+            //Check MonitoringPointParameter table
+            var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
+                .Include(mppl => mppl.DefaultUnit)
+                .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
+                    && mppl.ParameterId == parameterId
+                    && mppl.EffectiveDateTime <= sampleDateTime
+                    && mppl.RetirementDateTime >= sampleDateTime);
+
+            if (foundMonitoringPointParameter == null)
+            {
+                return;
+            }
+
+            int foundMonitoringPointParameterId = foundMonitoringPointParameter.MonitoringPointParameterId;
+
+            var foundLimit = _dbContext.MonitoringPointParameterLimits
+               .Include(mppl => mppl.LimitBasis)
+               .Include(mppl => mppl.LimitType)
+               .FirstOrDefault(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameterId
+                       && mppl.LimitBasis.Name == limitBasisName.ToString()
+                       && mppl.LimitType.Name == LimitTypeName.Daily.ToString()
+                       && !mppl.IsAlertOnly);
+
+            if (foundLimit != null)
+            {
+                //If qualifier is "ND" or "NF" both concentration and mass is in compliance
+                if (sampleResultDto.Qualifier == "ND" || sampleResultDto.Qualifier == "NF")
+                {
+                    //Compliance met
+                    if (limitBasisName == LimitBasisName.Concentration)
+                    {
+                        sampleResultDto.ConcentrationResultCompliance = true;
+                        sampleResultDto.ConcentrationResultComplianceIconColor = "green";
+                        sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                    }
+                    else if (limitBasisName == LimitBasisName.MassLoading)
+                    {
+                        sampleResultDto.MassResultCompliance = true;
+                        sampleResultDto.MassResultComplianceIconColor = "green";
+                        sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                    }
+
+                    return;
+                }
+
+                var floor = foundLimit.MinimumValue;
+                var ceiling = foundLimit.MaximumValue;
+                double valueToCheck; //Concentration value or mass loading value
+                if (limitBasisName == LimitBasisName.Concentration
+                    && sampleResultDto.Value != null)
+                {
+                    valueToCheck = sampleResultDto.Value.Value;
+                }
+                else if (!string.IsNullOrWhiteSpace(sampleResultDto.MassLoadingValue)
+                        && Double.TryParse(sampleResultDto.MassLoadingValue, out valueToCheck))
+                {
+                    //valueToCheck = sampleResultDto.MassLoadingValue (already assigned in the "else if" out parameter)
+                }
+                else
+                {
+                    throw new Exception($"CheckResultCompliance. ERROR: cannot check compliance. Limit Basis = {limitBasisName}.");
+                }
+                
+
+                if (floor.HasValue)
+                {
+                    //Range limit
+                    if (valueToCheck > ceiling || valueToCheck < floor)
+                    {
+                        //Outside the range
+                        if (limitBasisName == LimitBasisName.Concentration)
+                        {
+                            sampleResultDto.ConcentrationResultCompliance = false;
+                            sampleResultDto.ConcentrationResultComplianceIconColor = "red";
+                            sampleResultDto.ConcentrationResultComplianceComment = 
+                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.EnteredValue} is outside of limit range {floor} to {ceiling}.";
+                        }
+                        else if (limitBasisName == LimitBasisName.MassLoading)
+                        {
+                            sampleResultDto.MassResultCompliance = false;
+                            sampleResultDto.MassResultComplianceIconColor = "red";
+                            sampleResultDto.MassResultComplianceComment =
+                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.MassLoadingValue} is outside of limit range {floor} to {ceiling}.";
+                        }
+                    }
+                    else
+                    {
+                        //Compliance met
+                        if (limitBasisName == LimitBasisName.Concentration)
+                        {
+                            sampleResultDto.ConcentrationResultCompliance = true;
+                            sampleResultDto.ConcentrationResultComplianceIconColor = "green";
+                            sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                        }
+                        else if (limitBasisName == LimitBasisName.MassLoading)
+                        {
+                            sampleResultDto.MassResultCompliance = true;
+                            sampleResultDto.MassResultComplianceIconColor = "green";
+                            sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                        }
+                    }
+                }
+                else
+                {
+                    //Max-only limit
+                    if (valueToCheck > ceiling)
+                    {
+                        //Over the max
+                        if (limitBasisName == LimitBasisName.Concentration)
+                        {
+                            sampleResultDto.ConcentrationResultCompliance = false;
+                            sampleResultDto.ConcentrationResultComplianceIconColor = "red";
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.EnteredValue} exceeds limit of {ceiling}.";
+                        }
+                        else if (limitBasisName == LimitBasisName.MassLoading)
+                        {
+                            sampleResultDto.MassResultCompliance = false;
+                            sampleResultDto.MassResultComplianceIconColor = "red";
+                            sampleResultDto.MassResultComplianceComment =
+                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.MassLoadingValue} exceeds limit of {ceiling}.";
+                        }
+                    }
+                    else
+                    {
+                        //Compliance met
+                        if (limitBasisName == LimitBasisName.Concentration)
+                        {
+                            sampleResultDto.ConcentrationResultCompliance = true;
+                            sampleResultDto.ConcentrationResultComplianceIconColor = "green";
+                            sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                        }
+                        else if (limitBasisName == LimitBasisName.MassLoading)
+                        {
+                            sampleResultDto.MassResultCompliance = true;
+                            sampleResultDto.MassResultComplianceIconColor = "green";
+                            sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                        }
+                    }
+
+                }
+
+            }
+            
         }
 
         /// <summary>
