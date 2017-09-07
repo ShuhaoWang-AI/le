@@ -726,7 +726,11 @@ namespace Linko.LinkoExchange.Services.User
                 //Find admin users in each of these
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
                                        .Where(o => o.PermissionGroup.Name == "Administrator"
-                                                   && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId).Distinct();
+                                                   && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId 
+                                                   && o.IsEnabled 
+                                                   && !o.IsRemoved 
+                                                   && !o.IsRegistrationDenied 
+                                                   && o.IsRegistrationApproved).Distinct();
 
                 // Send emails to IU admins
                 foreach (var admin in admins.ToList())
@@ -741,9 +745,12 @@ namespace Linko.LinkoExchange.Services.User
                         adminEmailList.Add(item:adminEmail);
 
                         var userDto = GetUserProfileById(userProfileId:admin.UserProfileId);
-                        var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
-                                                                                         contentReplacements:contentReplacements, orgRegProg:program);
-                        emailEntries.Add(item:emailEntry);
+                        if (!userDto.IsAccountLocked && !userDto.IsAccountResetRequired)
+                        {
+                            var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:userDto, emailType:EmailType.UserAccess_LockoutToSysAdmins,
+                                                                                             contentReplacements:contentReplacements, orgRegProg:program);
+                            emailEntries.Add(item:emailEntry);
+                        }
                     }
                 }
 

@@ -778,14 +778,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             var resetPasswordTokenValidateInterval = Convert.ToInt32(value:ConfigurationManager.AppSettings[name:"ResetPasswordTokenValidateInterval"]);
-
-            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == resetPasswordToken);
-
-            if (emailAuditLog == null)
+            var emailAuditLogs = _dbContext.EmailAuditLogs.Where(i => i.Token == resetPasswordToken).ToList();
+            if (!emailAuditLogs.Any())
             {
                 throw new Exception(message:$"ERROR: Cannot find email audit log associated with token={resetPasswordToken}");
             }
 
+            var emailAuditLog = emailAuditLogs[0]; 
             var tokenCreated = emailAuditLog.SentDateTimeUtc;
 
             if (DateTimeOffset.Now.AddHours(hours:-resetPasswordTokenValidateInterval) > tokenCreated)
@@ -809,8 +808,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             var resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId:userQuestionAnswerId, answer:answer, failedCount:failedCount, newPassword:newPassword);
             if (resetPasswordResult.Result == AuthenticationResult.Success)
             {
-                emailAuditLog.Token = string.Empty;
+                foreach (var log in emailAuditLogs)
+                {
+                    log.Token = string.Empty;
+                } 
             }
+
             _dbContext.SaveChanges();
             return resetPasswordResult;
         }
