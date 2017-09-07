@@ -436,12 +436,15 @@ namespace Linko.LinkoExchange.Services.User
 
                     _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
 
-                    //Email the user
-                    var emailEntries = new List<EmailEntry>();
-                    var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements,
-                                                                                     orgRegProg:orgRegProgram);
-                    emailEntries.Add(item:emailEntry);
-
+                    //Email the user   
+                    var emailEntries = new List<EmailEntry>(); 
+                    if (!user.IsAccountLocked && !user.IsAccountResetRequired && programUser.IsEnabled && programUser.IsRegistrationApproved && !programUser.IsRemoved)
+                    { 
+                        var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:emailType, contentReplacements:contentReplacements,
+                                                                                         orgRegProg:orgRegProgram);
+                        emailEntries.Add(item:emailEntry); 
+                    }
+                     
                     //Email all IU Admins
                     var admins = _dbContext.OrganizationRegulatoryProgramUsers
                                            .Where(o => o.PermissionGroup.Name == "Administrator"
@@ -1721,7 +1724,8 @@ namespace Linko.LinkoExchange.Services.User
 
                 var emailEntries = new List<EmailEntry>
                                    {
-                                       _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:programUser, emailType:emailType, contentReplacements:contentReplacements)
+                                       _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:programUser, emailType:emailType,
+                                                                                                    contentReplacements:contentReplacements)
                                    };
 
                 // Do email audit log.
