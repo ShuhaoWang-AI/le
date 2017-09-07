@@ -822,6 +822,14 @@
                             clearMaskOnLostFocus: false,
                             clearIncomplete: true
                         });
+
+                    if ($("input[id^='EPAMethod_']:checked").length === $("input[id^='EPAMethod_']").length) {
+                        $("input[id='EPAMethod']").iCheck('check');
+                    }
+                    
+                    if ($("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
+                        $("input[id='CalcLoading']").iCheck('check');
+                    }
                 });
 
             $(document)
