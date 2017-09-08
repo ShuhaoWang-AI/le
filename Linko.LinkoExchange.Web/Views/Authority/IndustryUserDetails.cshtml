@@ -33,7 +33,10 @@
                 <div class="pull-right">
                     <input class="btn btn-primary btn-sm" data-target="#IndustryUserLockUnLockModal" data-toggle="modal" type="button" value="@Model.AccountLockedButtonText" />
                     @*<input type="button" value="@Model.StatusButtonText" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ChangeStatusModal" />*@
-                    <input class="btn btn-primary btn-sm" data-target="#resetModal" data-toggle="modal" type="button" value="Reset" />
+                    @if (!Model.IsInternalAccount)
+                    {
+                        <input class="btn btn-primary btn-sm" data-target="#resetModal" data-toggle="modal" type="button" value="Reset" />
+                    }
                 </div>
             </div>
         </div>

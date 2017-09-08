@@ -937,6 +937,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             {
                                 Id = user.OrganizationRegulatoryProgramUserId,
                                 PId = user.UserProfileId,
+                                IsInternalAccount = user.UserProfileDto.IsInternalAccount,
                                 FirstName = user.UserProfileDto.FirstName,
                                 LastName = user.UserProfileDto.LastName,
                                 PhoneNumber = user.UserProfileDto.PhoneNumber,
@@ -1475,6 +1476,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Id = user.OrganizationRegulatoryProgramUserId,
                                 IId = user.OrganizationRegulatoryProgramId,
                                 PId = user.UserProfileId,
+                                IsInternalAccount = user.UserProfileDto.IsInternalAccount,
                                 FirstName = user.UserProfileDto.FirstName,
                                 LastName = user.UserProfileDto.LastName,
                                 PhoneNumber = user.UserProfileDto.PhoneNumber,

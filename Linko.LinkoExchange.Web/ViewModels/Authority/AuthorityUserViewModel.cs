@@ -20,6 +20,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "PId")]
         public int PId { get; set; }
 
+        [ScaffoldColumn(scaffold:false)]
+        [Display(Name = "Is Internal Account")]
+        public bool IsInternalAccount { get; set; }
+
         [Editable(allowEdit:false)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
