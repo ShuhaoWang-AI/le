@@ -31,7 +31,10 @@
             <h3 class="box-title">User Information</h3>
             <div class="box-tools pull-right">
                 <div class="pull-right">
-                    <input class="btn btn-primary btn-sm" data-target="#IndustryUserLockUnLockModal" data-toggle="modal" type="button" value="@Model.AccountLockedButtonText" />
+                    @if (!Model.IsInternalAccount || Model.AccountLocked)
+                    {
+                        <input class="btn btn-primary btn-sm" data-target="#IndustryUserLockUnLockModal" data-toggle="modal" type="button" value="@Model.AccountLockedButtonText" />
+                    }
                     @*<input type="button" value="@Model.StatusButtonText" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ChangeStatusModal" />*@
                     @if (!Model.IsInternalAccount)
                     {
