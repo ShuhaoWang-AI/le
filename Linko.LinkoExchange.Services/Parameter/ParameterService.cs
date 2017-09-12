@@ -529,6 +529,8 @@ namespace Linko.LinkoExchange.Services.Parameter
             var monitoringPointAbbrv = _dbContext.MonitoringPoints
                                                  .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
 
+             var authorityOrganizationId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
+                                                 .OrganizationId;
             //Static Groups
             var parameterGroupDtos = new List<ParameterGroupDto>();
             parameterGroupDtos = GetStaticParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal, isGetActiveOnly:true).ToList();
@@ -536,21 +538,27 @@ namespace Linko.LinkoExchange.Services.Parameter
             //Add Dynamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
                                                      .Include(ss => ss.MonitoringPointParameter)
+                                                     .Include(x=>x.MonitoringPointParameter) 
                                                      .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
-
+                                                                  && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
+                                                                  && ss.CollectionMethod.OrganizationId == authorityOrganizationId
                                                                   // ReSharper disable once ArgumentsStyleNamedExpression
-                                                                  && !string.IsNullOrEmpty(ss.IUSampleFrequency))
+                                                                  && !string.IsNullOrEmpty(ss.IUSampleFrequency)) 
                                                      .Select(x => x.IUSampleFrequency)
                                                      .Distinct()
                                                      .ToList();
 
             var uniqueCollectionMethodIds = _dbContext.SampleFrequencies
                                                       .Include(ss => ss.MonitoringPointParameter)
+                                                      .Include(s=>s.MonitoringPointParameter)
                                                       .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                    && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal)
+                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+                                                                   && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
+                                                                   && ss.CollectionMethod.OrganizationId == authorityOrganizationId
+                                                                   )  
                                                       .Select(x => x.CollectionMethodId)
                                                       .Distinct()
                                                       .ToList();
@@ -613,6 +621,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                                                            && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                            && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
                                                            && ss.CollectionMethodId == collectMethodId
+                                                           && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
                                                            && ss.CollectionMethod.IsRemoved == false
                                                            && ss.CollectionMethod.IsEnabled)
                                               .Select(ss => ss.MonitoringPointParameter.Parameter)
