@@ -86,7 +86,8 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"> </param>
         /// <param name="isSignatory"> </param>
         /// <param name="isAuthorizationRequired"> </param>
-        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false);
+        /// <param name="needTransaction"></param>
+        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false, bool needTransaction = true);
 
         /// <summary>
         ///     Resets an org reg program user. Emails are then sent to the appropriate stakeholders including the user's email address
