@@ -567,7 +567,7 @@
     <Content Include="Views\Authority\IndustryUserDetails.cshtml" />
     <Content Include="Views\User\UserProfile.cshtml" />
     <Content Include="Views\Authority\Settings.cshtml" />
-    <Content Include="Temp\GRESD Electronic Signature Agreement.pdf" />
+    <Content Include="ElectronicSignatureAgreement\1000.pdf" />
     <Content Include="Views\Authority\AuthorityUsers.cshtml" />
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />

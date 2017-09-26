@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
@@ -29,7 +30,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region fields
 
         private readonly IAuthenticationService _authenticateService;
+        private readonly IHttpContextService _httpContextService;
         private readonly IMapHelper _mapHelper;
+        private readonly IOrganizationService _organizationService;
         private readonly ProfileHelper _profileHelper;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IUserService _userService;
@@ -46,7 +49,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             IMapHelper mapHelper,
             IHttpContextService httpContextService,
             IReportPackageService reportPackageService,
-            ISampleService sampleService
+            ISampleService sampleService,
+            IOrganizationService organizationService
         )
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
@@ -63,6 +67,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             _userService = userService;
             _questionAnswerService = questAnswerService;
             _mapHelper = mapHelper;
+            _httpContextService = httpContextService;
+            _organizationService = organizationService;
 
             _profileHelper = new ProfileHelper(questAnswerService:questAnswerService, userService:userService, jurisdictionService:jurisdictionService, mapHelper:mapHelper,
                                                httpContextService:httpContextService);
@@ -79,8 +85,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         [PortalAuthorize("industry")]
         public ActionResult DownloadSignatory()
         {
-            var file = HostingEnvironment.MapPath(virtualPath:"~/Temp/GRESD Electronic Signature Agreement.pdf");
-            var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var authority = _organizationService.GetAuthority(currentOrganizationRegulatoryProgramId);
+            var file = HostingEnvironment.MapPath(virtualPath:"~/ElectronicSignatureAgreement/" + authority.OrganizationId + ".pdf");
+            var fileDownloadName = authority.OrganizationDto.OrganizationName + " - Electronic Signature Agreement.pdf";
             var contentType = "application/pdf";
 
             var fileStream = System.IO.File.OpenRead(path:file);
