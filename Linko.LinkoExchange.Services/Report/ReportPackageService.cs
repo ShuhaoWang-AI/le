@@ -2168,11 +2168,11 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add(key:"recipientOrganizationJurisdictionName", value:reportPackage.RecipientOrganizationJurisdictionName);
             emailContentReplacements.Add(key:"recipientOrganizationZipCode", value:reportPackage.RecipientOrganizationZipCode);
 
-            var contactUserNameOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
+            var contactUserNameOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId,
                                                                                       settingType:SettingType.EmailContactInfoName);
-            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
+            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId,
                                                                                    settingType:SettingType.EmailContactInfoEmailAddress);
-            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
+            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId,
                                                                                   settingType:SettingType.EmailContactInfoPhone);
 
             emailContentReplacements.Add(key:"authorityName", value:contactUserNameOnEmail);
