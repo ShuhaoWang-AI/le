@@ -210,18 +210,15 @@ namespace Linko.LinkoExchange.Services.Organization
 
         public string GetUserAuthorityListForEmailContent(int userProfileId)
         {
-            var authorities = GetUserRegulators(userId:userProfileId);
+            var authorities = GetUserRegulators(userId:userProfileId).ToList();
 
             //Find all possible authorities
             var authorityList = "";
-            var newLine = "";
-            foreach (var authority in authorities)
-            {
-                authorityList += newLine + authority.EmailContactInfoName + " at " + authority.EmailContactInfoEmailAddress + " or " + authority.EmailContactInfoPhone;
+            var newLine = Environment.NewLine;
+            var leadingStr = "    "; 
 
-                //if (!String.IsNullOrEmpty(authority.PhoneExt))
-                //    authorityList += " ext." + authority.PhoneExt;
-                newLine = Environment.NewLine;
+            foreach (var authority in authorities) {
+                authorityList += leadingStr + authority.EmailContactInfoName + " at " + authority.EmailContactInfoEmailAddress + " or " + authority.EmailContactInfoPhone + newLine ;
             }
 
             return authorityList;
