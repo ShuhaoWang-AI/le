@@ -993,22 +993,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         private string GetClaimValue(string key)
         {
             var claims = ((ClaimsPrincipal) HttpContext.User).Claims;
-            var claim = claims.SingleOrDefault(i => i.Type == key);
-            if (claim != null)
-            {
-                return claim.Value;
-            }
-
-            return "";
-
-            //_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)
+            var claim = claims.FirstOrDefault(i => i.Type == key);
+            return claim != null ? claim.Value : "";
         }
 
         public ActionResult Industries_Read([DataSourceRequest] DataSourceRequest request, string searchString)
         {
             var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
-
-            // int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId, searchString:searchString)
                                                  .Where(i => i.IsRemoved == false);
 
