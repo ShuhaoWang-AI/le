@@ -1442,11 +1442,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             var approvalPeople = _permissionService.GetApprovalPeople(organizationRegulatoryProgram:inviterOrganizationRegulatoryProgram, isInvitedToIndustry:isInvitedToIndustry)
                                                    .ToList();
 
-            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId,
                                                                                    settingType:SettingType.EmailContactInfoEmailAddress);
-            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId,
                                                                                   settingType:SettingType.EmailContactInfoPhone);
-            var authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId,
                                                                              settingType:SettingType.EmailContactInfoName);
 
             var emailContentReplacements = new Dictionary<string, string>
