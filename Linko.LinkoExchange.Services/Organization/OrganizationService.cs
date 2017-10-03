@@ -218,7 +218,7 @@ namespace Linko.LinkoExchange.Services.Organization
             var leadingStr = "    "; 
 
             foreach (var authority in authorities) {
-                authorityList += leadingStr + authority.EmailContactInfoName + " at " + authority.EmailContactInfoEmailAddress + " or " + authority.EmailContactInfoPhone + newLine ;
+                authorityList += newLine + leadingStr + authority.EmailContactInfoName + " at " + authority.EmailContactInfoEmailAddress + " or " + authority.EmailContactInfoPhone;
             }
 
             return authorityList;

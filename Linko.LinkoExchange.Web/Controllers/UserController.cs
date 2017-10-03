@@ -230,7 +230,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 });
             }
 
-            _questionAnswerService.UpdateAnswer(questionAnswerDto); 
+            _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, new[] {questionAnswerDto});
             var questionType = "Security Question"; 
             if(questionAnswerViewModel.QuestionTypeName == QuestionTypeName.KBQ)
             {
