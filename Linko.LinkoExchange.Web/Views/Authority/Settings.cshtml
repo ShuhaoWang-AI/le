@@ -455,7 +455,8 @@
                             @* ReSharper disable once ArgumentsStyleNamedExpression *@
                             @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[i].Value)
                             @* ReSharper disable once ArgumentsStyleNamedExpression *@
-                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, labelText:Model.AvailableResultQualifierValidValues[index:i].Text)
+                            @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, labelText:Model.AvailableResultQualifierValidValues[i].Text)
                         </div>
                     }
                 </div>
@@ -478,7 +479,8 @@
                                 @* ReSharper disable once ArgumentsStyleNamedExpression *@
                                 @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
                                 @* ReSharper disable once ArgumentsStyleNamedExpression *@
-                                @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, labelText:Model.AvailableFlowUnitValidValues[index:i].Text)
+                                @* ReSharper disable once ArgumentsStyleNamedExpression *@
+                                @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, labelText:Model.AvailableFlowUnitValidValues[i].Text)
                             </div>
                         }
                     }
@@ -709,7 +711,7 @@
                         <script>
                             $("#btnSaveProgramSettings")
                                 .prop('disabled', true)
-                                .attr('title', 'At least one sample flow unit must be selected. Sync LinkoExchange from LinkoCTS to add flow units.');
+                                .attr('title', 'At least one sample flow unit must be selected.');
                         </script>
                     }
                 </div>
