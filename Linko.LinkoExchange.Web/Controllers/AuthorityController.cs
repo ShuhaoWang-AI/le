@@ -989,17 +989,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(model:model);
         }
-
-        private string GetClaimValue(string key)
-        {
-            var claims = ((ClaimsPrincipal) HttpContext.User).Claims;
-            var claim = claims.FirstOrDefault(i => i.Type == key);
-            return claim != null ? claim.Value : "";
-        }
-
+ 
         public ActionResult Industries_Read([DataSourceRequest] DataSourceRequest request, string searchString)
         {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId, searchString:searchString)
                                                  .Where(i => i.IsRemoved == false);
 
@@ -2472,7 +2465,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                Description = vm.Description
                                                                                                            }).ToList();
 
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId).Where(i => !i.IsRemoved);
 
             viewModel.AllReportPackageTemplateAssignments = industries.Select(vm => new IndustryViewModel

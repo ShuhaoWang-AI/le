@@ -107,11 +107,11 @@ namespace Linko.LinkoExchange.Services.Program
         }
 
         /// <inheritdoc />
-        public ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email)
+        public ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email, bool includeDisabled)
         {
-            return GetUserRegulatoryPrograms(email:email)
+            return GetUserRegulatoryPrograms(email:email, isIncludeDisabled:includeDisabled)
                 .Where(i => i.OrganizationRegulatoryProgramDto.IsEnabled
-                            && i.IsRegistrationApproved
+                            && i.IsRegistrationApproved 
                             && i.IsRegistrationDenied == false
                             && !i.InviterOrganizationRegulatoryProgramDto.IsRemoved).ToList();
         }
