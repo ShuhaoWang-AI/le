@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
@@ -23,6 +24,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
+        private readonly IOrganizationService _organizationService;
 
         #endregion
 
@@ -31,6 +33,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public InviteController(
             IInvitationService invitationService,
             ILogger logger,
+            IOrganizationService organizationService,
             IHttpContextService httpContextService,
             IUserService userService,
             IReportPackageService reportPackageService,
@@ -39,6 +42,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             _invitationService = invitationService;
             _logger = logger;
+            _organizationService = organizationService;
             _httpContextService = httpContextService;
         }
 
@@ -52,10 +56,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.OrgRegProgramId = Convert.ToInt32(value:industryOrgRegProgramId);
             }
 
+            var invitedOrganizationRegulatoryProgram = _organizationService
+                .GetOrganizationRegulatoryProgram(orgRegProgId:string.IsNullOrEmpty(value:industryOrgRegProgramId)
+                                                                   ? int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId))
+                                                                   : model.OrgRegProgramId);
             model.InvitationType = (InvitationType) Enum.Parse(enumType:typeof(InvitationType), value:invitationType);
 
-            ViewBag.OrganizationName = _httpContextService.GetClaimValue(CacheKey.OrganizationName); 
-            ViewBag.PortalName = _httpContextService.GetClaimValue(CacheKey.PortalName); 
+            model.OrganizationName = invitedOrganizationRegulatoryProgram.OrganizationDto.OrganizationName;
+            model.PortalName = invitedOrganizationRegulatoryProgram.OrganizationDto.OrganizationType.Name;
 
             return View(model:model);
         }

@@ -2,7 +2,7 @@
 @model Linko.LinkoExchange.Web.ViewModels.Shared.InviteViewModel
 
 @{
-    ViewBag.Title = "Invite"; 
+    ViewBag.Title = "Invite";
 }
 
 <section>
@@ -169,17 +169,14 @@
                                                                                        })
                     </div>
                 </div>
-            </div> 
-            
-            <div id="additionInfoDiv" style="display:none">
-                 <div class="col-md-offset-1">
-                     <label class="control-label">
-                         Inivite User to @ViewBag.OrganizationName   @ViewBag.PortalName portal ?
-                     </label>
-                 </div>
             </div>
         </section>
         <div class="box-footer">
+            <div id="additionInfoDiv" style="display: none">
+                <strong class="col-md-offset-2">
+                    Do you want to invite the user to the "@Model.OrganizationName" @Model.PortalName.ToLower() portal?
+                </strong>
+            </div>
             <div class="form-group pull-right">
                 <input class="btn btn-primary btn-sm" id="btnSearchEmail" type="submit" value="Search Email" />
                 <input class="btn btn-primary btn-sm" formmethod="post" id="btnSendInvite" style="display: none;" type="submit" value="Send Invite" />
@@ -194,11 +191,9 @@
 
     <script>
         $(document)
-            .ready(function()
-            {
+            .ready(function() {
                 $("#btnSendInvite")
-                    .click(function()
-                    {
+                    .click(function() {
                         //Prevent empty (just white space) strings
                         $("#FirstName").val($("#FirstName").val().trim());
                         $("#LastName").val($("#LastName").val().trim());
@@ -207,19 +202,16 @@
                     });
 
                 $("#btnSearchEmail")
-                    .click(function(event)
-                    {
+                    .click(function(event) {
                         event.preventDefault();
 
-                        if (!$('#EmailAddress').valid())
-                        {
+                        if (!$('#EmailAddress').valid()) {
                             return false;
                         }
 
                         var validationSummary = $('.validation-summary-errors');
 
-                        if (validationSummary.length === 0)
-                        {
+                        if (validationSummary.length === 0) {
                             // Form is still valid
                             validationSummary = $('.validation-summary-valid');
                         }
@@ -231,8 +223,7 @@
                                 emailAddress: $("#EmailAddress").val(),
                                 orgRegProgramIdString: $("#OrgRegProgramId").val()
                             },
-                            function(data)
-                            { 
+                            function(data) {
                                 $("#btnSearchEmail").hide();
                                 $("#btnCancelInvite").show();
 
@@ -245,18 +236,14 @@
 
                                 $("#EmailAddress").prop('readonly', true);
 
-                                $('#additionInfoDiv').show();
-
-                                if (data.FirstName == null && data.LastName == null)
-                                {
+                                if (data.FirstName == null && data.LastName == null) {
                                     // user not exist in LE
                                     $("input[type=text]").prop('readonly', false);
                                     $("#divDisplayMessage").addClass("alert-info");
 
                                     $("#btnSendInvite").show();
-                                }
-                                else
-                                {
+                                    $('#additionInfoDiv').show();
+                                } else {
                                     $("#divAdditionalUserInfo").show();
 
                                     $("#EmailAddress").val(data.EmailAddress);
@@ -267,20 +254,19 @@
 
                                     $("input[type=text]").prop('readonly', true);
 
-                                    if (data.IsUserActiveInSameProgram)
-                                    {
+                                    if (data.IsUserActiveInSameProgram) {
                                         @* user is active in same org program *@
                                         $("#divDisplayMessage").addClass("alert-danger");
                                         $("#iconDisplayMessage").removeClass("fa-check").addClass("fa-close");
 
                                         $("#btnSendInvite").hide();
-                                    }
-                                    else
-                                    {
+                                        $("#divAdditionalUserInfo").hide();
+                                    } else {
                                         @* user is not in same org program but in different org program *@
                                         $("#divDisplayMessage").addClass("alert-info");
 
                                         $("#btnSendInvite").show();
+                                        $('#additionInfoDiv').show();
                                     }
                                 }
                             });
@@ -288,8 +274,7 @@
                     });
 
                 $("[id=btnCancelInvite]")
-                    .click(function()
-                    {
+                    .click(function() {
                         clearFields();
                         $("#btnSearchEmail").show();
                         $("#btnSendInvite").hide();
@@ -304,12 +289,12 @@
 
                         $("#divNameContainer").hide();
                         $("#divAdditionalUserInfo").hide();
+                        $('#additionInfoDiv').hide();
                         $("#boxHeader").html("Search Email Address");
                     });
             });
 
-        function clearFields()
-        {
+        function clearFields() {
             $("#displayMessage").html("");
             $("#EmailAddress").val(null);
             $("#FirstName").val(null);
@@ -318,18 +303,18 @@
             $("#PhoneNumber").val(null);
         }
     </script>
-    
+
     <script>
-            $(document)
-                .keypress(function (evt) {
-                    if (evt.which === 13) {
-                        if ($("#btnSearchEmail").is(':visible')) {
-                            $("#btnSearchEmail").click();
-                        } else if ($("#btnSendInvite").is(':visible')) {
-                            $("#btnSendInvite").click();
-                        }
+        $(document)
+            .keypress(function(evt) {
+                if (evt.which === 13) {
+                    if ($("#btnSearchEmail").is(':visible')) {
+                        $("#btnSearchEmail").click();
+                    } else if ($("#btnSendInvite").is(':visible')) {
+                        $("#btnSendInvite").click();
                     }
-                });
+                }
+            });
     </script>
 
 }

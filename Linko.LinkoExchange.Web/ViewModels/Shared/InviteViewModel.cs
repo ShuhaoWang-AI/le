@@ -35,6 +35,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public InvitationType InvitationType { get; set; }
 
+        public string OrganizationName { get; set; }
+
+        public string PortalName { get; set; }
+
         #endregion
     }
 }
