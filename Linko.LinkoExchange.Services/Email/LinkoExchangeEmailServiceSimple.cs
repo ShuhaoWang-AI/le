@@ -150,11 +150,8 @@ namespace Linko.LinkoExchange.Services.Email
         /// <inheritdoc />
         public List<EmailEntry> GetAllProgramEmailEntiresForUser(UserProfile userProfile, EmailType emailType, Dictionary<string, string> contentReplacements)
         {
-            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
-            var includeRemovedUser = includeDisabledUser;  
+            var orgRegProgramUsers = GetOrganizationRegulatoryProgramUserList(userProfile.Email, emailType);
 
-            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:userProfile.Email, includeRemovedUser:includeRemovedUser, includeDisabledUser:includeDisabledUser); 
-            
             return orgRegProgramUsers.Select(i => new EmailEntry
                                                   {
                                                       EmailType = emailType,
@@ -171,10 +168,9 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
         public List<EmailEntry> GetAllProgramEmailEntiresForUser(UserDto user, EmailType emailType, Dictionary<string, string> contentReplacements)
-        {
-            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
-            var includeRemovedUser = includeDisabledUser; 
-            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:user.Email, includeRemovedUser: includeRemovedUser, includeDisabledUser: includeDisabledUser);
+        { 
+            var orgRegProgramUsers = GetOrganizationRegulatoryProgramUserList(user.Email, emailType);
+
             return orgRegProgramUsers.Select(i => new EmailEntry
                                                   {
                                                       EmailType = emailType,
@@ -243,6 +239,22 @@ namespace Linko.LinkoExchange.Services.Email
 
         #endregion
 
+        private ICollection<OrganizationRegulatoryProgramUserDto> GetOrganizationRegulatoryProgramUserList(string email, EmailType emailType)
+        {
+            var noCondition = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
+
+            ICollection<OrganizationRegulatoryProgramUserDto> orgRegProgramUsers;
+            if (noCondition)
+            {
+                orgRegProgramUsers = _programService.SimpleGetRegulatoryProgramUsers(email:email);
+            }
+            else
+            {
+                orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:email, includeRemovedUser:false, includeDisabledUser:false);
+            }
+            return orgRegProgramUsers;
+        }
+        
 
         private EmailAuditLogEntryDto GetEmailAuditLog(EmailEntry emailEntry, int emailTemplateId)
         {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Program
@@ -24,6 +25,13 @@ namespace Linko.LinkoExchange.Services.Program
         /// <param name="includeDisabledUser"> </param>
         /// <returns> </returns>
         ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email, bool includeRemovedUser, bool includeDisabledUser);
+
+        /// <summary>
+        /// Simples the get regulatory program users, don't care about user's status
+        /// </summary>
+        /// <param name="email">The email.</param>
+        /// <returns></returns>
+        ICollection<OrganizationRegulatoryProgramUserDto> SimpleGetRegulatoryProgramUsers(string email);
 
         /// <summary>
         ///     Get programs that a user can access

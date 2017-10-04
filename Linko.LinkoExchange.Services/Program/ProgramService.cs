@@ -105,6 +105,12 @@ namespace Linko.LinkoExchange.Services.Program
 
             return organziationRegulatoryProgramUserDtos;
         }
+        
+        /// <inheritdoc />
+        public ICollection<OrganizationRegulatoryProgramUserDto> SimpleGetRegulatoryProgramUsers(string email)
+        {
+            return GetUserRegulatoryPrograms(email:email, isIncludeRemoved:true, isIncludeDisabled:true).ToList();
+        }
 
         /// <inheritdoc />
         public ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email, bool includeRemovedUser, bool includeDisabledUser)
