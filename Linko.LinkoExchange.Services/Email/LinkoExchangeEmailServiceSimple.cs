@@ -103,7 +103,7 @@ namespace Linko.LinkoExchange.Services.Email
                 foreach (var emailEntry in emailEntries)
                 {
                     try
-                    { 
+                    {
                         using (var smtpClient = new SmtpClient(host:_emailServer))
                         {
                             smtpClient.Send(message:emailEntry.MailMessage);
@@ -150,9 +150,10 @@ namespace Linko.LinkoExchange.Services.Email
         /// <inheritdoc />
         public List<EmailEntry> GetAllProgramEmailEntiresForUser(UserProfile userProfile, EmailType emailType, Dictionary<string, string> contentReplacements)
         {
-            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;  
+            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
+            var includeRemovedUser = includeDisabledUser;  
 
-            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:userProfile.Email, includeDisabled: includeDisabledUser); 
+            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:userProfile.Email, includeRemovedUser:includeRemovedUser, includeDisabledUser:includeDisabledUser); 
             
             return orgRegProgramUsers.Select(i => new EmailEntry
                                                   {
@@ -171,8 +172,9 @@ namespace Linko.LinkoExchange.Services.Email
 
         public List<EmailEntry> GetAllProgramEmailEntiresForUser(UserDto user, EmailType emailType, Dictionary<string, string> contentReplacements)
         {
-            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;  
-            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:user.Email, includeDisabled:includeDisabledUser);
+            var includeDisabledUser = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
+            var includeRemovedUser = includeDisabledUser; 
+            var orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:user.Email, includeRemovedUser: includeRemovedUser, includeDisabledUser: includeDisabledUser);
             return orgRegProgramUsers.Select(i => new EmailEntry
                                                   {
                                                       EmailType = emailType,

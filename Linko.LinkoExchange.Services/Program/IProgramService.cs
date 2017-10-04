@@ -20,9 +20,10 @@ namespace Linko.LinkoExchange.Services.Program
         ///     and that were invited by org reg programs that still exist in the system (i.e. not removed).
         /// </summary>
         /// <param name="email"> </param>
-        /// <param name="includeDisabled"> </param>
+        /// <param name="includeRemovedUser"> </param>
+        /// <param name="includeDisabledUser"> </param>
         /// <returns> </returns>
-        ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email, bool includeDisabled);
+        ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email, bool includeRemovedUser, bool includeDisabledUser);
 
         /// <summary>
         ///     Get programs that a user can access
