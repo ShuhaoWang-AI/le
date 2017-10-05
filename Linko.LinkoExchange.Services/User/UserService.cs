@@ -818,30 +818,17 @@ namespace Linko.LinkoExchange.Services.User
                     }
                 }
             }
+            
+            // current authority settings 
+            var currentAuthorityContentReplacements = GetCurrentAuthoritySettingEmailContentReplacement(); 
 
             foreach (var program in programs.ToList())
             {
                 if (reason == AccountLockEvent.ManualAction)
                 {
-                    //Send to user on behalf of each program's authority
-                    var authority = _orgService.GetAuthority(orgRegProgramId:program.OrganizationRegulatoryProgramId);
-                    authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                                 settingType:SettingType.EmailContactInfoName);
-                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                                      settingType:SettingType.EmailContactInfoEmailAddress);
-                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
-                                                                                      settingType:SettingType.EmailContactInfoPhone);
-
-                    contentReplacements = new Dictionary<string, string>
-                                          {
-                                              {"authorityName", authorityName},
-                                              {"authorityOrganizationName", authority.OrganizationDto.OrganizationName},
-                                              {"authoritySupportEmail", authorityEmail},
-                                              {"authoritySupportPhoneNumber", authorityPhone}
-                                          };
-
+                    // For manual lock, always show the current authority's settings in the emails.
                     var emailEntry = _linkoExchangeEmailService.GetEmailEntryForUser(user:user, emailType:EmailType.UserAccess_AccountLockout,
-                                                                                     contentReplacements:contentReplacements, orgRegProg:program);
+                                                                                     contentReplacements:currentAuthorityContentReplacements, orgRegProg:program);
                     emailEntries.Add(item:emailEntry);
                 }
                 else
@@ -1104,6 +1091,30 @@ namespace Linko.LinkoExchange.Services.User
 
                 _crommerAuditLogService.Log(eventType:cromerrEvent, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
+        }
+
+        private Dictionary<string, string> GetCurrentAuthoritySettingEmailContentReplacement()
+        {
+            //Send to user on behalf of each program's authority
+            var authority = _orgService.GetAuthority(Int32.Parse(_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)));
+
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                             settingType:SettingType.EmailContactInfoName);
+            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                              settingType:SettingType.EmailContactInfoEmailAddress);
+            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+                                                                              settingType:SettingType.EmailContactInfoPhone);
+
+            // For manual lock, the authority information would always be the authority that perform the locking action
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"authorityName", authorityName},
+                                          {"authorityOrganizationName", authority.OrganizationDto.OrganizationName},
+                                          {"authoritySupportEmail", authorityEmail},
+                                          {"authoritySupportPhoneNumber", authorityPhone}
+                                      };
+
+            return contentReplacements;
         }
 
         public void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable, bool isAuthorizationRequired = false)
