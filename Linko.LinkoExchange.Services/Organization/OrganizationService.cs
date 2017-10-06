@@ -371,7 +371,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 dtos.Add(item:dto);
             }
 
-            return dtos.Count > 0 ? dtos : null;
+            return dtos;
         }
 
         public int GetRemainingUserLicenseCount(int orgRegProgramId)

@@ -39,39 +39,39 @@
                 @(Html.Kendo().Grid<IndustryViewModel>()
                       .Name(componentName:"grid")
                       .Columns(columns =>
-                               {
-                                   columns.Bound(c => c.ReferenceNumber)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.IndustryName)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-3"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.Address)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-4"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-4"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.Classification)
-                                          .HtmlAttributes(attributes:new {style = "width:80px;"})
-                                          .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.IsEnabledText)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.HasSignatoryText)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.AssignedTo)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Template(m => { })
-                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                          .Width(pixelWidth:40);
-                               })
+                      {
+                          columns.Bound(c => c.ReferenceNumber)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.IndustryName)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-3"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Address)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-4"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-4"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Classification)
+                                 .HtmlAttributes(attributes:new {style = "width:80px;"})
+                                 .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.IsEnabledText)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.HasSignatoryText)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.AssignedTo)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Template(m => { })
+                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth:40);
+                      })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -79,20 +79,21 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                                  {
-                                      selectable.Mode(mode:GridSelectionMode.Single);
-                                      selectable.Type(type:GridSelectionType.Row);
-                                  })
+                      {
+                          selectable.Mode(mode:GridSelectionMode.Single);
+                          selectable.Type(type:GridSelectionType.Row);
+                      })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text: "No industries match your search.")
 
                       //.Groupable()
                       .HtmlAttributes(attributes:new
-                                                 {
-                                                     //@class = "input-sm"
-                                                 })
+                      {
+                          //@class = "input-sm"
+                      })
                       .Events(events => { events.Change(handler:"gotoNextPage"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
@@ -100,9 +101,9 @@
                                                     .Batch(enabled:true)
                                                     .Sort(sort => sort.Add(memberName:"IndustryName").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"Industries_Read", controllerName:"Authority", routeValues:new
-                                                                                                                                                    {
-                                                                                                                                                        searchString = ViewBag.SearchString
-                                                                                                                                                    }))
+                                                    {
+                                                        searchString = ViewBag.SearchString
+                                                    }))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler.bind({gridId: '#grid'})"))
                       )
