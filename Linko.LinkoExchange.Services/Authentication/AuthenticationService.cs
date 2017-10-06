@@ -1862,7 +1862,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(settingType:SettingType.PasswordHistoryMaxCount, organizationSettingsValue:organizationSettings, orgTypeName:orgTypeName, isMax:false);
+            return GetSettingIntValue(settingType:SettingType.PasswordHistoryMaxCount, organizationSettingsValue:organizationSettings, orgTypeName:orgTypeName);
         }
 
         private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
