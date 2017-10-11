@@ -80,7 +80,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <summary>
         ///     Get settings for one program
         /// </summary>
-        /// <param name="programId"> The program Id to get for </param>
+        /// <param name="orgRegProgramId"> The program Id to get for </param>
         /// <returns> The PrrogramSetting object </returns>
         ProgramSettingDto GetProgramSettingsById(int orgRegProgramId);
 
@@ -92,5 +92,29 @@ namespace Linko.LinkoExchange.Services.Settings
         void CreateOrUpdateOrganizationSettings(int organizationId, IEnumerable<SettingDto> settingDtos);
         void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto);
         OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null);
+
+        /// <summary>
+        ///     Gets the strictest password history maximum count.
+        /// </summary>
+        /// <param name="organizationSettings"> The organization settings. </param>
+        /// <param name="orgTypeName"> Name of the organization type. </param>
+        /// <returns> </returns>
+        int GetStrictestPasswordHistoryMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName);
+
+        /// <summary>
+        ///     Gets the strictest password change required days.
+        /// </summary>
+        /// <param name="organizationSettings"> The organization settings. </param>
+        /// <param name="orgTypeName"> Name of the organization type. </param>
+        /// <returns> </returns>
+        int GetStrictestPasswordChangeRequiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName);
+
+        /// <summary>
+        ///     Gets the strictest failed password attempt maximum count.
+        /// </summary>
+        /// <param name="organizationSettings"> The organization settings. </param>
+        /// <param name="orgTypeName"> Name of the org type. </param>
+        /// <returns> </returns>
+        int GetStrictestFailedPasswordAttemptMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName);
     }
 }

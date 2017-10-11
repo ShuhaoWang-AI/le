@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
+using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -414,9 +414,24 @@ namespace Linko.LinkoExchange.Services.Settings
             return setting.DefaultValue;
         }
 
+        public int GetStrictestPasswordHistoryMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
+        {
+            return GetMaxOrganizationSettingValue(settingType:SettingType.PasswordHistoryMaxCount, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
+        }
+
+        public int GetStrictestPasswordChangeRequiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
+        {
+            return GetMinOrganizationSettingValue(settingType:SettingType.PasswordChangeRequiredDays, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
+        }
+
+        public int GetStrictestFailedPasswordAttemptMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
+        {
+            return GetMinOrganizationSettingValue(settingType:SettingType.FailedPasswordAttemptMaxCount, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
+        }
+
         #endregion
 
-        public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
+        internal void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {
             var transaction = _dbContext.BeginTransaction();
             try
@@ -439,7 +454,7 @@ namespace Linko.LinkoExchange.Services.Settings
             }
         }
 
-        public void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
+        internal void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
         {
             var transaction = _dbContext.BeginTransaction();
             try
@@ -460,6 +475,48 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 transaction.Dispose();
             }
+        }
+
+        private int GetMinOrganizationSettingValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
+        {
+            var defaultValueStr = GetSettingTemplateValue(settingType:settingType, orgType:orgTypeName);
+            var defaultValue = ValueParser.TryParseInt(value:defaultValueStr, defaultValue:0);
+            var list = organizationSettings.ToList();
+            if (list.Any())
+            {
+                if (orgTypeName != null)
+                {
+                    defaultValue = list.Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
+                                       .Min(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
+                }
+                else
+                {
+                    defaultValue = list.Where(i => i.TemplateName == settingType).Min(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
+                }
+            }
+
+            return defaultValue;
+        }
+
+        private int GetMaxOrganizationSettingValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
+        {
+            var defaultValueStr = GetSettingTemplateValue(settingType:settingType, orgType:orgTypeName);
+            var defaultValue = ValueParser.TryParseInt(value:defaultValueStr, defaultValue:0);
+            var list = organizationSettings.ToList();
+            if (list.Any())
+            {
+                if (orgTypeName != null)
+                {
+                    defaultValue = list.Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
+                                       .Max(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
+                }
+                else
+                {
+                    defaultValue = list.Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(value:i.Value, defaultValue:defaultValue));
+                }
+            }
+
+            return defaultValue;
         }
     }
 }
