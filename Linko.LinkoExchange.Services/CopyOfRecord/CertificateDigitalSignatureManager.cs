@@ -19,7 +19,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private readonly object _lock = new object();
         private readonly ILogger _logger;
         private int _currentCertificateId;
-        private bool _initialized;
 
         private RSACryptoServiceProvider _privateKey;
         private RSACryptoServiceProvider _publicKey;
@@ -66,7 +65,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             return signature;
         }
 
-        public bool VerifySignature(string currentSignatureStr, byte[] dataToVerify)
+        public bool VerifySignature(string currentSignatureStr, byte[] dataToVerify, int copyOfRecordCertificateId)
         {
             _logger.Info(message:"Enter CertificateDigitalSignatureManager.VerifySignature.");
             try
@@ -75,7 +74,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 var dataToVerifyHashBytes = Encoding.UTF8.GetBytes(s:dataToVerifyHash);
                 var signedDataBytes = Convert.FromBase64String(s:currentSignatureStr);
 
-                return VerifySignature(originData:dataToVerifyHashBytes, signedData:signedDataBytes);
+                return VerifySignature(originData:dataToVerifyHashBytes, signedData:signedDataBytes, certificateId:copyOfRecordCertificateId);
             }
             catch (Exception ex)
             {
@@ -84,13 +83,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
         }
 
-        public int LatestCertificateId()
+        public int GetLatestCertificateId()
         {
-            if (_initialized == false)
-            {
-                InitializeCertificate();
-            }
-
+           InitializeCertificate();
             return _currentCertificateId;
         }
 
@@ -98,9 +93,17 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         #region private section
 
-        private CopyOfRecordCertificate GetLatestCertificate()
+        private CopyOfRecordCertificate GetCertificate(int? certificateId)
         {
-            return _dbContext.CopyOfRecordCertificates.OrderByDescending(t => t.CreationDateTimeUtc).First();
+            if (certificateId.HasValue)
+            {
+                return _dbContext.CopyOfRecordCertificates.Single(t => t.CopyOfRecordCertificateId == certificateId);
+            } 
+            else 
+            {
+              // Use the latest one
+              return _dbContext.CopyOfRecordCertificates.OrderByDescending(t => t.CreationDateTimeUtc).First();  
+            } 
         }
 
         private string GetDataSignature(byte[] data)
@@ -110,29 +113,21 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private byte[] SignData(byte[] data)
         {
-            if (_initialized == false)
-            {
-                InitializeCertificate();
-            }
-
+            InitializeCertificate();
             var halg = new SHA1CryptoServiceProvider();
             return _privateKey.SignData(buffer:data, halg:halg);
         }
 
-        private bool VerifySignature(byte[] originData, byte[] signedData)
+        private bool VerifySignature(byte[] originData, byte[] signedData, int certificateId)
         {
-            if (_initialized == false)
-            {
-                InitializeCertificate();
-            }
-
+            InitializeCertificate(certificateId);
             var halg = new SHA1CryptoServiceProvider();
             return _publicKey.VerifyData(buffer:originData, halg:halg, signature:signedData);
         }
 
-        private void InitializeCertificate()
+        private void InitializeCertificate(int? certificateId = null)
         {
-            var certificateInfo = GetLatestCertificate();
+            var certificateInfo = GetCertificate(certificateId);
             _currentCertificateId = certificateInfo.CopyOfRecordCertificateId;
 
             var certificatePassword = certificateInfo.Password;
@@ -149,10 +144,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             if (_privateKey == null || _publicKey == null)
             {
                 throw new Exception(message:"Invalid certificate or password.");
-            }
-
-            _initialized = true;
-        }
+            } 
+        } 
 
         #endregion
     }

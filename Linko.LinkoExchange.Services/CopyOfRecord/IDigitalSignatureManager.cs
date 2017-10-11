@@ -3,8 +3,7 @@
     public interface IDigitalSignatureManager
     {
         string SignData(string base64Data);
-        int LatestCertificateId();
-
-        bool VerifySignature(string currentSignatureStr, byte[] dataToVerify);
+        int GetLatestCertificateId();
+        bool VerifySignature(string currentSignatureStr, byte[] dataToVerify, int copyOfRecordCertificateId);
     }
 }

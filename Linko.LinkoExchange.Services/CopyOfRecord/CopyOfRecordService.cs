@@ -69,7 +69,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             Array.Copy(sourceArray:coreBytes, destinationArray:copyOfRecord.Data, length:coreBytes.Length);
             copyOfRecord.Signature = SignaData(hash:copyOfRecord.Hash);
-            copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
+            copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.GetLatestCertificateId();
             copyOfRecord.ReportPackageId = reportPackageId;
             _dbContext.CopyOfRecords.Add(entity:copyOfRecord);
             _dbContext.SaveChanges();
@@ -95,7 +95,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _logger.Info(message:$"Enter CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
 
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
-            var isValid = _digitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecord.Signature, dataToVerify:copyOfRecord.Data);
+            var isValid = _digitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecord.Signature, dataToVerify:copyOfRecord.Data, copyOfRecordCertificateId:copyOfRecord.CopyOfRecordCertificateId);
             var validationResult = new CopyOfRecordValidationResultDto
                                    {
                                        Valid = isValid,

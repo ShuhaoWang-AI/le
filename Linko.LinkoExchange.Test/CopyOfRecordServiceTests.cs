@@ -174,7 +174,7 @@ namespace Linko.LinkoExchange.Test
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId:reportPackageId);
             var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(dbContext:_dbContext, logger:_logger.Object, httpContextService:_httpContext.Object);
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsTrue(condition:result);
         }
@@ -210,7 +210,7 @@ namespace Linko.LinkoExchange.Test
 
             ////1. Modify signature 
             copyOfRecordDto.Signature = "aaaa";
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsFalse(condition:result);
         }
@@ -247,7 +247,7 @@ namespace Linko.LinkoExchange.Test
             var testSingature = "fake signature";
             var testSignatuerBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(s:testSingature));
             copyOfRecordDto.Signature = testSignatuerBase64;
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsFalse(condition:result);
         }
@@ -282,7 +282,7 @@ namespace Linko.LinkoExchange.Test
             ////1. Fake signature  
             var testSingature = "fake data";
             copyOfRecordDto.Data = Encoding.UTF8.GetBytes(s:testSingature);
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsFalse(condition:result);
         }
@@ -316,7 +316,7 @@ namespace Linko.LinkoExchange.Test
 
             ////1. change some of the data  
             copyOfRecordDto.Data[0] = 10;
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsFalse(condition:result);
         }
@@ -350,7 +350,7 @@ namespace Linko.LinkoExchange.Test
 
             ////1. assign empty byte array  
             copyOfRecordDto.Data = new byte[] { };
-            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data);
+            var result = certificateDigitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecordDto.Signature, dataToVerify:copyOfRecordDto.Data, copyOfRecordCertificateId: copyOfRecordDto.CopyOfRecordCertificateId);
 
             Assert.IsFalse(condition:result);
         }
