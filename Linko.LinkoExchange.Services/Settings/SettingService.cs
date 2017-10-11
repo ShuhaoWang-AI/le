@@ -414,11 +414,6 @@ namespace Linko.LinkoExchange.Services.Settings
             return setting.DefaultValue;
         }
 
-        public int GetStrictestPasswordHistoryMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
-        {
-            return GetMaxOrganizationSettingValue(settingType:SettingType.PasswordHistoryMaxCount, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
-        }
-
         public int GetStrictestPasswordChangeRequiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
             return GetMinOrganizationSettingValue(settingType:SettingType.PasswordChangeRequiredDays, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
