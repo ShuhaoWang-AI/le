@@ -839,9 +839,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = false;
 
                 //3rd incorrect attempt (5.3.b) => lockout
-                var maxAnswerAttempts =
-                    Convert.ToInt32(value:_settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
-                                                                                              isChooseMin:true, isChooseMax:null));
+                var maxAnswerAttempts = 
+                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.FailedKBQAttemptMaxCount));
+
                 if (failedCount + 1 >= maxAnswerAttempts) // from web.config
                 {
                     _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);

@@ -48,6 +48,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly ISettingService _settingService;
         private readonly IUserService _userService;
+        private readonly IHttpContextService _httpContextService;
 
         #endregion
 
@@ -79,6 +80,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _mapHelper = mapHelper;
             _profileHelper = new ProfileHelper(questAnswerService:questionAnswerService, userService:userService, jurisdictionService:jurisdictionService,
                                                mapHelper:mapHelper, httpContextService:httpContextService);
+            _httpContextService = httpContextService;
         }
 
         #endregion
@@ -1078,11 +1080,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:model.Id, answer:model.Answer.ToLower()))
             {
                 model.FailedCount++;
+                var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
                 var maxAnswerAttempts =
-                    Convert.ToInt32(value:
-                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:model.UserProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
-                                                                                        isChooseMin:true,
-                                                                                        isChooseMax:null));
+                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.FailedKBQAttemptMaxCount));
+
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
                     // Lock the account; 
@@ -1267,11 +1268,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:model.QuestionAnswerId, answer:model.Answer.ToLower()))
             {
                 model.FailedCount++;
+                var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
                 var maxAnswerAttempts =
-                    Convert.ToInt32(value:
-                                    _settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
-                                                                                        isChooseMin:true,
-                                                                                        isChooseMax:null));
+                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.FailedKBQAttemptMaxCount));
+
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
                     // Logout user
