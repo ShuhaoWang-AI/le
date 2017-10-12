@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="reportOperation"> Sign & Submit or Repudiate </param>
         /// <param name="reportPackageId"> </param>
         /// <returns> </returns>
-        PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
+        PasswordAndKbqValidationResultDto ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
                                                               ReportOperation reportOperation, int? reportPackageId = null);
 
         /// <summary>

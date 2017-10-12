@@ -1113,12 +1113,14 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(result:signInResultDto);
         }
 
-        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
+        public PasswordAndKbqValidationResultDto ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
                                                                      ReportOperation reportOperation, int? reportPackageId = null)
         {
             _logger.Info(message:"Enter AuthenticationService.PasswordAndKbqValidationResult");
 
+            var result = new PasswordAndKbqValidationResultDto();
             var userProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
+            result.RegulatoryList = _organizationService.GetUserRegulators(userId: userProfileId) ?? new List<AuthorityDto>();
             var orgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authority = _settingService.GetAuthority(orgRegProgramId:orgRegProgramId);
             var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId:authority.OrganizationId).Settings;
@@ -1131,14 +1133,16 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (failedPasswordAttemptMaxCount <= failedPasswordCount)
             {
+                result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.InvalidPassword;
                 SignOff();
-                return PasswordAndKbqValidationResult.InvalidPassword;
+                return result;
             }
 
             if (failedKbqAttemptMaxCount <= failedKbqCount)
             {
+                result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.IncorrectKbqAnswer;
                 SignOff();
-                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+                return result;
             }
 
             var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
@@ -1173,10 +1177,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                                                            reason:AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony, reportPackageId:reportPackageId);
                     }
 
-                    return PasswordAndKbqValidationResult.UserLocked_Password;
+                    result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.UserLocked_Password;
+                    return result;
                 }
 
-                return PasswordAndKbqValidationResult.InvalidPassword;
+                result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.InvalidPassword;
+                return result;
             }
 
             // Check to see if KBQ answer matches
@@ -1196,10 +1202,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                                                            reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony, reportPackageId:reportPackageId);
                     }
 
-                    return PasswordAndKbqValidationResult.UserLocked_KBQ;
+                    result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.UserLocked_KBQ;
+                    return result;
                 }
 
-                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+                result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+                return result;
             }
 
             // Check user is validate user or not
@@ -1217,7 +1225,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 ThrowUserStatusRuleValiation(message:"User is disabled");
             }
 
-            return PasswordAndKbqValidationResult.Success;
+            result.PasswordAndKbqValidationResult = PasswordAndKbqValidationResult.Success;
+            return result;
         }
 
         public string GetClaimsValue(string claimType)

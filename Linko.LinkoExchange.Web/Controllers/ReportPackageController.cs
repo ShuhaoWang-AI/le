@@ -596,7 +596,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                    reportPackageId:id);
                         ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
-                        switch (result)
+                        switch (result.PasswordAndKbqValidationResult)
                         {
                             case PasswordAndKbqValidationResult.Success: break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
@@ -614,7 +614,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
-                            case PasswordAndKbqValidationResult.UserLocked_Password: return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            case PasswordAndKbqValidationResult.UserLocked_Password:
+                                TempData[key: "RegulatoryList"] = result.RegulatoryList;
+                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                             default: throw new ArgumentOutOfRangeException();
                         }
                     }
@@ -692,7 +694,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
 
-                        switch (result)
+                        switch (result.PasswordAndKbqValidationResult)
                         {
                             case PasswordAndKbqValidationResult.Success: break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
@@ -710,7 +712,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
-                            case PasswordAndKbqValidationResult.UserLocked_Password: return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            case PasswordAndKbqValidationResult.UserLocked_Password:
+                                TempData[key: "RegulatoryList"] = result.RegulatoryList;
+                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                             default: throw new ArgumentOutOfRangeException();
                         }
                     }
