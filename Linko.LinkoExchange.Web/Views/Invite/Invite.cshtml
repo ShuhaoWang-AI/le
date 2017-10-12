@@ -179,7 +179,7 @@
             </div>
             <div class="form-group pull-right">
                 <input class="btn btn-primary btn-sm" id="btnSearchEmail" type="submit" value="Search Email" />
-                <input class="btn btn-primary btn-sm" formmethod="post" id="btnSendInvite" style="display: none;" type="submit" value="Send Invite" />
+                <input class="btn btn-primary btn-sm" onclick="this.form.onsubmit(); return false;" id="btnSendInvite" style="display: none;" type="submit" value="Send Invite" />
                 <input class="btn btn-primary btn-sm" id="btnCancelInvite" style="display: none;" type="button" value="Cancel" />
             </div>
         </div>
