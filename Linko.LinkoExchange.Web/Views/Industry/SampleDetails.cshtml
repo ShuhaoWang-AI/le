@@ -1425,8 +1425,19 @@
                 }
             } else {
                 //no limits
-                complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+
+                //Don't show compliance icon at all if there isn't a valid result
+                if (qualifier !== "ND" && qualifier !== "NF" && isEmptyOrSpaces(result))
+                {
+                    complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+                }
+                else
+                {
+                    complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+                }
             }
+
+            
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
                 .html()
@@ -1440,9 +1451,8 @@
         }
 
         function displayMassLoadingCompliance(paramId) {
-            //if not calculating mass loading, do not display a mass compliance badge
-            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
-            if (!clChecked) {
+            if (!isMassLoadingValueComplianceIconRequired(paramId))
+            {
                 $("#MassResultCompliance_" + paramId).html("");
                 return;
             }
@@ -1508,6 +1518,27 @@
             //alert("Comparing mass loading value = '" + massLoadingValue + "' to min ='" + massLoadingMinValue + "' and max = '"  + massLoadingMaxValue + "'");
         }
 
+        function isMassLoadingValueComplianceIconRequired(paramId)
+        {
+            var qualifier = $("#Qualifier_" + paramId).val();
+            var result = parseFloat($("#Result_" + paramId).val());
+            var sampleFlowResult = parseFloat($("#FlowValue").val());
+            var flowUnitId = $("#FlowUnitId option:selected").val();
+            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+
+            //if no valid result OR not calc mass loading OR valid flow value/unit
+            if ((qualifier !== "ND" && qualifier !== "NF" && isNaN(result)) || //no valid result
+                !clChecked || //haven't checked isCalcMassLoading
+                (isNaN(sampleFlowResult) || flowUnitId < 1)) //no flow result value or unit
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         function getMassLoadingValue(paramId) {
             var result = parseFloat($("#Result_" + paramId).val());
             var sampleFlowResult = parseFloat($("#FlowValue").val());
@@ -1539,6 +1570,10 @@
                 {{complianceIconAndMessage}}
             </span>
         </span>
+    </script>
+
+    <script id="blankComplianceIconAndMessage" type="text/template">
+        <i class="fa fa-lg fa-check-circle" style="visibility: hidden" aria-hidden="true" data-placement="top" data-toggle="tooltip"></i>
     </script>
 
     <script id="goodComplianceIconAndMessage" type="text/template">
