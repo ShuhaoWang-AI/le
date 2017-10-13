@@ -51,10 +51,14 @@
                 if (filtered.length > 0) {
                     $(this).siblings(".field-validation-error").text("Question cannot be duplicated with others.");
                     qaDiv.find(".fa-save").addClass("disabled");
+                    qaDiv.find(".text-box").addClass("disabled");
+                    qaDiv.find(".text-box").attr("readonly", "readonly");
                 } else {
                     $(this).closest(".form-group").next().find("input[type=text]").val("");
                     $(this).siblings(".field-validation-error").text("");
                     qaDiv.find(".fa-save").removeClass("disabled");
+                    $(this).siblings("input").removeClass("disabled");
+                    qaDiv.find(".text-box").attr("readonly", null);
                 }
             });
 
@@ -168,7 +172,7 @@
             });
 
             setEditEventHandler();
-        };
+        }
 
         function setEditEventHandler() {
             var inputs = $(".question-answer-div").find("input[type='text']");
@@ -289,7 +293,7 @@
                 inKbq = false;
                 qa.questionTypeName = "SQ";
             }
-
+            var summaryDiv; 
             $.post(url, qa, function(data) {
                 qaDiv.find(".fa-spinner").hide();
                 if (data && data.result === "true") {
@@ -308,7 +312,7 @@
 
                     succeedPanel.find("ul").append("<li>" + data.message + "</li>");
 
-                    var summaryDiv = qaDiv.closest(".box-primary").find(".summaryDiv");
+                    summaryDiv = qaDiv.closest(".box-primary").find(".summaryDiv");
                     summaryDiv.empty();
                     summaryDiv.append(succeedPanel);
 
@@ -343,7 +347,7 @@
 
                     errorPanel.find("ul").append(messages);
 
-                    var summaryDiv = qaDiv.closest(".box-primary").find(".summaryDiv");
+                    summaryDiv = qaDiv.closest(".box-primary").find(".summaryDiv");
                     summaryDiv.empty();
                     summaryDiv.append(errorPanel);
                     errorPanel.show();
@@ -359,7 +363,7 @@
                     if (questionErrors.length > 0) {
                         qaDiv.find(questionErrorDivId).text(questionErrors);
                     }
-                };
+                }
             });
         }
 
