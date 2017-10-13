@@ -253,7 +253,8 @@
             $(this).hide();
             $(this).siblings(".fa-save").hide();
             $(this).siblings(".fa-edit").show();
-            qaDiv.find(".field-validation-error").text("");
+            qaDiv.find(".field-validation-error").text(""); 
+            qaDiv.siblings().find(".fa-edit").removeClass("disabled");
         }
 
         function clickSave() {
@@ -330,6 +331,7 @@
                     // update the selected question, and text box value
                     qaDiv.find("#lastValue").val(answer);
                     qaDiv.find("#lastSelected").val(questionIndex);
+                    qaDiv.siblings().find(".fa-edit").removeClass("disabled");
 
                 } else {
                     // display the error
@@ -389,6 +391,7 @@
                 });
             qaDiv.find("input[type='text']").removeAttr("readonly");
             qaDiv.find("input[type='text']").removeAttr("disabled");
+            qaDiv.siblings().find(".fa-edit").addClass("disabled");
             $(this).hide();
             $(this).siblings(".fa-save").show();
             $(this).siblings(".fa-undo").show();
