@@ -371,6 +371,9 @@
 
         function clickEdit() {
             var qaDiv = $(this).closest(".question-answer-div");
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
 
             qaDiv.find("select").attr("readonly", null);
             qaDiv.find("select").attr("disabled", null);
