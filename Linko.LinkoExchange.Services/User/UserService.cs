@@ -818,9 +818,14 @@ namespace Linko.LinkoExchange.Services.User
                     }
                 }
             }
-            
-            // current authority settings 
-            var currentAuthorityContentReplacements = GetCurrentAuthoritySettingEmailContentReplacement(); 
+
+            var currentAuthorityContentReplacements = new Dictionary<string, string>();
+
+            if (reason == AccountLockEvent.ManualAction)
+            {
+                // current authority settings 
+                currentAuthorityContentReplacements = GetCurrentAuthoritySettingEmailContentReplacement();
+            }
 
             foreach (var program in programs.ToList())
             {
