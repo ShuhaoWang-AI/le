@@ -289,14 +289,30 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     // Check if the new password is one of the password used last # numbers
-                    var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-                    if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId, currentOrgRegProgramId:currentOrgRegProgramId))
+                    // (If user is current logged into an org reg program and changing password, use the specific authority setting)
+                    //
+                    bool isValidPasswordCheckInHistory;
+                    int numberOfPasswordsInHistory;
+                    var currentOrgRegProgramString = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
+                    if (!string.IsNullOrEmpty(currentOrgRegProgramString))
                     {
-                        var numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+                        var currentOrgRegProgramId = int.Parse(s: currentOrgRegProgramString);
+                        numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+                        isValidPasswordCheckInHistory =
+                            IsValidPasswordCheckInHistory(password: newPassword, userProfileId: applicationUser.UserProfileId, currentOrgRegProgramId: currentOrgRegProgramId);
+                    }
+                    else
+                    {
+                        numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
+                        isValidPasswordCheckInHistory = IsValidPasswordCheckInHistory(password: newPassword, userProfileId: applicationUser.UserProfileId, organizationSettings: organizationSettings);
+                    }
+
+                    if (!isValidPasswordCheckInHistory)
+                    {
                         authenticationResult.Success = false;
                         authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                        authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
-                        return Task.FromResult(result:authenticationResult);
+                        authenticationResult.Errors = new[] { $"You cannot use the last {numberOfPasswordsInHistory} passwords." };
+                        return Task.FromResult(result: authenticationResult);
                     }
 
                     _userManager.RemovePassword(userId:userId);
@@ -613,9 +629,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                         var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
                         var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
-                        if (!IsValidPasswordCheckInHistory(password:userInfo.Password, userProfileId:applicationUser.UserProfileId, currentOrgRegProgramId:invitationDto.RecipientOrganizationRegulatoryProgramId))
+                        if (!IsValidPasswordCheckInHistory(password: userInfo.Password, userProfileId: applicationUser.UserProfileId, organizationSettings: organizationSettings))
                         {
-                            var numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: invitationDto.RecipientOrganizationRegulatoryProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+                            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords;
                             registrationResult.Errors = new[]
                                                         {
@@ -623,7 +639,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                                                         };
                             return registrationResult;
                         }
-
                         applicationUser.TitleRole = userInfo.TitleRole;
                         applicationUser.BusinessName = userInfo.BusinessName;
                         applicationUser.FirstName = userInfo.FirstName;
@@ -826,7 +841,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             var passwordHash = _passwordHasher.HashPassword(password:newPassword);
             var correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
-            var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid: userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds: authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
             var authenticationResult = new AuthenticationResultDto();
 
@@ -839,8 +855,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = false;
 
                 //3rd incorrect attempt (5.3.b) => lockout
-                var maxAnswerAttempts = 
-                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.FailedKBQAttemptMaxCount));
+                var maxAnswerAttempts =
+                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValueByUserId(userProfileId: userProfileId, settingType: SettingType.FailedKBQAttemptMaxCount,
+                                                                                               isChooseMin: true, isChooseMax: null));
 
                 if (failedCount + 1 >= maxAnswerAttempts) // from web.config
                 {
@@ -879,10 +896,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     authenticationResult.Errors = new[] {"The answer is incorrect.  Please try again."};
                 }
             }
-            else if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:userProfileId, currentOrgRegProgramId: currentOrgRegProgramId))
+            else if (!IsValidPasswordCheckInHistory(password: newPassword, userProfileId: userProfileId, organizationSettings: organizationSettings))
             {
                 //Password used before (6.a)
-                var numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+                var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
 
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
@@ -1721,16 +1738,35 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Check if password is in one of the last # passwords stores in UserPasswordHistory table
         // Return false means the new password is not validate because it has been used in the last #number of times
         // Return true means the new password is validate to use
+        private bool IsValidPasswordCheckInHistory(string password, int userProfileId, IEnumerable<SettingDto> organizationSettings)
+        {
+            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
+
+            var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
+                                                        .Where(i => i.UserProfileId == userProfileId)
+                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count: numberOfPasswordsInHistory)
+                                                        .ToList();
+
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash: i.PasswordHash, password: password)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Overloaded version of function (above) used when user is already logged in and is
+        // changing password.
         private bool IsValidPasswordCheckInHistory(string password, int userProfileId, int currentOrgRegProgramId)
         {
             var numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                                                         .Where(i => i.UserProfileId == userProfileId)
-                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count:numberOfPasswordsInHistory)
+                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count: numberOfPasswordsInHistory)
                                                         .ToList();
 
-            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash:i.PasswordHash, password:password)))
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash: i.PasswordHash, password: password)))
             {
                 return false;
             }

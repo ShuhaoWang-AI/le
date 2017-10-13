@@ -94,6 +94,14 @@ namespace Linko.LinkoExchange.Services.Settings
         OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null);
 
         /// <summary>
+        ///     Gets the strictest password history maximum count.
+        /// </summary>
+        /// <param name="organizationSettings"> The organization settings. </param>
+        /// <param name="orgTypeName"> Name of the organization type. </param>
+        /// <returns> </returns>
+        int GetStrictestPasswordHistoryMaxCount(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName);
+
+        /// <summary>
         ///     Gets the strictest password change required days.
         /// </summary>
         /// <param name="organizationSettings"> The organization settings. </param>
