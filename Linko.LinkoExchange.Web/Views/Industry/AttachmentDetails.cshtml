@@ -222,7 +222,7 @@
 
                         if (ViewBag.fromCreateAttachment)
                         {
-                            <input class="btn btn-primary btn-sm" type="submit" value="Add New" formaction= "@Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry")" formmethod="get" />
+                            <input class="btn btn-primary btn-sm" type="button" value="Add New"  onclick="location.href = '@Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry")'" />
                         }
                     }
                     else

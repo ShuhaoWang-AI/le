@@ -820,7 +820,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
             var previousUri = HttpContext.Request.UrlReferrer;
-            ViewBag.fromCreateAttachment = previousUri != null && previousUri.AbsolutePath.Equals("/industry/attachment/new", StringComparison.OrdinalIgnoreCase); 
+            ViewBag.fromCreateAttachment = previousUri != null && previousUri.AbsolutePath.Equals(Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry"), StringComparison.OrdinalIgnoreCase); 
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
             
