@@ -245,5 +245,12 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="authorityOrganizationId"> </param>
         /// <returns> </returns>
         ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);
+        
+        /// <summary>
+        /// Gets the active administrators for a given org reg program
+        /// </summary>
+        /// <param name="orgRegProgId">The org reg program identifier.</param>
+        /// <returns></returns>
+        ICollection<UserDto> GetOrgRegProgAdministrators(int orgRegProgId);
     }
 }
