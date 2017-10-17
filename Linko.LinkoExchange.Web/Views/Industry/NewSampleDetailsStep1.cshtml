@@ -7,6 +7,8 @@
 {
     @Html.AntiForgeryToken()
 
+    bool IsMonitoringPointsExist = !(Model.AllMonitoringPoints.Count < 1);
+
     <section>
         <ol class="breadcrumb">
             <li>
@@ -28,82 +30,96 @@
         <div class="box-body box-collapse collapse form-horizontal in">
 
             @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
-
-            <div class="form-group">
-                <div class="col-md-12">
-                    @Html.Label(expression:"Select Monitoring Point", htmlAttributes:new
-                                                                                     {
-                                                                                         @class = "control-label col-md-2 required"
-                                                                                     })
-                </div>
-                <div class="col-md-12">
-                    @foreach (var m in Model.AllMonitoringPoints)
-                    {
-                        <div class="col-md-12 form-group">
-                            <label class="col-md-offset-2">
-                                @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
-
-                                <span>@m.Name</span>
-                                @if (!m.Description.IsEmpty())
-                                {
-                                    <span class="text-info"> - @m.Description</span>
-                                }
-                            </label>
-                        </div>
-                    }
-                </div>
-
-                <div class="col-md-12">
-                    <!-- Date range -->
-                    @Html.Label(expression:"Enter Sample Period", htmlAttributes:new
-                                                                                 {
-                                                                                     @class = "control-label col-md-2"
-                                                                                 })
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
+           
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.Label(expression:"Select Monitoring Point", htmlAttributes:new
                                                                                          {
                                                                                              @class = "control-label col-md-2 required"
                                                                                          })
-                        <div class="col-md-4">
-                            @(Html.Kendo().DateTimePickerFor(model => model.StartDateTimeLocal)
-                                  .Max(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
-                                  .HtmlAttributes(attributes:new
-                                                             {
-                                                                 style = "width:210px;"
-                                                             }))
-                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        @if (IsMonitoringPointsExist)
+                        {
 
-                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2 required"
-                                                                                       })
-                        <div class="col-md-4">
-                            @(Html.Kendo().DateTimePickerFor(model => model.EndDateTimeLocal)
-                                  .Max(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
-                                  .HtmlAttributes(attributes:new
-                                                             {
-                                                                 style = "width:210px;"
-                                                             }))
+                            foreach (var m in Model.AllMonitoringPoints)
+                            {
+                                <div class="col-md-12 form-group">
+                                    <label class="col-md-offset-2">
+                                        @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
+
+                                        <span>@m.Name</span>
+                                        @if (!m.Description.IsEmpty())
+                                        {
+                                            <span class="text-info"> - @m.Description</span>
+                                        }
+                                    </label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <br />
+                            <div class="col-md-12 form-group">
+                                <span class="col-md-offset-2">No monitoring points exist for your Industry.</span>
+                            </div>
+                        }
+
+                    </div>
+                    <div class="col-md-12">
+                        <!-- Date range -->
+                        @Html.Label(expression:"Enter Sample Period", htmlAttributes:new
+                                                                                     {
+                                                                                         @class = "control-label col-md-2"
+                                                                                     })
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
+                                                                                             {
+                                                                                                 @class = "control-label col-md-2 required"
+                                                                                             })
+                            <div class="col-md-4">
+                                @(Html.Kendo().DateTimePickerFor(model => model.StartDateTimeLocal)
+                                      .Max(date:DateTime.Now)
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
+                                      .HtmlAttributes(attributes:new
+                                                                 {
+                                                                     style = "width:210px;"
+                                                                 }))
+                            </div>
+
+                            @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
+                                                                                           {
+                                                                                               @class = "control-label col-md-2 required"
+                                                                                           })
+                            <div class="col-md-4">
+                                @(Html.Kendo().DateTimePickerFor(model => model.EndDateTimeLocal)
+                                      .Max(date:DateTime.Now)
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
+                                      .HtmlAttributes(attributes:new
+                                                                 {
+                                                                     style = "width:210px;"
+                                                                 }))
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
-        <div class="box-footer">
-            <div class="col-md-12 form-group">
-                <input type="submit" value="Next" id="next-step" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+        @if (IsMonitoringPointsExist)
+        {
+            <div class="box-footer">
+                <div class="col-md-12 form-group">
+                    <input type="submit" value="Next" id="next-step" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+                </div>
             </div>
-        </div>
+        }
     </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/inputmask")
-
-    <script>
+    
+        <script>
         $(document)
             .ready(function()
             {
@@ -158,7 +174,7 @@
                     });
             });
 
-         
+
         $(document)
             .keypress(function(evt)
             {
@@ -166,7 +182,7 @@
                 {
                     $("#next-step").click();
                 }
-            }); 
-        
-    </script>
+            });
+
+        </script>
 }}
