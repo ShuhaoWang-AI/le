@@ -101,47 +101,7 @@
                     $("input[id=kbqCollapsed").val("true");
                 }
             });
-
-        $(document)
-            .on("click", "#kbqSubmit", function() {
-                $("#kbq-panel input[type='password'").show();
-                $("#kbq-panel input[type='text'").hide();
-
-                $("input[id=kbqCollapsed").val("false");
-
-                var collapsedSQ = $("#sq-panel .box-primary.collapsed-box");
-                if (!collapsedSQ || collapsedSQ.length < 1) {
-                    $("input[id=sqCollapsed").val("false");
-                } else {
-                    $("input[id=sqCollapsed").val("true");
-                }
-
-                var profileCollapsed = $("#user-info-panel .box-primary.collapsed-box");
-                if (!profileCollapsed || profileCollapsed.length < 1) {
-                    $("input[id=profileCollapsed").val("false");
-                } else {
-                    $("input[id=profileCollapsed").val("true");
-                }
-            });
-
-        $(document)
-            .on("click", "#sqSubmit", function() {
-                $("input[id=sqCollapsed").val("false");
-                var collapsedKBQ = $("#kbq-panel .box-primary.collapsed-box");
-                if (!collapsedKBQ || collapsedKBQ.length < 1) {
-                    $("input[id=kbqCollapsed").val("false");
-                } else {
-                    $("input[id=kbqCollapsed").val("true");
-                }
-
-                var profileCollapsed = $("#user-info-panel .box-primary.collapsed-box");
-                if (!profileCollapsed || profileCollapsed.length < 1) {
-                    $("input[id=profileCollapsed").val("false");
-                } else {
-                    $("input[id=profileCollapsed").val("true");
-                }
-            });
-
+         
         questionAnswerEventHandlerInit();
 
         // implementations 
@@ -182,8 +142,7 @@
                 $(obj).val(obj.value).change();
             });
         }
-
-
+        
         function editChanged() {
             var qaDiv = $(this).closest(".question-answer-div");
 
@@ -225,17 +184,16 @@
             qaDiv.find("select").attr("readonly", "disabled");
             qaDiv.find("select").attr("disabled", "true");
             qaDiv.find("input[type='text']").attr("disabled", "disabled");
-            qaDiv.find("input[type='password']").attr("disabled", "disabled");
+            qaDiv.find("input[type='password']").attr("disabled", "disabled"); 
 
             // restore the last selected question, and last text box value 
             var lastSelected = qaDiv.find("#lastSelected").val();
             var options = qaDiv.find("select").find("option");
             options.each(function() {
-
                 if (this.value !== lastSelected) {
-                    $(this).removeAttr("selected");
+                    $(this).prop("selected", false);
                 } else {
-                    $(this).attr("selected", "selected");
+                    $(this).prop("selected", true);
                 }
             });
 
@@ -408,9 +366,9 @@
                     .each(function(index) {
                         $(this).prop("selected", index === i);
                         if (index === i) {
-                            $(this).attr("selected", "selected");
+                            $(this).prop("selected", true);
                         } else {
-                            $(this).removeAttr("selected");
+                            $(this).prop("selected", false);
                         }
                     });
             });
