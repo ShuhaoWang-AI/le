@@ -66,7 +66,7 @@
                         </p>
                         <div class="form-group">
                             <div class="pull-right">
-                                <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName:"DeleteSample", controllerName:"Industry", routeValues:new {id = Model.Id})" formmethod="post">
+                                <button type="submit" id="btnDeleteSample" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName:"DeleteSample", controllerName:"Industry", routeValues:new {id = Model.Id})" formmethod="post">
                                     Yes
                                 </button>
                                 <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -658,7 +658,7 @@
 
                 var clickedButtonId = "";
 
-                $("input[type='submit']")
+                $("input[type='submit'],button[type='submit']")
                     .click(function() {
                         clickedButtonId = $(this).attr('id');
                     });
