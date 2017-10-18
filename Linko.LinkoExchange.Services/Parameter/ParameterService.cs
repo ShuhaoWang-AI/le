@@ -285,6 +285,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         ///     Parameter children contained within.
         /// </summary>
         /// <param name="parameterGroupId"> Id from tParameterGroup associated with Parameter Group to read </param>
+        /// <param name="isAuthorizationRequired"> </param>
         /// <returns> </returns>
         public ParameterGroupDto GetParameterGroup(int parameterGroupId, bool isAuthorizationRequired = false)
         {
@@ -326,7 +327,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <summary>
         ///     Creates a new Parameter group or updates and existing one in the database.
         /// </summary>
-        /// <param name="parameterGroup"> Parameter group to create new or update if and Id is included </param>
+        /// <param name="parameterGroupDto"> Parameter group to create new or update if and Id is included </param>
         /// <returns> Existing Id or newly created Id from tParameterGroup </returns>
         public int SaveParameterGroup(ParameterGroupDto parameterGroupDto)
         {
@@ -654,7 +655,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// </summary>
         /// <param name="paramDto"></param>
         /// <param name="monitoringPointId"></param>
-        /// <param name="sampleEndDateTimeUtc"></param>
+        /// <param name="sampleEndDateTimeLocal"></param>
         private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleEndDateTimeLocal)
         {
             var parameterId = paramDto.ParameterId;

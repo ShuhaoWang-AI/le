@@ -1179,6 +1179,7 @@ namespace Linko.LinkoExchange.Services.Report
         ///     Performs validation to ensure only allowed state transitions are occur,
         ///     throw RuleViolationException otherwise. Does NOT enter any corresponding values into the Report Package row.
         /// </summary>
+        /// <param name="reportPackageId"> </param>
         /// <param name="reportStatus"> Intended target state </param>
         /// <param name="isUseTransaction"> If true, runs within transaction object </param>
         public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction)
@@ -1266,7 +1267,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     Gets a collection of FileStoreDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
-        /// <param name="reportPackageId"> tReportPackage.ReportPackageId </param>
+        /// <param name="reportPackageElementTypeId"> Report Package Element Type identifier </param>
         /// <returns> Collection of FileStoreDto objects </returns>
         public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageElementTypeId)
         {
@@ -2368,6 +2369,7 @@ namespace Linko.LinkoExchange.Services.Report
         ///     Used to simplify and clean up methods where there are multiple validation tests.
         /// </summary>
         /// <param name="message"> Rule violation message to use when throwing the exception. </param>
+        /// <param name="propertyName"> </param>
         private void ThrowSimpleException(string message, string propertyName = null)
         {
             _logger.Info(message:$"Enter SampleService.ThrowSimpleException. message={message}");

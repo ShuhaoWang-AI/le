@@ -232,6 +232,8 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"> </param>
         /// <param name="permissionGroupId"> </param>
         /// <param name="isApproved"> </param>
+        /// <param name="isAuthorizationRequired"> </param>
+        /// <param name="isSignatory"> </param>
         RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false,
                                                          bool isSignatory = false);
 

@@ -43,6 +43,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         ///     Parameter children contained within.
         /// </summary>
         /// <param name="parameterGroupId"> Id from tParameterGroup associated with Parameter Group to read </param>
+        /// <param name="isAuthorizationRequired"> </param>
         /// <returns> </returns>
         ParameterGroupDto GetParameterGroup(int parameterGroupId, bool isAuthorizationRequired = false);
 

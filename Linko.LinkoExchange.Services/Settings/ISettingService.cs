@@ -16,7 +16,8 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <summary>
         ///     Get the default Setting template value
         /// </summary>
-        /// <param name="settingType"> </param>
+        /// <param name="settingType">Setting Type </param>
+        /// <param name="orgType">Organization Type </param>
         /// <returns> </returns>
         string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType = null);
 

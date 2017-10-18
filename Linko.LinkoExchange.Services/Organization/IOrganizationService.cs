@@ -18,6 +18,7 @@ namespace Linko.LinkoExchange.Services.Organization
         ///     Get the regulators list that the user belonged to.
         /// </summary>
         /// <param name="userId"> The user Id. </param>
+        /// <param name="isIncludeRemoved"> </param>
         /// <returns> </returns>
         IEnumerable<AuthorityDto> GetUserRegulators(int userId, bool isIncludeRemoved = false);
 
