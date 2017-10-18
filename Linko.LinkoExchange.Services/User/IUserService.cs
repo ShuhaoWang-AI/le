@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"> </param>
         /// <param name="isSignatory"> </param>
         /// <param name="isAuthorizationRequired"> </param>
-        /// <param name="needTransaction"></param>
+        /// <param name="needTransaction"> </param>
         void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false, bool needTransaction = true);
 
         /// <summary>
@@ -111,7 +111,8 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="reportPackageId"> </param>
         /// <param name="resetPasswordEmailAuditLogs"> </param>
         /// <returns> </returns>
-        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null, List<EmailAuditLog> resetPasswordEmailAuditLogs = null);
+        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null,
+                                                      List<EmailAuditLog> resetPasswordEmailAuditLogs = null);
 
         /// <summary>
         ///     Locks (or unlocks) an org reg program user. Emails are then sent to the appropriate stakeholders.
@@ -247,12 +248,12 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="authorityOrganizationId"> </param>
         /// <returns> </returns>
         ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);
-        
+
         /// <summary>
-        /// Gets the active administrators for a given org reg program
+        ///     Gets the active administrators for a given org reg program
         /// </summary>
-        /// <param name="orgRegProgId">The org reg program identifier.</param>
-        /// <returns></returns>
+        /// <param name="orgRegProgId"> The org reg program identifier. </param>
+        /// <returns> </returns>
         ICollection<UserDto> GetOrgRegProgAdministrators(int orgRegProgId);
     }
 }

@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="reportPackageId"> </param>
         /// <returns> </returns>
         PasswordAndKbqValidationResultDto ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
-                                                              ReportOperation reportOperation, int? reportPackageId = null);
+                                                                 ReportOperation reportOperation, int? reportPackageId = null);
 
         /// <summary>
         ///     Register a new user
@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="password"> The new password </param>
         /// <returns> </returns>
         Task<AuthenticationResultDto> ResetPasswordAsync(string token, int userQuestionAnswerId, string answer, int attemptCount, string password);
-        
+
         bool CheckPasswordResetUrlNotExpired(string token);
 
         /// <summary>

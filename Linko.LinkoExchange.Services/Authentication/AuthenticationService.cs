@@ -294,25 +294,28 @@ namespace Linko.LinkoExchange.Services.Authentication
                     bool isValidPasswordCheckInHistory;
                     int numberOfPasswordsInHistory;
                     var currentOrgRegProgramString = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
-                    if (!string.IsNullOrEmpty(currentOrgRegProgramString))
+                    if (!string.IsNullOrEmpty(value:currentOrgRegProgramString))
                     {
-                        var currentOrgRegProgramId = int.Parse(s: currentOrgRegProgramString);
-                        numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+                        var currentOrgRegProgramId = int.Parse(s:currentOrgRegProgramString);
+                        numberOfPasswordsInHistory =
+                            Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId,
+                                                                                              settingType:SettingType.PasswordHistoryMaxCount));
                         isValidPasswordCheckInHistory =
-                            IsValidPasswordCheckInHistory(password: newPassword, userProfileId: applicationUser.UserProfileId, currentOrgRegProgramId: currentOrgRegProgramId);
+                            IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId, currentOrgRegProgramId:currentOrgRegProgramId);
                     }
                     else
                     {
-                        numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
-                        isValidPasswordCheckInHistory = IsValidPasswordCheckInHistory(password: newPassword, userProfileId: applicationUser.UserProfileId, organizationSettings: organizationSettings);
+                        numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings:organizationSettings, orgTypeName:null);
+                        isValidPasswordCheckInHistory = IsValidPasswordCheckInHistory(password:newPassword, userProfileId:applicationUser.UserProfileId,
+                                                                                      organizationSettings:organizationSettings);
                     }
 
                     if (!isValidPasswordCheckInHistory)
                     {
                         authenticationResult.Success = false;
                         authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                        authenticationResult.Errors = new[] { $"You cannot use the last {numberOfPasswordsInHistory} passwords." };
-                        return Task.FromResult(result: authenticationResult);
+                        authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
+                        return Task.FromResult(result:authenticationResult);
                     }
 
                     _userManager.RemovePassword(userId:userId);
@@ -629,9 +632,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                         var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:applicationUser.UserProfileId);
                         var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
-                        if (!IsValidPasswordCheckInHistory(password: userInfo.Password, userProfileId: applicationUser.UserProfileId, organizationSettings: organizationSettings))
+                        if (!IsValidPasswordCheckInHistory(password:userInfo.Password, userProfileId:applicationUser.UserProfileId, organizationSettings:organizationSettings))
                         {
-                            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
+                            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings:organizationSettings, orgTypeName:null);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords;
                             registrationResult.Errors = new[]
                                                         {
@@ -639,6 +642,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                                         };
                             return registrationResult;
                         }
+
                         applicationUser.TitleRole = userInfo.TitleRole;
                         applicationUser.BusinessName = userInfo.BusinessName;
                         applicationUser.FirstName = userInfo.FirstName;
@@ -827,127 +831,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             return resetPasswordResult;
         }
 
-        private async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId, string answer, int failedCount, string newPassword, List<EmailAuditLog> emailAuditLogs)
-        {
-            var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
-            var passwordHash = _passwordHasher.HashPassword(password:newPassword);
-            var correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
-            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid: userProfileId);
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds: authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
-
-            var authenticationResult = new AuthenticationResultDto();
-
-            //KBQ ANSWERS ARE CASE-INSENSITIVE; PERSISTED AS ALL LOWER CASE
-            if (_userManager.PasswordHasher.VerifyHashedPassword(hashedPassword:correctSavedHashedAnswer, providedPassword:answer.Trim().ToLower())
-                != PasswordVerificationResult.Success)
-            {
-                //Check hashed answer (5.3.a)
-
-                authenticationResult.Success = false;
-
-                //3rd incorrect attempt (5.3.b) => lockout
-                var maxAnswerAttempts =
-                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValueByUserId(userProfileId: userProfileId, settingType: SettingType.FailedKBQAttemptMaxCount,
-                                                                                               isChooseMin: true, isChooseMax: null));
-
-                if (failedCount + 1 >= maxAnswerAttempts) // from web.config
-                {
-                    _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset,
-                                                       reportPackageId:null, resetPasswordEmailAuditLogs:emailAuditLogs);
-
-                    //Get all associated authorities
-                    var userOrgs = _organizationService.GetUserRegulators(userId:userProfileId).ToList();
-                    authenticationResult.RegulatoryList = userOrgs;
-
-                    var errorString = "<div class=\"table - responsive\">";
-                    errorString += "<table class=\"table no-margin\">";
-                    errorString += "<tbody>";
-
-                    foreach (var org in userOrgs)
-                    {
-                        errorString += "<tr><td>"
-                                       + org.EmailContactInfoName
-                                       + "</td><td>"
-                                       + org.EmailContactInfoEmailAddress
-                                       + "</td><td>"
-                                       + org.EmailContactInfoPhone
-                                       + " </td></tr>";
-                    }
-
-                    errorString += "</tbody>";
-                    errorString += "</table>";
-                    errorString += "</div>";
-                    errorString += "</table>";
-
-                    authenticationResult.Result = AuthenticationResult.UserIsLocked;
-                    authenticationResult.Errors = new[] {errorString};
-                }
-                else
-                {
-                    authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
-                    authenticationResult.Errors = new[] {"The answer is incorrect.  Please try again."};
-                }
-            }
-            else if (!IsValidPasswordCheckInHistory(password: newPassword, userProfileId: userProfileId, organizationSettings: organizationSettings))
-            {
-                //Password used before (6.a)
-                var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
-
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
-            }
-            else
-            {
-                using (var transaction = _dbContext.BeginTransaction())
-                {
-                    try
-                    {
-                        //create history record
-                        var history = _dbContext.UserPasswordHistories.Create();
-                        history.UserProfileId = userProfileId;
-                        history.PasswordHash = passwordHash;
-                        history.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                        _dbContext.UserPasswordHistories.Add(entity:history);
-                        _dbContext.SaveChanges();
-
-                        //Set new password
-                        _userService.SetHashedPassword(userProfileId:userProfileId, passwordHash:passwordHash);
-
-                        //Unlock user
-                        var userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
-                        await _userManager.UnlockUserAccount(userId:userOwinId);
-
-                        authenticationResult.Success = true;
-                        authenticationResult.Result = AuthenticationResult.Success;
-
-                        foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
-                        {
-                            var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
-                            _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto).Wait();
-                        }
-
-                        // remove the reset password token
-                        foreach (var log in emailAuditLogs)
-                        {
-                            log.Token = string.Empty;
-                        }
-
-                        _dbContext.SaveChanges();
-
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-            }
-
-            return authenticationResult;
-        }
-
         /// <summary>
         ///     To request a password reset. This will do follow:
         ///     1. generate a reset password token
@@ -1131,13 +1014,13 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         public PasswordAndKbqValidationResultDto ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount,
-                                                                     ReportOperation reportOperation, int? reportPackageId = null)
+                                                                        ReportOperation reportOperation, int? reportPackageId = null)
         {
             _logger.Info(message:"Enter AuthenticationService.PasswordAndKbqValidationResult");
 
             var result = new PasswordAndKbqValidationResultDto();
             var userProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
-            result.RegulatoryList = _organizationService.GetUserRegulators(userId: userProfileId) ?? new List<AuthorityDto>();
+            result.RegulatoryList = _organizationService.GetUserRegulators(userId:userProfileId) ?? new List<AuthorityDto>();
             var orgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authority = _settingService.GetAuthority(orgRegProgramId:orgRegProgramId);
             var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId:authority.OrganizationId).Settings;
@@ -1362,6 +1245,128 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         #endregion
+
+        private async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId, string answer, int failedCount, string newPassword,
+                                                                       List<EmailAuditLog> emailAuditLogs)
+        {
+            var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+            var passwordHash = _passwordHasher.HashPassword(password:newPassword);
+            var correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userid:userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds:authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
+
+            var authenticationResult = new AuthenticationResultDto();
+
+            //KBQ ANSWERS ARE CASE-INSENSITIVE; PERSISTED AS ALL LOWER CASE
+            if (_userManager.PasswordHasher.VerifyHashedPassword(hashedPassword:correctSavedHashedAnswer, providedPassword:answer.Trim().ToLower())
+                != PasswordVerificationResult.Success)
+            {
+                //Check hashed answer (5.3.a)
+
+                authenticationResult.Success = false;
+
+                //3rd incorrect attempt (5.3.b) => lockout
+                var maxAnswerAttempts =
+                    Convert.ToInt32(value:_settingService.GetOrganizationSettingValueByUserId(userProfileId:userProfileId, settingType:SettingType.FailedKBQAttemptMaxCount,
+                                                                                              isChooseMin:true, isChooseMax:null));
+
+                if (failedCount + 1 >= maxAnswerAttempts) // from web.config
+                {
+                    _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset,
+                                                       reportPackageId:null, resetPasswordEmailAuditLogs:emailAuditLogs);
+
+                    //Get all associated authorities
+                    var userOrgs = _organizationService.GetUserRegulators(userId:userProfileId).ToList();
+                    authenticationResult.RegulatoryList = userOrgs;
+
+                    var errorString = "<div class=\"table - responsive\">";
+                    errorString += "<table class=\"table no-margin\">";
+                    errorString += "<tbody>";
+
+                    foreach (var org in userOrgs)
+                    {
+                        errorString += "<tr><td>"
+                                       + org.EmailContactInfoName
+                                       + "</td><td>"
+                                       + org.EmailContactInfoEmailAddress
+                                       + "</td><td>"
+                                       + org.EmailContactInfoPhone
+                                       + " </td></tr>";
+                    }
+
+                    errorString += "</tbody>";
+                    errorString += "</table>";
+                    errorString += "</div>";
+                    errorString += "</table>";
+
+                    authenticationResult.Result = AuthenticationResult.UserIsLocked;
+                    authenticationResult.Errors = new[] {errorString};
+                }
+                else
+                {
+                    authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
+                    authenticationResult.Errors = new[] {"The answer is incorrect.  Please try again."};
+                }
+            }
+            else if (!IsValidPasswordCheckInHistory(password:newPassword, userProfileId:userProfileId, organizationSettings:organizationSettings))
+            {
+                //Password used before (6.a)
+                var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings:organizationSettings, orgTypeName:null);
+
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
+                authenticationResult.Errors = new[] {$"You cannot use the last {numberOfPasswordsInHistory} passwords."};
+            }
+            else
+            {
+                using (var transaction = _dbContext.BeginTransaction())
+                {
+                    try
+                    {
+                        //create history record
+                        var history = _dbContext.UserPasswordHistories.Create();
+                        history.UserProfileId = userProfileId;
+                        history.PasswordHash = passwordHash;
+                        history.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                        _dbContext.UserPasswordHistories.Add(entity:history);
+                        _dbContext.SaveChanges();
+
+                        //Set new password
+                        _userService.SetHashedPassword(userProfileId:userProfileId, passwordHash:passwordHash);
+
+                        //Unlock user
+                        var userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
+                        await _userManager.UnlockUserAccount(userId:userOwinId);
+
+                        authenticationResult.Success = true;
+                        authenticationResult.Result = AuthenticationResult.Success;
+
+                        foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userId:userProfileId))
+                        {
+                            var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
+                            _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto).Wait();
+                        }
+
+                        // remove the reset password token
+                        foreach (var log in emailAuditLogs)
+                        {
+                            log.Token = string.Empty;
+                        }
+
+                        _dbContext.SaveChanges();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+
+            return authenticationResult;
+        }
 
         private List<EmailEntry> CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser,
                                                                                                    OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
@@ -1740,14 +1745,14 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Return true means the new password is validate to use
         private bool IsValidPasswordCheckInHistory(string password, int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
-            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings: organizationSettings, orgTypeName: null);
+            var numberOfPasswordsInHistory = _settingService.GetStrictestPasswordHistoryMaxCount(organizationSettings:organizationSettings, orgTypeName:null);
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                                                         .Where(i => i.UserProfileId == userProfileId)
-                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count: numberOfPasswordsInHistory)
+                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count:numberOfPasswordsInHistory)
                                                         .ToList();
 
-            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash: i.PasswordHash, password: password)))
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash:i.PasswordHash, password:password)))
             {
                 return false;
             }
@@ -1759,14 +1764,15 @@ namespace Linko.LinkoExchange.Services.Authentication
         // changing password.
         private bool IsValidPasswordCheckInHistory(string password, int userProfileId, int currentOrgRegProgramId)
         {
-            var numberOfPasswordsInHistory = Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.PasswordHistoryMaxCount));
+            var numberOfPasswordsInHistory =
+                Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.PasswordHistoryMaxCount));
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                                                         .Where(i => i.UserProfileId == userProfileId)
-                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count: numberOfPasswordsInHistory)
+                                                        .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(count:numberOfPasswordsInHistory)
                                                         .ToList();
 
-            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash: i.PasswordHash, password: password)))
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(passwordHash:i.PasswordHash, password:password)))
             {
                 return false;
             }

@@ -1395,15 +1395,16 @@ namespace Linko.LinkoExchange.Services.User
         public ICollection<UserDto> GetOrgRegProgAdministrators(int orgRegProgId)
         {
             var adminIds = _dbContext.OrganizationRegulatoryProgramUsers
-                                         .Where(i => i.OrganizationRegulatoryProgramId == orgRegProgId
-                                                     // ReSharper disable once ArgumentsStyleOther
-                                                     // ReSharper disable once ArgumentsStyleNamedExpression
-                                                     && i.PermissionGroup.Name.Equals(UserRole.Administrator.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                                                     && i.IsEnabled
-                                                     && !i.IsRemoved
-                                                     && !i.IsRegistrationDenied
-                                                     && i.IsRegistrationApproved)
-                                         .Select(b => b.UserProfileId);
+                                     .Where(i => i.OrganizationRegulatoryProgramId == orgRegProgId
+
+                                                 // ReSharper disable once ArgumentsStyleOther
+                                                 // ReSharper disable once ArgumentsStyleNamedExpression
+                                                 && i.PermissionGroup.Name.Equals(UserRole.Administrator.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                                                 && i.IsEnabled
+                                                 && !i.IsRemoved
+                                                 && !i.IsRegistrationDenied
+                                                 && i.IsRegistrationApproved)
+                                     .Select(b => b.UserProfileId);
 
             // ReSharper disable once ArgumentsStyleNamedExpression
             var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && adminIds.Contains(i.UserProfileId));
@@ -1605,6 +1606,13 @@ namespace Linko.LinkoExchange.Services.User
                                           {"supportEmail", supportEmail}
                                       };
             }
+
+            // Future implementation: if in future requirement changes and need to send just one email per authority admin for multiple industry underneath then need to create  
+            // a dictionary with [RecipientRegulatoryProgramId], [RecipientOrganizationId], [RecipientRegulatorOrganizationId], [RecipientUserProfileId] combination to track which
+            // admin already getting emails as that authority admin. 
+            // Note: if scenario is same admin belongs to two different authorities and locked user belongs to two different industries 
+            // (industry A belongs to authority A and industry B belongs to authority B) then admin will get two emails
+            // if both industry belongs to same authority then admin will get one email (currently gets two emails)
 
             foreach (var orgRegProgram in orgRegPrograms.ToList())
             {
