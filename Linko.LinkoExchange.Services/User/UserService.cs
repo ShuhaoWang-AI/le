@@ -321,9 +321,11 @@ namespace Linko.LinkoExchange.Services.User
             var previousRoleLabel = _dbContext.PermissionGroups.Single(pg => pg.PermissionGroupId == previousPermissionGroupId).Name;
             var newRoleLabel = _dbContext.PermissionGroups.Single(pg => pg.PermissionGroupId == permissionGroupId).Name;
 
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                          {
+                                              RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId,
+                                              OrganizationId = targetOrgRegProgram.OrganizationId
+                                          };
             cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
             cromerrAuditLogEntryDto.UserName = userProfile.UserName;
@@ -714,7 +716,7 @@ namespace Linko.LinkoExchange.Services.User
                 if (remainingUsersAllowed < 1)
                 {
                     _logService.Info(message:$"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... "
-                                             + $"NoMoreRemainingUserLicenses.");
+                                             + "NoMoreRemainingUserLicenses.");
 
                     var validationIssues = new List<RuleViolation>();
                     var message = "No more User Licenses are available for this organization. Disable another User and try again.";
@@ -1457,19 +1459,21 @@ namespace Linko.LinkoExchange.Services.User
             var phoneNumber = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
                                                                            settingType:SettingType.EmailContactInfoPhone);
 
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add(key:"firstName", value:user.FirstName);
-            contentReplacements.Add(key:"lastName", value:user.LastName);
-            contentReplacements.Add(key:"userName", value:user.UserName);
-            contentReplacements.Add(key:"emailAddress", value:user.Email);
-            contentReplacements.Add(key:"authorityName", value:authorityName);
-            contentReplacements.Add(key:"authorityOrganizationName", value:authority.Organization.Name);
-            contentReplacements.Add(key:"organizationName", value:orgRegProgram.Organization.Name);
-            contentReplacements.Add(key:"addressLine1", value:orgRegProgram.Organization.AddressLine1);
-            contentReplacements.Add(key:"cityName", value:orgRegProgram.Organization.CityName);
-            contentReplacements.Add(key:"stateName", value:stateName);
-            contentReplacements.Add(key:"supportEmail", value:emailAddress);
-            contentReplacements.Add(key:"supportPhoneNumber", value:phoneNumber);
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"firstName", user.FirstName},
+                                          {"lastName", user.LastName},
+                                          {"userName", user.UserName},
+                                          {"emailAddress", user.Email},
+                                          {"authorityName", authorityName},
+                                          {"authorityOrganizationName", authority.Organization.Name},
+                                          {"organizationName", orgRegProgram.Organization.Name},
+                                          {"addressLine1", orgRegProgram.Organization.AddressLine1},
+                                          {"cityName", orgRegProgram.Organization.CityName},
+                                          {"stateName", stateName},
+                                          {"supportEmail", emailAddress},
+                                          {"supportPhoneNumber", phoneNumber}
+                                      };
 
             //Email user
             var emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
@@ -1729,7 +1733,7 @@ namespace Linko.LinkoExchange.Services.User
             else
             {
                 _logService.Info(message:$"LogLockUnlockActivityToCromerr. isAttemptingLock={isAttemptingLock}, reason={reason}, "
-                                         + $"Cannot associate a CromerrEvent with reason provided.");
+                                         + "Cannot associate a CromerrEvent with reason provided.");
                 return;
             }
 
@@ -1755,9 +1759,11 @@ namespace Linko.LinkoExchange.Services.User
                 var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
                 var actorUser = GetUserProfileById(userProfileId:actorProgramUserDto.UserProfileId);
 
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                              {
+                                                  RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                  OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId
+                                              };
                 cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = user.UserName;
@@ -1808,7 +1814,7 @@ namespace Linko.LinkoExchange.Services.User
                     }
                     else
                     {
-                        throw new Exception(message:$"ERROR: Account lock Cromerr log entry could not be completed without report package Id");
+                        throw new Exception(message:"ERROR: Account lock Cromerr log entry could not be completed without report package Id");
                     }
                 }
 

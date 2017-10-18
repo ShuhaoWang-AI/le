@@ -337,8 +337,10 @@ namespace Linko.LinkoExchange.Services.FileStore
             if (IsFileInReports(fileStoreId:fileStoreDto.FileStoreId.Value))
             {
                 var message = "The attachment is used in a Report Package, and cannot be changed.";
-                var validationIssues = new List<RuleViolation>();
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                var validationIssues = new List<RuleViolation>
+                                       {
+                                           new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
+                                       };
                 throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }
 

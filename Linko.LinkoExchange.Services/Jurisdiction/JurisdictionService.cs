@@ -36,15 +36,11 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
             _logService.Info(message:$"Entering GetStateProvs. countryId={countryId}");
 
             var dtos = new List<JurisdictionDto>();
-            var states = _dbContext.Jurisdictions
-                                   .Where(j => j.CountryId == countryId);
+            var states = _dbContext.Jurisdictions.Where(j => j.CountryId == countryId);
 
-            if (states != null)
+            foreach (var state in states)
             {
-                foreach (var state in states)
-                {
-                    dtos.Add(item:_mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction:state));
-                }
+                dtos.Add(item:_mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction:state));
             }
 
             _logService.Info(message:$"Exiting GetStateProvs. countryId={countryId}");

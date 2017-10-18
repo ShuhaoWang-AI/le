@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Email;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;

@@ -116,9 +116,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private void AttachmentsTable()
         {
-            var attachmentsTable = new Table();
-            attachmentsTable.Broken = TableBroken.VerticalInSamePage;
-            attachmentsTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
+            var attachmentsTable = new Table
+                                   {
+                                       Broken = TableBroken.VerticalInSamePage,
+                                       DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2)
+                                   };
             _pdfPage.Paragraphs.Add(paragraph:attachmentsTable);
 
             attachmentsTable.Margin.Top = 20;
@@ -148,12 +150,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 attachmentFilesTable.DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2);
                 _pdfPage.Paragraphs.Add(paragraph:attachmentFilesTable);
 
-                var titleBoldSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-                titleBoldSize8.FontSize = 8;
-                titleBoldSize8.FontStyle = FontStyles.Bold;
+                var titleBoldSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                     {
+                                         FontSize = 8,
+                                         FontStyle = FontStyles.Bold
+                                     };
 
-                var titleSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-                titleSize8.FontSize = 8;
+                var titleSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                 {
+                                     FontSize = 8
+                                 };
 
                 attachmentFilesTable.ColumnWidths = "33% 34% 33%";
                 row = attachmentFilesTable.Rows.Add();
@@ -202,8 +208,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             foreach (var certification in _reportPackage.CertificationTypes)
             {
-                var certificateTable = new Table {DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2)};
-                certificateTable.Broken = TableBroken.VerticalInSamePage;
+                var certificateTable = new Table
+                                       {
+                                           DefaultCellPadding = new MarginInfo(left:2, bottom:2, right:2, top:2),
+                                           Broken = TableBroken.VerticalInSamePage
+                                       };
                 _pdfPage.Paragraphs.Add(paragraph:certificateTable);
 
                 certificateTable.Margin.Top = 20;
@@ -221,8 +230,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             // According to Chris, we can assume there is only one sampleAndResults in one report; 
             if (_reportPackage.SamplesAndResultsTypes != null && _reportPackage.SamplesAndResultsTypes.Count > 0)
             {
-                var sampleResultsTextTable = new Table();
-                sampleResultsTextTable.IsKeptWithNext = true;
+                var sampleResultsTextTable = new Table
+                                             {
+                                                 IsKeptWithNext = true
+                                             };
 
                 _pdfPage.Paragraphs.Add(paragraph:sampleResultsTextTable);
 
@@ -276,33 +287,45 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private void DrawMonitoringPointSamplesAndResultsTable(Table sampleResultsTable, List<SampleDto> samples, string monitoringPointName, BorderInfo tableOrder)
         {
             // table header text font
-            var centerTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            centerTextBoldSize10.FontSize = 10;
-            centerTextBoldSize10.FontStyle = FontStyles.Bold;
-            centerTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Center;
+            var centerTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                       {
+                                           FontSize = 10,
+                                           FontStyle = FontStyles.Bold,
+                                           HorizontalAlignment = HorizontalAlignment.Center
+                                       };
 
-            var leftTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            leftTextBoldSize10.FontSize = 10;
-            leftTextBoldSize10.FontStyle = FontStyles.Bold;
-            leftTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Left;
+            var leftTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                     {
+                                         FontSize = 10,
+                                         FontStyle = FontStyles.Bold,
+                                         HorizontalAlignment = HorizontalAlignment.Left
+                                     };
 
-            var rightTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            rightTextBoldSize10.FontSize = 10;
-            rightTextBoldSize10.FontStyle = FontStyles.Bold;
-            rightTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Right;
+            var rightTextBoldSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                      {
+                                          FontSize = 10,
+                                          FontStyle = FontStyles.Bold,
+                                          HorizontalAlignment = HorizontalAlignment.Right
+                                      };
 
             // cell text font
-            var centerTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            centerTextSize8.FontSize = 8;
-            centerTextSize8.HorizontalAlignment = HorizontalAlignment.Center;
+            var centerTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                  {
+                                      FontSize = 8,
+                                      HorizontalAlignment = HorizontalAlignment.Center
+                                  };
 
-            var leftTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            leftTextSize8.FontSize = 8;
-            leftTextSize8.HorizontalAlignment = HorizontalAlignment.Left;
+            var leftTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                {
+                                    FontSize = 8,
+                                    HorizontalAlignment = HorizontalAlignment.Left
+                                };
 
-            var rightTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false);
-            rightTextSize8.FontSize = 8;
-            rightTextSize8.HorizontalAlignment = HorizontalAlignment.Right;
+            var rightTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+                                 {
+                                     FontSize = 8,
+                                     HorizontalAlignment = HorizontalAlignment.Right
+                                 };
 
             // Monitoring Point row 
             var row = sampleResultsTable.Rows.Add();

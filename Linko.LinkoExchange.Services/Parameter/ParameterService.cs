@@ -128,15 +128,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns> A parameter group with children parameters some with potentially overridden default units </returns>
         public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null)
         {
-            var monitoringPointIdString = string.Empty;
-            if (monitoringPointId.HasValue)
-            {
-                monitoringPointIdString = monitoringPointId.Value.ToString();
-            }
-            else
-            {
-                monitoringPointIdString = "null";
-            }
+            var monitoringPointIdString = monitoringPointId?.ToString() ?? "null";
 
             _logger.Info(message:$"Enter ParameterService.GetGlobalParameters. monitoringPointId.Value={monitoringPointIdString}");
 
@@ -208,15 +200,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns> Collection of parameter groups with children parameters some with potentially overridden default units </returns>
         public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null, bool? isGetActiveOnly = null)
         {
-            var monitoringPointIdString = string.Empty;
-            if (monitoringPointId.HasValue)
-            {
-                monitoringPointIdString = monitoringPointId.Value.ToString();
-            }
-            else
-            {
-                monitoringPointIdString = "null";
-            }
+            var monitoringPointIdString = monitoringPointId?.ToString() ?? "null";
 
             _logger.Info(message:$"Enter ParameterService.GetStaticParameterGroups. monitoringPointId.Value={monitoringPointIdString}");
 
@@ -331,21 +315,13 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns> Existing Id or newly created Id from tParameterGroup </returns>
         public int SaveParameterGroup(ParameterGroupDto parameterGroupDto)
         {
-            var parameterGroupIdString = string.Empty;
-            if (parameterGroupDto.ParameterGroupId.HasValue)
-            {
-                parameterGroupIdString = parameterGroupDto.ParameterGroupId.Value.ToString();
-            }
-            else
-            {
-                parameterGroupIdString = "null";
-            }
+            var parameterGroupIdString = parameterGroupDto.ParameterGroupId?.ToString() ?? "null";
 
             _logger.Info(message:$"Enter ParameterService.SaveParameterGroup. parameterGroup.ParameterGroupId.Value={parameterGroupIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
-            var parameterGroupIdToReturn = -1;
+            int parameterGroupIdToReturn;
             var currentUserProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
             var validationIssues = new List<RuleViolation>();
 
@@ -386,7 +362,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                     }
 
-                    ParameterGroup paramGroupToPersist = null;
+                    ParameterGroup paramGroupToPersist;
                     if (parameterGroupDto.ParameterGroupId.HasValue && parameterGroupDto.ParameterGroupId.Value > 0)
                     {
                         //Ensure there are no other groups with same name
@@ -411,7 +387,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     else
                     {
                         //Ensure there are no other groups with same name
-                        if (paramGroupsWithMatchingName.Count() > 0)
+                        if (paramGroupsWithMatchingName.Any())
                         {
                             var message = "A Parameter Group with that name already exists.  Please select another name.";
                             validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
@@ -533,8 +509,7 @@ namespace Linko.LinkoExchange.Services.Parameter
              var authorityOrganizationId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
                                                  .OrganizationId;
             //Static Groups
-            var parameterGroupDtos = new List<ParameterGroupDto>();
-            parameterGroupDtos = GetStaticParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal, isGetActiveOnly:true).ToList();
+            var parameterGroupDtos = GetStaticParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal, isGetActiveOnly:true).ToList();
 
             //Add Dynamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
@@ -572,10 +547,12 @@ namespace Linko.LinkoExchange.Services.Parameter
                 foreach (var freq in uniqueNonNullFrequencies)
                 {
                     //Add "<Frequency> + <Collection Method>" Groups
-                    var dynamicFreqAndCollectMethodParamGroup = new ParameterGroupDto();
-                    dynamicFreqAndCollectMethodParamGroup.Name = $"{freq} {collectionMethodName}";
-                    dynamicFreqAndCollectMethodParamGroup.Description = $"All {freq} {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}";
-                    dynamicFreqAndCollectMethodParamGroup.Parameters = new List<ParameterDto>();
+                    var dynamicFreqAndCollectMethodParamGroup = new ParameterGroupDto
+                                                                {
+                                                                    Name = $"{freq} {collectionMethodName}",
+                                                                    Description = $"All {freq} {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}",
+                                                                    Parameters = new List<ParameterDto>()
+                                                                };
 
                     //Add Parameters
                     var freqCollectParams = _dbContext.SampleFrequencies
@@ -601,17 +578,19 @@ namespace Linko.LinkoExchange.Services.Parameter
                         dynamicFreqAndCollectMethodParamGroup.Parameters.Add(item:paramDto);
                     }
 
-                    if (dynamicFreqAndCollectMethodParamGroup.Parameters.Count() > 0)
+                    if (dynamicFreqAndCollectMethodParamGroup.Parameters.Any())
                     {
                         parameterGroupDtos.Add(item:dynamicFreqAndCollectMethodParamGroup);
                     }
                 }
 
                 //Add All "<Collection Method>" Groups
-                var dynamicAllCollectMethodParamGroup = new ParameterGroupDto();
-                dynamicAllCollectMethodParamGroup.Name = $"All {collectionMethodName}'s";
-                dynamicAllCollectMethodParamGroup.Description = $"All {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}";
-                dynamicAllCollectMethodParamGroup.Parameters = new List<ParameterDto>();
+                var dynamicAllCollectMethodParamGroup = new ParameterGroupDto
+                                                        {
+                                                            Name = $"All {collectionMethodName}'s",
+                                                            Description = $"All {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}",
+                                                            Parameters = new List<ParameterDto>()
+                                                        };
 
                 //Add Parameters
                 var collectParams = _dbContext.SampleFrequencies

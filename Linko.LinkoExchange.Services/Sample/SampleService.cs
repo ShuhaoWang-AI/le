@@ -112,15 +112,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns> Existing Sample Id or newly created Sample Id </returns>
         public int SaveSample(SampleDto sampleDto)
         {
-            var sampleIdString = string.Empty;
-            if (sampleDto.SampleId.HasValue)
-            {
-                sampleIdString = sampleDto.SampleId.Value.ToString();
-            }
-            else
-            {
-                sampleIdString = "null";
-            }
+            var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
             _logger.Info(message:$"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
 
             var sampleId = -1;
@@ -162,15 +154,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns> Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode) </returns>
         public bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false)
         {
-            string sampleIdString;
-            if (sampleDto.SampleId.HasValue)
-            {
-                sampleIdString = sampleDto.SampleId.Value.ToString();
-            }
-            else
-            {
-                sampleIdString = "null";
-            }
+            var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
+
             _logger.Info(message:$"Enter SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -443,7 +428,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.SampleStatusName = SampleStatusName.Draft;
             }
 
-            if (sample?.ReportSamples != null && sample.ReportSamples.Count() > 0)
+            if (sample?.ReportSamples != null && sample.ReportSamples.Any())
             {
                 dto.SampleStatusName = SampleStatusName.Reported;
             }
@@ -558,13 +543,13 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 sampleResultDto.ConcentrationResultCompliance = false;
                 sampleResultDto.ConcentrationResultComplianceIconColor = "orange";
-                sampleResultDto.ConcentrationResultComplianceComment = $"Result compliance is unknown. No limit was found.";
+                sampleResultDto.ConcentrationResultComplianceComment = "Result compliance is unknown. No limit was found.";
             }
             else if (limitBasisName == LimitBasisName.MassLoading)
             {
                 sampleResultDto.MassResultCompliance = false;
                 sampleResultDto.MassResultComplianceIconColor = "orange";
-                sampleResultDto.MassResultComplianceComment = $"Result compliance is unknown. No limit was found.";
+                sampleResultDto.MassResultComplianceComment = "Result compliance is unknown. No limit was found.";
             }
 
             //Get possible limits
@@ -962,16 +947,13 @@ namespace Linko.LinkoExchange.Services.Sample
                                                                         || sr.LimitBasis.Name == LimitBasisName.MassLoading.ToString())
                                                            .ToArray();
 
-                for (var i = 0; i < existingSampleResults.Length; i++)
-                {
-                    var existingSampleResult = existingSampleResults[i];
-
+                foreach (var existingSampleResult in existingSampleResults) {
                     //Find match in sample dto results
-                    var matchedSampleResult = sampleDto.SampleResults
-                                                       .SingleOrDefault(sr => sr.ConcentrationSampleResultId.HasValue
-                                                                              && sr.ConcentrationSampleResultId.Value == existingSampleResult.SampleResultId
-                                                                              || sr.MassLoadingSampleResultId.HasValue
-                                                                              && sr.MassLoadingSampleResultId.Value == existingSampleResult.SampleResultId);
+                    var matchedSampleResult = sampleDto.SampleResults.SingleOrDefault(sr =>
+                                                                                          sr.ConcentrationSampleResultId.HasValue
+                                                                                          && sr.ConcentrationSampleResultId.Value == existingSampleResult.SampleResultId
+                                                                                          || sr.MassLoadingSampleResultId.HasValue
+                                                                                          && sr.MassLoadingSampleResultId.Value == existingSampleResult.SampleResultId);
 
                     if (matchedSampleResult == null)
                     {
@@ -1143,7 +1125,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 //... the SampleResultDto MAY ALSO have a Mass Loading component
                 if (!string.IsNullOrEmpty(value:sampleResultDto.MassLoadingValue))
                 {
-                    SampleResult massResultRowToUpdate = null;
+                    SampleResult massResultRowToUpdate;
                     if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
                     {
                         massResultRowToUpdate = new SampleResult {CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId};
@@ -1191,8 +1173,10 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             _logger.Info(message:$"Enter SampleService.ThrowSimpleException. message={message}");
 
-            var validationIssues = new List<RuleViolation>();
-            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+            var validationIssues = new List<RuleViolation>
+                                   {
+                                       new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
+                                   };
 
             _logger.Info(message:$"Leaving SampleService.ThrowSimpleException. message={message}");
 

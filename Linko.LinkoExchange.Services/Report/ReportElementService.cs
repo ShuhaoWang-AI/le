@@ -147,22 +147,14 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Existing Id or newly created Id </returns>
         public int SaveReportElementType(ReportElementTypeDto reportElementType)
         {
-            var reportElementTypeIdString = string.Empty;
-            if (reportElementType.ReportElementTypeId.HasValue)
-            {
-                reportElementTypeIdString = reportElementType.ReportElementTypeId.Value.ToString();
-            }
-            else
-            {
-                reportElementTypeIdString = "null";
-            }
+            var reportElementTypeIdString = reportElementType.ReportElementTypeId?.ToString() ?? "null";
 
             _logger.Info(message:$"Enter ReportElementService.SaveReportElementType. reportElementType.ReportElementTypeId.Value={reportElementTypeIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
-            var reportElementTypeIdToReturn = -1;
+            int reportElementTypeIdToReturn;
             var validationIssues = new List<RuleViolation>();
 
             //Check required fields (Name and Certification Text as per UC-53.3 4.b.)
@@ -191,7 +183,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                                  .Where(ret => ret.Name.Trim().ToLower() == proposedElementTypeName
                                                                                && ret.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
-                    ReportElementType reportElementTypeToPersist = null;
+                    ReportElementType reportElementTypeToPersist;
 
                     if (reportElementType.ReportElementTypeId.HasValue && reportElementType.ReportElementTypeId.Value > 0)
                     {
@@ -220,7 +212,7 @@ namespace Linko.LinkoExchange.Services.Report
                     else
                     {
                         //Ensure there are no other element types with same name
-                        if (elementTypesWithMatchingName.Count() > 0)
+                        if (elementTypesWithMatchingName.Any())
                         {
                             var message = "A Report Element Type with that name already exists. Please select another name.";
                             validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
@@ -281,8 +273,10 @@ namespace Linko.LinkoExchange.Services.Report
                     if (rpTemplatesUsingThis.Any())
                     {
                         var warningMessage = "This Report Package Element is in use in the following Report Package Templates and cannot be deleted:";
-                        var validationIssues = new List<RuleViolation>();
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:warningMessage));
+                        var validationIssues = new List<RuleViolation>
+                                               {
+                                                   new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:warningMessage)
+                                               };
 
                         foreach (var rpTemplate in rpTemplatesUsingThis)
                         {

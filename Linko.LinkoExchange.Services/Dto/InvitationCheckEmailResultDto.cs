@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Linko.LinkoExchange.Services.Dto
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public class InvitationCheckEmailResultDto
     {

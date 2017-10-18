@@ -124,7 +124,7 @@ namespace Linko.LinkoExchange.Services.Email
                         _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {emailEntry.AuditLogId}, "
                                              + $"Recipient User name:{emailEntry.RecipientUserName}, Recipient Email Address:{emailEntry.RecipientEmailAddress}, "
                                              + $"Subject:{emailEntry.MailMessage.Subject}");
-                        _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
+                        _logger.Error(message:"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
                     }
                 }
             }
@@ -243,15 +243,9 @@ namespace Linko.LinkoExchange.Services.Email
         {
             var noCondition = emailType == EmailType.ForgotPassword_ForgotPassword || emailType == EmailType.ForgotUserName_ForgotUserName;
 
-            ICollection<OrganizationRegulatoryProgramUserDto> orgRegProgramUsers;
-            if (noCondition)
-            {
-                orgRegProgramUsers = _programService.SimpleGetRegulatoryProgramUsers(email:email);
-            }
-            else
-            {
-                orgRegProgramUsers = _programService.GetActiveRegulatoryProgramUsers(email:email, includeRemovedUser:false, includeDisabledUser:false);
-            }
+            var orgRegProgramUsers = noCondition
+                                         ? _programService.SimpleGetRegulatoryProgramUsers(email:email)
+                                         : _programService.GetActiveRegulatoryProgramUsers(email:email, includeRemovedUser:false, includeDisabledUser:false);
             return orgRegProgramUsers;
         }
         

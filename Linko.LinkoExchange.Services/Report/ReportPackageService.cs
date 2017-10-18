@@ -721,10 +721,10 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> The newly created tReportPackage.ReportPackageId </returns>
         public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal)
         {
-            _logger.Info(message:
-                         $"Enter ReportPackageService.CreateDraft. reportPackageTemplateId={reportPackageTemplateId}, startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
+            _logger.Info(message:$"Enter ReportPackageService.CreateDraft. reportPackageTemplateId={reportPackageTemplateId}, "
+                                 + $"startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
 
-            var newReportPackageId = -1;
+            int newReportPackageId;
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -812,11 +812,13 @@ namespace Linko.LinkoExchange.Services.Report
                                                               .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
 
                             //Create a row in tReportPackageElementType
-                            var newReportPackageElementType = new ReportPackageElementType();
-                            newReportPackageElementType.ReportElementTypeId = rptet.ReportElementTypeId;
-                            newReportPackageElementType.ReportElementTypeName = reportElementType.Name;
-                            newReportPackageElementType.ReportElementTypeContent = reportElementType.Content;
-                            newReportPackageElementType.ReportElementTypeIsContentProvided = reportElementType.IsContentProvided;
+                            var newReportPackageElementType = new ReportPackageElementType
+                                                              {
+                                                                  ReportElementTypeId = rptet.ReportElementTypeId,
+                                                                  ReportElementTypeName = reportElementType.Name,
+                                                                  ReportElementTypeContent = reportElementType.Content,
+                                                                  ReportElementTypeIsContentProvided = reportElementType.IsContentProvided
+                                                              };
 
                             if (reportElementType.CtsEventType != null)
                             {
@@ -867,9 +869,11 @@ namespace Linko.LinkoExchange.Services.Report
 
                             foreach (var sample in existingEligibleSamples)
                             {
-                                var reportSampleAssociation = new ReportSample();
-                                reportSampleAssociation.ReportPackageElementTypeId = samplesAndResultsReportPackageElementType.ReportPackageElementTypeId;
-                                reportSampleAssociation.SampleId = sample.SampleId;
+                                var reportSampleAssociation = new ReportSample
+                                                              {
+                                                                  ReportPackageElementTypeId = samplesAndResultsReportPackageElementType.ReportPackageElementTypeId,
+                                                                  SampleId = sample.SampleId
+                                                              };
                                 _dbContext.ReportSamples.Add(entity:reportSampleAssociation);
                             }
 
@@ -968,16 +972,12 @@ namespace Linko.LinkoExchange.Services.Report
                         //we might have more than one "Sample and Results" section in a Report Package
 
                         var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
-                        for (var i = 0; i < existingReportSamples.Length; i++)
-                        {
-                            var existingReportSample = existingReportSamples[i];
-
+                        foreach (var existingReportSample in existingReportSamples) {
                             //Find match in dto samples
-                            var matchedSampleAssociation = reportPackageDto.SamplesAndResultsTypes
-                                                                           .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId
-                                                                                                    == existingReportSample.ReportPackageElementTypeId)
-                                                                           ?.Samples
-                                                                           .SingleOrDefault(s => s.SampleId == existingReportSample.SampleId);
+                            var matchedSampleAssociation =
+                                reportPackageDto.SamplesAndResultsTypes
+                                                .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
+                                                ?.Samples.SingleOrDefault(s => s.SampleId == existingReportSample.SampleId);
 
                             if (matchedSampleAssociation == null)
                             {
@@ -1033,15 +1033,11 @@ namespace Linko.LinkoExchange.Services.Report
                     foreach (var existingAttachmentsReportPackageElementType in attachmentsReportPackageElementCategory.ReportPackageElementTypes)
                     {
                         var existingReportFiles = existingAttachmentsReportPackageElementType.ReportFiles.ToArray();
-                        for (var i = 0; i < existingReportFiles.Length; i++)
-                        {
-                            var existingReportFile = existingReportFiles[i];
-
+                        foreach (var existingReportFile in existingReportFiles) {
                             //Find match in dto files
-                            var matchedFileAssociation = reportPackageDto.AttachmentTypes
-                                                                         .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
-                                                                         ?.FileStores
-                                                                         .SingleOrDefault(fs => fs.FileStoreId == existingReportFile.FileStoreId);
+                            var matchedFileAssociation = reportPackageDto
+                                .AttachmentTypes.SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)?.FileStores
+                                .SingleOrDefault(fs => fs.FileStoreId == existingReportFile.FileStoreId);
 
                             if (matchedFileAssociation == null)
                             {
@@ -1097,15 +1093,11 @@ namespace Linko.LinkoExchange.Services.Report
                     foreach (var existingCertReportPackageElementType in certsReportPackageElementCategory.ReportPackageElementTypes)
                     {
                         var existingReportFiles = existingCertReportPackageElementType.ReportFiles.ToArray();
-                        for (var i = 0; i < existingReportFiles.Length; i++)
-                        {
-                            var existingReportFile = existingReportFiles[i];
-
+                        foreach (var existingReportFile in existingReportFiles) {
                             //Find match in dto files
-                            var matchedFileAssociation = reportPackageDto.CertificationTypes
-                                                                         .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
-                                                                         ?.FileStores
-                                                                         .SingleOrDefault(fs => fs.FileStoreId == existingReportFile.FileStoreId);
+                            var matchedFileAssociation = reportPackageDto
+                                .CertificationTypes.SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)?.FileStores
+                                .SingleOrDefault(fs => fs.FileStoreId == existingReportFile.FileStoreId);
 
                             if (matchedFileAssociation == null)
                             {
@@ -1415,7 +1407,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public List<ReportPackageStatusCount> GetReportPackageStatusCounts()
         {
-            _logger.Info(message:$"Enter ReportPackageService.GetReportPackageStatusCounts.");
+            _logger.Info(message:"Enter ReportPackageService.GetReportPackageStatusCounts.");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var currentOrganizationId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationId));
@@ -1467,7 +1459,7 @@ namespace Linko.LinkoExchange.Services.Report
                 rptStatusCounts.Add(item:readyToSubmitCount);
             }
 
-            _logger.Info(message:$"Enter ReportPackageService.GetReportPackageStatusCounts.");
+            _logger.Info(message:"Enter ReportPackageService.GetReportPackageStatusCounts.");
             return rptStatusCounts;
         }
 
@@ -1625,7 +1617,7 @@ namespace Linko.LinkoExchange.Services.Report
                     //Check valid reason (UC-19 7.a.)
                     if (repudiationReasonId < 1)
                     {
-                        ThrowSimpleException(message:$"Reason is required.", propertyName:"RepudiationReasonId");
+                        ThrowSimpleException(message:"Reason is required.", propertyName:"RepudiationReasonId");
                     }
 
                     //=========
@@ -1666,35 +1658,45 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
-                    var contentReplacements = new Dictionary<string, string>();
+                    var contentReplacements = new Dictionary<string, string>
+                                              {
+                                                  {"reportPackageName", reportPackage.Name},
+                                                  {
+                                                      "periodStartDate",
+                                                      _timeZoneService
+                                                          .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.PeriodStartDateTimeUtc.UtcDateTime,
+                                                                                                   timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy")
+                                                  },
+                                                  {
+                                                      "periodEndDate",
+                                                      _timeZoneService
+                                                          .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.PeriodEndDateTimeUtc.UtcDateTime,
+                                                                                                   timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy")
+                                                  },
+                                                  {
+                                                      "submissionDateTime",
+                                                      _timeZoneService
+                                                          .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime,
+                                                                                                   timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy h:mmtt")
+                                                      + $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(leTimeZone:timeZone, dateTime:reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, abbreviationName:true)}"
+                                                  },
+                                                  {"corSignature", corHash.Signature},
+                                                  {
+                                                      "repudiatedDateTime",
+                                                      _timeZoneService
+                                                          .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime,
+                                                                                                   timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy h:mmtt")
+                                                      + $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(leTimeZone:timeZone, dateTime:reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, abbreviationName:true)}"
+                                                  },
+                                                  {"repudiationReason", repudiationReasonName},
+                                                  {"repudiationReasonComments", comments ?? ""},
+                                                  {"authOrganizationName", reportPackage.RecipientOrganizationName},
+                                                  {"authOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1}
+                                              };
 
                     //Report Details:
-                    contentReplacements.Add(key:"reportPackageName", value:reportPackage.Name);
-                    contentReplacements.Add(key:"periodStartDate",
-                                            value:_timeZoneService
-                                                .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.PeriodStartDateTimeUtc.UtcDateTime, timeZoneId:timeZoneId)
-                                                .ToString(format:"MMM d, yyyy"));
-                    contentReplacements.Add(key:"periodEndDate",
-                                            value:_timeZoneService
-                                                .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.PeriodEndDateTimeUtc.UtcDateTime, timeZoneId:timeZoneId)
-                                                .ToString(format:"MMM d, yyyy"));
-                    contentReplacements.Add(key:"submissionDateTime",
-                                            value:_timeZoneService
-                                                      .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime,
-                                                                                               timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy h:mmtt")
-                                                  + $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(leTimeZone:timeZone, dateTime:reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, abbreviationName:true)}");
-                    contentReplacements.Add(key:"corSignature", value:corHash.Signature);
-                    contentReplacements.Add(key:"repudiatedDateTime",
-                                            value:_timeZoneService
-                                                      .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime,
-                                                                                               timeZoneId:timeZoneId).ToString(format:"MMM d, yyyy h:mmtt")
-                                                  + $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(leTimeZone:timeZone, dateTime:reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, abbreviationName:true)}");
-                    contentReplacements.Add(key:"repudiationReason", value:repudiationReasonName);
-                    contentReplacements.Add(key:"repudiationReasonComments", value:comments ?? "");
 
                     //Repudiated to:
-                    contentReplacements.Add(key:"authOrganizationName", value:reportPackage.RecipientOrganizationName);
-                    contentReplacements.Add(key:"authOrganizationAddressLine1", value:reportPackage.RecipientOrganizationAddressLine1);
 
                     var authOrganizationAddressLine2 = "";
                     if (!string.IsNullOrWhiteSpace(value:reportPackage.RecipientOrganizationAddressLine2))
@@ -1747,9 +1749,11 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add(key:"emailAddress", value:currentUser.Email);
 
                     //Cromerr Log (UC-19 8.6.)
-                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                    cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                    cromerrAuditLogEntryDto.OrganizationId = reportPackage.OrganizationRegulatoryProgram.OrganizationId;
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                                  {
+                                                      RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                      OrganizationId = reportPackage.OrganizationRegulatoryProgram.OrganizationId
+                                                  };
                     cromerrAuditLogEntryDto.RegulatorOrganizationId = reportPackage.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = currentUser.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = currentUser.UserName;
@@ -1863,7 +1867,7 @@ namespace Linko.LinkoExchange.Services.Report
             if (string.IsNullOrEmpty(value:comments))
             {
                 //UC-56 (6.a.) "Required"
-                ThrowSimpleException(message:$"Comments are required.");
+                ThrowSimpleException(message:"Comments are required.");
             }
 
             using (var transaction = _dbContext.BeginTransaction())
@@ -1982,8 +1986,6 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> True if a Report Package with a later submission date/time exists </returns>
         public bool IsSimilarReportPackageSubmittedAfter(int reportPackageId)
         {
-            var isNewerReportPackageExist = false;
-
             _logger.Info(message:$"Enter ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
 
             var reportPackageToCompare = _dbContext.ReportPackages
@@ -1997,16 +1999,16 @@ namespace Linko.LinkoExchange.Services.Report
             var startDate = reportPackageToCompare.PeriodStartDateTimeUtc.Date;
             var endDate = reportPackageToCompare.PeriodEndDateTimeUtc.Date;
 
-            isNewerReportPackageExist = _dbContext.ReportPackages
-                                                  .Any(rp => rp.OrganizationRegulatoryProgramId == reportPackageToCompare.OrganizationRegulatoryProgramId
-                                                             && rp.ReportPackageTemplateId == reportPackageToCompare.ReportPackageTemplateId
-                                                             && rp.PeriodStartDateTimeUtc.Year == startDate.Year
-                                                             && rp.PeriodStartDateTimeUtc.Month == startDate.Month
-                                                             && rp.PeriodStartDateTimeUtc.Day == startDate.Day
-                                                             && rp.PeriodEndDateTimeUtc.Year == endDate.Year
-                                                             && rp.PeriodEndDateTimeUtc.Month == endDate.Month
-                                                             && rp.PeriodEndDateTimeUtc.Day == endDate.Day
-                                                             && rp.SubmissionDateTimeUtc > reportPackageToCompare.SubmissionDateTimeUtc);
+            var isNewerReportPackageExist = _dbContext.ReportPackages
+                                                       .Any(rp => rp.OrganizationRegulatoryProgramId == reportPackageToCompare.OrganizationRegulatoryProgramId
+                                                                  && rp.ReportPackageTemplateId == reportPackageToCompare.ReportPackageTemplateId
+                                                                  && rp.PeriodStartDateTimeUtc.Year == startDate.Year
+                                                                  && rp.PeriodStartDateTimeUtc.Month == startDate.Month
+                                                                  && rp.PeriodStartDateTimeUtc.Day == startDate.Day
+                                                                  && rp.PeriodEndDateTimeUtc.Year == endDate.Year
+                                                                  && rp.PeriodEndDateTimeUtc.Month == endDate.Month
+                                                                  && rp.PeriodEndDateTimeUtc.Day == endDate.Day
+                                                                  && rp.SubmissionDateTimeUtc > reportPackageToCompare.SubmissionDateTimeUtc);
 
             _logger.Info(message:$"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}, isNewerReportPackageExist={isNewerReportPackageExist}");
 
@@ -2024,8 +2026,7 @@ namespace Linko.LinkoExchange.Services.Report
             var reportRepudiatedDays =
                 Convert.ToInt32(value:_settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.ReportRepudiatedDays));
 
-            var reportPackage = _dbContext.ReportPackages
-                                          .Single(rep => rep.ReportPackageId == reportPackageId);
+            var reportPackage = _dbContext.ReportPackages.Single(rep => rep.ReportPackageId == reportPackageId);
 
             if (reportPackage.PeriodEndDateTimeUtc.UtcDateTime < DateTime.UtcNow.AddDays(value:-reportRepudiatedDays))
             {
@@ -2071,9 +2072,11 @@ namespace Linko.LinkoExchange.Services.Report
 
         private void WriteCrommerrLog(ReportPackageDto reportPackageDto, string submitterIpAddress, CopyOfRecordDto copyOfRecordDto)
         {
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationId));
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                          {
+                                              RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
+                                              OrganizationId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationId))
+                                          };
             var autorityOrg = _orgService.GetAuthority(orgRegProgramId:reportPackageDto.OrganizationRegulatoryProgramId);
             cromerrAuditLogEntryDto.RegulatorOrganizationId = autorityOrg.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = reportPackageDto.SubmitterUserId;
@@ -2085,9 +2088,11 @@ namespace Linko.LinkoExchange.Services.Report
             cromerrAuditLogEntryDto.IPAddress = submitterIpAddress;
             cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
 
-            var crommerContentReplacements = new Dictionary<string, string>();
-            crommerContentReplacements.Add(key:"organizationName", value:reportPackageDto.OrganizationName);
-            crommerContentReplacements.Add(key:"reportPackageName", value:reportPackageDto.Name);
+            var crommerContentReplacements = new Dictionary<string, string>
+                                             {
+                                                 {"organizationName", reportPackageDto.OrganizationName},
+                                                 {"reportPackageName", reportPackageDto.Name}
+                                             };
 
             var dateTimeFormat = "MM/dd/yyyy hh:mm tt";
             crommerContentReplacements.Add(key:"periodStartDate", value:reportPackageDto.PeriodStartDateTimeLocal.ToString(format:dateTimeFormat));
@@ -2106,13 +2111,15 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info(message:"Enter ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", argument:reportPackage.ReportPackageId);
 
-            var emailContentReplacements = new Dictionary<string, string>();
+            var emailContentReplacements = new Dictionary<string, string>
+                                           {
+                                               {"iuOrganizationName", reportPackage.OrganizationName},
+                                               {"reportPackageName", reportPackage.Name},
+                                               {"periodStartDate", reportPackage.PeriodStartDateTimeLocal.ToString(format:"MMM dd, yyyy")},
+                                               {"periodEndDate", reportPackage.PeriodEndDateTimeLocal.ToString(format:"MMM dd, yyyy")}
+                                           };
 
-            emailContentReplacements.Add(key:"iuOrganizationName", value:reportPackage.OrganizationName);
-            emailContentReplacements.Add(key:"reportPackageName", value:reportPackage.Name);
 
-            emailContentReplacements.Add(key:"periodStartDate", value:reportPackage.PeriodStartDateTimeLocal.ToString(format:"MMM dd, yyyy"));
-            emailContentReplacements.Add(key:"periodEndDate", value:reportPackage.PeriodEndDateTimeLocal.ToString(format:"MMM dd, yyyy"));
 
             var timeZoneNameAbbreviation =
                 _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramId,
@@ -2374,8 +2381,10 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info(message:$"Enter SampleService.ThrowSimpleException. message={message}");
 
-            var validationIssues = new List<RuleViolation>();
-            validationIssues.Add(item:new RuleViolation(propertyName:propertyName ?? string.Empty, propertyValue:null, errorMessage:message));
+            var validationIssues = new List<RuleViolation>
+                                   {
+                                       new RuleViolation(propertyName:propertyName ?? string.Empty, propertyValue:null, errorMessage:message)
+                                   };
 
             _logger.Info(message:$"Leaving SampleService.ThrowSimpleException. message={message}");
 

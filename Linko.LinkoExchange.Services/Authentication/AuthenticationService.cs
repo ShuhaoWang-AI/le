@@ -1607,8 +1607,10 @@ namespace Linko.LinkoExchange.Services.Authentication
         private void ThrowUserStatusRuleValiation(string message)
         {
             SignOff();
-            var validationIssues = new List<RuleViolation>();
-            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+            var validationIssues = new List<RuleViolation>
+                                   {
+                                       new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
+                                   };
             throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
         }
 
@@ -1918,10 +1920,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             var supportPhoneNumber = _globalSettings[key:SystemSettingType.SupportPhoneNumber];
             var supportEmail = _globalSettings[key:SystemSettingType.SupportEmailAddress];
 
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add(key:"link", value:link);
-            contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
-            contentReplacements.Add(key:"supportEmail", value:supportEmail);
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"link", link},
+                                          {"supportPhoneNumber", supportPhoneNumber},
+                                          {"supportEmail", supportEmail}
+                                      };
 
             _requestCache.SetValue(key:CacheKey.Token, value:token);
 

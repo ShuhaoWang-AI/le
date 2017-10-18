@@ -128,10 +128,10 @@ namespace Linko.LinkoExchange.Services.Sync
                         // No event would be created for that Element in LinkoCTS even if it had an Event Type assigned.
 
                         var reportPackageElements = new StringBuilder(value:"Report Element Type | Present in Report?\r\n");
-                        var isElementTypePresent = false;
                         foreach (var categoryName in reportPackageDto.ReportPackageElementCategories)
                         {
                             // Sample and Results
+                            bool isElementTypePresent;
                             if (categoryName.Equals(obj:ReportElementCategoryName.SamplesAndResults) && reportPackageDto.SamplesAndResultsTypes != null)
                             {
                                 // --------------------- LESampleResultParsedData: Samples and Results records ---------------------
@@ -454,9 +454,11 @@ namespace Linko.LinkoExchange.Services.Sync
             var dbPassword = ConfigurationManager.AppSettings[name:"SendToCtsDatabasePassword"];
             if (string.IsNullOrEmpty(value:dbServerName) || string.IsNullOrEmpty(value:dbName))
             {
-                var validationIssues = new List<RuleViolation>();
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
-                                                            errorMessage:"Send to CTS Failed. This feature is not configured. Please contact Linko for assistance."));
+                var validationIssues = new List<RuleViolation>
+                                       {
+                                           new RuleViolation(propertyName:string.Empty, propertyValue:null,
+                                                             errorMessage:"Send to CTS Failed. This feature is not configured. Please contact Linko for assistance.")
+                                       };
 
                 throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }

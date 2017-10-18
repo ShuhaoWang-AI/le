@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
 using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Program

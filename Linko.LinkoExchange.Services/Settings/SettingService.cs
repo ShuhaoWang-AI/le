@@ -64,8 +64,11 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
         {
-            var orgSettingDto = new OrganizationSettingDto {OrganizationId = organizationId};
-            orgSettingDto.Settings = new List<SettingDto>();
+            var orgSettingDto = new OrganizationSettingDto
+                                {
+                                    OrganizationId = organizationId,
+                                    Settings = new List<SettingDto>()
+                                };
 
             //Get Organization settings first
             var orgSettings = _dbContext.OrganizationSettings.Include(s => s.SettingTemplate.OrganizationType)
@@ -85,8 +88,11 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns> The ProgramSetting object </returns>
         public ProgramSettingDto GetProgramSettingsById(int orgRegProgramId)
         {
-            var progSettingDto = new ProgramSettingDto {OrgRegProgId = orgRegProgramId};
-            progSettingDto.Settings = new List<SettingDto>();
+            var progSettingDto = new ProgramSettingDto
+                                 {
+                                     OrgRegProgId = orgRegProgramId,
+                                     Settings = new List<SettingDto>()
+                                 };
             var settings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
             foreach (var setting in settings)
             {
@@ -103,8 +109,11 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns> The ProgramSetting object </returns>
         public ProgramSettingDto GetAuthorityProgramSettingsById(int orgRegProgramId)
         {
-            var progSettingDto = new ProgramSettingDto {OrgRegProgId = orgRegProgramId};
-            progSettingDto.Settings = new List<SettingDto>();
+            var progSettingDto = new ProgramSettingDto
+                                 {
+                                     OrgRegProgId = orgRegProgramId,
+                                     Settings = new List<SettingDto>()
+                                 };
 
             var org = _dbContext.OrganizationRegulatoryPrograms.Include(path:"Organization.Jurisdiction")
                                 .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);

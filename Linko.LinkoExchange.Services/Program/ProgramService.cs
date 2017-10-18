@@ -134,7 +134,7 @@ namespace Linko.LinkoExchange.Services.Program
             var orgRegProgram = _linkoExchangeDbContext.OrganizationRegulatoryPrograms
                                                        .SingleOrDefault(orp => orp.OrganizationRegulatoryProgramId == orgRegProgramId);
 
-            if (orgRegProgram != null && orgRegProgram.RegulatorOrganizationId != null)
+            if (orgRegProgram?.RegulatorOrganizationId != null)
             {
                 //Fetch authority
                 var authority = _linkoExchangeDbContext.OrganizationRegulatoryPrograms

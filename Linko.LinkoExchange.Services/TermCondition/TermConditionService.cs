@@ -27,15 +27,15 @@ namespace Linko.LinkoExchange.Services.TermCondition
 
         public string GetTermCondtionContent()
         {
-            _logger.Info(message:$"Enter TermConditionService.GetTermCondtionContent.");
+            _logger.Info(message:"Enter TermConditionService.GetTermCondtionContent.");
             var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.TermConditionId).First();
-            _logger.Info(message:$"Leave TermConditionService.GetTermCondtionContent.");
+            _logger.Info(message:"Leave TermConditionService.GetTermCondtionContent.");
             return termCondition.Content;
         }
 
         public int GetLatestTermConditionId()
         {
-            _logger.Info(message:$"Enter TermConditionService.GetLatestTermConditionId.");
+            _logger.Info(message:"Enter TermConditionService.GetLatestTermConditionId.");
             var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.TermConditionId).First();
             _logger.Info(message:$"Leave TermConditionService.GetLatestTermConditionId. termConditionId={termCondition.TermConditionId}");
             return termCondition.TermConditionId;

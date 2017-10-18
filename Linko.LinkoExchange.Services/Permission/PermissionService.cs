@@ -30,11 +30,11 @@ namespace Linko.LinkoExchange.Services.Permission
         {
             if (programService == null)
             {
-                throw new ArgumentNullException(paramName:"programService");
+                throw new ArgumentNullException(paramName:nameof(programService));
             }
             if (dbContext == null)
             {
-                throw new ArgumentNullException(paramName:"dbContext");
+                throw new ArgumentNullException(paramName:nameof(dbContext));
             }
 
             _programService = programService;
@@ -88,14 +88,9 @@ namespace Linko.LinkoExchange.Services.Permission
                                                   && u.IsRegistrationDenied == false
                                                   && u.IsRegistrationApproved);
 
-            if (isAuthorityUser)
-            {
-                approvals = approvals.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
-            }
-            else
-            {
-                approvals = approvals.Where(u => u.PermissionGroup.Name == UserRole.Standard.ToString() || u.PermissionGroup.Name == UserRole.Administrator.ToString());
-            }
+            approvals = isAuthorityUser
+                            ? approvals.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString())
+                            : approvals.Where(u => u.PermissionGroup.Name == UserRole.Standard.ToString() || u.PermissionGroup.Name == UserRole.Administrator.ToString());
 
             var userProfileIds = approvals.Select(i => i.UserProfileId).Distinct();
 
