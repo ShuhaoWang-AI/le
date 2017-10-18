@@ -444,10 +444,20 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public void DeleteInvitation(string invitationId, bool isSystemAction = false)
         {
+            _logger.Info(message: $"Enter InvitationService.DeleteInvitation. invitationId={invitationId}, isSystemAction={isSystemAction}");
+
             var invitation = _dbContext.Invitations
                                        .Include(x => x.RecipientOrganizationRegulatoryProgram.Organization)
                                        .Include(x => x.RecipientOrganizationRegulatoryProgram.RegulatoryProgram)
-                                       .Single(i => i.InvitationId == invitationId);
+                                       .SingleOrDefault(i => i.InvitationId == invitationId);
+
+            if (invitation == null)
+            {
+                //Race condition -- must have just been deleted by another user/client.    
+                _logger.Info(message: $"WARNING: InvitationService.DeleteInvitation. Invitation could not be found. Possible race condition. invitationId={invitationId}");
+                return;
+            }
+
             var recipientOrganizationRegulatoryProgram = invitation.RecipientOrganizationRegulatoryProgram;
             var authorityName = recipientOrganizationRegulatoryProgram.RegulatorOrganization != null ? recipientOrganizationRegulatoryProgram.RegulatorOrganization.Name : "";
             _dbContext.Invitations.Remove(entity:invitation);
@@ -501,6 +511,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                 _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteDeleted, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
+
+            _logger.Info(message: $"Exit InvitationService.DeleteInvitation. invitationId={invitationId}, isSystemAction={isSystemAction}");
         }
 
         public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)
