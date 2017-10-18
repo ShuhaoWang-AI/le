@@ -822,21 +822,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return authenticationResult;
             }
 
-            var resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId:userQuestionAnswerId, answer:answer, failedCount:failedCount, newPassword:newPassword);
-            if (resetPasswordResult.Result == AuthenticationResult.Success)
-            {
-                foreach (var log in emailAuditLogs)
-                {
-                    log.Token = string.Empty;
-                }
-            }
-
-            _dbContext.SaveChanges();
+            var resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId:userQuestionAnswerId, answer:answer, failedCount:failedCount, newPassword:newPassword,
+                                                               emailAuditLogs:emailAuditLogs);
             return resetPasswordResult;
         }
 
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
-                                                                      string answer, int failedCount, string newPassword)
+        private async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId, string answer, int failedCount, string newPassword, List<EmailAuditLog> emailAuditLogs)
         {
             var userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             var passwordHash = _passwordHasher.HashPassword(password:newPassword);
@@ -861,7 +852,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 if (failedCount + 1 >= maxAnswerAttempts) // from web.config
                 {
-                    _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    _userService.LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:true, reason:AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset,
+                                                       reportPackageId:null, resetPasswordEmailAuditLogs:emailAuditLogs);
 
                     //Get all associated authorities
                     var userOrgs = _organizationService.GetUserRegulators(userId:userProfileId).ToList();
@@ -934,6 +926,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                             var userDto = _userService.GetUserProfileById(userProfileId:userProfileId);
                             _crommerAuditLogService.SimpleLog(eventType:CromerrEvent.ForgotPassword_Success, orgRegProgram:orgRegProgDto, user:userDto).Wait();
                         }
+
+                        // remove the reset password token
+                        foreach (var log in emailAuditLogs)
+                        {
+                            log.Token = string.Empty;
+                        }
+
+                        _dbContext.SaveChanges();
 
                         transaction.Commit();
                     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 
@@ -108,8 +109,9 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="isAttemptingLock"> </param>
         /// <param name="reason"> </param>
         /// <param name="reportPackageId"> </param>
+        /// <param name="resetPasswordEmailAuditLogs"> </param>
         /// <returns> </returns>
-        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null);
+        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null, List<EmailAuditLog> resetPasswordEmailAuditLogs = null);
 
         /// <summary>
         ///     Locks (or unlocks) an org reg program user. Emails are then sent to the appropriate stakeholders.

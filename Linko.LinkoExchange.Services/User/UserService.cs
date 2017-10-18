@@ -603,7 +603,8 @@ namespace Linko.LinkoExchange.Services.User
             return LockUnlockUserAccount(userProfileId:userProfileId, isAttemptingLock:isAttemptingLock, reason:reason, reportPackageId:null);
         }
 
-        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null)
+        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null,
+                                                             List<EmailAuditLog> resetPasswordEmailAuditLogs = null)
         {
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -646,6 +647,17 @@ namespace Linko.LinkoExchange.Services.User
 
                         // Do email audit log.
                         _linkoExchangeEmailService.WriteEmailAuditLogs(emailEntries:emailEntries);
+                    }
+
+                    if (resetPasswordEmailAuditLogs != null)
+                    {
+                        // remove the reset password token
+                        foreach (var log in resetPasswordEmailAuditLogs)
+                        {
+                            log.Token = string.Empty;
+                        }
+
+                        _dbContext.SaveChanges();
                     }
 
                     transaction.Commit();
@@ -1382,9 +1394,8 @@ namespace Linko.LinkoExchange.Services.User
 
         public ICollection<UserDto> GetOrgRegProgAdministrators(int orgRegProgId)
         {
-            var signatoryIds = _dbContext.OrganizationRegulatoryProgramUsers
+            var adminIds = _dbContext.OrganizationRegulatoryProgramUsers
                                          .Where(i => i.OrganizationRegulatoryProgramId == orgRegProgId
-
                                                      // ReSharper disable once ArgumentsStyleOther
                                                      // ReSharper disable once ArgumentsStyleNamedExpression
                                                      && i.PermissionGroup.Name.Equals(UserRole.Administrator.ToString(), StringComparison.InvariantCultureIgnoreCase)
@@ -1395,7 +1406,7 @@ namespace Linko.LinkoExchange.Services.User
                                          .Select(b => b.UserProfileId);
 
             // ReSharper disable once ArgumentsStyleNamedExpression
-            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && signatoryIds.Contains(i.UserProfileId));
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && adminIds.Contains(i.UserProfileId));
 
             var userDtos = new List<UserDto>();
             foreach (var userProfile in userProfiles)

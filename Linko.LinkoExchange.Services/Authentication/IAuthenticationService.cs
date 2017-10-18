@@ -56,9 +56,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="password"> The new password </param>
         /// <returns> </returns>
         Task<AuthenticationResultDto> ResetPasswordAsync(string token, int userQuestionAnswerId, string answer, int attemptCount, string password);
-
-        Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId, string answer, int attempCount, string password);
-
+        
         bool CheckPasswordResetUrlNotExpired(string token);
 
         /// <summary>
