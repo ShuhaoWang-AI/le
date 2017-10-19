@@ -70,7 +70,7 @@ namespace Linko.LinkoExchange.Services.Organization
                     //
 
                     var targetOrgRegProgId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         if (currentOrgRegProgramId == targetOrgRegProgId)
                         {

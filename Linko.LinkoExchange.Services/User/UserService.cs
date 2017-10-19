@@ -113,7 +113,7 @@ namespace Linko.LinkoExchange.Services.User
                     //Authorize the correct Authority
                     //
 
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         //this will also handle scenarios where the current user and target user of from the same org reg program
                         retVal = currentOrgRegProgramId
@@ -1401,7 +1401,7 @@ namespace Linko.LinkoExchange.Services.User
 
                                                  // ReSharper disable once ArgumentsStyleOther
                                                  // ReSharper disable once ArgumentsStyleNamedExpression
-                                                 && i.PermissionGroup.Name.Equals(UserRole.Administrator.ToString(), StringComparison.InvariantCultureIgnoreCase)
+                                                 && i.PermissionGroup.Name.Equals(UserRole.Administrator.ToString(), StringComparison.OrdinalIgnoreCase)
                                                  && i.IsEnabled
                                                  && !i.IsRemoved
                                                  && !i.IsRegistrationDenied

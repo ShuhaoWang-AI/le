@@ -76,7 +76,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     var parameterGroup = _dbContext.ParameterGroups
                                                    .SingleOrDefault(pg => pg.ParameterGroupId == parameterGroupId);
 
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
                         {
@@ -463,7 +463,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     var childAssociations = _dbContext.ParameterGroupParameters
                                                       .Where(child => child.ParameterGroupId == parameterGroupId);
 
-                    if (childAssociations.Count() > 0)
+                    if (childAssociations.Any())
                     {
                         _dbContext.ParameterGroupParameters.RemoveRange(entities:childAssociations);
                     }
@@ -514,7 +514,6 @@ namespace Linko.LinkoExchange.Services.Parameter
             //Add Dynamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
                                                      .Include(ss => ss.MonitoringPointParameter)
-                                                     .Include(x=>x.MonitoringPointParameter) 
                                                      .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
@@ -528,7 +527,6 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             var uniqueCollectionMethodIds = _dbContext.SampleFrequencies
                                                       .Include(ss => ss.MonitoringPointParameter)
-                                                      .Include(s=>s.MonitoringPointParameter)
                                                       .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                    && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                                    && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal

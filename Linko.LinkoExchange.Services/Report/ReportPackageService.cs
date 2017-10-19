@@ -107,8 +107,7 @@ namespace Linko.LinkoExchange.Services.Report
                 case "GetReportPackage":
                 {
                     var reportPackageId = id[0];
-                    var reportPackage = _dbContext.ReportPackages
-                                                  .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+                    var reportPackage = _dbContext.ReportPackages.SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
 
                     if (reportPackage == null)
                     {
@@ -118,7 +117,7 @@ namespace Linko.LinkoExchange.Services.Report
                     //Check authorized access as either one of:
                     //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
                     //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         if (currentOrgRegProgramId == _orgService.GetAuthority(orgRegProgramId:reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
                         {
@@ -1471,7 +1470,8 @@ namespace Linko.LinkoExchange.Services.Report
         public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName)
         {
             _logger.Info(message:$"Enter ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
-            var isAuthorityViewing = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower().Equals(value:"authority");
+            var isAuthorityViewing = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower()
+                                                        .Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase);
             var reportPackageDtoList = new List<ReportPackageDto>();
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));

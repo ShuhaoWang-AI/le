@@ -110,7 +110,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 case "GetFileStoreById":
                 {
                     var fileStoreId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         var fileStore = _dbContext.FileStores
                                                   .Include(fs => fs.OrganizationRegulatoryProgram)

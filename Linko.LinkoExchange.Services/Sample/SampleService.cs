@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 case "GetSampleDetails":
                 {
                     var sampleId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
                         var authorityOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:_dbContext.Samples

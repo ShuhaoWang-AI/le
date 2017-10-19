@@ -71,7 +71,7 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 case "GetReportPackageTemplate":
                     var reportPackageTemplateId = id[0];
-                    if (currentPortalName.Equals(value:"authority"))
+                    if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         //this will also handle scenarios where ReportPackageTemplateId doesn't even exist (regardless of ownership)
                         var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTempates
