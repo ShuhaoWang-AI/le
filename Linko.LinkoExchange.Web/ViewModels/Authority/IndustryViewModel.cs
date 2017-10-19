@@ -58,7 +58,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
                 if (string.IsNullOrEmpty(value:address))
                 {
                     var formattedAddress = string.Format(format:"{0} {1}, {2}, {3} {4}", args:new object[] {AddressLine1, AddressLine2, CityName, State, ZipCode});
-                    formattedAddress = formattedAddress.Replace(oldValue:" , , ", newValue:"");
+                    formattedAddress = formattedAddress.Replace(oldValue:" , , ", newValue:", ");
                     formattedAddress = formattedAddress.Replace(oldValue:", ,", newValue:",");
                     formattedAddress = formattedAddress.Replace(oldValue:" , ", newValue:", ").Trim();
                     if (formattedAddress.Length > 0 && formattedAddress[index:0] == ',')

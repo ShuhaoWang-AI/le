@@ -229,5 +229,100 @@ namespace Linko.LinkoExchange.Test
 
             Assert.IsFalse(condition:isAuthorized);
         }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_Complete_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("PO Box 2088", "1050 Edgewater Cres", "Squamish", "BC", "V8B0B4");
+
+            Assert.IsTrue(formattedString == "PO Box 2088 1050 Edgewater Cres, Squamish, BC V8B0B4");
+        }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_No_Address_At_All_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("", "", "", "", "");
+
+            Assert.IsTrue(formattedString == "");
+        }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_Only_AddressLine1_State_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("PO Box 2088", "", "", "BC", "");
+
+            Assert.IsTrue(formattedString == "PO Box 2088, BC");
+        }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_Only_AddressLine1_City_State_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("PO Box 2088", "", "Squamish", "BC", "");
+
+            Assert.IsTrue(formattedString == "PO Box 2088, Squamish, BC");
+        }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_Only_City_State_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("", "", "Squamish", "BC", "");
+
+            Assert.IsTrue(formattedString == "Squamish, BC");
+        }
+
+        [TestMethod]
+        public void Formatting_Organization_Address_String_Only_State_Test()
+        {
+            //Setup mocks
+            var formattedString = IndustryViewModelAddressGetter("", "", "", "BC", "");
+
+            Assert.IsTrue(formattedString == "BC");
+        }
+
+        /// <summary>
+        /// This code snippet was created to test the logic within the IndustryViewModel's Address "get" function
+        /// It should mirror the code you will find there.
+        /// (See Bug 4624)
+        /// </summary>
+        /// <param name="AddressLine1"></param>
+        /// <param name="AddressLine2"></param>
+        /// <param name="CityName"></param>
+        /// <param name="State"></param>
+        /// <param name="ZipCode"></param>
+        /// <returns></returns>
+        private string IndustryViewModelAddressGetter(string AddressLine1, string AddressLine2, string CityName,
+           string State, string ZipCode)
+        {
+            string address = null;
+
+            if (string.IsNullOrEmpty(value: address))
+            {
+                var formattedAddress = string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
+                formattedAddress = formattedAddress.Replace(oldValue: " , , ", newValue: ", ");
+                formattedAddress = formattedAddress.Replace(oldValue: ", ,", newValue: ",");
+                formattedAddress = formattedAddress.Replace(oldValue: " , ", newValue: ", ").Trim();
+                if (formattedAddress.Length > 0 && formattedAddress[index: 0] == ',')
+                {
+                    //trim leading comma
+                    formattedAddress = formattedAddress.Substring(startIndex: 1);
+                }
+                if (formattedAddress.Length > 0 && formattedAddress[index: formattedAddress.Length - 1] == ',')
+                {
+                    //trim trailing comma
+                    formattedAddress = formattedAddress.Substring(startIndex: 0, length: formattedAddress.Length - 1);
+                }
+
+                return formattedAddress.Trim();
+            }
+            else
+            {
+                return address;
+            }
+        }
     }
 }
