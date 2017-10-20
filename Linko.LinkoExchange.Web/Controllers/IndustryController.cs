@@ -309,7 +309,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _userService.UpdateUserPermissionGroupId(orgRegProgUserId:model.Id, permissionGroupId:model.Role, isAuthorizationRequired:true);
-                _userService.UpdateUserSignatoryStatus(orgRegProgUserId:model.Id, isSignatory:model.IsSignatory);
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "User updated successfully!";
                 ModelState.Clear();

@@ -87,8 +87,7 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"> </param>
         /// <param name="isSignatory"> </param>
         /// <param name="isAuthorizationRequired"> </param>
-        /// <param name="needTransaction"> </param>
-        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false, bool needTransaction = true);
+        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false);
 
         /// <summary>
         ///     Resets an org reg program user. Emails are then sent to the appropriate stakeholders including the user's email address
@@ -205,15 +204,6 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="isAuthorizationRequired"> </param>
         /// <returns> </returns>
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId, bool isAuthorizationRequired = false);
-
-        /// <summary>
-        ///     Updates an org reg program user's approved status and signatory permissions if there is a change. If there is a change in signatory
-        ///     permissions, various email communications are sent out and logging occurs.
-        /// </summary>
-        /// <param name="orgRegProgUserId"> </param>
-        /// <param name="isApproved"> </param>
-        /// <param name="isSigantory"> </param>
-        void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved, bool isSigantory);
 
         /// <summary>
         ///     Updates the PermissionGroupId field of the OrganizationRegulatoryProgramUser

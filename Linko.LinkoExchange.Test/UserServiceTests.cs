@@ -114,14 +114,14 @@ namespace Linko.LinkoExchange.Test
             var userDtoList = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:2, isRegApproved:false, isRegDenied:false, isEnabled:true, isRemoved:false);
         }
 
-        [TestMethod]
-        public void ApproveUserRegistrationWithPermissionsForProgram()
-        {
-            var orgRegProgUserId = 7;
-            var permissionGroupId = 1;
-            _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId:orgRegProgUserId, permissionGroupId:permissionGroupId);
-            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId:orgRegProgUserId, isApproved:true, isSignatory:false);
-        }
+        //[TestMethod]
+        //public void ApproveUserRegistrationWithPermissionsForProgram()
+        //{
+        //    var orgRegProgUserId = 7;
+        //    var permissionGroupId = 1;
+        //    _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId:orgRegProgUserId, permissionGroupId:permissionGroupId);
+        //    _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId:orgRegProgUserId, isApproved:true, isSignatory:false);
+        //}
 
         [TestMethod]
         public void ApprovePendingRegistrationTransactionWithEmails()
