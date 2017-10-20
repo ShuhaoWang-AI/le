@@ -1470,6 +1470,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 DateRegistered = user.RegistrationDateTimeUtc?.DateTime,
                                 Status = user.IsEnabled,
                                 AccountLocked = user.UserProfileDto.IsAccountLocked,
+                                AccountResetRequired = user.UserProfileDto.IsAccountResetRequired,
                                 Role = user.PermissionGroup.PermissionGroupId ?? 0,
                                 RoleText = user.PermissionGroup.Name,
                                 IsSignatory = user.IsSignatory,
@@ -2349,6 +2350,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Name = reportPackageTemplate.Name,
                                 Description = reportPackageTemplate.Description,
                                 IsActive = reportPackageTemplate.IsActive,
+                                IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
                                 EffectiveDateTimeLocal = reportPackageTemplate.EffectiveDateTimeLocal,
                                 LastModificationDateTimeLocal = reportPackageTemplate.LastModificationDateTimeLocal,
                                 LastModifierUserName = reportPackageTemplate.LastModifierFullName,
@@ -2393,6 +2395,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 ViewBag.Satus = "New";
 
+                viewModel.IsSubmissionBySignatoryRequired = true; // Default is true for new templates
                 viewModel.SamplesAndResultsTypes = _reportElementService
                     .GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
                                                                                                                   {

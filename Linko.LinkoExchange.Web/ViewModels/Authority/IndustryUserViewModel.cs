@@ -71,6 +71,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "Account Locked")]
         public bool AccountLocked { get; set; }
 
+        [Editable(allowEdit: false)]
+        [Display(Name = "Account Reset Required")]
+        public bool AccountResetRequired { get; set; }
+
         [Editable(allowEdit:false)]
         [Display(Name = "Account Locked")]
         public string AccountLockedText => AccountLocked ? "Locked" : "No";

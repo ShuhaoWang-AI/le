@@ -332,7 +332,25 @@
         </section>
         <div class="box-footer">
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"IndustryUserUpdateSignatoryStatus", controllerName:"Authority")" formmethod="post" />
+                <input type="submit" id="btnSaveUserDetails" value="Save" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"IndustryUserUpdateSignatoryStatus", controllerName:"Authority")" formmethod="post" />
+                
+                @if (Model.AccountLocked)
+                {
+                    <script>
+                        $("#btnSaveUserDetails")
+                            .prop('disabled', true)
+                            .attr('title', 'Signatory rights cannot be changed because the user locked.');
+                    </script>
+                }
+                
+                @if (Model.AccountResetRequired) //if user is both locked AND reset, choose this message
+                {
+                    <script>
+                        $("#btnSaveUserDetails")
+                            .prop('disabled', true)
+                            .attr('title', 'Signatory rights cannot be changed because the user has not completed their registration reset.');
+                    </script>
+                }
             </div>
         </div>
     </div>
