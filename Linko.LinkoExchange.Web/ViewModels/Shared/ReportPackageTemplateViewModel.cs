@@ -31,8 +31,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Retirement Date")]
         public DateTime? RetirementDateTimeLocal { get; set; }
 
-        [Display(Name = "Is Submission By Signatory Required")]
-        public bool IsSubmissionBySignatoryRequired => true;
+        [Display(Name = "Signatory Required")]
+        public bool IsSubmissionBySignatoryRequired { get; set; }
 
         [Display(Name = "CTS Event Type")]
         public int CtsEventTypeId { get; set; }

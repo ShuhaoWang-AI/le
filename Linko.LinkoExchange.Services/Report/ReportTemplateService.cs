@@ -310,6 +310,7 @@ namespace Linko.LinkoExchange.Services.Report
                         currentReportPackageTempalte.CtsEventTypeId = rpt.CtsEventTypeId;
                         currentReportPackageTempalte.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         currentReportPackageTempalte.IsActive = rpt.IsActive;
+                        currentReportPackageTempalte.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
                         currentReportPackageTempalte.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         currentReportPackageTempalte.LastModifierUserId = currentUserId;
 

@@ -2350,6 +2350,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Name = reportPackageTemplate.Name,
                                 Description = reportPackageTemplate.Description,
                                 IsActive = reportPackageTemplate.IsActive,
+                                IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
                                 EffectiveDateTimeLocal = reportPackageTemplate.EffectiveDateTimeLocal,
                                 LastModificationDateTimeLocal = reportPackageTemplate.LastModificationDateTimeLocal,
                                 LastModifierUserName = reportPackageTemplate.LastModifierFullName,
@@ -2394,6 +2395,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 ViewBag.Satus = "New";
 
+                viewModel.IsSubmissionBySignatoryRequired = true; // Default is true for new templates
                 viewModel.SamplesAndResultsTypes = _reportElementService
                     .GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
                                                                                                                   {

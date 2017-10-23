@@ -104,7 +104,6 @@
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
                 @Html.HiddenFor(model => model.ShowSampleResults)
-                @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
                 @Html.LabelFor(model => model.Name, htmlAttributes:new
                                                                    {
                                                                        @class = "control-label col-md-2 required"
@@ -137,7 +136,8 @@
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsActive)
                     </div>
-                </div>
+                </div>         
+                
             </div>
 
             <div class="form-group">
@@ -155,6 +155,21 @@
                                                                                                             maxlength = 100
                                                                                                         }
                                                                                    })
+                </div>
+                
+                <div class="col-md-1"></div>
+                
+                @Html.LabelFor(model => model.IsSubmissionBySignatoryRequired, htmlAttributes:new
+                                                                                              {
+                                                                                                  @class = "control-label col-md-1"
+                                                                                              })
+                <div class="col-md-1">
+                    <div class="checkbox">
+                        @Html.EditorFor(model => model.IsSubmissionBySignatoryRequired)
+                        <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="" type="button" data-original-title="Signatory Rights are required to submit this report">
+                            <i class="fa fa-info-circle fa-lg"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -965,8 +980,8 @@
                 viewModel.Name = $('#Name').val();
                 viewModel.Description = $('#Description').val();
                 viewModel.IsActive = $('#IsActive').is(":checked");
+                viewModel.IsSubmissionBySignatoryRequired = $('#IsSubmissionBySignatoryRequired').is(":checked");
                 viewModel.EffectiveDateTimeLocal = $('#dEffectiveDateTimeLocal').val();
-                viewModel.IsSubmissionBySignatoryRequired = $('#IsSubmissionBySignatoryRequired').val();
                 viewModel.ShowSampleResults = $('#ShowSampleResults').val();
                 viewModel.CtsEventTypeId = $('#CtsEventTypeId').val();
                 viewModel.SamplesAndResultsTypes = selectedSamplesAndResults;
