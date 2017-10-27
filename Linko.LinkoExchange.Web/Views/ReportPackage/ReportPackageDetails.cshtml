@@ -133,7 +133,8 @@
                 @Html.HiddenFor(model => model.FailedCountPassword)
                 @Html.HiddenFor(model => model.FailedCountKbq)
                 @Html.Hidden(name:"SelectedSamples", value:Html.Raw(value:Json.Encode(value:Model.SelectedSamples)))
-                @Html.Hidden(name:"SelectedAttachments", value:Html.Raw(value:Json.Encode(value:Model.SelectedAttachments)))
+                @Html.Hidden(name:"SelectedAttachments", value:Html.Raw(value: Json.Encode(value: Model.SelectedAttachments)))
+                @Html.Hidden(name:"IncludedCertifications", value:Html.Raw(value: Json.Encode(value:Model.IncludedCertifications)))
 
             </div>
             <div class="form-group">
@@ -251,7 +252,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">
-                                @samplesAndResultType.Name
+                                @samplesAndResultType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && samplesAndResultType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</span>
                             </h3>
                             <div class="box-tools pull-right">
                                 <button class="btn btn-box-tool" data-widget="collapse">
@@ -416,7 +417,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">
-                                @attachmentType.Name
+                                @attachmentType.Name<div style="color: red;display:@( Model.Status == ReportStatusName.Draft && attachmentType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</div>
                             </h3>
                             <div class="box-tools pull-right">
                                 <button class="btn btn-box-tool" data-widget="collapse">
@@ -522,24 +523,40 @@
 
                 break;
             case ReportElementCategoryName.Certifications:
+                
                 foreach (var certificationType in Model.CertificationTypes)
                 {
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">
-                                @certificationType.Name
-                            </h3>
-                            <div class="box-tools pull-right">
-                                <button class="btn btn-box-tool" data-widget="collapse">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
+                    if (Model.Status == ReportStatusName.Draft || certificationType.IsIncluded)
+                    {
+                        //Show this certification in Draft mode only or if Included in other states
 
-                        <section class="box-body form-horizontal">
-                            <p style="white-space: pre-wrap;">@certificationType.Content</p>
-                        </section>
-                    </div>
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                @if (Model.Status == ReportStatusName.Draft)
+                                {
+                                    //Show checkbox in draft mode only
+                                    <div class="checkbox" style="display: inline-block;">
+                                        <input type="checkbox" checked="@( certificationType.IsIncluded ? true : false)" name="ckIncludedCertification_@certificationType.Id" />
+                                    </div>
+                                }
+                                <h3 class="box-title" style="display: inline-block;">
+                                    @certificationType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && certificationType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</span>
+                                </h3>
+                            
+                                <div class="box-tools pull-right">
+                                    <button class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <section class="box-body form-horizontal">
+                                <p style="white-space: pre-wrap;">@certificationType.Content</p>
+                            </section>
+                        </div>
+                    }
+
+                    
                 }
 
                 break;
@@ -1353,9 +1370,11 @@
         <script>
             var selectedSamples = $.parseJSON($("#SelectedSamples").val());
             var selectedAttachments = $.parseJSON($("#SelectedAttachments").val());
+            var includedCertifications = $.parseJSON($("#IncludedCertifications").val());
 
             //console.log("selectedSamples: " + $("#SelectedSamples").val());
             //console.log("selectedAttachments: " + $("#SelectedAttachments").val());
+            //console.log("includedCertifications: " + $("#IncludedCertifications").val());
 
             var idField = "Id";
 
@@ -1436,6 +1455,20 @@
                         }
                     });
 
+            //on check of required certificate "Include" checkbox
+            $(document)
+                .on('ifChecked', "input[name^='ckIncludedCertification']", function()
+                {
+                    var id = parseInt(this.name.replace('ckIncludedCertification_', ''));
+                    includedCertifications[id] = true;
+                });
+            $(document)
+                .on('ifUnchecked', "input[name^='ckIncludedCertification']", function()
+                {
+                    var id = parseInt(this.name.replace('ckIncludedCertification_', ''));
+                    includedCertifications[id] = false;
+                });
+
             //on dataBound event restore previous selected rows:
             function onGridDataBound(e)
             {
@@ -1474,26 +1507,20 @@
 
                 //console.log("previouslySelectedItemIds: " + previouslySelectedItemIds);
 
-                if (previouslySelectedItemIds.length)
-                {
-                    var items = grid.items();
-                    items.each(function(idx, row)
-                    {
-                        var dataItem = grid.dataItem(row);
-                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                var items = grid.items();
+                items.each(function (idx, row) {
+                    var dataItem = grid.dataItem(row);
+                    //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
 
-                        var isPerviouslySelected = ($.inArray(dataItem[idField], previouslySelectedItemIds) !== -1);
+                    var isPerviouslySelected = ($.inArray(dataItem[idField], previouslySelectedItemIds) !== -1);
 
-                        if (isPerviouslySelected)
-                        {
-                            $(row).find(".checkbox").attr('checked', true);
-                        }
-                        else
-                        {
-                            $(row).find(".checkbox").attr('checked', false);
-                        }
-                    });
-                }
+                    if (isPerviouslySelected) {
+                        $(row).find(".checkbox").attr('checked', true);
+                    }
+                    else {
+                        $(row).find(".checkbox").attr('checked', false);
+                    }
+                });
             }
 
             $(document)
@@ -1506,6 +1533,7 @@
                             {
                                 $("#SelectedSamples").val(JSON.stringify(selectedSamples));
                                 $("#SelectedAttachments").val(JSON.stringify(selectedAttachments));
+                                $("#IncludedCertifications").val(JSON.stringify(includedCertifications));
 
                                 //console.log("SelectedSamples: " + $("#SelectedSamples").val());
                                 //console.log("SelectedAttachments: " + $("#SelectedAttachments").val());

@@ -345,12 +345,6 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void IsRequiredReportPackageElementTypesIncluded()
-        {
-            var isGood = _reportPackageService.IsRequiredReportPackageElementTypesIncluded(reportPackageId:11);
-        }
-
-        [TestMethod]
         public void Test_CreatePDF()
         {
             var templateId = 1;

@@ -18,6 +18,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string CtsEventCategoryName { get; set; }
         public bool IsRequired { get; set; }
         public int SortOrder { get; set; }
+        public bool IsIncluded { get; set; }
 
         public List<SampleDto> Samples { get; set; }
         public List<FileStoreDto> FileStores { get; set; }

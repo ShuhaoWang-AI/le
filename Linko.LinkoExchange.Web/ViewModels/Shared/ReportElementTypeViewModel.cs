@@ -49,6 +49,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
 
+        [ScaffoldColumn(scaffold: false)]
+        public bool IsRequired { get; set; }
+
+        [ScaffoldColumn(scaffold: false)]
+        public bool IsIncluded { get; set; }
+
+
         #endregion
     }
 

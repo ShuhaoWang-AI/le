@@ -284,7 +284,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/Details")]
-        public ActionResult ReportPackageDetails(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments)
+        public ActionResult ReportPackageDetails(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments, string includedCertifications)
         {
             try
             {
@@ -295,7 +295,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var serializer = new JavaScriptSerializer();
                 var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
                 var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
-
+                var certifications = serializer.Deserialize<IDictionary<string, bool>>(input:includedCertifications);    //key = ReportPackageElementTypeId, value = Certification "Is Included"
+                
                 vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
                                                                 {
                                                                     ReportPackageElementTypeId = p.Id,
@@ -307,6 +308,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                  ReportPackageElementTypeId = p.Id,
                                                                  FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()
                                                              }).ToList();
+
+                vm.CertificationTypes = certifications.Select(p => new ReportPackageElementTypeDto
+                                                                   {
+                                                                       ReportPackageElementTypeId = Convert.ToInt32(p.Key),
+                                                                       IsIncluded = (bool)p.Value
+                                                                   }).ToList();
 
                 _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:true);
 
@@ -480,35 +487,42 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/ReadyToSubmit")]
         [PortalAuthorize("industry")]
-        public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments)
+        public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments, string includedCertifications)
         {
+            var serializer = new JavaScriptSerializer();
+            var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input: selectedSamples);
+            var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input: selectedAttachments);
+            var certifications = serializer.Deserialize<IDictionary<string, bool>>(input: includedCertifications);
+
             try
             {
                 using (var transaction = _dbContext.BeginTransaction())
                 {
                     try
                     {
-                        var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true, isAuthorizationRequired:true);
+                        var reportPackageDto = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true, isAuthorizationRequired:true);
 
-                        vm.Comments = model.Comments;
+                        reportPackageDto.Comments = model.Comments;
 
-                        var serializer = new JavaScriptSerializer();
-                        var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
-                        var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
-
-                        vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
+                        reportPackageDto.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
                                                                         {
                                                                             ReportPackageElementTypeId = p.Id,
                                                                             Samples = p.ChildElements.Select(c => new SampleDto {SampleId = c.Id}).ToList()
                                                                         }).ToList();
 
-                        vm.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
+                        reportPackageDto.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
                                                                      {
                                                                          ReportPackageElementTypeId = p.Id,
                                                                          FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()
                                                                      }).ToList();
 
-                        _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:false);
+                        reportPackageDto.CertificationTypes = certifications.Select(p => new ReportPackageElementTypeDto
+                                                                     {
+                                                                         ReportPackageElementTypeId = Convert.ToInt32(p.Key),
+                                                                         IsIncluded = (bool)p.Value
+                                                                     }).ToList();
+
+                        _reportPackageService.SaveReportPackage(reportPackageDto: reportPackageDto, isUseTransaction:false);
                         _reportPackageService.UpdateStatus(reportPackageId:id, reportStatus:ReportStatusName.ReadyToSubmit, isUseTransaction:false);
                         transaction.Commit();
                     }
@@ -530,7 +544,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return View(viewName:"ReportPackageDetails", model:model);
+            var viewModel = PrepareReportPackageDetails(id: id);
+            viewModel.SelectedSamples = samples;
+            viewModel.SelectedAttachments = attachments;
+            viewModel.IncludedCertifications = certifications;
+            
+            return View(viewName: "ReportPackageDetails", model: viewModel);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -944,7 +963,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
                                                                                                 {
                                                                                                     Id = t.ReportPackageElementTypeId,
-                                                                                                    Name = t.ReportElementTypeName
+                                                                                                    Name = t.ReportElementTypeName,
+                                                                                                    IsRequired = t.IsRequired
                                                                                                 }).ToList(),
                                 SelectedSamples = vm.SamplesAndResultsTypes?.Where(t => t.Samples.Count > 0).Select(t => new SelectedParentChildCombination
                                                                                                                          {
@@ -960,7 +980,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
                                                                                   {
                                                                                       Id = t.ReportPackageElementTypeId,
-                                                                                      Name = t.ReportElementTypeName
+                                                                                      Name = t.ReportElementTypeName,
+                                                                                      IsRequired = t.IsRequired
                                                                                   }).ToList(),
                                 SelectedAttachments = vm.AttachmentTypes?.Where(t => t.FileStores.Count > 0).Select(t => new SelectedParentChildCombination
                                                                                                                          {
@@ -975,8 +996,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                         {
                                                                                             Id = t.ReportPackageElementTypeId,
                                                                                             Name = t.ReportElementTypeName,
-                                                                                            Content = t.ReportElementTypeContent
+                                                                                            Content = t.ReportElementTypeContent,
+                                                                                            IsRequired = t.IsRequired,
+                                                                                            IsIncluded = t.IsIncluded,
                                                                                         }).ToList(),
+
+                                IncludedCertifications = vm.CertificationTypes?.ToDictionary(t => t.ReportPackageElementTypeId.ToString(), t => t.IsIncluded),
+
                                 IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
                                 SubmitterFirstName = vm.SubmitterFirstName,
                                 SubmitterLastName = vm.SubmitterLastName,

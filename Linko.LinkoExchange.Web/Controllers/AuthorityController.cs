@@ -2361,20 +2361,23 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                   {
                                                                                                                       Id = t.ReportElementTypeId,
                                                                                                                       Name = t.Name,
-                                                                                                                      Description = t.Description
+                                                                                                                      Description = t.Description,
+                                                                                                                      IsRequired = t.IsRequiredInTemplate
                                                                                                                   }).ToList(),
                                 AttachmentTypes = reportPackageTemplate.AttachmentTypes.Select(t => new ReportElementTypeViewModel
                                                                                                     {
                                                                                                         Id = t.ReportElementTypeId,
                                                                                                         Name = t.Name,
-                                                                                                        Description = t.Description
+                                                                                                        Description = t.Description,
+                                                                                                        IsRequired = t.IsRequiredInTemplate
                                                                                                     }).ToList(),
                                 CertificationTypes = reportPackageTemplate.CertificationTypes.Select(t => new ReportElementTypeViewModel
                                                                                                           {
                                                                                                               Id = t.ReportElementTypeId,
                                                                                                               Name = t.Name,
-                                                                                                              Description = t.Description
-                                                                                                          }).ToList(),
+                                                                                                              Description = t.Description,
+                                                                                                              IsRequired = t.IsRequiredInTemplate
+                                                                                                    }).ToList(),
                                 ReportPackageTemplateAssignments = reportPackageTemplate.ReportPackageTemplateAssignments.Select(vm => new IndustryViewModel
                                                                                                                                        {
                                                                                                                                            Id = vm.OrganizationRegulatoryProgramId,
@@ -2396,13 +2399,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.Satus = "New";
 
                 viewModel.IsSubmissionBySignatoryRequired = true; // Default is true for new templates
-                viewModel.SamplesAndResultsTypes = _reportElementService
-                    .GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
-                                                                                                                  {
-                                                                                                                      Id = vm.ReportElementTypeId,
-                                                                                                                      Name = vm.Name,
-                                                                                                                      Description = vm.Description
-                                                                                                                  }).ToList();
+                viewModel.SamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
                 viewModel.AttachmentTypes = new List<ReportElementTypeViewModel>();
                 viewModel.CertificationTypes = new List<ReportElementTypeViewModel>();
                 viewModel.ReportPackageTemplateAssignments = new List<IndustryViewModel>();
@@ -2450,7 +2447,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
             }
 
-            viewModel.AllSamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
+            viewModel.AllSamplesAndResultsTypes = _reportElementService
+                .GetReportElementTypes(categoryName: ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
+                                                                                                         {
+                                                                                                             Id = vm.ReportElementTypeId,
+                                                                                                             Name = vm.Name,
+                                                                                                             Description = vm.Description
+                                                                                                         }).ToList();
 
             viewModel.AllAttachmentTypes = _reportElementService
                 .GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
@@ -2538,11 +2541,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                 reportPackageTemplateDto.IsActive = model.IsActive;
                 reportPackageTemplateDto.EffectiveDateTimeLocal = model.EffectiveDateTimeLocal;
                 reportPackageTemplateDto.CtsEventTypeId = (int?) (model.CtsEventTypeId == 0 ? (ValueType) null : model.CtsEventTypeId);
-                reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?
+                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired}).ToList();
+                reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?
+                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired }).ToList();
+                reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?
+                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired }).ToList();
                 reportPackageTemplateDto.ReportPackageTemplateAssignments = model
-                    .ReportPackageTemplateAssignments?.Select(p => new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = p.Id}).ToList();
+                    .ReportPackageTemplateAssignments?
+                    .Select(p => new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = p.Id}).ToList();
                 reportPackageTemplateDto.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
                 reportPackageTemplateDto.IsSubmissionBySignatoryRequired = model.IsSubmissionBySignatoryRequired;
                 reportPackageTemplateDto.ShowSampleResults = model.ShowSampleResults;

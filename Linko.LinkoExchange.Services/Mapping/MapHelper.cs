@@ -1292,7 +1292,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                        CtsEventTypeName = reportPackageElementType.CtsEventTypeName,
                        CtsEventCategoryName = reportPackageElementType.CtsEventCategoryName,
                        IsRequired = reportPackageElementType.IsRequired,
-                       SortOrder = reportPackageElementType.SortOrder
+                       SortOrder = reportPackageElementType.SortOrder,
+                       IsIncluded = reportPackageElementType.IsIncluded
                    };
         }
 

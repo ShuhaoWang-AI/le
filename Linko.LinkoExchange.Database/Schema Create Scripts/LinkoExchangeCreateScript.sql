@@ -3063,6 +3063,7 @@ BEGIN
         , CtsEventTypeName                      varchar(50) NULL
         , CtsEventCategoryName                  varchar(50) NULL
         , IsRequired                            bit NOT NULL
+		, IsIncluded                            bit NOT NULL
         , SortOrder                             int NOT NULL  
     
         CONSTRAINT PK_tReportPackageElementType PRIMARY KEY CLUSTERED 
@@ -3081,6 +3082,7 @@ BEGIN
     ) ON [LinkoExchange_FG2_Data]
     
     ALTER TABLE dbo.tReportPackageElementType ADD CONSTRAINT DF_tReportPackageElementType_IsRequired DEFAULT 0 FOR IsRequired
+	ALTER TABLE dbo.tReportPackageElementType ADD CONSTRAINT DF_tReportPackageElementType_IsIncluded DEFAULT 0 FOR IsIncluded
     ALTER TABLE dbo.tReportPackageElementType ADD CONSTRAINT DF_tReportPackageElementType_SortOrder DEFAULT 0 FOR SortOrder
 
     CREATE NONCLUSTERED INDEX IX_tReportPackageElementType_ReportPackageElementCategoryId ON dbo.tReportPackageElementType

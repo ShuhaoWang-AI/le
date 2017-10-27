@@ -18,6 +18,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
 
+        //Used when creating a template
+        public bool IsRequiredInTemplate { get; set; }
+
         #endregion
     }
 }

@@ -53,6 +53,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int SortOrder { get; set; }
 
+        public bool IsIncluded { get; set; }
+
         // Reverse navigation
         public virtual ICollection<ReportSample> ReportSamples { get; set; }
 

@@ -370,11 +370,12 @@ namespace Linko.LinkoExchange.Services.Report
                                                    });
 
             dataXmlObj.Certifications = new List<Certification>();
-            dataXmlObj.Certifications = reportPackageDto.CertificationTypes.Select(i => new Certification
-                                                                                        {
-                                                                                            CertificationType = i.ReportElementTypeName,
-                                                                                            CertificationText = i.ReportElementTypeContent.GetValueOrEmptyString()
-                                                                                        }).ToList();
+            dataXmlObj.Certifications = reportPackageDto.CertificationTypes.Where(cert => cert.IsIncluded)
+                                                                            .Select(i => new Certification
+                                                                            {
+                                                                                CertificationType = i.ReportElementTypeName,
+                                                                                CertificationText = i.ReportElementTypeContent.GetValueOrEmptyString()
+                                                                            }).ToList();
 
             dataXmlObj.Comment = reportPackageDto.Comments;
 
@@ -827,6 +828,13 @@ namespace Linko.LinkoExchange.Services.Report
                             }
 
                             newReportPackageElementType.IsRequired = rptet.IsRequired;
+
+                            // NOTE:     
+                            //          "IsIncluded" is used for certifications only.
+                            //          Default should match the IsRequired value in RPT.  
+                            //          If IsRequired, then Cert is automatically checked to be included, otherwise not checked
+                            newReportPackageElementType.IsIncluded = rptet.IsRequired;
+
                             newReportPackageElementType.SortOrder = rptet.SortOrder;
                             newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory;
 
@@ -1032,6 +1040,7 @@ namespace Linko.LinkoExchange.Services.Report
                     foreach (var existingAttachmentsReportPackageElementType in attachmentsReportPackageElementCategory.ReportPackageElementTypes)
                     {
                         var existingReportFiles = existingAttachmentsReportPackageElementType.ReportFiles.ToArray();
+                        
                         foreach (var existingReportFile in existingReportFiles) {
                             //Find match in dto files
                             var matchedFileAssociation = reportPackageDto
@@ -1079,54 +1088,22 @@ namespace Linko.LinkoExchange.Services.Report
 
                 //CERTIFICATIONS
                 //===================
+                
+                //Can only update "Is Accepted" or not
 
-                //Find entry in tReportPackageElementType for this reportPackage associated with Attachments category
                 var certsReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                                                                      .SingleOrDefault(rpet => rpet.ReportElementCategory.Name
                                                                                               == ReportElementCategoryName.Certifications.ToString());
-
                 if (certsReportPackageElementCategory != null)
                 {
-                    //Handle deletions first
-                    // - Iterate through all Certification rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.CertificationTypes
-                    foreach (var existingCertReportPackageElementType in certsReportPackageElementCategory.ReportPackageElementTypes)
+                    foreach (var certificationElementType in reportPackageDto.CertificationTypes)
                     {
-                        var existingReportFiles = existingCertReportPackageElementType.ReportFiles.ToArray();
-                        foreach (var existingReportFile in existingReportFiles) {
-                            //Find match in dto files
-                            var matchedFileAssociation = reportPackageDto
-                                .CertificationTypes.SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)?.FileStores
-                                .SingleOrDefault(fs => fs.FileStoreId == existingReportFile.FileStoreId);
-
-                            if (matchedFileAssociation == null)
-                            {
-                                //existing association must have been deleted -- remove
-                                _dbContext.ReportFiles.Remove(entity:existingReportFile);
-                            }
-                        }
+                        var certificationElementTypeToUpdate = certsReportPackageElementCategory.ReportPackageElementTypes
+                                                                                                .Single(cert => cert.ReportPackageElementTypeId
+                                                                                                                == certificationElementType.ReportPackageElementTypeId);
+                        certificationElementTypeToUpdate.IsIncluded = certificationElementType.IsIncluded;
                     }
 
-                    //Now handle additions
-                    // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
-                    foreach (var requestedFileAssociation in reportPackageDto.CertificationTypes)
-                    {
-                        foreach (var fileStore in requestedFileAssociation.FileStores)
-                        {
-                            var foundReportFile = _dbContext.ReportFiles
-                                                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                                                                                   && rs.FileStoreId == fileStore.FileStoreId);
-
-                            if (foundReportFile == null)
-                            {
-                                //Need to add association
-                                _dbContext.ReportFiles.Add(entity:new ReportFile
-                                                                  {
-                                                                      FileStoreId = fileStore.FileStoreId.Value,
-                                                                      ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                                                                  });
-                            }
-                        }
-                    }
                 }
                 else
                 {
@@ -1198,6 +1175,9 @@ namespace Linko.LinkoExchange.Services.Report
                 else if (previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit)
                 {
                     //allowed
+
+                    //...but check to see if required Report Package Element Types are included.
+                    CheckRequiredReportPackageElementTypesIncluded(reportPackageId: reportPackageId);
                 }
                 else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft)
                 {
@@ -1208,10 +1188,8 @@ namespace Linko.LinkoExchange.Services.Report
                     //allowed
 
                     //...but check to see if required Report Package Element Types are included.
-                    if (!IsRequiredReportPackageElementTypesIncluded(reportPackageId:reportPackageId))
-                    {
-                        ThrowSimpleException(message:"Minimum counts for required element types must be met before a Report Package can be submitted.");
-                    }
+                    //(should already be OK since these were checked when putting report package into ReadyToSubmit state)
+                    CheckRequiredReportPackageElementTypesIncluded(reportPackageId: reportPackageId);
                 }
                 else if (previousStatus == ReportStatusName.Submitted.ToString() && reportStatus == ReportStatusName.Repudiated)
                 {
@@ -1905,33 +1883,41 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     Iterates through all required element types for a given report package where content is not provided and
         ///     ensures there is at least one "sample & results" or "file" associated with the report package
+        ///     OF in the case where content is provided (ie. Certifications), we check that they have been "included".
         /// </summary>
         /// <param name="reportPackageId"> tReportPackage.ReportPackageId </param>
-        /// <returns> True if there is an association for all required element types where content is not provided </returns>
-        public bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId)
+        private void CheckRequiredReportPackageElementTypesIncluded(int reportPackageId)
         {
-            _logger.Info(message:$"Enter ReportPackageService.IsRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}");
+            _logger.Info(message: $"Enter ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}");
 
             var requiredReportPackageElementTypes = _dbContext.ReportPackageElementTypes
                                                               .Include(rpet => rpet.ReportPackageElementCategory.ReportElementCategory)
                                                               .Where(rpet => rpet.ReportPackageElementCategory.ReportPackageId == reportPackageId
-                                                                             && !rpet.ReportElementTypeIsContentProvided
+                                                                             //&& !rpet.ReportElementTypeIsContentProvided
                                                                              && rpet.IsRequired)
                                                               .ToList();
 
             var isRequirementsMet = true;
+            var failedRequirements = new List<RuleViolation>();
             foreach (var requiredRPET in requiredReportPackageElementTypes)
             {
-                if (!requiredRPET.ReportSamples.Any() && !requiredRPET.ReportFiles.Any())
+                //LOGIC: if it's a certification (i.e. "content provided") and not accepted => VIOLATION
+                //      OR it's not a certification and there are no samples or attachments
+                if ((requiredRPET.ReportElementTypeIsContentProvided && !requiredRPET.IsIncluded)
+                    || (!requiredRPET.ReportElementTypeIsContentProvided && !requiredRPET.ReportSamples.Any() && !requiredRPET.ReportFiles.Any()))
                 {
+                    failedRequirements.Add(new RuleViolation("", null, $"{requiredRPET.ReportElementTypeName} is required."));
                     isRequirementsMet = false;
-                    break;
                 }
             }
 
-            _logger.Info(message:$"Leaving ReportPackageService.IsRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}, isIncluded={isRequirementsMet}");
+            if (!isRequirementsMet)
+            {
+                throw new RuleViolationException(message: "Validation errors", validationIssues: failedRequirements);
+            }
 
-            return isRequirementsMet;
+            _logger.Info(message: $"Leaving ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}, isIncluded={isRequirementsMet}");
+
         }
 
         /// <summary>

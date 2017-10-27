@@ -35,6 +35,8 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.IsRequired).IsRequired();
 
             Property(x => x.SortOrder).IsRequired();
+
+            Property(x => x.IsIncluded).IsRequired();
         }
 
         #endregion

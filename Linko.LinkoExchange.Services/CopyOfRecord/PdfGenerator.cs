@@ -206,7 +206,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         // This include TTO Certification, and Signature Certification
         private void CertificationsTable()
         {
-            foreach (var certification in _reportPackage.CertificationTypes)
+            foreach (var certification in _reportPackage.CertificationTypes.Where(cert => cert.IsIncluded))
             {
                 var certificateTable = new Table
                                        {

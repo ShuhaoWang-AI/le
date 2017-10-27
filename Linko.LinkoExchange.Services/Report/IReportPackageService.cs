@@ -160,14 +160,6 @@ namespace Linko.LinkoExchange.Services.Report
         void ReviewRepudiation(int reportPackageId, string comments);
 
         /// <summary>
-        ///     Iterates through all required element types for a given report package where content is not provided and
-        ///     ensures there is at least one "sample & results" or "file" associated with the report package
-        /// </summary>
-        /// <param name="reportPackageId"> tReportPackage.ReportPackageId </param>
-        /// <returns> True if there is an association for all required element types where content is not provided </returns>
-        bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId);
-
-        /// <summary>
         ///     Updates the LastSentDateTimeUtc value of a row in table tReportPackage.
         ///     Also optionally updates the "last sender" details.
         /// </summary>

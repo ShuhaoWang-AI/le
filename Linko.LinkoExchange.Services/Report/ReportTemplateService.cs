@@ -508,7 +508,8 @@ namespace Linko.LinkoExchange.Services.Report
                             {
                                 ReportPackageTemplateElementCategoryId = rptecId,
                                 ReportElementTypeId = elementTypeDto.ReportElementTypeId.Value,
-                                SortOrder = index
+                                SortOrder = index,
+                                IsRequired = elementTypeDto.IsRequiredInTemplate
                             };
 
                 _dbContext.ReportPackageTemplateElementTypes.Add(entity:rptet);
@@ -593,6 +594,15 @@ namespace Linko.LinkoExchange.Services.Report
                     else
                     {
                         retDto.LastModifierFullName = "N/A";
+                    }
+
+                    //Determine if this report element type "is required" in this template
+                    var rptet = _reportPackageTemplateElementTypes
+                        .SingleOrDefault(r => r.ReportPackageTemplateElementCategoryId == category.ReportPackageTemplateElementCategoryId
+                                              && r.ReportElementTypeId == reportElementType.ReportElementTypeId);
+                    if (rptet != null)
+                    {
+                        retDto.IsRequiredInTemplate = rptet.IsRequired;
                     }
 
                     reportElementTypeDtos.Add(item:retDto);

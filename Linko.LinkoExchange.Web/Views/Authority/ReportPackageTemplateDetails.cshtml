@@ -244,10 +244,90 @@
             </div>
         </div>
         <div class="box-body box-collapse collapse in">
-            <h5>Samples and Results are included in this report package template.</h5>
+            <div class="col-md-12">
+                <h5>Select the samples and results that should be submitted with the report.</h5>
+            </div>
 
-            @Html.Hidden(name:"SamplesAndResultsTypes", value:Html.Raw(value:Json.Encode(value:Model.SamplesAndResultsTypes)))
+            <div class="col-md-6">
+                <strong>Available</strong>
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableSamplesAndResultsTable">
+                    <thead>
+                        <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
+                            <th class="never">Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 25px">Add</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        @foreach (var samplesAndResults in Model.AvailableSamplesAndResultsTypes)
+                        {
+                            <tr>
+                                <td>@samplesAndResults.Id</td>
+                                <td>@samplesAndResults.Name</td>
+                                <td style="word-break: break-word;">@samplesAndResults.Description</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" id="btnAddSamplesAndResults" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Selected</strong>
+
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedSamplesAndResultsTable">
+                    <thead>
+                        <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
+                            <th style="width: 30px"></th>
+                            <th class="never">Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 60px">Required</th>
+                            <th style="width: 60px">Remove</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var samplesAndResults in Model.SamplesAndResultsTypes)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="btn btn-sm handler">&nbsp;</span>
+                                </td>
+                                <td>@samplesAndResults.Id</td>
+                                <td>@samplesAndResults.Name</td>
+                                <td style="word-break: break-word;">@samplesAndResults.Description</td>
+                                <td>
+                                    <input type="checkbox" checked="@samplesAndResults.IsRequired" />
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveSamplesAndResults" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @(Html.Kendo().Sortable()
+                  .For(selector: "#selectedSamplesAndResultsTable")
+                  .Filter(selector: "tbody > tr")
+                  .Cursor(cursor: "move")
+                  .Handler(selector: ".handler")
+                  .HintHandler(handler: "hint")
+                  .PlaceholderHandler(handler: "placeholder")
+                  .ContainerSelector(selector: "#selectedSamplesAndResultsTable tbody")
+            )
         </div>
     </div>
 
@@ -309,6 +389,7 @@
                             <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
+                            <th style="width: 60px">Required</th>
                             <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
@@ -323,6 +404,9 @@
                                 <td>@attachment.Id</td>
                                 <td>@attachment.Name</td>
                                 <td style="word-break: break-word;">@attachment.Description</td>
+                                <td>
+                                    <input type="checkbox" checked="@attachment.IsRequired" />
+                                </td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" id="btnRemoveAttachment" type="button">
                                         <i class="fa fa-minus"></i>
@@ -405,6 +489,7 @@
                             <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
+                            <th style="width: 60px">Required</th>
                             <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
@@ -419,6 +504,9 @@
                                 <td>@certification.Id</td>
                                 <td>@certification.Name</td>
                                 <td style="word-break: break-word;">@certification.Description</td>
+                                <td>
+                                    <input type="checkbox" checked="@certification.IsRequired" />
+                                </td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" id="btnRemoveCertification" type="button">
                                         <i class="fa fa-minus"></i>
@@ -558,6 +646,70 @@
         $(document)
             .ready(function()
             {
+                $('#availableSamplesAndResultsTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2] }, {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' id='btnAddSamplesAndResults'><i class='fa fa-plus'></i></button>",
+                                    "targets": 3
+                                }
+                            ],
+                            "searching": false,
+                            "ordering": true,
+                            "order": [[1, 'asc']],
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Samples And Results...",
+                                "zeroRecords": "No samples and results match your search.",
+                                "emptyTable": "No samples and results are available for selection."
+                            }
+                        }
+                    );
+
+                $('#selectedSamplesAndResultsTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [2, 3] }, {
+                                    "defaultContent":
+                                        "<span class='btn btn-sm handler'>&nbsp;</span>",
+                                    "targets": 0
+                                }, {
+                                    "defaultContent":
+                                        "<input type='checkbox' />",
+                                    "targets": 4
+                                }, {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveSamplesAndResults'><i class='fa fa-minus'></i></button>",
+                                    "targets": 5
+                                }
+                            ],
+                            "searching": false,
+                            "ordering": false,
+                            "paging": false,
+                            "info": false,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "processing": true,
+                            "stateSave": false,
+                            "language": {
+                                "search": "",
+                                "searchPlaceholder": "Search Samples And Results...",
+                                "zeroRecords": "No samples and results match your search.",
+                                "emptyTable": "No samples and results are selected."
+
+                            }
+                        }
+                    );
+
                 $('#availableAttachmentTable')
                     .DataTable(
                         {
@@ -596,8 +748,12 @@
                                     "targets": 0
                                 }, {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' id='btnRemoveAttachment'><i class='fa fa-minus'></i></button>",
+                                        "<input type='checkbox' />",
                                     "targets": 4
+                                }, {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveAttachment'><i class='fa fa-minus'></i></button>",
+                                    "targets": 5
                                 }
                             ],
                             "searching": false,
@@ -656,8 +812,12 @@
                                     "targets": 0
                                 }, {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' id='btnRemoveCertification'><i class='fa fa-minus'></i></button>",
+                                        "<input type='checkbox' />",
                                     "targets": 4
+                                }, {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveCertification'><i class='fa fa-minus'></i></button>",
+                                    "targets": 5
                                 }
                             ],
                             "searching": false,
@@ -733,6 +893,50 @@
             });
 
         $(document)
+            .on('click', "button[id^='btnAddSamplesAndResults']", function () {
+                var tableMoveFrom = $('#availableSamplesAndResultsTable').DataTable();
+
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                var tableMoveTo = $('#selectedSamplesAndResultsTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([null, data[0], data[1], data[2]])
+                    .draw()
+                    .node();
+
+                $(rowNode).css('color', 'green');
+
+                $(rowNode).find('input').iCheck({
+                    checkboxClass: "icheckbox_minimal-blue"});
+
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+
+            });
+
+        $(document)
+            .on('click', "button[id^='btnRemoveSamplesAndResults']", function () {
+                var tableMoveFrom = $('#selectedSamplesAndResultsTable').DataTable();
+
+                var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                var tableMoveTo = $('#availableSamplesAndResultsTable').DataTable();
+                var rowNode = tableMoveTo
+                    .row.add([data[1], data[2], data[3]])
+                    .draw()
+                    .node();
+
+                $(rowNode).css('color', 'green');
+
+                tableMoveFrom
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
+
+        $(document)
             .on('click', "button[id^='btnAddAttachment']", function()
             {
                 var tableMoveFrom = $('#availableAttachmentTable').DataTable();
@@ -746,6 +950,10 @@
                     .node();
 
                 $(rowNode).css('color', 'green');
+
+                $(rowNode).find('input').iCheck({
+                    checkboxClass: "icheckbox_minimal-blue"
+                });
 
                 tableMoveFrom
                     .row($(this).parents('tr'))
@@ -788,6 +996,10 @@
                     .node();
 
                 $(rowNode).css('color', 'green');
+
+                $(rowNode).find('input').iCheck({
+                    checkboxClass: "icheckbox_minimal-blue"
+                });
 
                 tableMoveFrom
                     .row($(this).parents('tr'))
@@ -918,7 +1130,8 @@
                 return {
                     Id: getReportPackageTempateElementTypeId(domId, values[1].innerText),
                     Name: values[1].innerText,
-                    Description: values[2].innerText
+                    Description: values[2].innerText,
+                    IsRequired: values[3].children[0].children[0].checked //drill down to access the checkbox within the iCheck helper wrapper
                 };
             });
         }
@@ -941,20 +1154,7 @@
         $("#btnSave")
             .on("click", function()
             {
-                var selectedSamplesAndResults = [];
-
-                var samplesAndResultsTypes = $.parseJSON($("#SamplesAndResultsTypes").val());
-
-                $.each(samplesAndResultsTypes, function(index, value)
-                {
-                    var reportElementTypeViewModel = {};
-                    reportElementTypeViewModel.Id = value.Id;
-                    reportElementTypeViewModel.Name = value.Name;
-                    reportElementTypeViewModel.Description = value.Description;
-                    selectedSamplesAndResults.push(reportElementTypeViewModel);
-                    //console.debug('Data in index: ' + index + ' is: ' + value);
-                });
-
+                var selectedSamplesAndResults = getSelectedReportPackageTemplateElements("selectedSamplesAndResultsTable");
                 var selectedAttachments = getSelectedReportPackageTemplateElements("selectedAttachmentTable");
                 var selectedCertifications = getSelectedReportPackageTemplateElements("selectedCertificationTable");
 
