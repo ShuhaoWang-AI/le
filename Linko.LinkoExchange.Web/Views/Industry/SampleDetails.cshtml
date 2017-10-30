@@ -1304,6 +1304,11 @@
                     $("#EndDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                     $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
+                    if ($('#EndDateTimeLocal').val() == "")
+                    {
+                        return;
+                    }
+
                     var viewModel = {};
                     viewModel.monitoringPointId = $('#MonitoringPointId').val();
                     viewModel.endDateTime = $('#EndDateTimeLocal').val();
