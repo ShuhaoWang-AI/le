@@ -6522,7 +6522,7 @@ Email: {emailAddress}
         'Profile',   
         'KBQChanged', 
         '',
-        'KBQ were changed
+        'Knowledge Based Questions
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
