@@ -310,6 +310,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ReportRepudiatedDaysDefault = programSettings.Settings
                                                                              .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                              .Select(s => s.DefaultValue).First(),
+                                ComplianceDeterminationDate = (ComplianceDeterminationDate)Enum.Parse(typeof(ComplianceDeterminationDate), 
+                                                                    programSettings.Settings
+                                                                                    .Where(s => s.TemplateName.Equals(obj: SettingType.ComplianceDeterminationDate))
+                                                                                    .Select(s => s.DefaultValue).First()),
                                 MassLoadingConversionFactorPounds = programSettings.Settings
                                                                                    .Where(s => s.TemplateName.Equals(obj:SettingType.MassLoadingConversionFactorPounds))
                                                                                    .Select(s => s.Value).First(),

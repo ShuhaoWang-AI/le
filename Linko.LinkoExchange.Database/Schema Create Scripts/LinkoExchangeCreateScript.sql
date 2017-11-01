@@ -4510,6 +4510,15 @@ BEGIN
 		    , @OrganizationTypeId_Authority
 		    , @RegulatoryProgramId_IPP
 		)
+	 INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'ComplianceDeterminationDate'
+		    , 'Use Start or End Date Sampled when calculating compliance and determining what parameters to include in a compliance period'
+            , 'EndDateSampled'
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
     INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
 		VALUES 
 		(

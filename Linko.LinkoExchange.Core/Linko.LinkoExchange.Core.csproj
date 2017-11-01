@@ -142,6 +142,7 @@
     <Compile Include="Domain\UserQuestionAnswer.cs" />
     <Compile Include="Enum\AccountAutoLockEvent.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
+    <Compile Include="Enum\ComplianceDeterminationDate.cs" />
     <Compile Include="Enum\DigitalSignatureAlgorithm.cs" />
     <Compile Include="Enum\HashAlgorithm.cs" />
     <Compile Include="Enum\Country.cs" />

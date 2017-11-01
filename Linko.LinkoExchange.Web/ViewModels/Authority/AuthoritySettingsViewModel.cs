@@ -129,6 +129,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Editable(allowEdit:false)]
         public string ReportRepudiatedDaysDefault { get; set; }
 
+        [Editable(allowEdit: false)]
+        [Display(Name = "Compliance Determination Date")]
+        public ComplianceDeterminationDate ComplianceDeterminationDate { get; set; }
+
         [Editable(allowEdit:false)]
         [Display(Name = "Mass Loading pounds Conversion Factor")]
         public string MassLoadingConversionFactorPounds { get; set; }

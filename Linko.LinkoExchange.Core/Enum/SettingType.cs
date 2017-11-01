@@ -9,6 +9,7 @@
         PasswordHistoryMaxCount,
         TimeZone,
         ReportRepudiatedDays,
+        ComplianceDeterminationDate,
         MassLoadingConversionFactorPounds,
         MassLoadingResultToUseLessThanSign,
         MassLoadingCalculationDecimalPlaces,

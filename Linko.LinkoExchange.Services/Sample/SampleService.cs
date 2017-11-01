@@ -437,7 +437,23 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (isIncludeChildObjects)
             {
-                var sampleEndDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.EndDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
+                DateTime sampleDateTimeLocal;
+
+                //Check which date to use for compliance checking
+                var complianceDeterminationDate = _settings.GetOrgRegProgramSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.ComplianceDeterminationDate);
+                if (complianceDeterminationDate == ComplianceDeterminationDate.EndDateSampled.ToString())
+                {
+                    sampleDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.EndDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
+                }
+                else if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
+                {
+                    sampleDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.StartDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
+                }
+                else
+                {
+                    throw new Exception($"ERROR: Unrecognized org reg program setting value for 'ComplianceDeterminationDate' of '{complianceDeterminationDate}' for authority of org reg program: {sample.ByOrganizationRegulatoryProgramId}");
+                }
+
                 foreach (var sampleResult in sample.SampleResults)
                 {
                     //Handle "special case" Sample Results. These do not get mapped to their own
@@ -520,8 +536,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 for (int i = 0; i < sampleResultList.Count(); i++)
                 {
                     var resultDto = sampleResultList[i];
-                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleEndDateTimeLocal, LimitBasisName.Concentration);
-                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleEndDateTimeLocal, LimitBasisName.MassLoading);
+                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleDateTimeLocal, LimitBasisName.Concentration);
+                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleDateTimeLocal, LimitBasisName.MassLoading);
                 }
 
                 dto.SampleResults = sampleResultList;
