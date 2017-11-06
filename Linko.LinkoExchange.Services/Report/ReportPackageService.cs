@@ -2080,7 +2080,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                  {"reportPackageName", reportPackageDto.Name}
                                              };
 
-            var dateTimeFormat = "MM/dd/yyyy hh:mm tt";
+            var dateTimeFormat = "MM/dd/yyyy";
             crommerContentReplacements.Add(key:"periodStartDate", value:reportPackageDto.PeriodStartDateTimeLocal.ToString(format:dateTimeFormat));
             crommerContentReplacements.Add(key:"periodEndDate", value:reportPackageDto.PeriodEndDateTimeLocal.ToString(format:dateTimeFormat));
             crommerContentReplacements.Add(key:"corSignature", value:copyOfRecordDto.Signature);
