@@ -156,4 +156,25 @@
   <data name="ValidationSummaryHeaderText" xml:space="preserve">
     <value>Unable to perform the action. See error messages below.</value>
   </data>
+  <data name="ResultComplianceBadAboveMax" xml:space="preserve">
+    <value>{0} result of {1} exceeds limit of {2}.</value>
+  </data>
+  <data name="ResultComplianceBadBelowMin" xml:space="preserve">
+    <value>{0} result of {1} must meet minimum limit of {2}.</value>
+  </data>
+  <data name="ResultComplianceBadOutsideRange" xml:space="preserve">
+    <value>{0} result of {1} is outside of limit range {2} to {3}.</value>
+  </data>
+  <data name="ResultComplianceGood" xml:space="preserve">
+    <value>Results are in compliance.</value>
+  </data>
+  <data name="ResultComplianceUnknown" xml:space="preserve">
+    <value>Result compliance is unknown. No limit was found.</value>
+  </data>
+  <data name="OverallSampleComplianceBad" xml:space="preserve">
+    <value>At least one result is not in compliance.</value>
+  </data>
+  <data name="OverallSampleComplianceGood" xml:space="preserve">
+    <value>Results are in compliance.</value>
+  </data>
 </root>

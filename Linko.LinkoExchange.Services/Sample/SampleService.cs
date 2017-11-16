@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
@@ -557,15 +558,13 @@ namespace Linko.LinkoExchange.Services.Sample
             //Set compliance as unknown initially by default
             if (limitBasisName == LimitBasisName.Concentration)
             {
-                sampleResultDto.ConcentrationResultCompliance = false;
-                sampleResultDto.ConcentrationResultComplianceIconColor = "orange";
-                sampleResultDto.ConcentrationResultComplianceComment = "Result compliance is unknown. No limit was found.";
+                sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Unknown;
+                sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceUnknown;
             }
             else if (limitBasisName == LimitBasisName.MassLoading)
             {
-                sampleResultDto.MassResultCompliance = false;
-                sampleResultDto.MassResultComplianceIconColor = "orange";
-                sampleResultDto.MassResultComplianceComment = "Result compliance is unknown. No limit was found.";
+                sampleResultDto.MassResultCompliance = ResultComplianceType.Unknown;
+                sampleResultDto.MassResultComplianceComment = Message.ResultComplianceUnknown;
             }
 
             //Get possible limits
@@ -602,15 +601,13 @@ namespace Linko.LinkoExchange.Services.Sample
                     //Compliance met
                     if (limitBasisName == LimitBasisName.Concentration)
                     {
-                        sampleResultDto.ConcentrationResultCompliance = true;
-                        sampleResultDto.ConcentrationResultComplianceIconColor = "green";
-                        sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                        sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
+                        sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
                     }
                     else if (limitBasisName == LimitBasisName.MassLoading)
                     {
-                        sampleResultDto.MassResultCompliance = true;
-                        sampleResultDto.MassResultComplianceIconColor = "green";
-                        sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                        sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
+                        sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
                     }
 
                     return;
@@ -643,17 +640,16 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Outside the range
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
-                            sampleResultDto.ConcentrationResultCompliance = false;
-                            sampleResultDto.ConcentrationResultComplianceIconColor = "red";
-                            sampleResultDto.ConcentrationResultComplianceComment = 
-                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.EnteredValue} is outside of limit range {floor} to {ceiling}.";
+                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Bad;
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                string.Format(Message.ResultComplianceBadOutsideRange, sampleResultDto.ParameterName, sampleResultDto.EnteredValue, floor, ceiling);
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
-                            sampleResultDto.MassResultCompliance = false;
-                            sampleResultDto.MassResultComplianceIconColor = "red";
+                            sampleResultDto.MassResultCompliance = ResultComplianceType.Bad;
                             sampleResultDto.MassResultComplianceComment =
-                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.MassLoadingValue} is outside of limit range {floor} to {ceiling}.";
+                                string.Format(Message.ResultComplianceBadOutsideRange, sampleResultDto.ParameterName, sampleResultDto.MassLoadingValue, floor, ceiling);
+
                         }
                     }
                     else
@@ -661,15 +657,13 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Compliance met
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
-                            sampleResultDto.ConcentrationResultCompliance = true;
-                            sampleResultDto.ConcentrationResultComplianceIconColor = "green";
-                            sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
+                            sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
-                            sampleResultDto.MassResultCompliance = true;
-                            sampleResultDto.MassResultComplianceIconColor = "green";
-                            sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                            sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
+                            sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
                         }
                     }
                 }
@@ -681,17 +675,16 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Over the max
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
-                            sampleResultDto.ConcentrationResultCompliance = false;
-                            sampleResultDto.ConcentrationResultComplianceIconColor = "red";
+                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Bad;
                             sampleResultDto.ConcentrationResultComplianceComment =
-                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.EnteredValue} exceeds limit of {ceiling}.";
+                                string.Format(Message.ResultComplianceBadAboveMax, sampleResultDto.ParameterName, sampleResultDto.EnteredValue, ceiling);
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
-                            sampleResultDto.MassResultCompliance = false;
-                            sampleResultDto.MassResultComplianceIconColor = "red";
+                            sampleResultDto.MassResultCompliance = ResultComplianceType.Bad;
                             sampleResultDto.MassResultComplianceComment =
-                                $"{sampleResultDto.ParameterName} result of {sampleResultDto.MassLoadingValue} exceeds limit of {ceiling}.";
+                                string.Format(Message.ResultComplianceBadAboveMax, sampleResultDto.ParameterName, sampleResultDto.MassLoadingValue, ceiling);
+
                         }
                     }
                     else
@@ -699,15 +692,13 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Compliance met
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
-                            sampleResultDto.ConcentrationResultCompliance = true;
-                            sampleResultDto.ConcentrationResultComplianceIconColor = "green";
-                            sampleResultDto.ConcentrationResultComplianceComment = "Results are in compliance";
+                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
+                            sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
-                            sampleResultDto.MassResultCompliance = true;
-                            sampleResultDto.MassResultComplianceIconColor = "green";
-                            sampleResultDto.MassResultComplianceComment = "Results are in compliance";
+                            sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
+                            sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
                         }
                     }
 

@@ -169,6 +169,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public List<SelectedParentChildCombination> SelectedAttachments { get; set; }
         public IDictionary<string, bool> IncludedCertifications { get; set; }
 
+        public ReportSummaryViewModel ReportSummaryViewModel { get; set; }
+
         #endregion
     }
 

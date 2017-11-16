@@ -115,6 +115,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one result is not in compliance..
+        /// </summary>
+        public static string OverallSampleComplianceBad {
+            get {
+                return ResourceManager.GetString("OverallSampleComplianceBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Results are in compliance..
+        /// </summary>
+        public static string OverallSampleComplianceGood {
+            get {
+                return ResourceManager.GetString("OverallSampleComplianceGood", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password successfully changed..
         /// </summary>
         public static string PasswordChangeSucceed {
@@ -138,6 +156,51 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string RegistrationApprovalPending {
             get {
                 return ResourceManager.GetString("RegistrationApprovalPending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} result of {1} exceeds limit of {2}..
+        /// </summary>
+        public static string ResultComplianceBadAboveMax {
+            get {
+                return ResourceManager.GetString("ResultComplianceBadAboveMax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} result of {1} must meet minimum limit of {2}..
+        /// </summary>
+        public static string ResultComplianceBadBelowMin {
+            get {
+                return ResourceManager.GetString("ResultComplianceBadBelowMin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} result of {1} is outside of limit range {2} to {3}..
+        /// </summary>
+        public static string ResultComplianceBadOutsideRange {
+            get {
+                return ResourceManager.GetString("ResultComplianceBadOutsideRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Results are in compliance..
+        /// </summary>
+        public static string ResultComplianceGood {
+            get {
+                return ResourceManager.GetString("ResultComplianceGood", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result compliance is unknown. No limit was found..
+        /// </summary>
+        public static string ResultComplianceUnknown {
+            get {
+                return ResourceManager.GetString("ResultComplianceUnknown", resourceCulture);
             }
         }
         

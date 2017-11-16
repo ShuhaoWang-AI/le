@@ -255,10 +255,86 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model:model);
         }
 
+        /// <summary>
+        /// Gets the data necessary to populate the Report Summary Panel in the
+        /// Report Package Details page.
+        /// </summary>
+        /// <param name="reportPackageViewModel">The existing populated view model used to 
+        /// display the other panels on the page.</param>
+        /// <returns></returns>
+        private ReportSummaryViewModel GetReportSummaryViewModel(ReportPackageViewModel reportPackageViewModel)
+        {
+            var reportSummaryViewModel = new ReportSummaryViewModel()
+                                         {
+                                             ReportContentReviewItems = new List<ReportContentReviewItem>()
+                                             //SamplingRequirementsItems =  new List<SamplingRequirementsItem>()
+                                         };
+
+            //
+            // Report Content Review (Progress bar and grid)
+            //
+            
+            //Sample Element Types
+            foreach (var sampleElement in reportPackageViewModel.SamplesAndResultsTypes)
+            {
+                var contentReviewItem = new ReportContentReviewItem()
+                                        {
+                                            ReportElementName = sampleElement.Name,
+                                            IsRequired = sampleElement.IsRequired 
+                                        };
+
+                //Is "Present in Report" if "Id" can be found in list of "Selected Samples" (Sample Types with at least 1 sample included)
+                contentReviewItem.IsPresentInReport =
+                    reportPackageViewModel.SelectedSamples.Any(selectedSample => selectedSample.Id == sampleElement.Id 
+                                                                && selectedSample.ChildElements.Count > 0);
+                reportSummaryViewModel.ReportContentReviewItems.Add(contentReviewItem);
+
+            }
+
+            //Attachment Element Types
+            foreach (var attachmentElement in reportPackageViewModel.AttachmentTypes)
+            {
+                var contentReviewItem = new ReportContentReviewItem()
+                                        {
+                                            ReportElementName = attachmentElement.Name,
+                                            IsRequired = attachmentElement.IsRequired
+                                        };
+
+
+                //Is "Present in Report" if "Id" can be found in list of "Selected Attachments" (Attachment Types with at least 1 file included)
+                contentReviewItem.IsPresentInReport =
+                    reportPackageViewModel.SelectedAttachments.Any(selectedAttachment => selectedAttachment.Id == attachmentElement.Id
+                                                                                 && selectedAttachment.ChildElements.Count > 0);
+                reportSummaryViewModel.ReportContentReviewItems.Add(contentReviewItem);
+
+            }
+
+            //Certification Element Types
+            foreach (var certificationElement in reportPackageViewModel.CertificationTypes)
+            {
+                var contentReviewItem = new ReportContentReviewItem()
+                                        {
+                                            ReportElementName = certificationElement.Name,
+                                            IsRequired = certificationElement.IsRequired
+                                        };
+
+
+                //Is "Present in Report" if "Id" can be found in list of "Included Certifications" (and have "Value" as true)
+                contentReviewItem.IsPresentInReport =
+                    reportPackageViewModel.IncludedCertifications.Any(certification => certification.Key == certificationElement.Id.ToString()
+                                                                                         && certification.Value);
+                reportSummaryViewModel.ReportContentReviewItems.Add(contentReviewItem);
+
+            }
+
+            return reportSummaryViewModel;
+        }
+
         [Route(template:"{id:int}/Details")]
         public ActionResult ReportPackageDetails(int id)
         {
             var viewModel = PrepareReportPackageDetails(id:id);
+            viewModel.ReportSummaryViewModel = GetReportSummaryViewModel(viewModel);
 
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
@@ -350,8 +426,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                    EndDateTimeLocal = vm.EndDateTimeLocal,
                                                    LabSampleIdentifier = vm.LabSampleIdentifier,
                                                    IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage,
-                                                   LastSubmitted = vm.LastSubmissionDateTimeLocal
-                                               });
+                                                   LastSubmitted = vm.LastSubmissionDateTimeLocal,
+                                                   SampleOverallCompliance = (vm.SampleResults.Any(sr => sr.ConcentrationResultCompliance == ResultComplianceType.Bad || sr.MassResultCompliance == ResultComplianceType.Bad) ? "Bad" : "Good"),
+                                                });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
                                                                                        {
@@ -363,8 +440,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            EndDateTimeLocal = vm.EndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LabSampleIdentifier,
                                                                                            vm.IsAssociatedWithReportPackage,
-                                                                                           LastSubmitted = vm.LastSubmitted.ToString()
-                                                                                       });
+                                                                                           LastSubmitted = vm.LastSubmitted.ToString(),
+                                                                                           SampleOverallCompliance = vm.SampleOverallCompliance,
+                                                                                           SampleOverallComplianceComment = vm.SampleOverallCompliance == ResultComplianceType.Good.ToString() ? Message.OverallSampleComplianceGood : Message.OverallSampleComplianceBad
+            });
 
             return Json(data:result);
         }
@@ -373,31 +452,29 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var dto = _sampleService.GetSampleDetails(sampleId:sampleId);
 
-            var sampleresults = dto.SampleResults.Select(vm => new SampleResultViewModel
+            var sampleresults = dto.SampleResults.Select(sr => new SampleResultViewModel
                                                                {
-                                                                   AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal,
-                                                                   AnalysisMethod = vm.AnalysisMethod,
-                                                                   EnteredMethodDetectionLimit = vm.EnteredMethodDetectionLimit,
-                                                                   Id = vm.ConcentrationSampleResultId,
-                                                                   IsApprovedEPAMethod = vm.IsApprovedEPAMethod,
-                                                                   IsCalcMassLoading = vm.IsCalcMassLoading,
-                                                                   MassLoadingSampleResultId = vm.MassLoadingSampleResultId,
-                                                                   MassLoadingQualifier = vm.MassLoadingQualifier,
-                                                                   MassLoadingUnitId = vm.MassLoadingUnitId,
-                                                                   MassLoadingUnitName = vm.MassLoadingUnitName,
-                                                                   MassLoadingValue = vm.MassLoadingValue,
-                                                                   ParameterId = vm.ParameterId,
-                                                                   ParameterName = vm.ParameterName,
-                                                                   Qualifier = vm.Qualifier,
-                                                                   UnitId = vm.UnitId,
-                                                                   Value = vm.EnteredValue,
-                                                                   UnitName = vm.UnitName,
-                                                                   ConcentrationResultCompliance = vm.ConcentrationResultCompliance,
-                                                                   ConcentrationResultComplianceIconColor = vm.ConcentrationResultComplianceIconColor,
-                                                                   ConcentrationResultComplianceComment = vm.ConcentrationResultComplianceComment,
-                                                                   MassResultCompliance = vm.MassResultCompliance,
-                                                                   MassResultComplianceIconColor = vm.MassResultComplianceIconColor,
-                                                                   MassResultComplianceComment = vm.MassResultComplianceComment
+                                                                   AnalysisDateTimeLocal = sr.AnalysisDateTimeLocal,
+                                                                   AnalysisMethod = sr.AnalysisMethod,
+                                                                   EnteredMethodDetectionLimit = sr.EnteredMethodDetectionLimit,
+                                                                   Id = sr.ConcentrationSampleResultId,
+                                                                   IsApprovedEPAMethod = sr.IsApprovedEPAMethod,
+                                                                   IsCalcMassLoading = sr.IsCalcMassLoading,
+                                                                   MassLoadingSampleResultId = sr.MassLoadingSampleResultId,
+                                                                   MassLoadingQualifier = sr.MassLoadingQualifier,
+                                                                   MassLoadingUnitId = sr.MassLoadingUnitId,
+                                                                   MassLoadingUnitName = sr.MassLoadingUnitName,
+                                                                   MassLoadingValue = sr.MassLoadingValue,
+                                                                   ParameterId = sr.ParameterId,
+                                                                   ParameterName = sr.ParameterName,
+                                                                   Qualifier = sr.Qualifier,
+                                                                   UnitId = sr.UnitId,
+                                                                   Value = sr.EnteredValue,
+                                                                   UnitName = sr.UnitName,
+                                                                   ConcentrationResultCompliance = sr.ConcentrationResultCompliance.ToString(),
+                                                                   ConcentrationResultComplianceComment = sr.ConcentrationResultComplianceComment,
+                                                                   MassResultCompliance = sr.MassResultCompliance.ToString(),
+                                                                   MassResultComplianceComment = sr.MassResultComplianceComment
                                                                 }).ToList();
 
             var result = sampleresults.ToDataSourceResult(request:request, selector:vm => new
@@ -417,10 +494,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                               AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString(),
                                                                                               vm.IsApprovedEPAMethodText,
                                                                                               vm.ConcentrationResultCompliance,
-                                                                                              vm.ConcentrationResultComplianceIconColor,
                                                                                               vm.ConcentrationResultComplianceComment,
                                                                                               vm.MassResultCompliance,
-                                                                                              vm.MassResultComplianceIconColor,
                                                                                               vm.MassResultComplianceComment,
                                                                                               vm.IsCalcMassLoading
                                                                                             });
@@ -548,7 +623,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.SelectedSamples = samples;
             viewModel.SelectedAttachments = attachments;
             viewModel.IncludedCertifications = certifications;
-            
+            viewModel.ReportSummaryViewModel = GetReportSummaryViewModel(viewModel);
+
             return View(viewName: "ReportPackageDetails", model: viewModel);
         }
 

@@ -127,6 +127,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = " ")]
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
 
+        [Display(Name = " ")]
+        public string SampleOverallCompliance { get; set; }
+        public string SampleOverallComplianceComment { get; set; }
+
         #endregion
     }
 

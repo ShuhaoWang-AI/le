@@ -252,7 +252,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">
-                                @samplesAndResultType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && samplesAndResultType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</span>
+                                @samplesAndResultType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && samplesAndResultType.IsRequired ? "inline-block" : "none");">&nbsp;(Required)</span>
                             </h3>
                             <div class="box-tools pull-right">
                                 <button class="btn btn-box-tool" data-widget="collapse">
@@ -266,42 +266,59 @@
                             @(Html.Kendo().Grid<SampleViewModel>()
                                   .Name(componentName:"gridSample_" + samplesAndResultType.Id)
                                   .Columns(columns =>
-                                           {
-                                               if (Model.Status == ReportStatusName.Draft)
-                                               {
-                                                   columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                          .ClientTemplate(value:"<input type='checkbox' name='ckgridSample_" + samplesAndResultType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
-                                                          .HtmlAttributes(attributes:new
-                                                                                     {
-                                                                                         align = "center"
-                                                                                     })
-                                                          .Filterable(f => f.Enabled(value:false))
-                                                          .Width(pixelWidth:40);
-                                               }
-                                               columns.Bound(c => c.MonitoringPointName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
-                                               columns.Bound(c => c.CtsEventTypeName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
-                                               columns.Bound(c => c.CollectionMethodName)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
-                                               columns.Bound(c => c.StartDateTimeLocal)
-                                                      .ClientTemplate(value:"#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                               columns.Bound(c => c.EndDateTimeLocal)
-                                                      .ClientTemplate(value:"#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                               columns.Bound(c => c.LabSampleIdentifier)
-                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
-                                               if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
-                                               {
-                                                   columns.Bound(c => c.LastSubmitted).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                               }
-                                           })
+                                  {
+                                      if (Model.Status == ReportStatusName.Draft)
+                                      {
+                                          columns.Bound(c => c.IsAssociatedWithReportPackage)
+                                                 .ClientTemplate(value:"<input type='checkbox' name='ckgridSample_" + samplesAndResultType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                 .HtmlAttributes(attributes:new
+                                                 {
+                                                     align = "center"
+                                                 })
+                                                 .Filterable(f => f.Enabled(value:false))
+                                                 .Width(pixelWidth:40);
+                                      }
+                                      columns.Bound(c => c.SampleOverallCompliance)
+                                             .ClientTemplate(
+                                                             "# if (SampleOverallCompliance == 'Bad') { #" +
+                                                                "<i class='fa fa-lg fa-exclamation-circle' style='color:red' " +
+                                                             "# } else { #" +
+                                                                "<i class='fa fa-lg fa-check-circle' style='color:green' " +
+                                                             "# } #" +
+                                                             "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
+                                             )
+                                             .HtmlAttributes(attributes:new
+                                             {
+                                                 align = "center"
+                                             })
+                                             .Filterable(f => f.Enabled(value:false))
+                                             .Width(pixelWidth:40);
+
+
+                                      columns.Bound(c => c.MonitoringPointName)
+                                             .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                     .SuggestionOperator(filterType:FilterType.Contains)));
+                                      columns.Bound(c => c.CtsEventTypeName)
+                                             .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                     .SuggestionOperator(filterType:FilterType.Contains)));
+                                      columns.Bound(c => c.CollectionMethodName)
+                                             .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                     .SuggestionOperator(filterType:FilterType.Contains)));
+                                      columns.Bound(c => c.StartDateTimeLocal)
+                                             .ClientTemplate(value:"#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                             .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                      columns.Bound(c => c.EndDateTimeLocal)
+                                             .ClientTemplate(value:"#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                             .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                      columns.Bound(c => c.LabSampleIdentifier)
+                                             .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                     .SuggestionOperator(filterType:FilterType.Contains)));
+                                      if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
+                                      {
+                                          columns.Bound(c => c.LastSubmitted).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                      }
+                                  })
                                   .Pageable(pageable => pageable
                                                             .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                             .Refresh(enabled:true)
@@ -311,41 +328,41 @@
                                   .ClientDetailTemplateId(id:"template")
                                   .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                                   .Filterable(filterable =>
-                                              {
-                                                  if (Model.Status == ReportStatusName.Draft)
-                                                  {
-                                                      filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
-                                                  }
-                                                  else
-                                                  {
-                                                      filterable.Enabled(value:false);
-                                                  }
-                                              })
+                                  {
+                                      if (Model.Status == ReportStatusName.Draft)
+                                      {
+                                          filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
+                                      }
+                                      else
+                                      {
+                                          filterable.Enabled(value:false);
+                                      }
+                                  })
                                   .Resizable(resizable => resizable.Columns(value:true))
                                   .Scrollable(s => s.Height(value:"auto"))
                                   .NoRecords(text:"No sample exists.")
                                   .Events(events =>
-                                          {
-                                              if (Model.Status == ReportStatusName.Draft)
-                                              {
-                                                  events.DataBound(handler:"onGridDataBound");
-                                              }
-                                          })
+                                  {
+                                      if (Model.Status == ReportStatusName.Draft)
+                                      {
+                                          events.DataBound(handler:"onGridDataBound");
+                                      }
+                                  })
                                   .DataSource(dataSource => dataSource
                                                                 .Ajax()
                                                                 .ServerOperation(enabled:true)
                                                                 .Batch(enabled:true)
                                                                 .Sort(sort =>
-                                                                      {
-                                                                          sort.Add(memberName:"StartDateTimeLocal").Ascending();
-                                                                          sort.Add(memberName:"MonitoringPointName").Ascending();
-                                                                          sort.Add(memberName:"CollectionMethodName").Ascending();
-                                                                      }) // <-- initial sort expression
+                                                                {
+                                                                    sort.Add(memberName:"StartDateTimeLocal").Ascending();
+                                                                    sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                                    sort.Add(memberName:"CollectionMethodName").Ascending();
+                                                                }) // <-- initial sort expression
                                                                 .Read(read => read.Action(actionName:"Samples_Read", controllerName:"ReportPackage", routeValues:new
-                                                                                                                                                                 {
-                                                                                                                                                                     reportPackageElementTypeId = samplesAndResultType.Id.GetValueOrDefault(),
-                                                                                                                                                                     reportStatusName = Model.Status
-                                                                                                                                                                 }))
+                                                                {
+                                                                    reportPackageElementTypeId = samplesAndResultType.Id.GetValueOrDefault(),
+                                                                    reportStatusName = Model.Status
+                                                                }))
                                                                 .PageSize(pageSize:15)
                                                                 .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridSample_" + samplesAndResultType.Id + "'})"))
                                   )
@@ -360,27 +377,29 @@
                                       columns.Bound(c => c.Value)
                                           .HtmlAttributes(attributes: new { align = "right" })
                                           .ClientTemplate(value: "\\#=Value\\#&nbsp;&nbsp;<i "
-                                                         + "\\#if(ConcentrationResultCompliance==1){ \\#"
-                                                         + "class='fa fa-lg fa-check-circle'"
-                                                         + "\\# } else { \\#"
-                                                         + "class='fa fa-lg fa-exclamation-circle'"
+                                                         + "\\#if(ConcentrationResultCompliance==\"Good\") { \\#"
+                                                         + "class='fa fa-lg fa-check-circle' style='color:green' "
+                                                         + "\\# } else if(ConcentrationResultCompliance==\"Unknown\") { \\#"
+                                                         + "class='fa fa-lg fa-circle' style='color:green' "
+                                                         + "\\# } else if(ConcentrationResultCompliance==\"Bad\") { \\#"
+                                                         + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
                                                          + "\\# } \\#"
-                                                         + " style='color:\\#=ConcentrationResultComplianceIconColor\\#'"
                                                          + "aria-hidden='true' data-placement='top' "
                                                          + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
 
                                       columns.Bound(c => c.MassLoadingValue)
                                               .HtmlAttributes(attributes: new {align = "right"})
                                               .ClientTemplate(value:
-                                                            "\\#if(IsCalcMassLoading==0){ \\#"
+                                                            "\\#if(IsCalcMassLoading==0) { \\#"
                                                            + "\\# } else { \\#"
                                                            + "\\#=MassLoadingValue\\#&nbsp;&nbsp;<i "
-                                                           + "\\#if(MassResultCompliance==1){ \\#"
-                                                           + "class='fa fa-lg fa-check-circle'"
-                                                           + "\\# } else { \\#"
-                                                           + "class='fa fa-lg fa-exclamation-circle'"
-                                                           + "\\# } \\#"
-                                                           + " style='color:\\#=MassResultComplianceIconColor\\#'"
+                                                           + "\\#if(MassResultCompliance==\"Good\") { \\#"
+                                                           + "class='fa fa-lg fa-check-circle' style='color:green' "
+                                                           + "\\# } else if(MassResultCompliance==\"Unknown\") { \\#"
+                                                           + "class='fa fa-lg fa-circle' style='color:green' "
+                                                            + "\\# } else if(MassResultCompliance==\"Bad\") { \\#"
+                                                            + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
+                                                            + "\\# } \\#"
                                                            + "aria-hidden='true' data-placement='top' "
                                                            + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
                                                            + "\\# } \\#");
@@ -417,7 +436,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">
-                                @attachmentType.Name<div style="color: red;display:@( Model.Status == ReportStatusName.Draft && attachmentType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</div>
+                                @attachmentType.Name<div style="color: red;display:@( Model.Status == ReportStatusName.Draft && attachmentType.IsRequired ? "inline-block" : "none");">&nbsp;(Required)</div>
                             </h3>
                             <div class="box-tools pull-right">
                                 <button class="btn btn-box-tool" data-widget="collapse">
@@ -540,7 +559,7 @@
                                     </div>
                                 }
                                 <h3 class="box-title" style="display: inline-block;">
-                                    @certificationType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && certificationType.IsRequired ? "inline-block" : "none");">&nbsp;-&nbsp;Required</span>
+                                    @certificationType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && certificationType.IsRequired ? "inline-block" : "none");">&nbsp;(Required)</span>
                                 </h3>
                             
                                 <div class="box-tools pull-right">
@@ -598,6 +617,83 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    // Report Summary
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Report Summary</h3>
+            <div class="box-tools pull-right">
+                <button formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" class="btn btn-box-tool" data-placement="top" data-toggle="tooltip" title="" data-original-title="refresh">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="box-body box-collapse collapse form-horizontal in" style="display: block;">
+            <div class="box box-group box-solid">
+                <div class="box-header">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    &nbsp;
+                    <h3 class="box-title">Report Content Review</h3>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        <span class="progress-text">@Model.ReportSummaryViewModel.RequiredAndPresentItemCount of @Model.ReportSummaryViewModel.RequiredItemCount required report elements are present</span>
+                        <span class="progress-number">&nbsp;</span>
+                        @{
+                            int reportContentPercentageComplete = Convert.ToInt32((Convert.ToDecimal(Model.ReportSummaryViewModel.RequiredAndPresentItemCount) / Convert.ToDecimal(Model.ReportSummaryViewModel.RequiredItemCount)) * 100);
+                        }
+                        <div class="active progress progress-xs"style="height: 7px;">
+                            <div class="progress-bar progress-bar-green" style="width: @(reportContentPercentageComplete)%; background-color: #00a65a;"></div>
+                            <div class="progress-bar progress-bar-danger" style="width: @(100 - reportContentPercentageComplete)%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0px 40px; display: block;">
+                    <table class="dataTable table table-bordered table-condensed table-striped text-center">
+                        <tbody>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>Report Element</th>
+                                <th>Required</th>
+                                <th>Present in Report</th>
+                                <th></th>
+                            </tr>
+                            
+                            @for (int index = 0; index < Model.ReportSummaryViewModel.ReportContentReviewItems.Count; index++)
+                            {
+                                var reportContentReviewItem = Model.ReportSummaryViewModel.ReportContentReviewItems[index];
+                                <tr>
+                                    <td>@(index + 1).</td>
+                                    <td>@reportContentReviewItem.ReportElementName</td>
+                                    <td>@(@reportContentReviewItem.IsRequired ? "Yes" : "No")</td>
+                                    <td>@(@reportContentReviewItem.IsPresentInReport ? "Yes" : "No")</td>
+                                    <td>
+                                        @if (reportContentReviewItem.IsRequired)
+                                        {
+                                            if (reportContentReviewItem.IsPresentInReport)
+                                            {
+                                                <i aria-hidden="true" class="fa fa-check-circle fa-lg" data-placement="top" data-toggle="tooltip" style="color: green"></i>
+                                            }
+                                            else
+                                            {
+                                                <i aria-hidden="true" class="fa fa-times-circle fa-lg" data-placement="top" data-toggle="tooltip" style="color: red"></i>
+                                            }
+                                        }
+                                        
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>    
+        </div>
+
     </div>
 
     // Sign and Submit Report
@@ -1282,7 +1378,7 @@
                         @(ViewBag.VerifyResult.Valid ? "The COR is valid." : "The COR is invalid.")
                     </p>
                     <p style="word-wrap: break-word">
-                        @("LinkoExchange COR Signature : " + ViewBag.VerifyResult.DigitalSignature)
+                        @("LinkoExchange COR Signature : " + ViewBag.VerifyResult.DigitalSignature)R
                     </p>
                 </div>
                 <script>
@@ -1428,32 +1524,32 @@
                         }
                     }
 
-                        if (selectedObj.Id === id)
+                    if (selectedObj.Id === id)
+                    {
+                        if (checked)
                         {
-                            if (checked)
+                            //-select the row
+                            //row.addClass("k-state-selected");
+                            var childElement = {};
+                            childElement.Id = dataItem[idField];
+                            selectedObj.ChildElements.push(childElement);
+                            //console.log(selectedObj.ChildElements);
+                        }
+                        else
+                        {
+                            //-remove selection
+                            //row.removeClass("k-state-selected");
+                            var newArray = selectedObj.ChildElements.filter(function(obj)
                             {
-                                //-select the row
-                                //row.addClass("k-state-selected");
-                                var childElement = {};
-                                childElement.Id = dataItem[idField];
-                                selectedObj.ChildElements.push(childElement);
-                                //console.log(selectedObj.ChildElements);
-                            }
-                            else
-                            {
-                                //-remove selection
-                                //row.removeClass("k-state-selected");
-                                var newArray = selectedObj.ChildElements.filter(function(obj)
-                                {
-                                    return obj.Id !== dataItem[idField];
-                                });
+                                return obj.Id !== dataItem[idField];
+                            });
 
                             selectedObj.ChildElements = newArray;
 
-                                //console.log(selectedObj.ChildElements);
-                            }
+                            //console.log(selectedObj.ChildElements);
                         }
-                    });
+                    }
+                });
 
             //on check of required certificate "Include" checkbox
             $(document)
@@ -1508,16 +1604,19 @@
                 //console.log("previouslySelectedItemIds: " + previouslySelectedItemIds);
 
                 var items = grid.items();
-                items.each(function (idx, row) {
+                items.each(function(idx, row)
+                {
                     var dataItem = grid.dataItem(row);
                     //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
 
-                    var isPerviouslySelected = ($.inArray(dataItem[idField], previouslySelectedItemIds) !== -1);
+                    var isPreviouslySelected = ($.inArray(dataItem[idField], previouslySelectedItemIds) !== -1);
 
-                    if (isPerviouslySelected) {
+                    if (isPreviouslySelected)
+                    {
                         $(row).find(".checkbox").attr('checked', true);
                     }
-                    else {
+                    else
+                    {
                         $(row).find(".checkbox").attr('checked', false);
                     }
                 });
