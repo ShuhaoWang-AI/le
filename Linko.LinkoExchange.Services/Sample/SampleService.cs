@@ -616,21 +616,32 @@ namespace Linko.LinkoExchange.Services.Sample
                 var floor = foundLimit.MinimumValue;
                 var ceiling = foundLimit.MaximumValue;
                 double valueToCheck; //Concentration value or mass loading value
-                if (limitBasisName == LimitBasisName.Concentration
-                    && sampleResultDto.Value != null)
+                if (limitBasisName == LimitBasisName.Concentration)
                 {
-                    valueToCheck = sampleResultDto.Value.Value;
+                    if (sampleResultDto.Value != null)
+                        valueToCheck = sampleResultDto.Value.Value;
+                    else
+                    {
+                        return;
+                    }
                 }
-                else if (!string.IsNullOrWhiteSpace(sampleResultDto.MassLoadingValue)
-                        && Double.TryParse(sampleResultDto.MassLoadingValue, out valueToCheck))
+                else if (limitBasisName == LimitBasisName.MassLoading)
                 {
-                    //valueToCheck = sampleResultDto.MassLoadingValue (already assigned in the "else if" out parameter)
+                    if (!string.IsNullOrWhiteSpace(sampleResultDto.MassLoadingValue)
+                        && Double.TryParse(sampleResultDto.MassLoadingValue, out valueToCheck))
+                    {
+                        //valueToCheck is set via "out" parameter
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
                     throw new Exception($"CheckResultCompliance. ERROR: cannot check compliance. Limit Basis = {limitBasisName}.");
                 }
-                
+
 
                 if (floor.HasValue)
                 {
