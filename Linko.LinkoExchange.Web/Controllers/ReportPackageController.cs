@@ -267,7 +267,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             var reportSummaryViewModel = new ReportSummaryViewModel()
                                          {
                                              ReportContentReviewItems = new List<ReportContentReviewItem>()
-                                             //SamplingRequirementsItems =  new List<SamplingRequirementsItem>()
                                          };
 
             //
@@ -334,8 +333,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ReportPackageDetails(int id)
         {
             var viewModel = PrepareReportPackageDetails(id:id);
-            viewModel.ReportSummaryViewModel = GetReportSummaryViewModel(viewModel);
-
+            
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
 
@@ -623,6 +621,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.SelectedSamples = samples;
             viewModel.SelectedAttachments = attachments;
             viewModel.IncludedCertifications = certifications;
+
+            //Overwrite the Report Summary view model set in "PrepareReportPackageDetails" with "selected" (but maybe not saved) items
             viewModel.ReportSummaryViewModel = GetReportSummaryViewModel(viewModel);
 
             return View(viewName: "ReportPackageDetails", model: viewModel);
@@ -1152,6 +1152,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
+
+            viewModel.ReportSummaryViewModel = GetReportSummaryViewModel(viewModel);
+
             return viewModel;
         }
 
