@@ -122,7 +122,7 @@
                                                                                                              @class = "text-danger"
                                                                                                          })
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1" style="padding-left: 0px;">
                     <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="The Industry sees this Name and Description. It should describe the report." type="button">
                         <i class="fa fa-info-circle fa-lg"></i>
                     </button>
@@ -166,9 +166,11 @@
                 <div class="col-md-1">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsSubmissionBySignatoryRequired)
-                        <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="" type="button" data-original-title="Signatory Rights are required to submit this report">
-                            <i class="fa fa-info-circle fa-lg"></i>
-                        </button>
+                        <span style="padding-left: 15px;">
+                            <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="" type="button" data-original-title="Signatory Rights are required to submit this report">
+                                <i class="fa fa-info-circle fa-lg"></i>
+                            </button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -192,17 +194,16 @@
                                                      {
                                                          style = "width:210px;"
                                                      }))
+                    <span style="padding-left: 15px;">
+                        <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="When will the Industry start seeing and using this template?" type="button">
+                            <i class="fa fa-info-circle fa-lg"></i>
+                        </button>
+                    </span>
                     <br />
                     @Html.ValidationMessageFor(model => model.EffectiveDateTimeLocal, validationMessage:"", htmlAttributes:new
                                                                                                                            {
                                                                                                                                @class = "text-danger"
                                                                                                                            })
-
-                </div>
-                <div>
-                    <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="When will the Industry start seeing and using this template?" type="button">
-                        <i class="fa fa-info-circle fa-lg"></i>
-                    </button>
                 </div>
             </div>
 
