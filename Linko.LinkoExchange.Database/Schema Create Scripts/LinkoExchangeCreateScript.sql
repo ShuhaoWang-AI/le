@@ -6531,7 +6531,7 @@ Email: {emailAddress}
         'Profile',   
         'KBQChanged', 
         '',
-        'Knowledge Based Questions
+        'Knowledge Based Questions were changed
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
