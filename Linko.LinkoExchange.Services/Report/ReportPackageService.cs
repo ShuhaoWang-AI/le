@@ -102,17 +102,19 @@ namespace Linko.LinkoExchange.Services.Report
             var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
             currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
 
+            var reportPackageId = id[0];
+            var reportPackage = _dbContext.ReportPackages
+                .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+            if (reportPackage == null)
+            {
+                return false;
+            }
+
             switch (apiName)
             {
                 case "GetReportPackage":
                 {
-                    var reportPackageId = id[0];
-                    var reportPackage = _dbContext.ReportPackages.SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
-
-                    if (reportPackage == null)
-                    {
-                        return false;
-                    }
 
                     //Check authorized access as either one of:
                     //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
@@ -140,14 +142,8 @@ namespace Linko.LinkoExchange.Services.Report
                 case "SignAndSubmitReportPackage":
                 case "RepudiateReport":
                 {
-                    var reportPackageId = id[0];
 
-                    //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
-                    var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
-                                                                             .Any(rp => rp.ReportPackageId == reportPackageId
-                                                                                        && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                    if (isReportPackageForThisOrgRegProgramExist)
+                    if (reportPackage.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
                     {
                         //Get current user
                         var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
@@ -160,14 +156,17 @@ namespace Linko.LinkoExchange.Services.Report
                             return false;
                         }
 
-                        //Check if user has signatory rights
-                        if (!orgRegProgramUser.IsSignatory)
+                        //Check if user is removed or disabled
+                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
                         {
                             return false;
                         }
 
-                        //Check if user is removed or disabled
-                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
+                        //Check if user signatory rights are required and current user "is signatory".
+                        var rpTemplate = _dbContext.ReportPackageTempates
+                                                   .SingleOrDefault(rpt => rpt.ReportPackageTemplateId == reportPackage.ReportPackageTemplateId);
+
+                        if (rpTemplate == null || (rpTemplate.IsSubmissionBySignatoryRequired && !orgRegProgramUser.IsSignatory))
                         {
                             return false;
                         }
