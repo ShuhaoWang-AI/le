@@ -326,6 +326,44 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             }
 
+            //
+            // Sample Result Compliance Summary (Progress bar)
+            //
+            reportSummaryViewModel.SampleResultsInComplianceCount = 0;
+            reportSummaryViewModel.SampleResultsNonComplianceCount = 0;
+
+            foreach (var populatedSampleElement in reportPackageViewModel.SelectedSamples.Where(sampleElement => sampleElement.ChildElements.Count > 0))
+            {
+                foreach (var sample in populatedSampleElement.ChildElements)
+                {
+                    var sampleDto = _sampleService.GetSampleDetails(sample.Id);
+                    foreach (var result in sampleDto.SampleResults)
+                    {
+                        if (result.ConcentrationResultCompliance == ResultComplianceType.Good)
+                        {
+                            reportSummaryViewModel.SampleResultsInComplianceCount++;
+                        }
+                        else if (result.ConcentrationResultCompliance == ResultComplianceType.Bad)
+                        {
+                            reportSummaryViewModel.SampleResultsNonComplianceCount++;
+                        }
+
+                        if (result.IsCalcMassLoading)
+                        {
+                            if (result.MassResultCompliance == ResultComplianceType.Good)
+                            {
+                                reportSummaryViewModel.SampleResultsInComplianceCount++;
+                            }
+                            else if (result.MassResultCompliance == ResultComplianceType.Bad)
+                            {
+                                reportSummaryViewModel.SampleResultsNonComplianceCount++;
+                            }
+                        }
+
+                    }
+                }
+            }
+
             return reportSummaryViewModel;
         }
 
@@ -697,14 +735,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                             model.FailedCountPassword = failedCountPassword;
                             model.FailedCountKbq = failedCountKbq + 1;
                             ViewBag.ShowSubmissionValidationErrorMessage = true;
-                            ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                            ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
                             break;
                         case PasswordAndKbqValidationResult.InvalidPassword:
                             isValid = false;
                             model.FailedCountPassword = failedCountPassword + 1;
                             model.FailedCountKbq = failedCountKbq;
                             ViewBag.ShowSubmissionValidationErrorMessage = true;
-                            ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                            ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
                             break;
                         case PasswordAndKbqValidationResult.UserLocked_KBQ:
                         case PasswordAndKbqValidationResult.UserLocked_Password:
@@ -794,14 +832,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 model.FailedCountPassword = failedCountPassword;
                                 model.FailedCountKbq = failedCountKbq + 1;
                                 ViewBag.ShowRepudiateValidationErrorMessage = true;
-                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.InvalidPassword:
                                 isValid = false;
                                 model.FailedCountPassword = failedCountPassword + 1;
                                 model.FailedCountKbq = failedCountKbq;
                                 ViewBag.ShowRepudiateValidationErrorMessage = true;
-                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
                             case PasswordAndKbqValidationResult.UserLocked_Password:

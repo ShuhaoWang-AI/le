@@ -36,7 +36,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
                 }
             }
         }
-       
+        public int SampleResultsInComplianceCount { get; set; }
+        public int SampleResultsNonComplianceCount { get; set; }
     }
 
     public class ReportContentReviewItem
