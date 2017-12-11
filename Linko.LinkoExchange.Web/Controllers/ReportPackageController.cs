@@ -339,7 +339,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var sampleDto = _sampleService.GetSampleDetails(sample.Id);
                     foreach (var result in sampleDto.SampleResults)
                     {
-                        if (result.ConcentrationResultCompliance == ResultComplianceType.Good)
+                        if (result.ConcentrationResultCompliance == ResultComplianceType.Good
+                            || result.ConcentrationResultCompliance == ResultComplianceType.Unknown)
                         {
                             reportSummaryViewModel.SampleResultsInComplianceCount++;
                         }
@@ -350,7 +351,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                         if (result.IsCalcMassLoading)
                         {
-                            if (result.MassResultCompliance == ResultComplianceType.Good)
+                            if (result.MassResultCompliance == ResultComplianceType.Good
+                                || result.MassResultCompliance == ResultComplianceType.Unknown)
                             {
                                 reportSummaryViewModel.SampleResultsInComplianceCount++;
                             }
