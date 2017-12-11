@@ -1429,7 +1429,17 @@
                         && (result > concentrationMaxValue || result < concentrationMinValue)) {
                         complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
                     } else {
-                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        
+                        //If there's no result don't show compliance badge at all
+                        if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
+                        {
+                            complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        }
+                        else
+                        {
+                            complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+                        }
+
                     }
                 } else {
                     //max limit only
@@ -1439,7 +1449,16 @@
                         && result > concentrationMaxValue) {
                         complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
                     } else {
-                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        
+                        //If there's no result don't show compliance badge at all
+                        if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
+                        {
+                            complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        }
+                        else
+                        {
+                            complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+                        }
                     }
                 }
             } else {
