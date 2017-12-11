@@ -708,8 +708,6 @@
                     &nbsp;
                     <h3 class="box-title">Sample Result Compliance Summary </h3>
                     <div class="box-tools pull-right progress-group" style="width: 450px;">
-                        <span class="progress-text">@Model.ReportSummaryViewModel.SampleResultsInComplianceCount in compliance / @Model.ReportSummaryViewModel.SampleResultsNonComplianceCount in non-compliance</span>
-                        <span class="progress-number">&nbsp;</span>
                         @{
                             int total = Model.ReportSummaryViewModel.SampleResultsInComplianceCount + Model.ReportSummaryViewModel.SampleResultsNonComplianceCount;
                             int sampleResultPercentageComplete;
@@ -723,6 +721,8 @@
                             }
 
                         }
+                        <span class="progress-text">@Model.ReportSummaryViewModel.SampleResultsInComplianceCount of @total sample results are in compliance</span>
+                        <span class="progress-number">&nbsp;</span>
                         <div class="active progress progress-xs" style="height: 7px;">
                             <div class="progress-bar progress-bar-green" style="width: @(sampleResultPercentageComplete)%; background-color: #00a65a;"></div>
                             <div class="progress-bar progress-bar-danger" style="width: @(100 - sampleResultPercentageComplete)%"></div>
@@ -736,7 +736,7 @@
                 </div>
             </div> 
         </div>
-          
+
     </div>
 
     // Sign and Submit Report
