@@ -736,7 +736,77 @@
                 </div>
             </div> 
         </div>
+        
+        <div class="box-body box-collapse collapse form-horizontal in" style="display: block;">
+            <div class="box box-group box-solid">
+                <div class="box-header">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    &nbsp;
+                    <h3 class="box-title">Sampling Requirements Summary</h3>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        @{
+                            var totalRequiredCount = Model.ReportSummaryViewModel.SamplingRequirementsItems.Select(sr => sr.ExpectedSampleCount).Sum();
+                            var totalIncludedCount = Model.ReportSummaryViewModel.SamplingRequirementsItems.Select(sr => sr.IncludedSampleCount).Sum();
+                            var totalMissingCount = totalRequiredCount - totalIncludedCount;
+                            int allRequirementsPercentageMet;
+                            if (totalMissingCount < 0 || totalRequiredCount == 0)
+                            {
+                                totalMissingCount = 0;
+                                allRequirementsPercentageMet = 100;
+                            }
+                            else
+                            {
+                                allRequirementsPercentageMet = Convert.ToInt32((Convert.ToDecimal(totalIncludedCount) / Convert.ToDecimal(totalRequiredCount)) * 100);
+                            }
+                        }
+                        <span class="progress-text">@totalMissingCount of @totalRequiredCount parameters are missing expected samples</span>
+                        <span class="progress-number">&nbsp;</span>
+                        <div class="active progress progress-xs" style="height: 7px;">
+                            <div class="progress-bar progress-bar-green" style="width:@(allRequirementsPercentageMet)%; background-color: #00a65a;"></div>
+                            <div class="progress-bar progress-bar-danger" style="width:@(100 - allRequirementsPercentageMet)%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0px 40px; display: block;">
+                    <table class="dataTable table table-bordered table-condensed table-striped text-center">
+                        <tbody>
+                            <tr>
+                                <th>Monitoring Point</th>
+                                <th>Parameter</th>
+                                <th>Progress</th>
+                                <th>Expected # of Samples</th>
+                                <th>Included # of Samples</th>
+                            </tr>
 
+                            @foreach (var samplingRequirement in Model.ReportSummaryViewModel.SamplingRequirementsItems)
+                            {
+                                <tr>
+                                    <td>@(samplingRequirement.MonitoringPointName)</td>
+                                    <td>@(samplingRequirement.ParameterName)</td>
+                                    <td>
+                                        <div class="active progress progress-xs" style="height: 7px;">
+                                            @{
+                                                int requirementPercentageMet = Convert.ToInt32((Convert.ToDecimal(samplingRequirement.IncludedSampleCount) / Convert.ToDecimal(samplingRequirement.ExpectedSampleCount)) * 100);
+                                                if (samplingRequirement.IncludedSampleCount > samplingRequirement.ExpectedSampleCount)
+                                                {
+                                                    requirementPercentageMet = 100;
+                                                }
+
+                                            }
+                                            <div class="progress-bar progress-bar-green" style="width: @(requirementPercentageMet)%;background-color: #00a65a;"></div>
+                                        </div>
+                                    </td>
+                                    <td>@(samplingRequirement.ExpectedSampleCount)</td>
+                                    <td>@(samplingRequirement.IncludedSampleCount)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     // Sign and Submit Report

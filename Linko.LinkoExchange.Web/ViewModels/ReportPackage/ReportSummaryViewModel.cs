@@ -38,6 +38,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         }
         public int SampleResultsInComplianceCount { get; set; }
         public int SampleResultsNonComplianceCount { get; set; }
+
+        public List<SamplingRequirementsItem> SamplingRequirementsItems { get; set; }
     }
 
     public class ReportContentReviewItem
@@ -47,4 +49,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public bool IsPresentInReport { get; set; }
     }
 
+    public class SamplingRequirementsItem
+    {
+        public string MonitoringPointName { get; set; }
+        public string ParameterName { get; set; }
+        public int ExpectedSampleCount { get; set; }
+        public int IncludedSampleCount { get; set; }
+    }
 }

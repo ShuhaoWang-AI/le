@@ -622,6 +622,30 @@ namespace Linko.LinkoExchange.Test
             Assert.IsFalse(condition:isAuthorized);
         }
 
+        [TestMethod]
+        public void GetSampleRequirements_Positive_Test()
+        {
+            var startDate = new DateTime(2017, 10, 30);
+            var endDate = new DateTime(2017, 10, 30);
+            var sampleReqs = _sampleService.GetSampleRequirements(startDate, endDate, 13);
+        }
+
+        [TestMethod]
+        public void GetSampleRequirements_Wrong_Dates_Test()
+        {
+            var startDate = new DateTime(2016, 10, 30);
+            var endDate = new DateTime(2016, 10, 30);
+            var sampleReqs = _sampleService.GetSampleRequirements(startDate, endDate, 13);
+        }
+
+        [TestMethod]
+        public void GetSampleRequirements_Wrong_OrgRegProgramId_Test()
+        {
+            var startDate = new DateTime(2017, 10, 30);
+            var endDate = new DateTime(2017, 10, 30);
+            var sampleReqs = _sampleService.GetSampleRequirements(startDate, endDate, -1);
+        }
+
         #region Private helper functions
 
         private SampleDto GetTestSampleDto()

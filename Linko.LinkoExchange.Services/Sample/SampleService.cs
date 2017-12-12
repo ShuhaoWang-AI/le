@@ -923,6 +923,40 @@ namespace Linko.LinkoExchange.Services.Sample
             return collectionMethodList;
         }
 
+        public IEnumerable<SampleRequirementDto> GetSampleRequirements(DateTime startDate, DateTime endDate, int orgRegProgramId)
+        {
+            _logger.Info(message: $"Enter SampleService.GetSampleRequirements. startDate={startDate}, endDate={endDate}, orgRegProgramId={orgRegProgramId}");
+
+            var sampleRequirementDtos = _dbContext.SampleRequirements
+                .Include(sr => sr.MonitoringPointParameter)
+                .Include(sr => sr.MonitoringPointParameter.MonitoringPoint)
+                .Include(sr => sr.MonitoringPointParameter.Parameter)
+                .Where(sr => DbFunctions.TruncateTime(sr.PeriodStartDateTime) == DbFunctions.TruncateTime(startDate)
+                            && DbFunctions.TruncateTime(sr.PeriodEndDateTime) == DbFunctions.TruncateTime(endDate)
+                            && sr.ByOrganizationRegulatoryProgramId == orgRegProgramId)
+                .GroupBy(sr => new
+                {
+                    sr.MonitoringPointParameter.MonitoringPointId,
+                    MonitoringPointName = sr.MonitoringPointParameter.MonitoringPoint.Name,
+                    sr.MonitoringPointParameter.ParameterId,
+                    ParameterName = sr.MonitoringPointParameter.Parameter.Name,
+                    sr.PeriodStartDateTime,
+                    sr.PeriodEndDateTime
+                })
+                .Select(consolidatedRequirement => new SampleRequirementDto()
+                {
+                    MonitoringPointId = consolidatedRequirement.Key.MonitoringPointId,
+                    MonitoringPointName = consolidatedRequirement.Key.MonitoringPointName,
+                    ParameterId = consolidatedRequirement.Key.ParameterId,
+                    ParameterName = consolidatedRequirement.Key.ParameterName,
+                    TotalSamplesRequiredCount = consolidatedRequirement.Sum(g => g.SamplesRequired)
+                }).ToList();
+
+            _logger.Info(message: $"Exit SampleService.GetSampleRequirements. startDate={startDate}, endDate={endDate}, orgRegProgramId={orgRegProgramId}, list count={sampleRequirementDtos.Count()}");
+
+            return sampleRequirementDtos;
+        }
+
         #endregion
 
         /// <summary>

@@ -266,7 +266,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var reportSummaryViewModel = new ReportSummaryViewModel()
                                          {
-                                             ReportContentReviewItems = new List<ReportContentReviewItem>()
+                                             ReportContentReviewItems = new List<ReportContentReviewItem>(),
+                                             SamplingRequirementsItems =  new List<SamplingRequirementsItem>()
                                          };
 
             //
@@ -365,6 +366,58 @@ namespace Linko.LinkoExchange.Web.Controllers
                     }
                 }
             }
+
+            //
+            //  Sampling Requirements Summary
+            //
+            var sampleRequirementsDtos = _sampleService.GetSampleRequirements(reportPackageViewModel.PeriodStartDateTimeLocal, reportPackageViewModel.PeriodStartDateTimeLocal, reportPackageViewModel.OrganizationRegulatoryProgramId);
+            foreach (var sampleRequirementDto in sampleRequirementsDtos.OrderBy(sr => sr.MonitoringPointName).ThenBy(sr => sr.ParameterName))
+            {
+                //Need to count the number of results for this parameter at this monitoring point
+                //amongst the samples that are included in this report package
+                int includedSampleCount = 0;
+                if (reportPackageViewModel.SelectedSamples != null)
+                {
+                    foreach (var sampleElementType in reportPackageViewModel.SelectedSamples)
+                    {
+                        if (sampleElementType.ChildElements != null && sampleElementType.ChildElements.Count > 0)
+                        {
+                            foreach (var sampleChildElement in sampleElementType.ChildElements)
+                            {
+                                var sampleId = sampleChildElement.Id;
+                                var sample = _sampleService.GetSampleDetails(sampleId);
+
+                                if (sample.MonitoringPointId == sampleRequirementDto.MonitoringPointId)
+                                {
+                                    //Iterate through this selected sample's results
+                                    foreach (var result in sample.SampleResults)
+                                    {
+                                        if (result.ParameterId == sampleRequirementDto.ParameterId)
+                                        {
+                                            includedSampleCount++;
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    }
+
+                }
+                
+
+                reportSummaryViewModel.SamplingRequirementsItems.Add(
+                    new SamplingRequirementsItem()
+                    {
+                        MonitoringPointName = sampleRequirementDto.MonitoringPointName,
+                        ParameterName = sampleRequirementDto.ParameterName,
+                        ExpectedSampleCount = sampleRequirementDto.TotalSamplesRequiredCount,
+                        IncludedSampleCount = includedSampleCount
+                    });
+            }
+
 
             return reportSummaryViewModel;
         }

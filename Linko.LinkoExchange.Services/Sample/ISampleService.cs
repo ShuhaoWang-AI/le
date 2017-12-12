@@ -90,5 +90,15 @@ namespace Linko.LinkoExchange.Services.Sample
         /// </summary>
         /// <returns> </returns>
         IEnumerable<CollectionMethodDto> GetCollectionMethods();
+
+        /// <summary>
+        /// Returns a list of sample requirement dto objects for a given org reg program that match up with a
+        /// specified "schedule" (matching start and end dates -- ignore time component).
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="orgRegProgramId"></param>
+        /// <returns></returns>
+        IEnumerable<SampleRequirementDto> GetSampleRequirements(DateTime startDate, DateTime endDate, int orgRegProgramId);
     }
 }
