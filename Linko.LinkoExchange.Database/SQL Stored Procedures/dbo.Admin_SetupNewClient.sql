@@ -185,7 +185,7 @@ BEGIN TRANSACTION
 		VALUES 
         (
             'Samples and Results'
-            , 'Sample results'
+            , 'Samples and Results'
             , 1
             , @OrganizationRegulatoryProgramId
         );
