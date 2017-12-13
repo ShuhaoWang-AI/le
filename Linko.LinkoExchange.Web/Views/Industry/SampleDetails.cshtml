@@ -1481,6 +1481,7 @@
                 .html()
                 .replace("{{parameterName}}", foundParameters[0].Name)
                 .replace("{{resultValue}}", result)
+                .replace("{{minLimit}}", concentrationMinValue)
                 .replace("{{maxLimit}}", concentrationMaxValue);
 
             $("#ResultCompliance_" + parameterId).html(complianceIconAndMessage);
