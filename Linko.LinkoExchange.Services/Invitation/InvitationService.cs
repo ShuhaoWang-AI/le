@@ -396,7 +396,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                     }
 
                     var emailEntry = _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:existingUser, emailType:emailType, contentReplacements:contentReplacements);
-                    emailEntry.RecipientOrgulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
+                    emailEntry.RecipientRegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
                     emailEntry.RecipientOrganizationId = targetOrgRegProgram.OrganizationId;
                     emailEntry.RecipientRegulatorOrganizationId = cromerrAuditLogEntryDto.RegulatorOrganizationId;
 

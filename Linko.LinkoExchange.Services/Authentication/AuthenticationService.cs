@@ -356,7 +356,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         var currentOrganizationRegulatoryProgram =
                             _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:int.Parse(s:currentOrganizationRegulatoryProgramId));
                         emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId;
-                        emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
+                        emailEntry.RecipientRegulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
                         emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId;
                     }
 
@@ -1545,7 +1545,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                                                   RecipientLastName = i.LastName,
                                                                   RecipientUserName = i.UserName,
                                                                   ContentReplacements = emailContentReplacements,
-                                                                  RecipientOrgulatoryProgramId = inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                                                  RecipientRegulatoryProgramId = inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
                                                                   RecipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
                                                                   RecipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId,
                                                                   EmailType = isInvitedToIndustry

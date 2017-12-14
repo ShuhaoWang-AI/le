@@ -141,7 +141,7 @@ namespace Linko.LinkoExchange.Services.Email
                        RecipientUserName = user.UserProfileDto?.UserName,
                        RecipientUserProfileId = user.UserProfileId,
                        RecipientOrganizationId = user.OrganizationRegulatoryProgramDto?.OrganizationId,
-                       RecipientOrgulatoryProgramId = user.OrganizationRegulatoryProgramDto?.RegulatoryProgramId,
+                       RecipientRegulatoryProgramId = user.OrganizationRegulatoryProgramDto?.RegulatoryProgramId,
                        RecipientRegulatorOrganizationId = user.OrganizationRegulatoryProgramDto?.RegulatorOrganizationId,
                        ContentReplacements = contentReplacements
                    };
@@ -162,7 +162,7 @@ namespace Linko.LinkoExchange.Services.Email
                                                       RecipientFirstName = userProfile.FirstName,
                                                       RecipientLastName = userProfile.LastName,
                                                       RecipientOrganizationId = i.OrganizationRegulatoryProgramDto.OrganizationId,
-                                                      RecipientOrgulatoryProgramId = i.OrganizationRegulatoryProgramId,
+                                                      RecipientRegulatoryProgramId = i.OrganizationRegulatoryProgramId,
                                                       RecipientRegulatorOrganizationId = i.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
                                                   }).ToList();
         }
@@ -181,7 +181,7 @@ namespace Linko.LinkoExchange.Services.Email
                                                       RecipientFirstName = user.FirstName,
                                                       RecipientLastName = user.LastName,
                                                       RecipientOrganizationId = i.OrganizationRegulatoryProgramDto.OrganizationId,
-                                                      RecipientOrgulatoryProgramId = i.OrganizationRegulatoryProgramId,
+                                                      RecipientRegulatoryProgramId = i.OrganizationRegulatoryProgramDto.RegulatoryProgramId,
                                                       RecipientRegulatorOrganizationId = i.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
                                                   }).ToList();
         }
@@ -197,7 +197,7 @@ namespace Linko.LinkoExchange.Services.Email
                        RecipientFirstName = user.FirstName,
                        RecipientLastName = user.LastName,
                        RecipientOrganizationId = orgRegProg.OrganizationId,
-                       RecipientOrgulatoryProgramId = orgRegProg.RegulatoryProgramId,
+                       RecipientRegulatoryProgramId = orgRegProg.RegulatoryProgramId,
                        RecipientRegulatorOrganizationId = orgRegProg.RegulatorOrganizationId,
                        ContentReplacements = contentReplacements
                    };
@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Services.Email
                        RecipientFirstName = user.FirstName,
                        RecipientLastName = user.LastName,
                        RecipientOrganizationId = orgRegProg.OrganizationId,
-                       RecipientOrgulatoryProgramId = orgRegProg.RegulatoryProgramId,
+                       RecipientRegulatoryProgramId = orgRegProg.RegulatoryProgramId,
                        RecipientRegulatorOrganizationId = orgRegProg.RegulatorOrganizationId,
                        ContentReplacements = contentReplacements
                    };
@@ -231,7 +231,7 @@ namespace Linko.LinkoExchange.Services.Email
                        RecipientFirstName = user.FirstName,
                        RecipientLastName = user.LastName,
                        RecipientOrganizationId = orgRegProg.OrganizationId,
-                       RecipientOrgulatoryProgramId = orgRegProg.RegulatoryProgramId,
+                       RecipientRegulatoryProgramId = orgRegProg.RegulatoryProgramId,
                        RecipientRegulatorOrganizationId = orgRegProg.RegulatorOrganizationId,
                        ContentReplacements = contentReplacements
                    };
@@ -258,7 +258,7 @@ namespace Linko.LinkoExchange.Services.Email
                             RecipientLastName = emailEntry.RecipientLastName,
                             RecipientUserName = emailEntry.RecipientUserName,
                             RecipientUserProfileId = emailEntry.RecipientUserProfileId,
-                            RecipientRegulatoryProgramId = emailEntry.RecipientOrgulatoryProgramId,
+                            RecipientRegulatoryProgramId = emailEntry.RecipientRegulatoryProgramId,
                             RecipientOrganizationId = emailEntry.RecipientOrganizationId,
                             RecipientRegulatorOrganizationId = emailEntry.RecipientRegulatorOrganizationId,
                             SenderEmailAddress = _senderEmailAddres,

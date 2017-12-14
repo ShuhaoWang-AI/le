@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Services.Email
         public string RecipientEmailAddress { get; set; }
         public EmailType EmailType { get; set; }
         public Dictionary<string, string> ContentReplacements { get; set; }
-        public int? RecipientOrgulatoryProgramId { get; set; }
+        public int? RecipientRegulatoryProgramId { get; set; }
         public int? RecipientOrganizationId { get; set; }
         public int? RecipientRegulatorOrganizationId { get; set; }
         public MailMessage MailMessage { get; set; }
