@@ -345,6 +345,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                                      {
                                          EmailType = EmailType.Profile_PasswordChanged,
                                          ContentReplacements = contentReplacements,
+                                         RecipientUserProfileId = applicationUser.UserProfileId,
+                                         RecipientUserName =  applicationUser.UserName,
                                          RecipientEmailAddress = applicationUser.Email,
                                          RecipientFirstName = applicationUser.FirstName,
                                          RecipientLastName = applicationUser.LastName
