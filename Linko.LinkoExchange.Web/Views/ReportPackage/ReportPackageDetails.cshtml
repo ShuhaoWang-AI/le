@@ -624,9 +624,12 @@
         <div class="box-header with-border">
             <h3 class="box-title">Report Summary</h3>
             <div class="box-tools pull-right">
-                <button formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" class="btn btn-box-tool" data-placement="top" data-toggle="tooltip" title="" data-original-title="refresh">
-                    <i class="fa fa-refresh" aria-hidden="true"></i>
-                </button>
+                @if (Model.Status == ReportStatusName.Draft)
+                {
+                    <button formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" class="btn btn-box-tool" data-placement="top" data-toggle="tooltip" title="" data-original-title="refresh">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </button>
+                }
                 <button class="btn btn-box-tool" data-widget="collapse">
                     <i class="fa fa-minus"></i>
                 </button>
