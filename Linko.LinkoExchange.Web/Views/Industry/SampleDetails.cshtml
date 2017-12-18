@@ -1548,9 +1548,16 @@
                 complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
             }
 
+            
+            //Update mass loading value for display purposes only
             if (qualifier == "ND" || qualifier == "NF")
             {
-                massLoadingValue = qualifier; //for display purposes only
+                massLoadingValue = qualifier; 
+            }
+            else
+            {
+                var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+                massLoadingValue = massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces);
             }
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
