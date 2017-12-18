@@ -559,12 +559,12 @@ namespace Linko.LinkoExchange.Services.Sample
             if (limitBasisName == LimitBasisName.Concentration)
             {
                 sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Unknown;
-                sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceUnknown;
+                sampleResultDto.ConcentrationResultComplianceComment = string.Format(Message.ResultComplianceUnknown, sampleResultDto.ParameterName);
             }
             else if (limitBasisName == LimitBasisName.MassLoading)
             {
                 sampleResultDto.MassResultCompliance = ResultComplianceType.Unknown;
-                sampleResultDto.MassResultComplianceComment = Message.ResultComplianceUnknown;
+                sampleResultDto.MassResultComplianceComment = string.Format(Message.ResultComplianceUnknown, sampleResultDto.ParameterName);
             }
 
             //Get possible limits
@@ -595,6 +595,9 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (foundLimit != null)
             {
+                var floor = foundLimit.MinimumValue;
+                var ceiling = foundLimit.MaximumValue;
+
                 //If qualifier is "ND" or "NF" both concentration and mass is in compliance
                 if (sampleResultDto.Qualifier == "ND" || sampleResultDto.Qualifier == "NF")
                 {
@@ -602,19 +605,37 @@ namespace Linko.LinkoExchange.Services.Sample
                     if (limitBasisName == LimitBasisName.Concentration)
                     {
                         sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                        sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
+                        if (floor.HasValue)
+                        {
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier, floor, ceiling);
+                        }
+                        else
+                        {
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.Qualifier, ceiling);
+                        }
+                        
                     }
                     else if (limitBasisName == LimitBasisName.MassLoading)
                     {
                         sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                        sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
+                        if (floor.HasValue)
+                        {
+                            sampleResultDto.MassResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier, floor, ceiling);
+                        }
+                        else
+                        {
+                            sampleResultDto.MassResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.Qualifier, ceiling);
+                        }
+
                     }
 
                     return;
                 }
 
-                var floor = foundLimit.MinimumValue;
-                var ceiling = foundLimit.MaximumValue;
                 double valueToCheck; //Concentration value or mass loading value
                 if (limitBasisName == LimitBasisName.Concentration)
                 {
@@ -669,12 +690,14 @@ namespace Linko.LinkoExchange.Services.Sample
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
                             sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.EnteredValue, floor, ceiling);
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
                             sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
+                            sampleResultDto.MassResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.MassLoadingValue, floor, ceiling);
                         }
                     }
                 }
@@ -704,12 +727,14 @@ namespace Linko.LinkoExchange.Services.Sample
                         if (limitBasisName == LimitBasisName.Concentration)
                         {
                             sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.ConcentrationResultComplianceComment = Message.ResultComplianceGood;
+                            sampleResultDto.ConcentrationResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.EnteredValue, ceiling);
                         }
                         else if (limitBasisName == LimitBasisName.MassLoading)
                         {
                             sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.MassResultComplianceComment = Message.ResultComplianceGood;
+                            sampleResultDto.MassResultComplianceComment =
+                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.MassLoadingValue, ceiling);
                         }
                     }
 

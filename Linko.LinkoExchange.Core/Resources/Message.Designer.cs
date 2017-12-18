@@ -160,7 +160,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} result of {1} exceeds limit of {2}..
+        ///   Looks up a localized string similar to {0} result of {1} violates limit of {2}..
         /// </summary>
         public static string ResultComplianceBadAboveMax {
             get {
@@ -169,16 +169,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} result of {1} must meet minimum limit of {2}..
-        /// </summary>
-        public static string ResultComplianceBadBelowMin {
-            get {
-                return ResourceManager.GetString("ResultComplianceBadBelowMin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} result of {1} is outside of limit range {2} to {3}..
+        ///   Looks up a localized string similar to {0} result of {1} violates limit of {2}-{3}..
         /// </summary>
         public static string ResultComplianceBadOutsideRange {
             get {
@@ -187,16 +178,25 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Results are in compliance..
+        ///   Looks up a localized string similar to {0} result of {1} is in compliance with limit of {2}..
         /// </summary>
-        public static string ResultComplianceGood {
+        public static string ResultComplianceGoodWithinLimit {
             get {
-                return ResourceManager.GetString("ResultComplianceGood", resourceCulture);
+                return ResourceManager.GetString("ResultComplianceGoodWithinLimit", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Result compliance is unknown. No limit was found..
+        ///   Looks up a localized string similar to {0} result of {1} is in compliance with limit of {2}-{3}..
+        /// </summary>
+        public static string ResultComplianceGoodWithinRange {
+            get {
+                return ResourceManager.GetString("ResultComplianceGoodWithinRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No limit found for {0}..
         /// </summary>
         public static string ResultComplianceUnknown {
             get {

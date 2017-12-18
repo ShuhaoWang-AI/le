@@ -1433,7 +1433,7 @@
                         //If there's no result don't show compliance badge at all
                         if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
                         {
-                            complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                            complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
                         }
                         else
                         {
@@ -1453,7 +1453,7 @@
                         //If there's no result don't show compliance badge at all
                         if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
                         {
-                            complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                            complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
                         }
                         else
                         {
@@ -1475,7 +1475,10 @@
                 }
             }
 
-            
+            if (qualifier == "ND" || qualifier == "NF")
+            {
+                result = qualifier; //for display purposes only
+            }
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
                 .html()
@@ -1528,7 +1531,7 @@
                         && (massLoadingValue > massLoadingMaxValue || massLoadingValue < massLoadingMinValue)) {
                         complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
                     } else {
-                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
                     }
                 } else {
                     //max limit only
@@ -1537,12 +1540,17 @@
                         && massLoadingValue > massLoadingMaxValue) {
                         complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
                     } else {
-                        complianceTemplateToDisplay = "#goodComplianceIconAndMessage";
+                        complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
                     }
                 }
             } else {
                 //no limits
                 complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+            }
+
+            if (qualifier == "ND" || qualifier == "NF")
+            {
+                massLoadingValue = qualifier; //for display purposes only
             }
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
@@ -1615,20 +1623,24 @@
         <i class="fa fa-lg fa-check-circle" style="visibility: hidden" aria-hidden="true" data-placement="top" data-toggle="tooltip"></i>
     </script>
 
-    <script id="goodComplianceIconAndMessage" type="text/template">
-        <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Results are in compliance."></i>
+    <script id="goodComplianceMaxIconAndMessage" type="text/template">
+        <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is in compliance with limit of {{maxLimit}}."></i>
+    </script>
+
+    <script id="goodComplianceRangeIconAndMessage" type="text/template">
+        <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is in compliance with limit of {{minLimit}}-{{maxLimit}}."></i>
     </script>
 
     <script id="unknownComplianceIconAndMessage" type="text/template">
-        <i class="fa fa-lg fa-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="Result compliance unknown. No limit was found."></i>
+        <i class="fa fa-lg fa-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="No limit found for {{parameterName}}."></i>
     </script>
 
     <script id="bad-aboveMaxComplianceIconAndMessage" type="text/template">
-        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} exceeds limit of {{maxLimit}}."></i>
+        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} violates limit of {{maxLimit}}."></i>
     </script>
 
     <script id="bad-outsideRangeComplianceIconAndMessage" type="text/template">
-        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is outside of range {{minLimit}} to {{maxLimit}}."></i>
+        <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} violates limit of {{minLimit}}-{{maxLimit}}."></i>
     </script>
 
     <script id="massResultAndComplianceTemplate" type="text/template">
@@ -1637,7 +1649,7 @@
                 <strong id="MassResult_{{parameterId}}"></strong>
             </span>
             <span id="MassResultCompliance_{{parameterId}}">
-                <i class="fa fa-lg fa-circle" style="color:green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="Mass loading result compliance unknown. No limit was found."></i>
+                <i class="fa fa-lg fa-circle" style="color:green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="No limit found for {{parameterName}}."></i>
             </span>
         </span>
     </script>
