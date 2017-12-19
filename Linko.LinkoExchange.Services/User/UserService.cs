@@ -1532,7 +1532,7 @@ namespace Linko.LinkoExchange.Services.User
             //3. Find all regulator orgs (Authorities) of those orgs (Industries) (if exist)
             //4. Email all Authority Admin users of those org reg programs
             var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
-                                           .Where(o => o.UserProfileId == user.UserProfileId && !o.IsRemoved)
+                                           .Where(o => o.UserProfileId == user.UserProfileId && !o.IsRemoved && o.IsEnabled)
                                            .Select(o => o.OrganizationRegulatoryProgram);
 
             var contentReplacementsWithUserInfo = new Dictionary<string, string>
