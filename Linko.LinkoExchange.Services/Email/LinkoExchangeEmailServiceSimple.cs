@@ -161,9 +161,9 @@ namespace Linko.LinkoExchange.Services.Email
                                                       RecipientUserProfileId = userProfile.UserProfileId,
                                                       RecipientFirstName = userProfile.FirstName,
                                                       RecipientLastName = userProfile.LastName,
-                                                      RecipientOrganizationId = i.OrganizationRegulatoryProgramDto.OrganizationId,
-                                                      RecipientRegulatoryProgramId = i.OrganizationRegulatoryProgramId,
-                                                      RecipientRegulatorOrganizationId = i.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
+                                                      RecipientOrganizationId = i.OrganizationRegulatoryProgramDto?.OrganizationId,
+                                                      RecipientRegulatoryProgramId = i.OrganizationRegulatoryProgramDto?.RegulatoryProgramId,
+                                                      RecipientRegulatorOrganizationId = i.OrganizationRegulatoryProgramDto?.RegulatorOrganizationId
                                                   }).ToList();
         }
 
