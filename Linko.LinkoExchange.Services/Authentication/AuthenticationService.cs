@@ -341,7 +341,18 @@ namespace Linko.LinkoExchange.Services.Authentication
                     contentReplacements.Add(key:"supportPhoneNumber", value:supportPhoneNumber);
                     contentReplacements.Add(key:"supportEmail", value:supportEmail);
 
-                    var emailEntry = new EmailEntry
+                    //Need to send email for all valid associated org reg programs
+                    var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
+                                                    .Include(path: "OrganizationRegulatoryProgram")
+                                                    .Where(u => u.UserProfileId == applicationUser.UserProfileId
+                                                        && u.IsEnabled
+                                                        && !u.IsRemoved
+                                                        && u.OrganizationRegulatoryProgram.IsEnabled)
+                                                    .ToList();
+
+                    foreach (var actorProgramUser in orgRegProgUsers)
+                    {
+                        var emailEntry = new EmailEntry
                                      {
                                          EmailType = EmailType.Profile_PasswordChanged,
                                          ContentReplacements = contentReplacements,
@@ -349,26 +360,19 @@ namespace Linko.LinkoExchange.Services.Authentication
                                          RecipientUserName =  applicationUser.UserName,
                                          RecipientEmailAddress = applicationUser.Email,
                                          RecipientFirstName = applicationUser.FirstName,
-                                         RecipientLastName = applicationUser.LastName
-                                     };
+                                         RecipientLastName = applicationUser.LastName,
+                                         RecipientOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId,
+                                         RecipientRegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId,
+                                         RecipientRegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
+                        };
 
-                    var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId);
-                    if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
-                    {
-                        var currentOrganizationRegulatoryProgram =
-                            _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:int.Parse(s:currentOrganizationRegulatoryProgramId));
-                        emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId;
-                        emailEntry.RecipientRegulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId;
-                        emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId;
+                        emailEntries.Add(item:emailEntry);
                     }
 
-                    emailEntries.Add(item:emailEntry);
-
-                    //Cromerr
-                    //Need to log for all associated regulatory program orgs
-                    var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
-                                                    .Include(path:"OrganizationRegulatoryProgram")
-                                                    .Where(u => u.UserProfileId == applicationUser.UserProfileId).ToList();
+                    //
+                    //  Cromerr
+                    //  Need to log for all valid associated org reg programs
+                    //
                     foreach (var actorProgramUser in orgRegProgUsers)
                     {
                         _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user:actorProgramUser);
