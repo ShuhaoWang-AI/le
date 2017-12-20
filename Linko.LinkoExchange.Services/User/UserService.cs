@@ -1533,7 +1533,10 @@ namespace Linko.LinkoExchange.Services.User
             //4. Email all Authority Admin users of those org reg programs
             var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
                                            .Include(o => o.OrganizationRegulatoryProgram)
-                                           .Where(o => o.UserProfileId == user.UserProfileId && !o.IsRemoved && o.OrganizationRegulatoryProgram.IsEnabled)
+                                           .Where(o => o.UserProfileId == user.UserProfileId 
+                                                && !o.IsRemoved 
+                                                && o.IsEnabled
+                                                && o.OrganizationRegulatoryProgram.IsEnabled)
                                            .Select(o => o.OrganizationRegulatoryProgram);
 
             var contentReplacementsWithUserInfo = new Dictionary<string, string>
