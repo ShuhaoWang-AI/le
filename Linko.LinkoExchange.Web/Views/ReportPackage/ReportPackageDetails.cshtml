@@ -764,7 +764,7 @@
                                 allRequirementsPercentageMet = Convert.ToInt32((Convert.ToDecimal(totalIncludedCount) / Convert.ToDecimal(totalRequiredCount)) * 100);
                             }
                         }
-                        <span class="progress-text">@totalMissingCount of @totalRequiredCount parameters are missing expected samples</span>
+                        <span class="progress-text">@totalIncludedCount of @totalRequiredCount parameters have the expected # of samples</span>
                         <span class="progress-number">&nbsp;</span>
                         <div class="active progress progress-xs" style="height: 7px;">
                             <div class="progress-bar progress-bar-green" style="width:@(allRequirementsPercentageMet)%; background-color: #00a65a;"></div>
@@ -807,6 +807,9 @@
                             }
                         </tbody>
                     </table>
+                </div>
+                <div class="box-footer">
+                    * Expected # of Samples may be incorrect for weekly samples.
                 </div>
             </div>
         </div>
@@ -1356,7 +1359,7 @@
     }
 
     // Send to LinkoCTS
-    if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
+    if (Model.IsCurrentPortalAuthority && ((Model.Status == ReportStatusName.Submitted && Model.SubmissionReviewDateTimeLocal != null) || Model.Status == ReportStatusName.Repudiated))
     {
         <div class="box box-primary" id="divSendToLinkoCTS">
             <div class="box-header with-border">
