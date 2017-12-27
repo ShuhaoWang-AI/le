@@ -16,7 +16,6 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public string MethodDetectionLimit { get; set; }
         public string AnalysisMethod { get; set; }
         public string AnalysisDateTimeUtc { get; set; }
-        public string IsApprovedEPAMethod { get; set; }
         public string LimitBasis { get; set; }
 
         #endregion

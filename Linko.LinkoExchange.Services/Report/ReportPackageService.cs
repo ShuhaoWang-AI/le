@@ -304,7 +304,7 @@ namespace Linko.LinkoExchange.Services.Report
                              {
                                  XmlFileVersion = new XmlFileVersion
                                                   {
-                                                      VersionNumber = "1.0.0"
+                                                      VersionNumber = "1.0.1"
                                                   },
 
                                  ReportHeader = reportHeader,
@@ -428,7 +428,6 @@ namespace Linko.LinkoExchange.Services.Report
                                                    MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString() ?? "",
                                                    AnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrEmptyString(),
                                                    AnalysisDateTimeUtc = analysisDateTime,
-                                                   IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod ? "Yes" : "No",
                                                    LimitBasis = LimitBasisName.Concentration.ToString()
                                                };
 

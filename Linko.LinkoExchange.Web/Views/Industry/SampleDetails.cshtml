@@ -410,13 +410,6 @@
                         <th class="all"> Analysis Method </th>
                         <th class="all" style="min-width: 160px; width: 180px;"> Analysis Date & Time </th>
                         <th class="all" style="width: 50px;">
-                            EPA Method
-                            @if (!ViewBag.Readonly)
-                            {
-                                <input class='checkbox' id="EPAMethod" type='checkbox' />
-                            }
-                        </th>
-                        <th class="all" style="width: 50px;">
                             Calculate Loading
                             @if (!ViewBag.Readonly)
                             {
@@ -509,16 +502,6 @@
                                                                      {
                                                                          style = "width:100%; font-size:12px"
                                                                      }))
-                                }
-                            </td>
-                            <td>
-                                @if (sampleResult.IsApprovedEPAMethod)
-                                {
-                                    <input type='checkbox' class='checkbox' id="EPAMethod_@sampleResult.ParameterId" checked />
-                                }
-                                else
-                                {
-                                    <input type='checkbox' class='checkbox' id="EPAMethod_@sampleResult.ParameterId" />
                                 }
                             </td>
                             <td>
@@ -707,8 +690,6 @@
                                     sampleResult.UnitName = $("#UnitName_" + paramId).html();
                                     sampleResult
                                         .IsCalcMassLoading = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
-                                    sampleResult
-                                        .IsApprovedEPAMethod = $("#EPAMethod_" + paramId).iCheck('update')[0].checked;
                                     sampleResult.AnalysisDateTimeLocal = $("#AnalysisDateTime_" + paramId).val();
                                     sampleResult.AnalysisMethod = $("#AnalysisMethod_" + paramId).val();
                                     sampleResult.EnteredMethodDetectionLimit = $("#MDL_" + paramId).val();
@@ -775,14 +756,8 @@
                     $("input[type='text']").prop('readonly', true);
 
                     $("input[id^='CalcLoading_']").prop('disabled', true);
-                    $("input[id^='EPAMethod_']").prop('disabled', true);
 
                     //Need to reinitialize these checkboxes for some reason!
-                    $("input[id^='EPAMethod_']")
-                        .iCheck({
-                            checkboxClass: "icheckbox_minimal-blue"
-                        });
-            
                     $("input[id^='CalcLoading_']")
                         .iCheck({
                             checkboxClass: "icheckbox_minimal-blue"
@@ -837,10 +812,6 @@
                             clearIncomplete: true
                         });
 
-                    if ($("input[id^='EPAMethod_']").length > 0 && $("input[id^='EPAMethod_']:checked").length === $("input[id^='EPAMethod_']").length) {
-                        $("input[id='EPAMethod']").iCheck('check');
-                    }
-                    
                     if ($("input[id^='CalcLoading_']").length > 0 && $("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
                         $("input[id='CalcLoading']").iCheck('check');
                     }
@@ -980,30 +951,6 @@
                     var paramId = this.id.replace('Result_', '');
                     displayConcentrationCompliance(paramId);
                     displayMassLoading(paramId);
-                });
-
-            $(document)
-                .on('ifChecked', "input[id='EPAMethod']", function(event) {
-                    $("input[id^='EPAMethod_']").iCheck('check');
-                });
-
-            $(document)
-                .on('ifUnchecked', "input[id='EPAMethod']", function(event) {
-                    $("input[id^='EPAMethod_']").iCheck('uncheck');
-                });
-
-            $(document)
-                .on('ifChecked', "input[id^='EPAMethod_']", function(event) {
-                    if ($("input[id^='EPAMethod_']:checked").length === $("input[id^='EPAMethod_']").length) {
-                        $("input[id='EPAMethod']").iCheck('check');
-                    }
-                });
-
-            $(document)
-                .on('ifUnchecked', "input[id^='EPAMethod_']", function(event) {
-                    if ($("input[id^='EPAMethod_']:checked").length !== $("input[id^='EPAMethod_']").length) {
-                        $("input[id='EPAMethod']").iCheck('indeterminate');
-                    }
                 });
 
             $(document)
@@ -1221,27 +1168,23 @@
                         + value.Id
                         + '" style="width: 100%; font-size: 12px;"'
                         + 'autocomplete="false" />';
-                    data[7] =
-                        '<input type="checkbox" class="checkbox" id="EPAMethod_'
-                        + value.Id
-                        + '"/>';
 
                     if (value.IsCalcMassLoading) {
-                        data[8] =
+                        data[7] =
                             '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
                             + value.Id
                             + '" checked />';
                     } else {
-                        data[8] =
+                        data[7] =
                             '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
                             + value.Id
                             + '"/>';
                     }
-                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="" />';
-                    data[10] = $("#massResultAndComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
+                    data[8] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="" />';
+                    data[9] = $("#massResultAndComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
                         .html()
                         .replace(/{{parameterId}}/g, value.Id);
-                    data[11] = null;
+                    data[10] = null;
 
                     //console.debug("data : " + data);
 
@@ -1257,11 +1200,7 @@
                 });
 
                 // need to reinitialize iCheck otherwise newly added checkbox doesn't work
-                $("input[id^='EPAMethod_']")
-                    .iCheck({
-                        checkboxClass: "icheckbox_minimal-blue"
-                    });
-
+                
                 $("input[id^='CalcLoading_']")
                     .iCheck({
                         checkboxClass: "icheckbox_minimal-blue"
