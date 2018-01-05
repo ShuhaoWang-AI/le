@@ -772,40 +772,49 @@
                     </div>
                 </div>
                 <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0px 40px; display: none;">
-                    <table class="dataTable table table-bordered table-condensed table-striped text-center">
-                        <tbody>
-                            <tr>
-                                <th>Monitoring Point</th>
-                                <th>Parameter</th>
-                                <th>Progress</th>
-                                <th>Expected # of Samples</th>
-                                <th>Included # of Samples</th>
-                            </tr>
-
-                            @foreach (var samplingRequirement in Model.ReportSummaryViewModel.SamplingRequirementsItems)
-                            {
+                    @if (Model.ReportSummaryViewModel.SamplingRequirementsItems.Count > 0)
+                    {
+                        <table class="dataTable table table-bordered table-condensed table-striped text-center">
+                            <tbody>
                                 <tr>
-                                    <td>@(samplingRequirement.MonitoringPointName)</td>
-                                    <td>@(samplingRequirement.ParameterName)</td>
-                                    <td>
-                                        <div class="active progress progress-xs" style="height: 7px;">
-                                            @{
-                                                int requirementPercentageMet = Convert.ToInt32((Convert.ToDecimal(samplingRequirement.IncludedSampleCount) / Convert.ToDecimal(samplingRequirement.ExpectedSampleCount)) * 100);
-                                                if (samplingRequirement.IncludedSampleCount > samplingRequirement.ExpectedSampleCount)
-                                                {
-                                                    requirementPercentageMet = 100;
-                                                }
-
-                                            }
-                                            <div class="progress-bar progress-bar-green" style="width: @(requirementPercentageMet)%;background-color: #00a65a;"></div>
-                                        </div>
-                                    </td>
-                                    <td>@(samplingRequirement.ExpectedSampleCount)</td>
-                                    <td>@(samplingRequirement.IncludedSampleCount)</td>
+                                    <th>Monitoring Point</th>
+                                    <th>Parameter</th>
+                                    <th>Progress</th>
+                                    <th>Expected # of Samples</th>
+                                    <th>Included # of Samples</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+
+                                @foreach (var samplingRequirement in Model.ReportSummaryViewModel.SamplingRequirementsItems)
+                                {
+                                    <tr>
+                                        <td>@(samplingRequirement.MonitoringPointName)</td>
+                                        <td>@(samplingRequirement.ParameterName)</td>
+                                        <td>
+                                            <div class="active progress progress-xs" style="height: 7px;">
+                                                @{
+                                                    int requirementPercentageMet = Convert.ToInt32((Convert.ToDecimal(samplingRequirement.IncludedSampleCount) / Convert.ToDecimal(samplingRequirement.ExpectedSampleCount)) * 100);
+                                                    if (samplingRequirement.IncludedSampleCount > samplingRequirement.ExpectedSampleCount)
+                                                    {
+                                                        requirementPercentageMet = 100;
+                                                    }
+
+                                                }
+                                                <div class="progress-bar progress-bar-green" style="width: @(requirementPercentageMet)%; background-color: #00a65a;"></div>
+                                            </div>
+                                        </td>
+                                        <td>@(samplingRequirement.ExpectedSampleCount)</td>
+                                        <td>@(samplingRequirement.IncludedSampleCount)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>
+                            No sampling requirements found matching the Report Period Start and End Dates
+                        </p>
+                    }
                 </div>
                 <div class="box-footer">
                     * Expected # of Samples may be incorrect for weekly samples.
