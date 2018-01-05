@@ -850,7 +850,6 @@
                     var qualifier = $("#Qualifier_" + paramId).val();
                     var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
                     var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
-                    var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
                     var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
                     var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
 
@@ -870,7 +869,7 @@
 
                             $("#MassResult_" + paramId)
                                 .html(" "
-                                    + massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces)
+                                    + massLoadingValue
                                     + " "
                                     + massLoadingUnit);
                             //.css('color', 'green');
@@ -890,7 +889,7 @@
                             $("#MassResult_" + paramId)
                                 .html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
                                     + " "
-                                    + massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces)
+                                    + massLoadingValue
                                     + " "
                                     + massLoadingUnit);
                             //.css('color', 'green');
@@ -1364,11 +1363,14 @@
             if (concentrationMaxValue != null) {
                 if (concentrationMinValue != null) {
                     //range limit
-                    if (qualifier != "ND"
-                        && qualifier != "NF"
-                        && !isEmptyOrSpaces(result)
-                        && (result > concentrationMaxValue || result < concentrationMinValue)) {
+                    if (qualifier != "ND" && qualifier != "NF" && !isEmptyOrSpaces(result) 
+                            && ((qualifier == "<" && (result > concentrationMaxValue || result <= concentrationMinValue))
+                                || (qualifier == ">" && (result >= concentrationMaxValue || result < concentrationMinValue)) 
+                                || (result > concentrationMaxValue || result < concentrationMinValue))) //blank qualifier/exact value
+                    {
+
                         complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
+
                     } else {
                         
                         //If there's no result don't show compliance badge at all
@@ -1420,6 +1422,13 @@
             {
                 result = qualifier; //for display purposes only
             }
+            else
+            {
+                if (qualifier == ">" || qualifier == "<")
+                {
+                    result = qualifier + " " + result;
+                }
+            }
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
                 .html()
@@ -1444,6 +1453,7 @@
             var qualifier = $("#Qualifier_" + paramId).val();
             var massLoadingMaxValue = null;
             var massLoadingMinValue = null;
+            var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
 
             //find limit from global parameter JSON blob
             var allParameters = $.parseJSON($("#AllParameters").val());
@@ -1467,17 +1477,16 @@
             if (massLoadingMaxValue != null) {
                 if (massLoadingMinValue != null) {
                     //range limit
-                    if (qualifier != "ND"
-                        && qualifier != "NF"
-                        && (massLoadingValue > massLoadingMaxValue || massLoadingValue < massLoadingMinValue)) {
+                    if (qualifier != "ND" && qualifier != "NF"
+                        && ((isMassLoadingResultToUseLessThanSign && qualifier == "<" && massLoadingValue <= massLoadingMinValue) 
+                            || massLoadingValue > massLoadingMaxValue || massLoadingValue < massLoadingMinValue)) {
                         complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
                     } else {
                         complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
                     }
                 } else {
                     //max limit only
-                    if (qualifier != "ND"
-                        && qualifier != "NF"
+                    if (qualifier != "ND" && qualifier != "NF"
                         && massLoadingValue > massLoadingMaxValue) {
                         complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
                     } else {
@@ -1497,8 +1506,10 @@
             }
             else
             {
-                var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
-                massLoadingValue = massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces);
+                if (qualifier == "<" && isMassLoadingResultToUseLessThanSign)
+                {
+                    massLoadingValue = qualifier + " " + massLoadingValue;
+                }
             }
 
             complianceIconAndMessage = $(complianceTemplateToDisplay)
@@ -1548,6 +1559,9 @@
                 * massLoadingMultiplier
                 * flowUnitConversionFactor
                 * resultUnitConversionFactor;
+
+            var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+            massLoadingValue = massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces);
 
             return massLoadingValue;
         }
