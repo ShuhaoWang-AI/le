@@ -33,6 +33,8 @@
 
             <div class="box-tools pull-right">
                 
+                <input type="submit" id="btnCopySample" value="Copy Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"CopySample", controllerName:"Industry")" formmethod="post" />
+                
                 @switch (Model.SampleStatusName)
                 {
                     case SampleStatusName.Draft:

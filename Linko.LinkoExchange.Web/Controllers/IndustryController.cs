@@ -1134,6 +1134,37 @@ namespace Linko.LinkoExchange.Web.Controllers
                                         AllParameters = new List<ParameterViewModel>()
                                     };
 
+                    if (newSampleStep1ViewModel.IsClonedSample)
+                    {
+                        //
+                        // Cloning a sample, set copied parameters here
+                        //
+
+                        if (newSampleStep1ViewModel.SampleResults != null)
+                        {
+                            //Need to scrub sample results for any potential existing id's from copied sample
+                            foreach (var sampleResult in newSampleStep1ViewModel.SampleResults)
+                            {
+                                sampleResult.Id = null;
+                                sampleResult.MassLoadingSampleResultId = null;
+                            }
+
+                            viewModel.SampleResults = newSampleStep1ViewModel.SampleResults;
+                        }
+
+                        viewModel.CollectionMethodId = newSampleStep1ViewModel.CollectionMethodId;
+                        viewModel.LabSampleIdentifier = newSampleStep1ViewModel.LabSampleIdentifier;
+                        viewModel.CtsEventTypeId = newSampleStep1ViewModel.CtsEventTypeId;
+                        viewModel.FlowValue = newSampleStep1ViewModel.FlowValue;
+                        viewModel.FlowUnitId = newSampleStep1ViewModel.FlowUnitId;
+                        viewModel.FlowUnitValidValues = newSampleStep1ViewModel.FlowUnitValidValues;
+                    }
+                    else
+                    {
+                        viewModel.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
+                    }
+                    
+
                     viewModel.ResultQualifierValidValues = programSettings
                         .Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
                     viewModel.MassLoadingConversionFactorPounds =
@@ -1152,9 +1183,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                         .First()
                                                         .IfNullOrWhiteSpace(defaultValue:"true"));
 
-                    viewModel.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
-
                     AddAdditionalPropertyToSampleDetails(viewModel:viewModel);
+
+                    ViewBag.ShowSuccessMessage = TempData[key: "ShowSuccessMessage"] ?? false;
+                    ViewBag.SuccessMessage = TempData[key: "SuccessMessage"] ?? "";
 
                     return View(viewName:"SampleDetails", model:viewModel);
                 }
@@ -1308,6 +1340,47 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ModelState.Clear();
             return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        public ActionResult CopySample(SampleViewModel model, FormCollection collection)
+        {
+            var objJavascript = new JavaScriptSerializer();
+
+            model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input: collection[name: "FlowUnitValidValues"]);
+            model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input: HttpUtility.HtmlDecode(s: collection[name: "SampleResults"]));
+
+            // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
+            if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
+            {
+                ViewBag.Satus = "Edit";
+                AddAdditionalPropertyToSampleDetails(viewModel: model);
+                return View(viewName: "SampleDetails", model: model);
+            }
+
+            var viewModel = new NewSampleStep1ViewModel()
+            {
+                IsClonedSample = true,
+                StartDateTimeLocal = model.StartDateTimeLocal,
+                EndDateTimeLocal = model.EndDateTimeLocal,
+                SelectedMonitoringPointId = model.MonitoringPointId,
+                FlowUnitValidValues = model.FlowUnitValidValues,
+                SampleResults = model.SampleResults,
+                CollectionMethodId = model.CollectionMethodId,
+                LabSampleIdentifier = model.LabSampleIdentifier,
+                CtsEventTypeId = model.CtsEventTypeId,
+                FlowValue = model.FlowValue,
+                FlowUnitId = model.FlowUnitId
+            };
+
+
+            TempData[key: "NewSampleStep1ViewModel"] = viewModel;
+            TempData[key: "ShowSuccessMessage"] = true;
+            TempData[key: "SuccessMessage"] = "Sample was copied successfully!";
+
+            return RedirectToAction(actionName: "NewSampleDetailsStep2");
+
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]

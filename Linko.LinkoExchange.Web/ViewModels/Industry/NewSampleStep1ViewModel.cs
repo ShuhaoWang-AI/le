@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
@@ -23,6 +24,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "End Date")]
         public DateTime? EndDateTimeLocal { get; set; }
 
+        //
+        // Copied properties used when cloning a sample only
+        //
+        public bool IsClonedSample { get; set; }
+        public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
+        public IEnumerable<SampleResultViewModel> SampleResults { get; set; }
+        public int CollectionMethodId { get; set; }
+        public string LabSampleIdentifier { get; set; }
+        public int CtsEventTypeId { get; set; }
+        public string FlowValue { get; set; }
+        public int? FlowUnitId { get; set; }
         #endregion
     }
 
