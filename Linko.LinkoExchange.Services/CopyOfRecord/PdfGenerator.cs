@@ -267,7 +267,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     _pdfPage.Paragraphs.Add(paragraph:sampleResultsTable);
 
                     // Month, Parameter, result, MDL, Sample Start, Sample End, Collection Method, Lab SampleId, Analysis Method, EPA method, Analysis Data, Flow
-                    sampleResultsTable.ColumnWidths = "6% 19% 8.9% 8.9% 7.1% 7.1% 7.3% 7.8% 7.5% 5.3% 7.1% 8.0%";
+                    sampleResultsTable.ColumnWidths = "6.48% 19.48% 9.38% 9.38% 7.58% 7.58% 7.78% 8.28% 7.98% 7.58% 8.48%"; //needs to equal 100%
 
                     var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
                     foreach (var sampleMonitoringPointerGroup in sampleMonitoringPointerGroups)
@@ -333,7 +333,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.BackgroundColor = Color.LightGray;
             row.Border = tableOrder;
             var cell = row.Cells.Add(text:$"Monitoring Point:{monitoringPointName}");
-            cell.ColSpan = 12;
+            cell.ColSpan = 11;
 
             row = sampleResultsTable.Rows.Add();
             row.DefaultCellTextState = centerTextBoldSize10;
@@ -348,7 +348,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add(text:"Collection Method");
             row.Cells.Add(text:"Lab Sample ID");
             row.Cells.Add(text:"Analysis Method");
-            row.Cells.Add(text:"EPA Method");
             row.Cells.Add(text:"Analysis Date");
             row.Cells.Add(text:"Flow");
 
@@ -421,12 +420,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     row.Cells.Add(text:sampleResultExtension.Sample.CollectionMethodName, ts:centerTextSize8);
                     row.Cells.Add(text:sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), ts:centerTextSize8);
                     row.Cells.Add(text:sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), ts:centerTextSize8);
-                    var isEpaMethod = "No";
-                    if (sampleResultExtension.SampleResult.IsApprovedEPAMethod)
-                    {
-                        isEpaMethod = "Yes";
-                    }
-                    row.Cells.Add(text:isEpaMethod, ts:centerTextSize8);
                     var analysisDateTimeString = sampleResultExtension.SampleResult.AnalysisDateTimeLocal.HasValue
                                                      ? sampleResultExtension
                                                          .SampleResult.AnalysisDateTimeLocal.Value.ToString(format:"MM/dd/yyyy hh:mm tt").ToLower()
@@ -451,7 +444,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(text:sampleResultExtension.Sample.CollectionMethodName, ts:centerTextSize8);
                         row.Cells.Add(text:sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), ts:centerTextSize8);
                         row.Cells.Add(text:sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), ts:centerTextSize8);
-                        row.Cells.Add(text:isEpaMethod, ts:centerTextSize8);
                         row.Cells.Add(text:analysisDateTimeString, ts:centerTextSize8);
                         row.Cells.Add(text:$"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}",
                                       ts:rightTextSize8);
