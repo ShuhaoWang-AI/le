@@ -1109,7 +1109,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else
                 {
                     ModelState.Remove(key:"FailedCount");
-                    ModelState.AddModelError(key:"", errorMessage:@"Wrong Answer.");
+                    ModelState.AddModelError(key:"", errorMessage: @"The answer is incorrect. Please try again.");
                     ModelState.Remove(key:"Answer");
                     model.Answer = "";
                 }
@@ -1304,7 +1304,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else
                 {
                     ModelState.Remove(key:"FailedCount");
-                    ModelState.AddModelError(key:"", errorMessage:@"Wrong Answer.");
+                    ModelState.AddModelError(key:"", errorMessage: @"The answer is incorrect. Please try again.");
                     ModelState.Remove(key:"Answer");
                     model.Answer = "";
                 }
