@@ -309,7 +309,6 @@ namespace Linko.LinkoExchange.Services.Settings
                             if (Convert.ToInt32(value:setting.Value) < minValue)
                             {
                                 minValue = Convert.ToInt32(value:setting.Value);
-                                break;
                             }
                         }
 
@@ -324,7 +323,6 @@ namespace Linko.LinkoExchange.Services.Settings
                             if (Convert.ToInt32(value:setting.Value) > maxValue)
                             {
                                 maxValue = Convert.ToInt32(value:setting.Value);
-                                break;
                             }
                         }
 
@@ -438,7 +436,7 @@ namespace Linko.LinkoExchange.Services.Settings
             return GetMinOrganizationSettingValue(settingType:SettingType.FailedPasswordAttemptMaxCount, organizationSettings:organizationSettings, orgTypeName:orgTypeName);
         }
 
-        #endregion
+       #endregion
 
         internal void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {

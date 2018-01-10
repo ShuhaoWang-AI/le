@@ -1080,10 +1080,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:model.Id, answer:model.Answer.ToLower()))
             {
                 model.FailedCount++;
-                var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
                 var maxAnswerAttempts =
-                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.FailedKBQAttemptMaxCount));
-
+                    Convert.ToInt32(value: _settingService.GetOrganizationSettingValueByUserId(userProfileId: model.UserProfileId, settingType: SettingType.FailedKBQAttemptMaxCount,
+                                                                                               isChooseMin: true, isChooseMax: null));
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
                     // Lock the account; 
