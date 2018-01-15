@@ -488,16 +488,18 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        ///     Gets a collection of both static and dynamic Parameter Groups associated with a Monitoring Point and
-        ///     a Sample End Date/time (Local will get converted to UTC for comparison against database items)
+        ///     Gets a collection of both static and dynamic Parameter Groups associated with a Monitoring Point,
+        ///     a Sample End Date/time (Local will get converted to UTC for comparison against database items),
+        ///     and collection method.
         /// </summary>
         /// <param name="monitoringPointId"> Monitoring point that must be associated with a Sample </param>
         /// <param name="sampleEndDateTimeLocal">
         ///     Sample end date/time, once converted to UTC will be used to get monitoring point
         ///     specific parameter information if it falls between effective and retirement date/time values.
         /// </param>
+        /// <param name="collectionMethodId"> Used to further filter and obtain parameter groups related to a given collection method only.</param>
         /// <returns> Static and Dynamic Parameter Groups </returns>
-        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal)
+        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal, int collectionMethodId)
         {
             _logger.Info(message:$"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}");
 
@@ -528,6 +530,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             var uniqueCollectionMethodIds = _dbContext.SampleFrequencies
                                                       .Include(ss => ss.MonitoringPointParameter)
                                                       .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                                                   && ss.CollectionMethodId == collectionMethodId
                                                                    && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
                                                                    && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
                                                                    && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId

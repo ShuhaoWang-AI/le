@@ -61,15 +61,17 @@ namespace Linko.LinkoExchange.Services.Parameter
         void DeleteParameterGroup(int parameterGroupId);
 
         /// <summary>
-        ///     Gets a collection of both static and dynamic Parameter Groups associated with a Monitoring Point and
-        ///     a Sample End Date/time (Local will get converted to UTC for comparison against database items)
+        ///     Gets a collection of both static and dynamic Parameter Groups associated with a Monitoring Point,
+        ///     a Sample End Date/time (Local will get converted to UTC for comparison against database items),
+        ///     and collection method.
         /// </summary>
         /// <param name="monitoringPointId"> Monitoring point that must be associated with a Sample </param>
         /// <param name="sampleEndDateTimeLocal">
         ///     Sample end date/time, once converted to UTC will be used to get monitoring point
         ///     specific parameter information if it falls between effective and retirement date/time values.
         /// </param>
+        /// <param name="collectionMethodId"> Used to further filter and obtain parameter groups related to a given collection method only.</param>
         /// <returns> Static and Dynamic Parameter Groups </returns>
-        IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal);
+        IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal, int collectionMethodId);
     }
 }

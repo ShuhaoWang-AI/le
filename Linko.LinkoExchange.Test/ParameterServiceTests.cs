@@ -278,7 +278,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetAllParameterGroups_Test()
         {
-            var resultDtos = _paramService.GetAllParameterGroups(monitoringPointId:129, sampleEndDateTimeLocal:new DateTime(year:1997, month:3, day:31));
+            var resultDtos = _paramService.GetAllParameterGroups(monitoringPointId:129, sampleEndDateTimeLocal:new DateTime(year:1997, month:3, day:31), collectionMethodId: 1);
         }
 
         [TestMethod]

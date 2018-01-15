@@ -1386,19 +1386,29 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult GetParameterGroupsForSample(int monitoringPointId, DateTime endDateTime)
+        public ActionResult GetParameterGroupsForSample(int monitoringPointId, DateTime endDateTime, int collectionMethodId)
         {
             try
             {
-                var parameterGroups =
-                    _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:endDateTime)
-                                     .Select(c => new ParameterGroupViewModel
-                                                  {
-                                                      Id = c.ParameterGroupId,
-                                                      Name = c.Name,
-                                                      Description = c.Description,
-                                                      ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
-                                                  }).OrderBy(c => c.Name).ToList();
+                List<ParameterGroupViewModel> parameterGroups;
+                if (monitoringPointId > 0 && collectionMethodId > 0)
+                {
+                    parameterGroups =
+                        _parameterService.GetAllParameterGroups(monitoringPointId: monitoringPointId,
+                                                                sampleEndDateTimeLocal: endDateTime,
+                                                                collectionMethodId: collectionMethodId)
+                                         .Select(c => new ParameterGroupViewModel
+                                                      {
+                                                          Id = c.ParameterGroupId,
+                                                          Name = c.Name,
+                                                          Description = c.Description,
+                                                          ParameterIds = string.Join(separator: ",", values: c.Parameters.Select(p => p.ParameterId).ToList())
+                                                      }).OrderBy(c => c.Name).ToList();
+                }
+                else
+                {
+                    parameterGroups = new List<ParameterGroupViewModel>();
+                }
 
                 var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:endDateTime)
                                                      .Select(c => new ParameterViewModel
@@ -1580,15 +1590,25 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void AddAdditionalPropertyToSampleDetails(SampleViewModel viewModel)
         {
-            viewModel.ParameterGroups =
-                _parameterService.GetAllParameterGroups(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeLocal:viewModel.EndDateTimeLocal)
-                                 .Select(c => new ParameterGroupViewModel
-                                              {
-                                                  Id = c.ParameterGroupId,
-                                                  Name = c.Name,
-                                                  Description = c.Description,
-                                                  ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
-                                              }).OrderBy(c => c.Name).ToList();
+            if (viewModel.CollectionMethodId > 0)
+            {
+                viewModel.ParameterGroups =
+                    _parameterService.GetAllParameterGroups(monitoringPointId: viewModel.MonitoringPointId, 
+                    sampleEndDateTimeLocal: viewModel.EndDateTimeLocal,
+                    collectionMethodId: viewModel.CollectionMethodId)
+                                     .Select(c => new ParameterGroupViewModel
+                                                  {
+                                                      Id = c.ParameterGroupId,
+                                                      Name = c.Name,
+                                                      Description = c.Description,
+                                                      ParameterIds = string.Join(separator: ",", values: c.Parameters.Select(p => p.ParameterId).ToList())
+                                                  }).OrderBy(c => c.Name).ToList();
+            }
+            else
+            {
+                viewModel.ParameterGroups = new List<ParameterGroupViewModel>();
+            }
+            
 
             viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
                                                                                                      {
