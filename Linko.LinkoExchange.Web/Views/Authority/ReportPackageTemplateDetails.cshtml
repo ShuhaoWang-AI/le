@@ -108,7 +108,7 @@
                                                                    {
                                                                        @class = "control-label col-md-2 required"
                                                                    })
-                <div class="col-md-7">
+                <div class="col-md-6">
                     @Html.EditorFor(model => model.Name, additionalViewData:new
                                                                             {
                                                                                 htmlAttributes = new
@@ -127,11 +127,12 @@
                         <i class="fa fa-info-circle fa-lg"></i>
                     </button>
                 </div>
-
+                
                 @Html.LabelFor(model => model.IsActive, htmlAttributes:new
                                                                        {
-                                                                           @class = "control-label col-md-1"
+                                                                           @class = "control-label col-md-2"
                                                                        })
+                
                 <div class="col-md-1">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsActive)
@@ -145,7 +146,7 @@
                                                                           {
                                                                               @class = "control-label col-md-2"
                                                                           })
-                <div class="col-md-7">
+                <div class="col-md-6">
                     @Html.EditorFor(model => model.Description, additionalViewData:new
                                                                                    {
                                                                                        htmlAttributes = new
@@ -158,12 +159,12 @@
                 </div>
                 
                 <div class="col-md-1"></div>
-                
                 @Html.LabelFor(model => model.IsSubmissionBySignatoryRequired, htmlAttributes:new
                                                                                               {
-                                                                                                  @class = "control-label col-md-1",
+                                                                                                  @class = "control-label col-md-2",
                                                                                                   @style="white-space:nowrap"
                                                                                               })
+                
                 <div class="col-md-1">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsSubmissionBySignatoryRequired)
