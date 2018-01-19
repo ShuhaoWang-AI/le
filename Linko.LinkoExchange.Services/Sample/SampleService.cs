@@ -964,17 +964,16 @@ namespace Linko.LinkoExchange.Services.Sample
                 .Include(sr => sr.MonitoringPointParameter)
                 .Include(sr => sr.MonitoringPointParameter.MonitoringPoint)
                 .Include(sr => sr.MonitoringPointParameter.Parameter)
-                .Where(sr => DbFunctions.TruncateTime(sr.PeriodStartDateTime) == DbFunctions.TruncateTime(startDate)
-                            && DbFunctions.TruncateTime(sr.PeriodEndDateTime) == DbFunctions.TruncateTime(endDate)
-                            && sr.ByOrganizationRegulatoryProgramId == orgRegProgramId)
+                .Where(sr => sr.ByOrganizationRegulatoryProgramId == orgRegProgramId &&
+                            ((DbFunctions.TruncateTime(sr.PeriodStartDateTime) >= DbFunctions.TruncateTime(startDate) && (DbFunctions.TruncateTime(sr.PeriodStartDateTime) <= DbFunctions.TruncateTime(endDate)))
+                            ||
+                            (DbFunctions.TruncateTime(sr.PeriodEndDateTime) >= DbFunctions.TruncateTime(startDate) && (DbFunctions.TruncateTime(sr.PeriodEndDateTime) <= DbFunctions.TruncateTime(endDate)))))
                 .GroupBy(sr => new
                 {
                     sr.MonitoringPointParameter.MonitoringPointId,
                     MonitoringPointName = sr.MonitoringPointParameter.MonitoringPoint.Name,
                     sr.MonitoringPointParameter.ParameterId,
-                    ParameterName = sr.MonitoringPointParameter.Parameter.Name,
-                    sr.PeriodStartDateTime,
-                    sr.PeriodEndDateTime
+                    ParameterName = sr.MonitoringPointParameter.Parameter.Name
                 })
                 .Select(consolidatedRequirement => new SampleRequirementDto()
                 {
