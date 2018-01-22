@@ -1379,7 +1379,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             TempData[key: "NewSampleStep1ViewModel"] = viewModel;
             TempData[key: "ShowSuccessMessage"] = true;
-            TempData[key: "SuccessMessage"] = "Sample was copied successfully!";
+            TempData[key: "SuccessMessage"] = "Sample was successfully copied and is displayed below. Please update accordingly.";
 
             return RedirectToAction(actionName: "NewSampleDetailsStep2");
 
