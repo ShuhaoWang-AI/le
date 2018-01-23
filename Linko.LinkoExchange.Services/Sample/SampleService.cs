@@ -1202,6 +1202,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
                 concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
+                concentrationResultRowToUpdate.IsApprovedEPAMethod = true;
 
                 //this is always persisted with the concentration result NOT the mass loading result
                 concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = sampleResultDto.IsCalcMassLoading;
@@ -1239,6 +1240,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
                     massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                     massResultRowToUpdate.LastModifierUserId = currentUserId;
+                    massResultRowToUpdate.IsApprovedEPAMethod = true;
                 }
             }
 
