@@ -122,7 +122,7 @@
                                                                                                              @class = "text-danger"
                                                                                                          })
                 </div>
-                <div class="col-md-1" style="padding-left: 0px;">
+                <div class="col-md-1" style="padding-left: 0px; max-width: 50px;">
                     <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="The Industry sees this Name and Description. It should describe the report." type="button">
                         <i class="fa fa-info-circle fa-lg"></i>
                     </button>
@@ -130,10 +130,11 @@
                 
                 @Html.LabelFor(model => model.IsActive, htmlAttributes:new
                                                                        {
-                                                                           @class = "control-label col-md-2"
+                                                                           @class = "control-label col-md-2",
+                                                                           style = "max-width: 160px"
                                                                        })
                 
-                <div class="col-md-1">
+                <div class="col-md-1" style="min-width: 73px;">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsActive)
                     </div>
@@ -158,14 +159,14 @@
                                                                                    })
                 </div>
                 
-                <div class="col-md-1"></div>
+                <div class="col-md-1" style="max-width: 50px;"></div>
                 @Html.LabelFor(model => model.IsSubmissionBySignatoryRequired, htmlAttributes:new
                                                                                               {
                                                                                                   @class = "control-label col-md-2",
-                                                                                                  @style="white-space:nowrap"
+                                                                                                  style="white-space:nowrap; max-width: 160px"
                                                                                               })
                 
-                <div class="col-md-1">
+                <div class="col-md-1" style="min-width: 73px;padding-right:0">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsSubmissionBySignatoryRequired)
                         <span style="padding-left: 15px;">
