@@ -370,7 +370,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             //
             //  Sampling Requirements Summary
             //
-            var sampleRequirementsDtos = _sampleService.GetSampleRequirements(reportPackageViewModel.PeriodStartDateTimeLocal, reportPackageViewModel.PeriodStartDateTimeLocal, reportPackageViewModel.OrganizationRegulatoryProgramId);
+            var sampleRequirementsDtos = _sampleService.GetSampleRequirements(reportPackageViewModel.PeriodStartDateTimeLocal, reportPackageViewModel.PeriodEndDateTimeLocal, reportPackageViewModel.OrganizationRegulatoryProgramId);
             foreach (var sampleRequirementDto in sampleRequirementsDtos.OrderBy(sr => sr.MonitoringPointName).ThenBy(sr => sr.ParameterName))
             {
                 //Need to count the number of results for this parameter at this monitoring point
