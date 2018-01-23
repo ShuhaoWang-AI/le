@@ -1367,7 +1367,9 @@
     }
 
     // Send to LinkoCTS
-    if (Model.IsCurrentPortalAuthority && ((Model.Status == ReportStatusName.Submitted && Model.SubmissionReviewDateTimeLocal != null) || Model.Status == ReportStatusName.Repudiated))
+    if (Model.IsCurrentPortalAuthority && 
+        (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated) && 
+        Model.SubmissionReviewDateTimeLocal != null)
     {
         <div class="box box-primary" id="divSendToLinkoCTS">
             <div class="box-header with-border">
