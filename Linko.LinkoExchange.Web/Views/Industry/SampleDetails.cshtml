@@ -1229,9 +1229,9 @@
                 });
 
             $("#StartDateTimeLocal")
-                .on("change", function() {
-                    $("#StartDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
-                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+                .on("change", function() 
+                {
+                    ReloadParameterGroups();
                 });
 
             $("#EndDateTimeLocal")
@@ -1253,16 +1253,22 @@
 
             function ReloadParameterGroups()
             {
+                //Start date
+                $("#StartDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
+                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+
+                //End date
                 $("#EndDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                 $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
-                if ($('#EndDateTimeLocal').val() == "" || $('#CollectionMethodId').val() < 1)
+                if ($('#StartDateTimeLocal').val() == "" || $('#EndDateTimeLocal').val() == "" || $('#CollectionMethodId').val() < 1)
                 {
                     return;
                 }
 
                 var viewModel = {};
                 viewModel.monitoringPointId = $('#MonitoringPointId').val();
+                viewModel.startDateTime = $('#StartDateTimeLocal').val();
                 viewModel.endDateTime = $('#EndDateTimeLocal').val();
                 viewModel.collectionMethodId = $('#CollectionMethodId').val();
 

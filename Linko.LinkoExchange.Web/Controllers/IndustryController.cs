@@ -1386,16 +1386,29 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult GetParameterGroupsForSample(int monitoringPointId, DateTime endDateTime, int collectionMethodId)
+        public ActionResult GetParameterGroupsForSample(int monitoringPointId, 
+            DateTime startDateTime, DateTime endDateTime, int collectionMethodId)
         {
             try
             {
+                var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+                var complianceDeterminationDate = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.ComplianceDeterminationDate);
+                DateTime sampleDateTimeLocal;
+                if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
+                {
+                    sampleDateTimeLocal = startDateTime;
+                }
+                else
+                {
+                    sampleDateTimeLocal = endDateTime;
+                }
+
                 List<ParameterGroupViewModel> parameterGroups;
                 if (monitoringPointId > 0 && collectionMethodId > 0)
                 {
                     parameterGroups =
                         _parameterService.GetAllParameterGroups(monitoringPointId: monitoringPointId,
-                                                                sampleEndDateTimeLocal: endDateTime,
+                                                                sampleDateTimeLocal: sampleDateTimeLocal,
                                                                 collectionMethodId: collectionMethodId)
                                          .Select(c => new ParameterGroupViewModel
                                                       {
@@ -1410,7 +1423,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     parameterGroups = new List<ParameterGroupViewModel>();
                 }
 
-                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:endDateTime)
+                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal)
                                                      .Select(c => new ParameterViewModel
                                                                   {
                                                                       Id = c.ParameterId,
@@ -1590,11 +1603,23 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void AddAdditionalPropertyToSampleDetails(SampleViewModel viewModel)
         {
+            var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var complianceDeterminationDate = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.ComplianceDeterminationDate);
+            DateTime sampleDateTimeLocal;
+            if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
+            {
+                sampleDateTimeLocal = viewModel.StartDateTimeLocal;
+            }
+            else
+            {
+                sampleDateTimeLocal = viewModel.EndDateTimeLocal;
+            }
+
             if (viewModel.CollectionMethodId > 0)
             {
                 viewModel.ParameterGroups =
-                    _parameterService.GetAllParameterGroups(monitoringPointId: viewModel.MonitoringPointId, 
-                    sampleEndDateTimeLocal: viewModel.EndDateTimeLocal,
+                    _parameterService.GetAllParameterGroups(monitoringPointId: viewModel.MonitoringPointId,
+                    sampleDateTimeLocal: sampleDateTimeLocal,
                     collectionMethodId: viewModel.CollectionMethodId)
                                      .Select(c => new ParameterGroupViewModel
                                                   {
@@ -1656,7 +1681,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Sample Type", Value = "0", Disabled = true});
 
-            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeLocal:viewModel.EndDateTimeLocal)
+            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal)
                                                        .Select(c => new ParameterViewModel
                                                                     {
                                                                         Id = c.ParameterId,

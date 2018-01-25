@@ -120,13 +120,13 @@ namespace Linko.LinkoExchange.Services.Parameter
         ///     Optional Monitoring Point parameter must be combined with the other
         ///     optional parameter "sampleEndDateTimeUtc"
         /// </param>
-        /// <param name="sampleEndDateTimeLocal">
-        ///     If monitoring point and sample end date/time are passed in,
+        /// <param name="sampleDateTimeLocal">
+        ///     If monitoring point and sample date/time are passed in,
         ///     default unit gets overridden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///     for each child parameter that is associated with the monitoring point and effective date range.
         /// </param>
         /// <returns> A parameter group with children parameters some with potentially overridden default units </returns>
-        public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null)
+        public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTime? sampleDateTimeLocal = null)
         {
             var monitoringPointIdString = monitoringPointId?.ToString() ?? "null";
 
@@ -157,9 +157,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                 //If monitoring point and sample end datetime is passed in,
                 //get Unit and Calc mass data if this parameter is associated with the monitoring point
                 //and effective date range.
-                if (monitoringPointId.HasValue && sampleEndDateTimeLocal.HasValue)
+                if (monitoringPointId.HasValue && sampleDateTimeLocal.HasValue)
                 {
-                    UpdateParameterForMonitoringPoint(paramDto:ref dto, monitoringPointId:monitoringPointId.Value, sampleEndDateTimeLocal:sampleEndDateTimeLocal.Value);
+                    UpdateParameterForMonitoringPoint(paramDto:ref dto, monitoringPointId:monitoringPointId.Value, sampleDateTimeLocal: sampleDateTimeLocal.Value);
                 }
 
                 dto.LastModificationDateTimeLocal = _timeZoneService
@@ -191,14 +191,14 @@ namespace Linko.LinkoExchange.Services.Parameter
         ///     Optional Monitoring Point parameter must be combined with the other
         ///     optional parameter "sampleEndDateTimeUtc"
         /// </param>
-        /// <param name="sampleEndDateTimeLocal">
-        ///     If monitoring point and sample end date/time are passed in,
+        /// <param name="sampleDateTimeLocal">
+        ///     If monitoring point and sample date/time are passed in,
         ///     default unit gets overridden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///     for each child parameter that is associated with the monitoring point and effective date range.
         /// </param>
         /// <param name="isGetActiveOnly"> True when being called by IU for use in Sample creation. False when being called by Authority </param>
         /// <returns> Collection of parameter groups with children parameters some with potentially overridden default units </returns>
-        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null, bool? isGetActiveOnly = null)
+        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTime? sampleDateTimeLocal = null, bool? isGetActiveOnly = null)
         {
             var monitoringPointIdString = monitoringPointId?.ToString() ?? "null";
 
@@ -229,13 +229,13 @@ namespace Linko.LinkoExchange.Services.Parameter
                 //If monitoring point and sample end datetime is passed in,
                 //get Unit and Calc mass data if this parameter is associated with the monitoring point
                 //and effective date range.
-                if (monitoringPointId.HasValue && sampleEndDateTimeLocal.HasValue)
+                if (monitoringPointId.HasValue && sampleDateTimeLocal.HasValue)
                 {
                     for (var paramIndex = 0; paramIndex < paramGroupDto.Parameters.Count; paramIndex++)
                     {
                         var paramDto = paramGroupDto.Parameters.ElementAt(index:paramIndex);
                         UpdateParameterForMonitoringPoint(paramDto:ref paramDto, monitoringPointId:monitoringPointId.Value,
-                                                          sampleEndDateTimeLocal:sampleEndDateTimeLocal.Value); // TODO: Need to reduce DB call inside the function
+                                                          sampleDateTimeLocal: sampleDateTimeLocal.Value); // TODO: Need to reduce DB call inside the function
                     }
                 }
 
@@ -493,15 +493,15 @@ namespace Linko.LinkoExchange.Services.Parameter
         ///     and collection method.
         /// </summary>
         /// <param name="monitoringPointId"> Monitoring point that must be associated with a Sample </param>
-        /// <param name="sampleEndDateTimeLocal">
-        ///     Sample end date/time, once converted to UTC will be used to get monitoring point
+        /// <param name="sampleDateTimeLocal">
+        ///     Sample date/time, once converted to UTC will be used to get monitoring point
         ///     specific parameter information if it falls between effective and retirement date/time values.
         /// </param>
         /// <param name="collectionMethodId"> Used to further filter and obtain parameter groups related to a given collection method only.</param>
         /// <returns> Static and Dynamic Parameter Groups </returns>
-        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal, int collectionMethodId)
+        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleDateTimeLocal, int collectionMethodId)
         {
-            _logger.Info(message:$"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}");
+            _logger.Info(message:$"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleDateTimeLocal={sampleDateTimeLocal}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
@@ -511,14 +511,14 @@ namespace Linko.LinkoExchange.Services.Parameter
              var authorityOrganizationId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
                                                  .OrganizationId;
             //Static Groups
-            var parameterGroupDtos = GetStaticParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal, isGetActiveOnly:true).ToList();
+            var parameterGroupDtos = GetStaticParameterGroups(monitoringPointId:monitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal, isGetActiveOnly:true).ToList();
 
             //Add Dynamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
                                                      .Include(ss => ss.MonitoringPointParameter)
                                                      .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
-                                                                  && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                                  && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+                                                                  && ss.MonitoringPointParameter.EffectiveDateTime <= sampleDateTimeLocal
+                                                                  && ss.MonitoringPointParameter.RetirementDateTime >= sampleDateTimeLocal
                                                                   && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
                                                                   && ss.CollectionMethod.OrganizationId == authorityOrganizationId
                                                                   // ReSharper disable once ArgumentsStyleNamedExpression
@@ -531,8 +531,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                                       .Include(ss => ss.MonitoringPointParameter)
                                                       .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                                                    && ss.CollectionMethodId == collectionMethodId
-                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleDateTimeLocal
+                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleDateTimeLocal
                                                                    && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
                                                                    && ss.CollectionMethod.OrganizationId == authorityOrganizationId
                                                                    )  
@@ -561,8 +561,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                                       .Include(ss => ss.CollectionMethod)
                                                       .Include(ss => ss.MonitoringPointParameter.Parameter)
                                                       .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
-                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+                                                                   && ss.MonitoringPointParameter.EffectiveDateTime <= sampleDateTimeLocal
+                                                                   && ss.MonitoringPointParameter.RetirementDateTime >= sampleDateTimeLocal
                                                                    && ss.IUSampleFrequency == freq
                                                                    && ss.CollectionMethodId == collectMethodId
                                                                    && ss.CollectionMethod.IsRemoved == false
@@ -574,7 +574,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     foreach (var parameter in freqCollectParams.ToList())
                     {
                         var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter:parameter);
-                        UpdateParameterForMonitoringPoint(paramDto:ref paramDto, monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal);
+                        UpdateParameterForMonitoringPoint(paramDto:ref paramDto, monitoringPointId:monitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal);
 
                         dynamicFreqAndCollectMethodParamGroup.Parameters.Add(item:paramDto);
                     }
@@ -599,8 +599,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                               .Include(ss => ss.CollectionMethod)
                                               .Include(ss => ss.MonitoringPointParameter.Parameter)
                                               .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
-                                                           && ss.MonitoringPointParameter.EffectiveDateTime <= sampleEndDateTimeLocal
-                                                           && ss.MonitoringPointParameter.RetirementDateTime >= sampleEndDateTimeLocal
+                                                           && ss.MonitoringPointParameter.EffectiveDateTime <= sampleDateTimeLocal
+                                                           && ss.MonitoringPointParameter.RetirementDateTime >= sampleDateTimeLocal
                                                            && ss.CollectionMethodId == collectMethodId
                                                            && ss.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgram.RegulatorOrganizationId == authorityOrganizationId
                                                            && ss.CollectionMethod.IsRemoved == false
@@ -612,7 +612,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 foreach (var parameter in collectParams)
                 {
                     var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter:parameter);
-                    UpdateParameterForMonitoringPoint(paramDto:ref paramDto, monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:sampleEndDateTimeLocal);
+                    UpdateParameterForMonitoringPoint(paramDto:ref paramDto, monitoringPointId:monitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal);
 
                     dynamicAllCollectMethodParamGroup.Parameters.Add(item:paramDto);
                 }
@@ -622,7 +622,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             }
 
             _logger.Info(message:
-                         $"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}, parameterGroupDtos.Count={parameterGroupDtos.Count()}");
+                         $"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleDateTimeLocal={sampleDateTimeLocal}, parameterGroupDtos.Count={parameterGroupDtos.Count()}");
 
             return parameterGroupDtos;
         }
@@ -635,8 +635,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// </summary>
         /// <param name="paramDto"></param>
         /// <param name="monitoringPointId"></param>
-        /// <param name="sampleEndDateTimeLocal"></param>
-        private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleEndDateTimeLocal)
+        /// <param name="sampleDateTimeLocal"></param>
+        private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleDateTimeLocal)
         {
             var parameterId = paramDto.ParameterId;
 
@@ -647,8 +647,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Include(mppl => mppl.DefaultUnit)
                 .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
                     && mppl.ParameterId == parameterId
-                    && mppl.EffectiveDateTime <= sampleEndDateTimeLocal
-                    && mppl.RetirementDateTime >= sampleEndDateTimeLocal);
+                    && mppl.EffectiveDateTime <= sampleDateTimeLocal
+                    && mppl.RetirementDateTime >= sampleDateTimeLocal);
 
             if (foundMonitoringPointParameter?.DefaultUnit != null)
             {

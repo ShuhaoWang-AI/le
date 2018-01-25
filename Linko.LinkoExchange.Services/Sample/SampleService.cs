@@ -442,17 +442,13 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 //Check which date to use for compliance checking
                 var complianceDeterminationDate = _settings.GetOrgRegProgramSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.ComplianceDeterminationDate);
-                if (complianceDeterminationDate == ComplianceDeterminationDate.EndDateSampled.ToString())
-                {
-                    sampleDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.EndDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
-                }
-                else if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
+                if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
                 {
                     sampleDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.StartDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
                 }
                 else
                 {
-                    throw new Exception($"ERROR: Unrecognized org reg program setting value for 'ComplianceDeterminationDate' of '{complianceDeterminationDate}' for authority of org reg program: {sample.ByOrganizationRegulatoryProgramId}");
+                    sampleDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(sample.EndDateTimeUtc.UtcDateTime, sample.ByOrganizationRegulatoryProgramId);
                 }
 
                 foreach (var sampleResult in sample.SampleResults)
