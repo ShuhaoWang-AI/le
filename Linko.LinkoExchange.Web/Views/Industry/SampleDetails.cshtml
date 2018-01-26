@@ -1547,9 +1547,11 @@
             var sampleFlowResult = parseFloat($("#FlowValue").val());
             var flowUnitId = $("#FlowUnitId option:selected").val();
             var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+            var massResult = $("#MassResult_" + paramId).html();
 
             //if no valid result OR not calc mass loading OR valid flow value/unit
-            if (isNaN(result) || //no valid result
+            if (massResult == "" ||
+                isNaN(result) || //no valid result
                 !clChecked || //haven't checked isCalcMassLoading
                 (isNaN(sampleFlowResult) || flowUnitId < 1)) //no flow result value or unit
             {
