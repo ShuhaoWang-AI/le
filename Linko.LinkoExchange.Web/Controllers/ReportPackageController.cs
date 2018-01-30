@@ -845,61 +845,58 @@ namespace Linko.LinkoExchange.Web.Controllers
             var isValid = true;
             try
             {
-                if (model.IsSubmissionBySignatoryRequired)
+                if (model.Password == null || model.Password.Trim().Length == 0)
                 {
-                    if (model.Password == null || model.Password.Trim().Length == 0)
+                    ModelState.AddModelError(key: "Password", errorMessage: @"Password is required.");
+                    isValid = false;
+                    ViewBag.ShowRepudiateValidationErrorMessage = true;
+                }
+
+                if (model.Answer == null || model.Answer.Trim().Length == 0)
+                {
+                    ModelState.AddModelError(key: "Answer", errorMessage: @"KBQ answer is required.");
+                    isValid = false;
+                    ViewBag.ShowRepudiateValidationErrorMessage = true;
+                }
+
+                if (isValid)
+                {
+                    var failedCountPassword = model.FailedCountPassword;
+                    var failedCountKbq = model.FailedCountKbq;
+                    var result = _authenticationService.ValidatePasswordAndKbq(
+                                                                               password: model.Password,
+                                                                               userQuestionAnswerId: model.QuestionAnswerId,
+                                                                               kbqAnswer: model.Answer,
+                                                                               failedPasswordCount: failedCountPassword,
+                                                                               failedKbqCount: failedCountKbq,
+                                                                               reportOperation: ReportOperation.Repudiation,
+                                                                               reportPackageId: id);
+
+                    ModelState.Remove(key: "FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
+                    ModelState.Remove(key: "FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
+
+                    switch (result.PasswordAndKbqValidationResult)
                     {
-                        ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
-                        isValid = false;
-                        ViewBag.ShowRepudiateValidationErrorMessage = true;
-                    }
-
-                    if (model.Answer == null || model.Answer.Trim().Length == 0)
-                    {
-                        ModelState.AddModelError(key:"Answer", errorMessage:@"KBQ answer is required.");
-                        isValid = false;
-                        ViewBag.ShowRepudiateValidationErrorMessage = true;
-                    }
-
-                    if (isValid)
-                    {
-                        var failedCountPassword = model.FailedCountPassword;
-                        var failedCountKbq = model.FailedCountKbq;
-                        var result = _authenticationService.ValidatePasswordAndKbq(
-                                                                                   password:model.Password,
-                                                                                   userQuestionAnswerId:model.QuestionAnswerId,
-                                                                                   kbqAnswer:model.Answer,
-                                                                                   failedPasswordCount:failedCountPassword,
-                                                                                   failedKbqCount:failedCountKbq,
-                                                                                   reportOperation:ReportOperation.Repudiation,
-                                                                                   reportPackageId:id);
-
-                        ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
-                        ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
-
-                        switch (result.PasswordAndKbqValidationResult)
-                        {
-                            case PasswordAndKbqValidationResult.Success: break;
-                            case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
-                                isValid = false;
-                                model.FailedCountPassword = failedCountPassword;
-                                model.FailedCountKbq = failedCountKbq + 1;
-                                ViewBag.ShowRepudiateValidationErrorMessage = true;
-                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
-                                break;
-                            case PasswordAndKbqValidationResult.InvalidPassword:
-                                isValid = false;
-                                model.FailedCountPassword = failedCountPassword + 1;
-                                model.FailedCountKbq = failedCountKbq;
-                                ViewBag.ShowRepudiateValidationErrorMessage = true;
-                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
-                                break;
-                            case PasswordAndKbqValidationResult.UserLocked_KBQ:
-                            case PasswordAndKbqValidationResult.UserLocked_Password:
-                                TempData[key: "RegulatoryList"] = result.RegulatoryList;
-                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
-                            default: throw new ArgumentOutOfRangeException();
-                        }
+                        case PasswordAndKbqValidationResult.Success: break;
+                        case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
+                            isValid = false;
+                            model.FailedCountPassword = failedCountPassword;
+                            model.FailedCountKbq = failedCountKbq + 1;
+                            ViewBag.ShowRepudiateValidationErrorMessage = true;
+                            ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
+                            break;
+                        case PasswordAndKbqValidationResult.InvalidPassword:
+                            isValid = false;
+                            model.FailedCountPassword = failedCountPassword + 1;
+                            model.FailedCountKbq = failedCountKbq;
+                            ViewBag.ShowRepudiateValidationErrorMessage = true;
+                            ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is incorrect. Please try again.";
+                            break;
+                        case PasswordAndKbqValidationResult.UserLocked_KBQ:
+                        case PasswordAndKbqValidationResult.UserLocked_Password:
+                            TempData[key: "RegulatoryList"] = result.RegulatoryList;
+                            return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
+                        default: throw new ArgumentOutOfRangeException();
                     }
                 }
             }
