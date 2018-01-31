@@ -390,7 +390,7 @@
                                       columns.Bound(c => c.MassLoadingValue)
                                               .HtmlAttributes(attributes: new {align = "right"})
                                               .ClientTemplate(value:
-                                                            "\\#if(IsCalcMassLoading==0) { \\#"
+                                                            "\\#if(MassLoadingValue==\"\" ) { \\#"
                                                            + "\\# } else { \\#"
                                                            + "\\#=MassLoadingValue\\#&nbsp;&nbsp;<i "
                                                            + "\\#if(MassResultCompliance==\"Good\") { \\#"
