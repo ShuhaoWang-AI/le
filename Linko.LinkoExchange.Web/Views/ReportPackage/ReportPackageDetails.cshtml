@@ -704,41 +704,44 @@
             </div>    
         </div>
 
-        <div class="box-body box-collapse collapse form-horizontal in">
-            <div class="box box-group box-solid" style="padding: 0px 0px 0px 40px;">
-                <div class="box-header">
-                    &nbsp;
-                    <h3 class="box-title">Sample Result Compliance Summary </h3>
-                    <div class="box-tools pull-right progress-group" style="width: 450px;">
-                        @{
-                            int total = Model.ReportSummaryViewModel.SampleResultsInComplianceCount + Model.ReportSummaryViewModel.SampleResultsNonComplianceCount;
-                            int sampleResultPercentageComplete;
-                            if (total == 0)
-                            {
-                                sampleResultPercentageComplete = 100;
-                            }
-                            else
-                            {
-                                sampleResultPercentageComplete = Convert.ToInt32((Convert.ToDecimal(Model.ReportSummaryViewModel.SampleResultsInComplianceCount) / Convert.ToDecimal(total)) * 100);
-                            }
+        @if (Model.ReportPackageTemplateElementCategories != null && Model.ReportPackageTemplateElementCategories.Contains(ReportElementCategoryName.SamplesAndResults))
+        {
+            <div class="box-body box-collapse collapse form-horizontal in">
+                <div class="box box-group box-solid" style="padding: 0px 0px 0px 40px;">
+                    <div class="box-header">
+                        &nbsp;
+                        <h3 class="box-title">Sample Result Compliance Summary </h3>
+                        <div class="box-tools pull-right progress-group" style="width: 450px;">
+                            @{
+                                int total = Model.ReportSummaryViewModel.SampleResultsInComplianceCount + Model.ReportSummaryViewModel.SampleResultsNonComplianceCount;
+                                int sampleResultPercentageComplete;
+                                if (total == 0)
+                                {
+                                    sampleResultPercentageComplete = 100;
+                                }
+                                else
+                                {
+                                    sampleResultPercentageComplete = Convert.ToInt32((Convert.ToDecimal(Model.ReportSummaryViewModel.SampleResultsInComplianceCount) / Convert.ToDecimal(total)) * 100);
+                                }
 
-                        }
-                        <span class="progress-text">@Model.ReportSummaryViewModel.SampleResultsInComplianceCount of @total sample results are in compliance</span>
-                        <span class="progress-number">&nbsp;</span>
-                        <div class="active progress progress-xs" style="height: 7px;">
-                            <div class="progress-bar progress-bar-green" style="width: @(sampleResultPercentageComplete)%; background-color: #00a65a;"></div>
-                            <div class="progress-bar progress-bar-danger" style="width: @(100 - sampleResultPercentageComplete)%"></div>
+                            }
+                            <span class="progress-text">@Model.ReportSummaryViewModel.SampleResultsInComplianceCount of @total sample results are in compliance</span>
+                            <span class="progress-number">&nbsp;</span>
+                            <div class="active progress progress-xs" style="height: 7px;">
+                                <div class="progress-bar progress-bar-green" style="width: @(sampleResultPercentageComplete)%; background-color: #00a65a;"></div>
+                                <div class="progress-bar progress-bar-danger" style="width: @(100 - sampleResultPercentageComplete)%"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
-                </div>
-                <div class="box-footer">
-                    * Please see the Samples and Results section to view each parameter.
-                </div>
-            </div> 
-        </div>
-        
+                    <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
+                    </div>
+                    <div class="box-footer">
+                        * Please see the Samples and Results section to view each parameter.
+                    </div>
+                </div> 
+            </div>  
+        }
+
         @* *** This section has been hidden until the information it conveys can be refined as per Chris W's request Jan 24/2018.
 
             <div class="box-body box-collapse collapse form-horizontal in" style="display: block;">
