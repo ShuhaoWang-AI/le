@@ -51,7 +51,6 @@ obj
 node_modules
 
 *.vsext
-.vs/*
 
 lib
 \LinkoExchange_Report.htm
@@ -65,6 +64,3 @@ lib
 \Linko.LinkoExchange2.psess
 \Linko.LinkoExchange3.psess
 \Linko.LinkoExchange4.psess
-Web.config
-Web.Debug.config
-Web.Release.config
