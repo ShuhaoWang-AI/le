@@ -1146,7 +1146,7 @@
             for (var i = 0; i < attachmentTypes.length; i++)
             {
                 var value = attachmentTypes[i];
-                if (value[2] === elementTypeName)
+                if ($.parseHTML(value[2])[0].data === elementTypeName)
                 {
                     return value[1];
                 }
