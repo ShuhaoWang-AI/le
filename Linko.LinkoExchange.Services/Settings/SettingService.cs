@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
@@ -185,6 +186,27 @@ namespace Linko.LinkoExchange.Services.Settings
             try
             {
                 _dbContext.SaveChanges();
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errors = new List<string> {ex.Message};
+                foreach (var item in ex.EntityValidationErrors)
+                {
+                    var entry = item.Entry;
+                    var entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (var subItem in item.ValidationErrors)
+                    {
+                        var message = $"Error {subItem.ErrorMessage} occurred in {entityTypeName} at {subItem.PropertyName}";
+                        errors.Add(item:message);
+                    }
+                }
+
+                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
+
+                var msg = $"Cannot create/update program setting '{settingDto.Description}.'";
+                var violations = new List<RuleViolation> {new RuleViolation(propertyName:"", propertyValue:settingDto.Value, errorMessage:msg)};
+                throw new RuleViolationException(message:msg, validationIssues:violations);
             }
             catch (Exception ex)
             {
