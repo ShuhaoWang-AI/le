@@ -365,11 +365,7 @@ namespace Linko.LinkoExchange.Services.Sync
         {
             sampleResultParsedData.LinkoVersionNo = "ExchangeLabSync_1.0";
             sampleResultParsedData.LinkoClientID = reportPackageDto.RecipientOrganizationRegulatoryProgramId;
-
-            // LabPermitMPID max length: 250 characters
-            var labPermitMpid = $"{reportPackageDto.OrganizationName} - {sampleDto.MonitoringPointName}";
-            sampleResultParsedData.LabPermitMPID = labPermitMpid.Substring(startIndex:0, length:labPermitMpid.Length > 250 ? 250 : labPermitMpid.Length).GetValueOrNull();
-
+            sampleResultParsedData.LabPermitMPID = $"{reportPackageDto.PermitNumber} - {sampleDto.MonitoringPointName}";
             sampleResultParsedData.LabSampleName = sampleDto.Name.GetValueOrNull();
             sampleResultParsedData.LabDateSampled = sampleDto.StartDateTimeLocal.Date;
             sampleResultParsedData.LabStartDateTimeSampled = sampleDto.StartDateTimeLocal;
