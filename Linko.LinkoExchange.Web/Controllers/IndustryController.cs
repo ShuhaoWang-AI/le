@@ -1143,12 +1143,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                         if (newSampleStep1ViewModel.SampleResults != null)
                         {
                             //Need to scrub sample results for any potential existing id's from copied sample
-                            //and Analysis Date/Times need to be removed as per requirements.
                             foreach (var sampleResult in newSampleStep1ViewModel.SampleResults)
                             {
                                 sampleResult.Id = null;
                                 sampleResult.MassLoadingSampleResultId = null;
-                                sampleResult.AnalysisDateTimeLocal = null;
                             }
 
                             viewModel.SampleResults = newSampleStep1ViewModel.SampleResults;
