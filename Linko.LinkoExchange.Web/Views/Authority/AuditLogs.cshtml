@@ -45,6 +45,7 @@
                                        columns.Bound(c => c.LogDateTimeUtc)
                                               .HtmlAttributes(attributes:new {@class = "col-sm-2"})
                                               .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .ClientTemplate("#=LogDateTimeUtcDetailString#")
                                               .Format(value:"{0:MM/dd/yyyy h:mm tt}");
                                        columns.Bound(c => c.AuditLogTemplateId).Hidden()
                                               .HtmlAttributes(attributes:new {@class = "col-sm-1"})
