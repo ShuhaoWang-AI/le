@@ -350,7 +350,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             reportSummaryViewModel.SampleResultsNonComplianceCount++;
                         }
 
-                        if (result.IsCalcMassLoading)
+                        if (result.IsCalcMassLoading && result.MassLoadingValue != null)
                         {
                             if (result.MassResultCompliance == ResultComplianceType.Good
                                 || result.MassResultCompliance == ResultComplianceType.Unknown)
