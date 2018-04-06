@@ -365,7 +365,7 @@ namespace Linko.LinkoExchange.Services.Sync
         {
             sampleResultParsedData.LinkoVersionNo = "ExchangeLabSync_1.0";
             sampleResultParsedData.LinkoClientID = reportPackageDto.RecipientOrganizationRegulatoryProgramId;
-            sampleResultParsedData.LabPermitMPID = $"{reportPackageDto.PermitNumber} - {sampleDto.MonitoringPointName}";
+            sampleResultParsedData.LabPermitMPID = $"{reportPackageDto.OrganizationReferenceNumber} - {sampleDto.MonitoringPointName}";
             sampleResultParsedData.LabSampleName = sampleDto.Name.GetValueOrNull();
             sampleResultParsedData.LabDateSampled = sampleDto.StartDateTimeLocal.Date;
             sampleResultParsedData.LabStartDateTimeSampled = sampleDto.StartDateTimeLocal;

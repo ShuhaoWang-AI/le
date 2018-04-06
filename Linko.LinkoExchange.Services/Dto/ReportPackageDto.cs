@@ -84,7 +84,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string LastSenderFirstName { get; internal set; }
         public string LastSenderLastName { get; internal set; }
 
-        public string PermitNumber { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
         public DateTime LastModificationDateTimeLocal { get; internal set; }
 
