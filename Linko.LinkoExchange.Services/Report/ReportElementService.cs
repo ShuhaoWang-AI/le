@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Collection of dto's that map to the Report Element Type objects associated with the passed in category </returns>
         public IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName)
         {
-            _logger.Info(message:$"Enter ReportElementService.GetReportElementTypes. categoryName={categoryName}");
+            _logger.Info(message:$"Start: ReportElementService.GetReportElementTypes. categoryName={categoryName}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
@@ -91,7 +91,7 @@ namespace Linko.LinkoExchange.Services.Report
                 reportElementTypes.Add(item:dto);
             }
 
-            _logger.Info(message:$"Leaving ReportElementService.GetReportElementTypes. reportElementTypes.Count={reportElementTypes.Count()}");
+            _logger.Info(message:$"End: ReportElementService.GetReportElementTypes. Count={reportElementTypes.Count}");
 
             return reportElementTypes;
         }
@@ -103,7 +103,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Dto that maps to the Report Element Type object associated with the passed in Id </returns>
         public ReportElementTypeDto GetReportElementType(int reportElementTypeId)
         {
-            _logger.Info(message:$"Enter ReportElementService.GetReportElementType. reportElementTypeId={reportElementTypeId}");
+            _logger.Info(message:$"Start: ReportElementService.GetReportElementType. reportElementTypeId={reportElementTypeId}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var foundREType = _dbContext.ReportElementTypes
@@ -132,7 +132,7 @@ namespace Linko.LinkoExchange.Services.Report
                 dto.LastModifierFullName = "N/A";
             }
 
-            _logger.Info(message:$"Leaving ReportElementService.GetReportElementType. reportElementTypeId={reportElementTypeId}");
+            _logger.Info(message:"End: ReportElementService.GetReportElementType.");
 
             return dto;
         }
@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var reportElementTypeIdString = reportElementType.ReportElementTypeId?.ToString() ?? "null";
 
-            _logger.Info(message:$"Enter ReportElementService.SaveReportElementType. reportElementType.ReportElementTypeId.Value={reportElementTypeIdString}");
+            _logger.Info(message:$"Start: ReportElementService.SaveReportElementType. reportElementType.ReportElementTypeId={reportElementTypeIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
@@ -244,7 +244,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:$"Leaving ReportElementService.SaveReportElementType. reportElementTypeIdToReturn={reportElementTypeIdToReturn}");
+            _logger.Info(message:$"End: ReportElementService.SaveReportElementType. reportElementTypeIdToReturn={reportElementTypeIdToReturn}");
 
             return reportElementTypeIdToReturn;
         }
@@ -255,7 +255,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportElementTypeId"> Id of the Report Element Type to remove from the database </param>
         public ReportElementTypeDto DeleteReportElementType(int reportElementTypeId)
         {
-            _logger.Info(message:$"Enter ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
+            _logger.Info(message:$"Start: ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
 
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
                                                  .OrganizationRegulatoryProgramId;
@@ -296,7 +296,7 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
 
-                    _logger.Info(message:$"Leaving ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
+                    _logger.Info(message:"End: ReportElementService.DeleteReportElementType.");
 
                     return elementTypeDto;
                 }
@@ -315,7 +315,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> True = Report Element Type is included in at least 1 Report Package Template, False otherwise. </returns>
         public bool IsReportElementTypeInUse(int reportElementTypeId)
         {
-            _logger.Info(message:$"Enter ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}");
+            _logger.Info(message:$"Start: ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}");
 
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId)))
                                                  .OrganizationRegulatoryProgramId;
@@ -328,7 +328,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                  .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
             var isInUse = rpTemplatesUsingThis.Any();
-            _logger.Info(message:$"Leaving ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}, isInUse={isInUse}");
+            _logger.Info(message:$"End: ReportElementService.IsReportElementTypeInUse. isInUse={isInUse}");
 
             return isInUse;
         }

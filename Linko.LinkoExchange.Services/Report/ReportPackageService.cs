@@ -193,11 +193,9 @@ namespace Linko.LinkoExchange.Services.Report
             var submitterFirstName = _httpContextService.GetClaimValue(claimType:CacheKey.FirstName);
             var submitterLastName = _httpContextService.GetClaimValue(claimType:CacheKey.LastName);
             var submitterUserName = _httpContextService.GetClaimValue(claimType:CacheKey.UserName);
-            ReportPackageDto reportPackageDto;
-            CopyOfRecordDto copyOfRecordDto;
 
             _logger.Info(message:
-                         $"Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
+                         $"Start: ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -229,8 +227,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     UpdateStatus(reportPackageId:reportPackageId, reportStatus:ReportStatusName.Submitted, isUseTransaction:false);
                     _dbContext.SaveChanges();
-                    reportPackageDto = GetReportPackage(reportPackageId:reportPackageId, isIncludeAssociatedElementData:true);
-                    copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto:reportPackageDto);
+
+                    var reportPackageDto = GetReportPackage(reportPackageId:reportPackageId, isIncludeAssociatedElementData:true);
+                    var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto:reportPackageDto);
 
                     // Add for crommer log
                     WriteCrommerrLog(reportPackageDto:reportPackageDto, submitterIpAddress:submitterIpAddress, copyOfRecordDto:copyOfRecordDto);
@@ -260,8 +259,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:
-                         $"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
+            _logger.Info(message:"End: ReportPackageService.SignAndSubmitReportPackage.");
         }
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
@@ -285,7 +283,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto)
         {
-            _logger.Info(message:"Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", argument:reportPackageDto.ReportPackageId);
+            _logger.Info(message:$"Start: ReportPackageService.GetReportPackageCopyOfRecordDataXmlFile. reportPackageId={reportPackageDto.ReportPackageId}");
 
             var dateTimeFormat = "MM/dd/yyyyThh:mm tt zzzz";
             var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(orgRegProgramId:reportPackageDto.OrganizationRegulatoryProgramId,
@@ -457,25 +455,25 @@ namespace Linko.LinkoExchange.Services.Report
                               FileName = "Copy Of Record Data.xml"
                           };
 
-            _logger.Info(message:"Leave ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", argument:reportPackageDto.ReportPackageId);
+            _logger.Info(message:"End: ReportPackageService.GetReportPackageCopyOfRecordDataXmlFile.");
 
             return xmlData;
         }
 
         public CopyOfRecordValidationResultDto VerifyCopyOfRecord(int reportPackageId)
         {
-            _logger.Info(message:"Enter ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:"Start: ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", argument:reportPackageId);
 
             var validationResult = _copyOfRecordService.ValidCopyOfRecordData(reportPackageId:reportPackageId);
 
-            _logger.Info(message:"Enter ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:"End: ReportPackageService.VerififyCopyOfRecord.");
 
             return validationResult;
         }
 
         public ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData, bool isAuthorizationRequired = false)
         {
-            _logger.Info(message:"Enter ReportPackageService.GetReportPackage. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:$"Start: ReportPackageService.GetReportPackage. reportPackageId={reportPackageId}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
@@ -624,13 +622,13 @@ namespace Linko.LinkoExchange.Services.Report
 
             reportPackagegDto.CertificationTypes = sortedCertificationTypes;
 
-            _logger.Info(message:"Leave ReportPackageService.GetReportPackage. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:"End: ReportPackageService.GetReportPackage.");
             return reportPackagegDto;
         }
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId, ReportPackageDto reportPackageDto = null)
         {
-            _logger.Info(message:"Enter ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:$"Start: ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={reportPackageId}");
 
             if (reportPackageDto == null)
             {
@@ -638,7 +636,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             var copyOfRecordDto = _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackage:reportPackageDto);
-            _logger.Info(message:"Leave ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:"End: ReportPackageService.GetCopyOfRecordByReportPackageId.");
 
             return copyOfRecordDto;
         }
@@ -656,7 +654,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId"> tReportPackage.ReportPackageId </param>
         public ReportPackageDto DeleteReportPackage(int reportPackageId)
         {
-            _logger.Info(message:$"Enter ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
+            _logger.Info(message:$"Start: ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -698,7 +696,7 @@ namespace Linko.LinkoExchange.Services.Report
                     transaction.Commit();
                     var reportPackagegDto = _mapHelper.GetReportPackageDtoFromReportPackage(rpt:reportPackage);
                     reportPackagegDto.ReportStatusName = GetReportStatusName(reportPackage:reportPackage);
-                    _logger.Info(message:$"Leave ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
+                    _logger.Info(message:$"End: ReportPackageService.DeleteReportPackage.");
                     return reportPackagegDto;
                 }
                 catch
@@ -719,7 +717,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> The newly created tReportPackage.ReportPackageId </returns>
         public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal)
         {
-            _logger.Info(message:$"Enter ReportPackageService.CreateDraft. reportPackageTemplateId={reportPackageTemplateId}, "
+            _logger.Info(message:$"Start: ReportPackageService.CreateDraft. reportPackageTemplateId={reportPackageTemplateId}, "
                                  + $"startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
 
             int newReportPackageId;
@@ -912,7 +910,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             _logger.Info(message:
-                         $"Leave ReportPackageService.CreateDraft. newReportPackageId={newReportPackageId}, reportPackageTemplateId={reportPackageTemplateId}, startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
+                         $"End: ReportPackageService.CreateDraft. newReportPackageId={newReportPackageId}, reportPackageTemplateId={reportPackageTemplateId}, startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
 
             return newReportPackageId;
         }
@@ -932,7 +930,7 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception(message:"ERROR: Cannot call 'SaveReportPackage' without setting reportPackageDto.ReportPackageId.");
             }
 
-            _logger.Info(message:$"Enter ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+            _logger.Info(message:$"Start: ReportPackageService.SaveReportPackage. ReportPackageId={reportPackageDto.ReportPackageId}");
 
             DbContextTransaction transaction = null;
             if (isUseTransaction)
@@ -1119,7 +1117,7 @@ namespace Linko.LinkoExchange.Services.Report
                     transaction.Commit();
                 }
 
-                _logger.Info(message:$"Leave ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+                _logger.Info(message:$"End: ReportPackageService.SaveReportPackage.");
 
                 return reportPackage.ReportPackageId;
             }
@@ -1150,7 +1148,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="isUseTransaction"> If true, runs within transaction object </param>
         public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction)
         {
-            _logger.Info(message:$"Enter ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
+            _logger.Info(message:$"Start: ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
 
             DbContextTransaction transaction = null;
             if (isUseTransaction)
@@ -1228,7 +1226,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:$"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
+            _logger.Info(message:$"End: ReportPackageService.UpdateStatus.");
         }
 
         /// <summary>
@@ -1238,6 +1236,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Collection of FileStoreDto objects </returns>
         public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageElementTypeId)
         {
+            _logger.Info(message:$"Start: ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
+
             var existingFilesReportPackageElementType = _dbContext.ReportPackageElementTypes
                                                                   .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
                                                                   .Include(rp => rp.ReportPackageElementCategory.ReportElementCategory)
@@ -1248,9 +1248,7 @@ namespace Linko.LinkoExchange.Services.Report
             var timeZoneId = Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
 
             var reportPackage = existingFilesReportPackageElementType.ReportPackageElementCategory.ReportPackage;
-
-            _logger.Info(message:$"Enter ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
-
+            
             var fileStoreList = new List<FileStoreDto>();
             var ageInMonthsSinceFileUploaded = int.Parse(s:_settingService.GetGlobalSettings()[key:SystemSettingType.FileAvailableToAttachMaxAgeMonths]);
 
@@ -1297,8 +1295,7 @@ namespace Linko.LinkoExchange.Services.Report
                 fileStoreList.Add(item:fileStoreDto);
             }
 
-            _logger.Info(message:
-                         $"Leave ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}, fileStoreList.Count={fileStoreList.Count}");
+            _logger.Info(message: $"End: ReportPackageService.GetFilesForSelection. Count={fileStoreList.Count}");
 
             return fileStoreList;
         }
@@ -1310,7 +1307,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Collection of SampleDto objects </returns>
         public ICollection<SampleDto> GetSamplesForSelection(int reportPackageElementTypeId)
         {
-            _logger.Info(message:$"Enter ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
+            _logger.Info(message:$"Start: ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
@@ -1364,8 +1361,7 @@ namespace Linko.LinkoExchange.Services.Report
                 eligibleSampleList.Add(item:sampleDto);
             }
 
-            _logger.Info(message:
-                         $"Leave ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}, eligibleSampleList.Count={eligibleSampleList.Count}");
+            _logger.Info(message: $"End: ReportPackageService.GetSamplesForSelection. Count={eligibleSampleList.Count}");
 
             return eligibleSampleList;
         }
@@ -1382,7 +1378,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public List<ReportPackageStatusCount> GetReportPackageStatusCounts()
         {
-            _logger.Info(message:"Enter ReportPackageService.GetReportPackageStatusCounts.");
+            _logger.Info(message:"Start: ReportPackageService.GetReportPackageStatusCounts.");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var currentOrganizationId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationId));
@@ -1434,7 +1430,7 @@ namespace Linko.LinkoExchange.Services.Report
                 rptStatusCounts.Add(item:readyToSubmitCount);
             }
 
-            _logger.Info(message:"Enter ReportPackageService.GetReportPackageStatusCounts.");
+            _logger.Info(message:"End: ReportPackageService.GetReportPackageStatusCounts.");
             return rptStatusCounts;
         }
 
@@ -1445,7 +1441,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> Collection of ReportPackageDto objects (without children element data) </returns>
         public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName)
         {
-            _logger.Info(message:$"Enter ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
+            _logger.Info(message:$"Start: ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
             var isAuthorityViewing = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower()
                                                         .Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase);
             var reportPackageDtoList = new List<ReportPackageDto>();
@@ -1503,7 +1499,7 @@ namespace Linko.LinkoExchange.Services.Report
                 reportPackageDtoList.Add(item:reportPackagegDto);
             }
 
-            _logger.Info(message:$"Leaving ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
+            _logger.Info(message:$"End: ReportPackageService.GetReportPackagesByStatusName.");
 
             return reportPackageDtoList;
         }
@@ -1519,7 +1515,7 @@ namespace Linko.LinkoExchange.Services.Report
             var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
 
-            _logger.Info(message:$"Enter ReportPackageService.GetRepudiationReasons. currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:$"Start: ReportPackageService.GetRepudiationReasons. currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
             var repudiationReasonDtos = new List<RepudiationReasonDto>();
 
@@ -1541,7 +1537,7 @@ namespace Linko.LinkoExchange.Services.Report
                 repudiationReasonDtos.Add(item:repudiationReasonDto);
             }
 
-            _logger.Info(message:$"Leaving ReportPackageService.GetRepudiationReasons. currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:$"End: ReportPackageService.GetRepudiationReasons.");
 
             return repudiationReasonDtos;
         }
@@ -1559,8 +1555,9 @@ namespace Linko.LinkoExchange.Services.Report
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
-            _logger.Info(message:
-                         $"Enter ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"Start: ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, "
+                                 + $"repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, "
+                                 + $"currentUserId={currentUserId}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -1774,8 +1771,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:$"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, "
-                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"End: ReportPackageService.RepudiateReport.");
         }
 
         /// <summary>
@@ -1787,8 +1783,8 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-            _logger.Info(message:
-                         $"Enter ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message: $"Start: ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, "
+                                  + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
             //Comments are optional here (UC-10 6.)
 
@@ -1796,11 +1792,9 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 try
                 {
-                    var user = _dbContext.Users
-                                         .Single(u => u.UserProfileId == currentUserId);
+                    var user = _dbContext.Users.Single(u => u.UserProfileId == currentUserId);
 
-                    var reportPackage = _dbContext.ReportPackages
-                                                  .Single(rep => rep.ReportPackageId == reportPackageId);
+                    var reportPackage = _dbContext.ReportPackages.Single(rep => rep.ReportPackageId == reportPackageId);
 
                     reportPackage.SubmissionReviewDateTimeUtc = DateTimeOffset.Now;
                     reportPackage.SubmissionReviewerUserId = currentUserId;
@@ -1824,8 +1818,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:$"Leave ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, "
-                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"End: ReportPackageService.ReviewSubmission.");
         }
 
         /// <summary>
@@ -1837,8 +1830,8 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-            _logger.Info(message:
-                         $"Enter ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message: $"Start: ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, "
+                                  + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
             if (string.IsNullOrEmpty(value:comments))
             {
@@ -1874,8 +1867,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            _logger.Info(message:$"Leave ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, "
-                                 + $"currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+            _logger.Info(message:$"End: ReportPackageService.ReviewRepudiation.");
         }
 
         /// <summary>
@@ -1886,7 +1878,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId"> tReportPackage.ReportPackageId </param>
         private void CheckRequiredReportPackageElementTypesIncluded(int reportPackageId)
         {
-            _logger.Info(message: $"Enter ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}");
+            _logger.Info(message: $"Start: ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}");
 
             var requiredReportPackageElementTypes = _dbContext.ReportPackageElementTypes
                                                               .Include(rpet => rpet.ReportPackageElementCategory.ReportElementCategory)
@@ -1914,7 +1906,7 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new RuleViolationException(message: "Validation errors", validationIssues: failedRequirements);
             }
 
-            _logger.Info(message: $"Leaving ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}, isIncluded={isRequirementsMet}");
+            _logger.Info(message: $"End: ReportPackageService.CheckRequiredReportPackageElementTypesIncluded. isIncluded={isRequirementsMet}");
 
         }
 
@@ -1930,7 +1922,8 @@ namespace Linko.LinkoExchange.Services.Report
         public void UpdateLastSentDateTime(int reportPackageId, DateTimeOffset sentDateTime, int? lastSenderUserId = null, string lastSenderFirstName = null,
                                            string lastSenderLastName = null)
         {
-            _logger.Info(message:$"Enter ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+            _logger.Info(message: $"Start: ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}, "
+                                  + $"lastSenderUserId={lastSenderUserId?.ToString() ?? "null"}");
 
             var reportPackage = _dbContext.ReportPackages
                                           .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
@@ -1959,7 +1952,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             _dbContext.SaveChanges();
 
-            _logger.Info(message:$"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+            _logger.Info(message:$"End: ReportPackageService.UpdateLastSentDateTime.");
         }
 
         /// <summary>
@@ -1970,7 +1963,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns> True if a Report Package with a later submission date/time exists </returns>
         public bool IsSimilarReportPackageSubmittedAfter(int reportPackageId)
         {
-            _logger.Info(message:$"Enter ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+            _logger.Info(message:$"Start: ReportPackageService.IsSimilarReportPackageSubmittedAfter. reportPackageId={reportPackageId}");
 
             var reportPackageToCompare = _dbContext.ReportPackages
                                                    .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
@@ -1994,7 +1987,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                                   && rp.PeriodEndDateTimeUtc.Day == endDate.Day
                                                                   && rp.SubmissionDateTimeUtc > reportPackageToCompare.SubmissionDateTimeUtc);
 
-            _logger.Info(message:$"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}, isNewerReportPackageExist={isNewerReportPackageExist}");
+            _logger.Info(message:$"End: ReportPackageService.IsSimilarReportPackageSubmittedAfter. isNewerReportPackageExist={isNewerReportPackageExist}");
 
             return isNewerReportPackageExist;
         }
@@ -2004,7 +1997,7 @@ namespace Linko.LinkoExchange.Services.Report
             bool canRepudiate;
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-            _logger.Info(message:$"Enter ReportPackageService.CanRepudiateReportPackage. reportPackageId={reportPackageId}, currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:$"Start: ReportPackageService.CanRepudiateReportPackage. reportPackageId={reportPackageId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
             //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
             var reportRepudiatedDays =
@@ -2021,8 +2014,7 @@ namespace Linko.LinkoExchange.Services.Report
                 canRepudiate = true;
             }
 
-            _logger.Info(message:
-                         $"Enter ReportPackageService.CanRepudiateReportPackage. reportPackageId={reportPackageId}, currentOrgRegProgramId={currentOrgRegProgramId}, canRepudiate={canRepudiate}");
+            _logger.Info(message: $"End: ReportPackageService.CanRepudiateReportPackage. canRepudiate={canRepudiate}");
 
             return canRepudiate;
         }
@@ -2031,7 +2023,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
         {
-            _logger.Info(message:"Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", argument:reportPackageDto.ReportPackageId);
+            _logger.Info(message:$"Start: ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={reportPackageDto.ReportPackageId}");
             var reportPackageId = reportPackageDto.ReportPackageId;
 
             var attachments = new List<FileStoreDto>();
@@ -2049,7 +2041,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                                                           copyOfRecordPdfFileDto:copyOfRecordPdfFile,
                                                                                           copyOfRecordDataXmlFileDto:copyOfRecordDataXmlFile);
 
-            _logger.Info(message:"Leave ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", argument:reportPackageId);
+            _logger.Info(message:"End: ReportPackageService.CreateCopyOfRecordForReportPackage.");
 
             return copyOfRecordDto;
         }
@@ -2093,7 +2085,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private List<EmailEntry> GetSignAndSubmitEmailEntries(ReportPackageDto reportPackage, CopyOfRecordDto copyOfRecordDto)
         {
-            _logger.Info(message:"Enter ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", argument:reportPackage.ReportPackageId);
+            _logger.Info(message:$"Start: ReportPackageService.GetSignAndSubmitEmailEntries. reportPackageId={reportPackage.ReportPackageId}");
 
             var emailContentReplacements = new Dictionary<string, string>
                                            {
@@ -2191,7 +2183,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                                                                       contentReplacements:emailContentReplacements,
                                                                                                       orgRegProg:authorityOrganizationRegulatoryProgramDto)));
             
-            _logger.Info(message:"Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", argument:reportPackage.ReportPackageId);
+            _logger.Info(message:"End: ReportPackageService.GetSignAndSubmitEmailEntries.");
             return emailEntries;
         }
 
@@ -2363,14 +2355,14 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="propertyName"> </param>
         private void ThrowSimpleException(string message, string propertyName = null)
         {
-            _logger.Info(message:$"Enter SampleService.ThrowSimpleException. message={message}");
+            _logger.Info(message:$"Start: ReportPackageService.ThrowSimpleException. message={message}");
 
             var validationIssues = new List<RuleViolation>
                                    {
                                        new RuleViolation(propertyName:propertyName ?? string.Empty, propertyValue:null, errorMessage:message)
                                    };
 
-            _logger.Info(message:$"Leaving SampleService.ThrowSimpleException. message={message}");
+            _logger.Info(message:"End: ReportPackageService.ThrowSimpleException.");
 
             throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
         }

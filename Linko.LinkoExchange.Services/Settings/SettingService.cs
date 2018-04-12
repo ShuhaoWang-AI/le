@@ -202,7 +202,7 @@ namespace Linko.LinkoExchange.Services.Settings
                     }
                 }
 
-                _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
+                _logger.Error(message:"Error: SettingService.CreateOrUpdateProgramSetting. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                 var msg = $"Cannot create/update program setting '{settingDto.Description}.'";
                 var violations = new List<RuleViolation> {new RuleViolation(propertyName:"", propertyValue:settingDto.Value, errorMessage:msg)};

@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Services.Unit
         /// <returns> </returns>
         public IEnumerable<UnitDto> GetFlowUnits()
         {
-            _logger.Info(message:"Enter UnitService.GetFlowUnits.");
+            _logger.Info(message:"Start: UnitService.GetFlowUnits.");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
@@ -110,7 +110,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var unitDtos = UnitDtosHelper(units:units);
 
-            _logger.Info(message:"Leave UnitService.GetFlowUnits.");
+            _logger.Info(message:"End: UnitService.GetFlowUnits.");
 
             return unitDtos;
         }
@@ -121,7 +121,7 @@ namespace Linko.LinkoExchange.Services.Unit
         /// <returns> Collection of unit dto's corresponding to the labels read from the setting </returns>
         public IEnumerable<UnitDto> GetFlowUnitValidValues()
         {
-            _logger.Info(message:"Enter UnitService.GetFlowUnitValidValues.");
+            _logger.Info(message:"Start: UnitService.GetFlowUnitValidValues.");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
@@ -138,7 +138,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var unitDtos = UnitDtosHelper(units:units);
 
-            _logger.Info(message:"Leave UnitService.GetFlowUnitValidValues.");
+            _logger.Info(message:"End: UnitService.GetFlowUnitValidValues.");
 
             return unitDtos;
         }
@@ -155,7 +155,7 @@ namespace Linko.LinkoExchange.Services.Unit
         {
             if (isLoggingEnabled)
             {
-                _logger.Info(message:"Enter UnitService.GetFlowUnitsFromCommaDelimitedString.");
+                _logger.Info(message:"Start: UnitService.GetFlowUnitsFromCommaDelimitedString.");
             }
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -180,7 +180,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             if (isLoggingEnabled)
             {
-                _logger.Info(message:"Leave UnitService.GetFlowUnitsFromCommaDelimitedString.");
+                _logger.Info(message:"End: UnitService.GetFlowUnitsFromCommaDelimitedString.");
             }
 
             return (List<UnitDto>) _requestCache.GetValue(key:cacheKey);
@@ -192,7 +192,7 @@ namespace Linko.LinkoExchange.Services.Unit
         /// <returns> </returns>
         public UnitDto GetUnitForMassLoadingCalculations()
         {
-            _logger.Info(message:"Enter UnitService.GetUnitForMassLoadingCalculations.");
+            _logger.Info(message:"Start: UnitService.GetUnitForMassLoadingCalculations.");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
@@ -202,7 +202,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var unitDtos = UnitDtosHelper(units:units);
 
-            _logger.Info(message:"Leave UnitService.GetUnitForMassLoadingCalculations.");
+            _logger.Info(message:"End: UnitService.GetUnitForMassLoadingCalculations.");
 
             return unitDtos.First();
         }

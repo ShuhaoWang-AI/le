@@ -55,14 +55,14 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns(value:"1");
 
             _timeZones = new TimeZoneService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), settings:_settingService.Object,
-                                             mapHelper:new MapHelper(), appCache:new Mock<IApplicationCache>().Object);
+                                             mapHelper:new MapHelper(), appCache:new Mock<IApplicationCache>().Object, logger:_logger.Object);
 
             _orgService = new OrganizationService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
                                                   settingService:new SettingService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
                                                                                     logger:_logger.Object, mapHelper:new MapHelper(), cache:new Mock<IRequestCache>().Object,
                                                                                     globalSettings:new Mock<IGlobalSettings>().Object), httpContext:_httpContext.Object,
                                                   jurisdictionService:new JurisdictionService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
-                                                                                              mapHelper:new MapHelper(), logService:_logger.Object), timeZoneService:_timeZones,
+                                                                                              mapHelper:new MapHelper(), logger:_logger.Object), timeZoneService:_timeZones,
                                                   mapHelper:new MapHelper());
         }
 

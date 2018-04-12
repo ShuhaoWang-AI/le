@@ -54,7 +54,7 @@ namespace Linko.LinkoExchange.Test
             var actualSettingService = new SettingService(dbContext:connection, logger:_logger.Object, mapHelper:new MapHelper(), cache:new Mock<IRequestCache>().Object,
                                                           globalSettings:new Mock<IGlobalSettings>().Object);
             var actualTimeZoneService = new TimeZoneService(dbContext:connection, settings:actualSettingService, mapHelper:new MapHelper(),
-                                                            appCache:new Mock<IApplicationCache>().Object);
+                                                            appCache:new Mock<IApplicationCache>().Object, logger:_logger.Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto

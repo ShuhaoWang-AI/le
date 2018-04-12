@@ -31,11 +31,11 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
         /// <returns> </returns>
         public string GetPrivacyPolicyContent()
         {
-            _logger.Info(message:"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
+            _logger.Info(message:"Start: PrivacyPolicyService.GetPrivacyPolicyContent.");
 
             var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i => i.EffectiveDateTimeUtc).First();
 
-            _logger.Info(message:"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
+            _logger.Info(message:"End: PrivacyPolicyService.GetPrivacyPolicyContent.");
 
             return privacyPolicy.Content;
         }

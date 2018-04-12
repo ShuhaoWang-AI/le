@@ -114,7 +114,7 @@ namespace Linko.LinkoExchange.Services.Sample
         public int SaveSample(SampleDto sampleDto)
         {
             var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
-            _logger.Info(message:$"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
+            _logger.Info(message:$"Start: SampleService.SaveSample. SampleId={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
 
             var sampleId = -1;
             using (var transaction = _dbContext.BeginTransaction())
@@ -142,7 +142,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
-            _logger.Info(message:$"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
+            _logger.Info(message:"End: SampleService.SaveSample.");
             return sampleId;
         }
 
@@ -157,7 +157,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
 
-            _logger.Info(message:$"Enter SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}");
+            _logger.Info(message:$"Start: SampleService.IsValidSample. SampleId={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
@@ -320,7 +320,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
-            _logger.Info(message:$"Leaving SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}, isValid={isValid}");
+            _logger.Info(message:$"End: SampleService.IsValidSample. isValid={isValid}");
 
             return isValid;
         }
@@ -332,7 +332,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns> The sample object deleted </returns>
         public SampleDto DeleteSample(int sampleId)
         {
-            _logger.Info(message:$"Enter SampleService.DeleteSample. sampleId={sampleId}");
+            _logger.Info(message:$"Start: SampleService.DeleteSample. sampleId={sampleId}");
             var validationIssues = new List<RuleViolation>();
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -360,7 +360,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         _dbContext.Samples.Remove(entity:sampleToRemove);
                         _dbContext.SaveChanges();
                         transaction.Commit();
-                        _logger.Info(message:$"Leaving SampleService.DeleteSample. sampleId={sampleId}");
+                        _logger.Info(message:"End: SampleService.DeleteSample.");
 
                         return sampleDto;
                     }
@@ -384,7 +384,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             if (isLoggingEnabled)
             {
-                _logger.Info(message:$"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+                _logger.Info(message:$"Start: SampleService.GetSampleDetails. SampleId={sample.SampleId}");
             }
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -543,7 +543,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (isLoggingEnabled)
             {
-                _logger.Info(message:$"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+                _logger.Info(message:"End: SampleService.GetSampleDetails.");
             }
 
             return dto;
@@ -756,7 +756,7 @@ namespace Linko.LinkoExchange.Services.Sample
         public SampleDto GetSampleDetails(int sampleId)
         {
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            _logger.Info(message:$"Enter SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:$"Start: SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
             if (!CanUserExecuteApi(id:sampleId))
             {
@@ -774,9 +774,9 @@ namespace Linko.LinkoExchange.Services.Sample
                 throw new Exception(message:$"ERROR: Could not find Sample associated with sampleId={sampleId}");
             }
 
-            var dto = GetSampleDetails(sample:sample);
+            var dto = GetSampleDetails(sample:sample, isIncludeChildObjects: true, isLoggingEnabled: false);
 
-            _logger.Info(message:$"Leaving SampleService.GetSampleDetails. sampleId={sampleId}");
+            _logger.Info(message:"End: SampleService.GetSampleDetails.");
 
             return dto;
         }
@@ -788,13 +788,13 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns> Boolean indicating if the Sample is or isn't included in at least 1 report package </returns>
         public bool IsSampleIncludedInReportPackage(int sampleId)
         {
-            _logger.Info(message:$"Enter SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
+            _logger.Info(message:$"Start: SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
 
-            var isExists = _dbContext.ReportSamples.Any(rs => rs.SampleId == sampleId);
+            var isIncluded = _dbContext.ReportSamples.Any(rs => rs.SampleId == sampleId);
 
-            _logger.Info(message:$"Leaving SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
+            _logger.Info(message:$"End: SampleService.IsSampleIncludedInReportPackage. isIncluded={isIncluded}");
 
-            return isExists;
+            return isIncluded;
         }
 
         /// <summary>
@@ -814,7 +814,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var startDateString = startDate?.ToString() ?? "null";
             var endDateString = endDate?.ToString() ?? "null";
 
-            _logger.Info(message:$"Enter SampleService.GetSamples. startDate={startDateString}, endDate={endDateString}");
+            _logger.Info(message:$"Start: SampleService.GetSampleCounts. startDate={startDateString}, endDate={endDateString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
@@ -852,7 +852,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             sampleCounts.Add(item:readyToSubmitSamples);
 
-            _logger.Info(message:$"Leaving SampleService.GetSamples. startDate={startDateString}, endDate={endDateString}");
+            _logger.Info(message:"End: SampleService.GetSampleCounts.");
 
             return sampleCounts;
         }
@@ -875,7 +875,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             var startDateString = startDate?.ToString() ?? "null";
             var endDateString = endDate?.ToString() ?? "null";
-            _logger.Info(message:$"Enter SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}");
+            _logger.Info(message:$"Start: SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
@@ -924,7 +924,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 dtos.Add(item:dto);
             }
 
-            _logger.Info(message:$"Leaving SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}, dtos.Count={dtos.Count()}");
+            _logger.Info(message:$"End: SampleService.GetSamples. Count={dtos.Count}");
 
             return dtos;
         }
@@ -933,7 +933,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-            _logger.Info(message:$"Enter SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:$"Start: SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
 
             var collectionMethodList = new List<CollectionMethodDto>();
             var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
@@ -947,14 +947,14 @@ namespace Linko.LinkoExchange.Services.Sample
                 collectionMethodList.Add(item:new CollectionMethodDto {CollectionMethodId = cm.CollectionMethodId, Name = cm.Name});
             }
 
-            _logger.Info(message:$"Leave SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
+            _logger.Info(message:"End: SampleService.GetCollectionMethods.");
 
             return collectionMethodList;
         }
 
         public IEnumerable<SampleRequirementDto> GetSampleRequirements(DateTime startDate, DateTime endDate, int orgRegProgramId)
         {
-            _logger.Info(message: $"Enter SampleService.GetSampleRequirements. startDate={startDate}, endDate={endDate}, orgRegProgramId={orgRegProgramId}");
+            _logger.Info(message: $"Start: SampleService.GetSampleRequirements. startDate={startDate}, endDate={endDate}, orgRegProgramId={orgRegProgramId}");
 
             var sampleRequirementDtos = _dbContext.SampleRequirements
                 .Include(sr => sr.MonitoringPointParameter)
@@ -980,7 +980,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     TotalSamplesRequiredCount = consolidatedRequirement.Sum(g => g.SamplesRequired)
                 }).ToList();
 
-            _logger.Info(message: $"Exit SampleService.GetSampleRequirements. startDate={startDate}, endDate={endDate}, orgRegProgramId={orgRegProgramId}, list count={sampleRequirementDtos.Count()}");
+            _logger.Info(message: $"End: SampleService.GetSampleRequirements. Count={sampleRequirementDtos.Count}");
 
             return sampleRequirementDtos;
         }
@@ -996,7 +996,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
 
-            _logger.Info(message:$"Enter SampleService.SimplePersist. sampleDto.SampleId. Value={sampleIdString}");
+            _logger.Info(message:$"Start: SampleService.SimplePersist. SampleId. Value={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
@@ -1242,7 +1242,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             _dbContext.SaveChanges();
 
-            _logger.Info(message:$"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleToPersist.SampleId}");
+            _logger.Info(message:$"End: SampleService.SimplePersist. sampleIdToReturn={sampleToPersist.SampleId}");
 
             return sampleToPersist.SampleId;
         }
@@ -1253,14 +1253,14 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="message"> Rule violation message to use when throwing the exception. </param>
         private void ThrowSimpleException(string message)
         {
-            _logger.Info(message:$"Enter SampleService.ThrowSimpleException. message={message}");
+            _logger.Info(message:$"Start: SampleService.ThrowSimpleException. message={message}");
 
             var validationIssues = new List<RuleViolation>
                                    {
                                        new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
                                    };
 
-            _logger.Info(message:$"Leaving SampleService.ThrowSimpleException. message={message}");
+            _logger.Info(message:"End: SampleService.ThrowSimpleException.");
 
             throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
         }
@@ -1286,8 +1286,6 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="timeZoneId"> The time zone id used to localize the date/times </param>
         private void SetSampleResultDatesAndLastModified(SampleResult sampleResult, ref SampleResultDto resultDto, int timeZoneId)
         {
-            _logger.Info(message:$"Enter SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
-
             //Need to set localized time stamps for SampleResults
             if (sampleResult.AnalysisDateTimeUtc.HasValue)
             {
@@ -1310,8 +1308,6 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 resultDto.LastModifierFullName = "N/A";
             }
-
-            _logger.Info(message:$"Leaving SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
         }
     }
 }

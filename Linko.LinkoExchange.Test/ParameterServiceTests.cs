@@ -59,7 +59,7 @@ namespace Linko.LinkoExchange.Test
             var actualTimeZoneService = new TimeZoneService(dbContext:connection,
                                                             settings:new SettingService(dbContext:connection, logger:_logger.Object, mapHelper:new MapHelper(),
                                                                                         cache:_mockRequestCache.Object, globalSettings:new Mock<IGlobalSettings>().Object),
-                                                            mapHelper:new MapHelper(), appCache:_mockAppCache.Object);
+                                                            mapHelper:new MapHelper(), appCache:_mockAppCache.Object, logger:_logger.Object);
             var actualSettings = new SettingService(dbContext:connection, logger:_logger.Object, mapHelper:new MapHelper(), cache:_mockRequestCache.Object,
                                                     globalSettings:new Mock<IGlobalSettings>().Object);
 

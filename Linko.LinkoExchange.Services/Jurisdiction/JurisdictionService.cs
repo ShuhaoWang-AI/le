@@ -13,18 +13,18 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
         #region fields
 
         private readonly LinkoExchangeContext _dbContext;
-        private readonly ILogger _logService;
+        private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
 
         #endregion
 
         #region constructors and destructor
 
-        public JurisdictionService(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logService)
+        public JurisdictionService(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logger)
         {
             _dbContext = dbContext;
             _mapHelper = mapHelper;
-            _logService = logService;
+            _logger = logger;
         }
 
         #endregion
@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
 
         public ICollection<JurisdictionDto> GetStateProvs(int countryId)
         {
-            _logService.Info(message:$"Entering GetStateProvs. countryId={countryId}");
+            _logger.Info(message:$"Start: JurisdictionService.GetStateProvs. countryId={countryId}");
 
             var dtos = new List<JurisdictionDto>();
             var states = _dbContext.Jurisdictions.Where(j => j.CountryId == countryId);
@@ -43,7 +43,7 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
                 dtos.Add(item:_mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction:state));
             }
 
-            _logService.Info(message:$"Exiting GetStateProvs. countryId={countryId}");
+            _logger.Info(message:$"End: JurisdictionService.GetStateProvs.");
 
             return dtos;
         }
@@ -55,8 +55,7 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
                 return null;
             }
 
-            var jurisdiction = _dbContext.Jurisdictions
-                                         .SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
+            var jurisdiction = _dbContext.Jurisdictions.SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
 
             if (jurisdiction != null)
             {
@@ -65,8 +64,7 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
             }
             else
             {
-                var errorMessage = $"GetJurisdictionById. Could not find Jurisdiction associated with JurisdictionId={jurisdictionId}.";
-                _logService.Info(message:errorMessage);
+                var errorMessage = $"JurisdictionService.GetJurisdictionById. Could not find Jurisdiction associated with JurisdictionId={jurisdictionId}.";
                 throw new Exception(message:errorMessage);
             }
         }

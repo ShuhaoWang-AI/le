@@ -55,7 +55,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         public CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto,
                                                                   CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
         {
-            _logger.Info(message:$"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
+            _logger.Info(message:$"Start: CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
 
             var coreBytes = CreateZipFileData(attachments:attachments, copyOfRecordPdfFileDto:copyOfRecordPdfFileDto, copyOfRecordDataXmlFileDto:copyOfRecordDataXmlFileDto);
 
@@ -83,16 +83,15 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                                       HashAlgorithm = copyOfRecord.HashAlgorithm,
                                       CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
                                   };
-
-            var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
-            _logger.Info(message:message);
+            
+            _logger.Info(message:"End: CopyOfRecordService.CreateCopyOfRecordForReportPackage.");
 
             return copyOfRecordDto;
         }
 
         public CopyOfRecordValidationResultDto ValidCopyOfRecordData(int reportPackageId)
         {
-            _logger.Info(message:$"Enter CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
+            _logger.Info(message:$"Start: CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
 
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
             var isValid = _digitalSignatureManager.VerifySignature(currentSignatureStr:copyOfRecord.Signature, dataToVerify:copyOfRecord.Data, copyOfRecordCertificateId:copyOfRecord.CopyOfRecordCertificateId);
@@ -102,7 +101,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                                        DigitalSignature = copyOfRecord.Signature
                                    };
 
-            _logger.Info(message:$"Leave CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
+            _logger.Info(message:"End: CopyOfRecordService.ValidCopyOfRecordData.");
 
             return validationResult;
         }
@@ -114,7 +113,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 throw new ArgumentNullException(paramName:nameof(reportPackage));
             }
 
-            _logger.Info(message:$"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
+            _logger.Info(message:$"Start: CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
 
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackage.ReportPackageId);
             var copyOfRecordDto = new CopyOfRecordDto
@@ -128,12 +127,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                                       CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
                                   };
 
-            var datetimePart = reportPackage.SubmissionDateTimeLocal.Value.ToString(format:"yyyyMMdd");
+            var datetimePart = reportPackage.SubmissionDateTimeLocal?.ToString(format:"yyyyMMdd") ?? "";
             var referenceNumber = string.IsNullOrWhiteSpace(value:reportPackage.OrganizationReferenceNumber) ? "" : reportPackage.OrganizationReferenceNumber;
             copyOfRecordDto.DownloadFileName = $"{referenceNumber} {reportPackage.Name} {datetimePart}.zip";
             copyOfRecordDto.DownloadFileName = StripReservedCharacters(fileName:copyOfRecordDto.DownloadFileName);
 
-            _logger.Info(message:$"Leave CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
+            _logger.Info(message:"End: CopyOfRecordService.GetCopyOfRecordByReportPackage.");
             return copyOfRecordDto;
         }
 

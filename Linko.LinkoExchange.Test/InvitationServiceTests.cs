@@ -97,7 +97,7 @@ namespace Linko.LinkoExchange.Test
                                                                                   httpContext:new HttpContextService(),
                                                                                   jurisdictionService:new
                                                                                       JurisdictionService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString),
-                                                                                                          mapHelper:new MapHelper(), logService:_logger.Object),
+                                                                                                          mapHelper:new MapHelper(), logger:_logger.Object),
                                                                                   timeZoneService:_timeZones.Object, mapHelper:new MapHelper()),
                                       httpContext:_httpContext.Object,
                                       timeZones:_timeZones.Object,

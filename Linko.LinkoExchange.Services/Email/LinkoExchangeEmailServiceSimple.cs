@@ -124,7 +124,7 @@ namespace Linko.LinkoExchange.Services.Email
                         _logger.Info(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {emailEntry.AuditLogId}, "
                                              + $"Recipient User name:{emailEntry.RecipientUserName}, Recipient Email Address:{emailEntry.RecipientEmailAddress}, "
                                              + $"Subject:{emailEntry.MailMessage.Subject}");
-                        _logger.Error(message:"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
+                        _logger.Error(message:"Error: LinkoExchangeEmailServiceSimple.SendEmails. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                     }
                 }
             }

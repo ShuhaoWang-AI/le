@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -57,28 +58,37 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public string SignData(string base64Data)
         {
-            _logger.Info(message:"Enter CertificateDigitalSignatureManager.GetDataSignature.");
+            _logger.Info(message:"Start: CertificateDigitalSignatureManager.SignData.");
             var dataBytes = Convert.FromBase64String(s:base64Data);
             var signature = GetDataSignature(data:dataBytes);
-            _logger.Info(message:"Leave CertificateDigitalSignatureManager.GetDataSignature.");
+            _logger.Info(message:"End: CertificateDigitalSignatureManager.SignData.");
 
             return signature;
         }
 
         public bool VerifySignature(string currentSignatureStr, byte[] dataToVerify, int copyOfRecordCertificateId)
         {
-            _logger.Info(message:"Enter CertificateDigitalSignatureManager.VerifySignature.");
+            _logger.Info(message:"Start: CertificateDigitalSignatureManager.VerifySignature.");
             try
             {
                 var dataToVerifyHash = HashHelper.ComputeSha256Hash(data:dataToVerify);
                 var dataToVerifyHashBytes = Encoding.UTF8.GetBytes(s:dataToVerifyHash);
                 var signedDataBytes = Convert.FromBase64String(s:currentSignatureStr);
+                
+                _logger.Info(message:"End: CertificateDigitalSignatureManager.VerifySignature.");
 
                 return VerifySignature(originData:dataToVerifyHashBytes, signedData:signedDataBytes, certificateId:copyOfRecordCertificateId);
             }
             catch (Exception ex)
             {
-                _logger.Info(message:$"Error happens in CertificateDigitalSignatureManager.VerifySignature.  Error: {ex.Message}");
+                var errors = new List<string> {ex.Message};
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                    errors.Add(item:ex.Message);
+                }
+
+                _logger.Error(message:"Error: CertificateDigitalSignatureManager.VerifySignature. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
                 return false;
             }
         }

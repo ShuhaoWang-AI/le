@@ -199,7 +199,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public void SendUserInvite(int targetOrgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType)
         {
-            _logger.Info(message:$"Enter InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
+            _logger.Info(message:$"Start: InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -417,7 +417,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 }
             }
 
-            _logger.Info(message:$"Leaving InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
+            _logger.Info(message:"End: InvitationService.SendUserInvite.");
         }
 
         public void CreateInvitation(InvitationDto dto)
@@ -444,7 +444,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public void DeleteInvitation(string invitationId, bool isSystemAction = false)
         {
-            _logger.Info(message: $"Enter InvitationService.DeleteInvitation. invitationId={invitationId}, isSystemAction={isSystemAction}");
+            _logger.Info(message: $"Start: InvitationService.DeleteInvitation. invitationId={invitationId}, isSystemAction={isSystemAction}");
 
             var invitation = _dbContext.Invitations
                                        .Include(x => x.RecipientOrganizationRegulatoryProgram.Organization)
@@ -512,7 +512,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteDeleted, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
 
-            _logger.Info(message: $"Exit InvitationService.DeleteInvitation. invitationId={invitationId}, isSystemAction={isSystemAction}");
+            _logger.Info(message: $"End: InvitationService.DeleteInvitation.");
         }
 
         public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)

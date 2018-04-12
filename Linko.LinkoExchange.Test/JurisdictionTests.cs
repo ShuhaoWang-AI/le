@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
             _logger = new Mock<ILogger>();
-            _jService = new JurisdictionService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), mapHelper:new MapHelper(), logService:_logger.Object);
+            _jService = new JurisdictionService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), mapHelper:new MapHelper(), logger:_logger.Object);
         }
 
         [TestMethod]

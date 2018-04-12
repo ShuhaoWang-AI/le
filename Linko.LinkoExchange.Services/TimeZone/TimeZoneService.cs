@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Settings;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.TimeZone
 {
@@ -19,17 +20,19 @@ namespace Linko.LinkoExchange.Services.TimeZone
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
         private readonly ISettingService _settings;
+        private readonly ILogger _logger;
 
         #endregion
 
         #region constructors and destructor
 
-        public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper, IApplicationCache appCache)
+        public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper, IApplicationCache appCache, ILogger logger)
         {
             _dbContext = dbContext;
             _settings = settings;
             _mapHelper = mapHelper;
             _appCache = appCache;
+            _logger = logger;
         }
 
         #endregion
@@ -112,7 +115,10 @@ namespace Linko.LinkoExchange.Services.TimeZone
             }
 
             var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(id:leTimeZone.Name);
-            return timezoneInfo.DisplayName.Substring(startIndex:timezoneInfo.DisplayName.IndexOf(value:" ") + 1);
+            return timezoneInfo.DisplayName.Substring(startIndex:timezoneInfo.DisplayName.Contains(value:" ")
+                                                                     ? timezoneInfo.DisplayName.IndexOf(value:" ", comparisonType:StringComparison.Ordinal) + 1
+                                                                     : 0
+                                                     );
         }
 
         public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
@@ -123,6 +129,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         public DateTimeOffset GetDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
         {
+            _logger.Info(message:$"Start: TimeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId. localDateTime={localDateTime}, timeZoneId={timeZoneId}");
             var authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(id:GetTimeZoneName(timeZoneId:timeZoneId));
             var serverTimeZone = TimeZoneInfo.Local;
 
@@ -132,6 +139,9 @@ namespace Linko.LinkoExchange.Services.TimeZone
             }
 
             var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime:localDateTime, sourceTimeZone:authorityLocalZone);
+
+            _logger.Info(message:"End: TimeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId.");
+
             return new DateTimeOffset(dateTime:utcDateTime).ToOffset(offset:serverTimeZone.GetUtcOffset(dateTime:utcDateTime));
         }
 

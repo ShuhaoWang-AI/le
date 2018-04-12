@@ -108,7 +108,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageTemplateId"> </param>
         public void DeleteReportPackageTemplate(int reportPackageTemplateId)
         {
-            _logger.Info(message:"Enter ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={0}", argument:reportPackageTemplateId);
+            _logger.Info(message:$"Start: ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={reportPackageTemplateId}");
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
@@ -129,7 +129,7 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
 
-                    _logger.Info(message:"Leave ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={0}", argument:reportPackageTemplateId);
+                    _logger.Info(message:"End: ReportTemplateService.DeleteReportPackageTemplate.");
                 }
                 catch
                 {
@@ -141,7 +141,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId)
         {
-            _logger.Info(message:"Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", argument:reportPackageTemplateId);
+            _logger.Info(message:$"Start: ReportTemplateService.GetReportPackageTemplate. reportPackageTemplateId={reportPackageTemplateId}");
 
             if (!CanUserExecuteApi(id:reportPackageTemplateId))
             {
@@ -160,13 +160,13 @@ namespace Linko.LinkoExchange.Services.Report
 
             var rptDto = GetReportPackageTemplateInner(rpt:rpt);
 
-            _logger.Info(message:"Enter ReportTemplateService.ReportPackageTemplateDto.");
+            _logger.Info(message:"End: ReportTemplateService.GetReportPackageTemplate.");
             return rptDto;
         }
 
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool isForCreatingDraft = false, bool includeChildObjects = true)
         {
-            _logger.Info(message:"Enter ReportTemplateService.GetReportPackageTemplates.");
+            _logger.Info(message:"Start: ReportTemplateService.GetReportPackageTemplates.");
 
             var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
@@ -209,7 +209,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
             var rptDtos = rpts.Select(rpt => GetReportPackageTemplateInner(rpt:rpt, includeChildObjects:includeChildObjects)).ToList();
 
-            _logger.Info(message:"Enter ReportTemplateService.ReportPackageTemplateDto. Return count={0}", argument:rptDtos.Count);
+            _logger.Info(message:$"End: ReportTemplateService.GetReportPackageTemplates. Count={rptDtos.Count}");
             return rptDtos;
         }
 
@@ -233,7 +233,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="rpt"> The ReportPackageTemplateDto Object </param>
         public int SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
         {
-            _logger.Info(message:"Enter ReportTemplateService.SaveReportPackageTemplate.");
+            _logger.Info(message:"Start: ReportTemplateService.SaveReportPackageTemplate.");
 
             var rptId = rpt.ReportPackageTemplateId ?? -1;
 
@@ -383,7 +383,7 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
 
-                    _logger.Info(message:"Leave ReportTemplateService.SaveReportPackageTemplate. rptId={0}", argument:rptId);
+                    _logger.Info(message:$"End: ReportTemplateService.SaveReportPackageTemplate. rptId={rptId}");
 
                     return rptId;
                 }
@@ -519,7 +519,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private ReportPackageTemplateDto GetReportPackageTemplateInner(ReportPackageTemplate rpt, bool includeChildObjects = true)
         {
-            _logger.Info(message:"Enter ReportTemplateService.ReportPackageTemplateDto.");
+            _logger.Info(message:"Start: ReportTemplateService.GetReportPackageTemplateInner.");
             var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(reportPackageTemplate:rpt);
 
@@ -563,7 +563,7 @@ namespace Linko.LinkoExchange.Services.Report
                 rptDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
             }
 
-            _logger.Info(message:"Leave ReportTemplateService.GetReportPackageTemplateInner.");
+            _logger.Info(message:"End: ReportTemplateService.GetReportPackageTemplateInner.");
             return rptDto;
         }
 

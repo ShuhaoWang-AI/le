@@ -50,7 +50,7 @@ namespace Linko.LinkoExchange.Services.Sync
         /// <param name="reportPackageId"> Report Package Id. </param>
         public void SendSubmittedReportPackageToCts(int reportPackageId)
         {
-            _logger.Info(message:$"Enter SyncService.SendSubmittedReportPackageToCts. ReportPackageId: {reportPackageId}");
+            _logger.Info(message:$"Start: SyncService.SendSubmittedReportPackageToCts. ReportPackageId: {reportPackageId}");
 
             var validationIssues = new List<RuleViolation>();
 
@@ -88,7 +88,7 @@ namespace Linko.LinkoExchange.Services.Sync
                         errors.Add(item:ex.Message);
                     }
 
-                    _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
+                    _logger.Error(message:"Error: SyncService.SendSubmittedReportPackageToCts. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                     validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
                                                                 errorMessage:"Send to CTS Failed. Unable to establish a connection to CTS. Please contact Linko for assistance."));
@@ -260,7 +260,7 @@ namespace Linko.LinkoExchange.Services.Sync
                             }
                         }
 
-                        _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
+                        _logger.Error(message:"Error: SyncService.SendSubmittedReportPackageToCts. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                         validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
                                                                     errorMessage:"Send to CTS Failed. An unknown error occurred. Please contact Linko for assistance."));
@@ -277,7 +277,7 @@ namespace Linko.LinkoExchange.Services.Sync
                             errors.Add(item:ex.Message);
                         }
 
-                        _logger.Error(message:"Error happens {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
+                        _logger.Error(message:"Error: SyncService.SendSubmittedReportPackageToCts. {0} ", argument:string.Join(separator:"," + Environment.NewLine, values:errors));
 
                         validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
                                                                     errorMessage:"Send to CTS Failed. An unknown error occurred. Please contact Linko for assistance."));
@@ -287,7 +287,7 @@ namespace Linko.LinkoExchange.Services.Sync
                 }
             }
 
-            _logger.Info(message:$"Leave SyncService.SendSubmittedReportPackageToCts. ReportPackageId: {reportPackageId}");
+            _logger.Info(message:$"End: SyncService.SendSubmittedReportPackageToCts. ReportPackageId: {reportPackageId}");
         }
 
         #endregion

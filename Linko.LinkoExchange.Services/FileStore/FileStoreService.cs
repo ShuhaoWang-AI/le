@@ -159,11 +159,11 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public List<string> GetValidAttachmentFileExtensions()
         {
-            _logger.Info(message:"Enter FileStoreService.GetValidAttachmentFileExtensions.");
+            _logger.Info(message:"Start: FileStoreService.GetValidAttachmentFileExtensions.");
 
             var fileTypes = _dbContext.FileTypes.Select(i => i.Extension);
 
-            _logger.Info(message:"Leave FileStoreService.GetValidAttachmentFileExtensions.");
+            _logger.Info(message:"End: FileStoreService.GetValidAttachmentFileExtensions.");
             return new List<string>(collection:fileTypes);
         }
 
@@ -185,7 +185,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public List<FileStoreDto> GetFileStores()
         {
-            _logger.Info(message:"Enter FileStoreService.GetFileStores.");
+            _logger.Info(message:"Start: FileStoreService.GetFileStores.");
 
             var currentRegulatoryProgramId =
                 int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -198,13 +198,13 @@ namespace Linko.LinkoExchange.Services.FileStore
 
             fileStoreDtos = fileStoreDtos.Select(i => FileStoreDtoHelper(fileStoreDto:i, currentOrgRegProgramId:currentRegulatoryProgramId)).ToList();
 
-            _logger.Info(message:"Leave FileStoreService.GetFileStores.");
+            _logger.Info(message:"End: FileStoreService.GetFileStores.");
             return fileStoreDtos;
         }
 
         public int CreateFileStore(FileStoreDto fileStoreDto)
         {
-            _logger.Info(message:"Enter FileStoreService.CreateFileStore.");
+            _logger.Info(message:"Start: FileStoreService.CreateFileStore.");
 
             if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
             {
@@ -276,7 +276,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                     _dbContext.FileStoreDatas.Add(entity:fileStoreData);
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction:transaction);
-                    _logger.Info(message:"Leave FileStoreService.CreateFileStore.");
+                    _logger.Info(message:"End: FileStoreService.CreateFileStore.");
 
                     return fileStore.FileStoreId;
                 }
@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public FileStoreDto GetFileStoreById(int fileStoreId, bool includingFileData = false)
         {
-            _logger.Info(message:"Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", argument:fileStoreId);
+            _logger.Info(message:$"Start: FileStoreService.GetFileStoreById. attachmentFileId={fileStoreId}.");
 
             if (!CanUserExecuteApi(id:fileStoreId))
             {
@@ -310,18 +310,18 @@ namespace Linko.LinkoExchange.Services.FileStore
             }
 
             FileStoreDtoHelper(fileStoreDto:fileStoreDto, currentOrgRegProgramId:currentRegulatoryProgramId);
-            _logger.Info(message:"Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", argument:fileStoreId);
+            _logger.Info(message:"End: FileStoreService.GetFileStoreById.");
 
             return fileStoreDto;
         }
 
         public void UpdateFileStore(FileStoreDto fileStoreDto)
         {
-            _logger.Info(message:"Enter FileStoreService.UpdateFileStore.");
+            _logger.Info(message:"Start: FileStoreService.UpdateFileStore.");
 
             if (fileStoreDto == null || fileStoreDto.FileStoreId.HasValue == false)
             {
-                _logger.Info(message:"Leave FileStoreService.UpdateFileStore. null filsStoreDto or fileStoreDto.FileStoreId");
+                _logger.Info(message:"End: FileStoreService.UpdateFileStore. null fileStoreDto or fileStoreDto.FileStoreId");
                 return;
             }
 
@@ -358,7 +358,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction:transaction);
-                    _logger.Info(message:"Leave FileStoreService.UpdateFileStore.");
+                    _logger.Info(message:"End: FileStoreService.UpdateFileStore.");
                 }
                 catch
                 {
@@ -370,7 +370,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public void DeleteFileStore(int fileStoreId)
         {
-            _logger.Info(message:"Enter FileStoreService.DeleteFileStore.");
+            _logger.Info(message:$"Start: FileStoreService.DeleteFileStore. fileStoreId = {fileStoreId}");
 
             if (!CanUserExecuteApi(id:fileStoreId))
             {
@@ -396,7 +396,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                     _dbContext.FileStores.Remove(entity:testFileStore);
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction:transaction);
-                    _logger.Info(message:"Leave FileStoreService.DeleteFileStore.");
+                    _logger.Info(message:"End: FileStoreService.DeleteFileStore.");
                 }
                 catch
                 {
@@ -408,11 +408,11 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public bool IsFileInReports(int fileStoreId)
         {
-            _logger.Info(message:"Enter FileStoreService.IsFileInReports.");
+            _logger.Info(message:$"Start: FileStoreService.IsFileInReports. fileStoreId = {fileStoreId}");
 
             var isFileInReports = _dbContext.ReportFiles.Any(i => i.FileStoreId == fileStoreId);
 
-            _logger.Info(message:"Leave FileStoreService.IsFileInReports.");
+            _logger.Info(message:$"End: FileStoreService.IsFileInReports. isFileInReports={isFileInReports}");
 
             return isFileInReports;
         }

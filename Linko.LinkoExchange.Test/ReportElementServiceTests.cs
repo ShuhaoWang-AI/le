@@ -52,7 +52,8 @@ namespace Linko.LinkoExchange.Test
                                                                                         globalSettings:new Mock<IGlobalSettings>().Object
                                                                                        ),
                                                             mapHelper:new MapHelper(),
-                                                            appCache:new Mock<IApplicationCache>().Object);
+                                                            appCache:new Mock<IApplicationCache>().Object, 
+                                                            logger:_logger.Object);
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(value:new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = 1});

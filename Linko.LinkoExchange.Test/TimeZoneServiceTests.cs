@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NLog;
 
 // ReSharper disable ArgumentsStyleNamedExpression
 // ReSharper disable ArgumentsStyleOther
@@ -23,12 +24,14 @@ namespace Linko.LinkoExchange.Test
 
         private Mock<ISettingService> _settings;
         private TimeZoneService _tZservice;
+        private Mock<ILogger> _logger;
 
         #endregion
 
         [TestInitialize]
         public void Initialize()
         {
+            _logger = new Mock<ILogger>();
             _settings = new Mock<ISettingService>();
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 1, It.IsAny<SettingType>())).Returns(value:"1");
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 2, It.IsAny<SettingType>())).Returns(value:"4");
@@ -36,7 +39,7 @@ namespace Linko.LinkoExchange.Test
 
             var connectionString = ConfigurationManager.ConnectionStrings[name:"LinkoExchangeContext"].ConnectionString;
             _tZservice = new TimeZoneService(dbContext:new LinkoExchangeContext(nameOrConnectionString:connectionString), settings:_settings.Object, mapHelper:new MapHelper(),
-                                             appCache:new Mock<IApplicationCache>().Object);
+                                             appCache:new Mock<IApplicationCache>().Object, logger:_logger.Object);
         }
 
         [TestMethod]
