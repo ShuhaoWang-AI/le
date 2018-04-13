@@ -1,28 +1,33 @@
-﻿doAjaxAction = function(grid, postUrl, returnUrl, noSelectionMessage)
-{
+﻿$(document)
+    .ajaxSend(function() {
+        window.kendo.ui.progress($("#mainContentInLayout"), true);
+    });
+
+$(document)
+    .ajaxStop(function() {
+        window.kendo.ui.progress($("#mainContentInLayout"), false);
+    });
+
+doAjaxAction = function(grid, postUrl, returnUrl, noSelectionMessage) {
     var selection = [];
 
     grid.select()
         .each(
-            function()
-            {
+            function() {
                 var dataItem = grid.dataItem($(this));
                 selection.push(dataItem);
             }
         );
 
-    if (selection.length > 0)
-    {
+    if (selection.length > 0) {
         $.ajax({
-            type: "POST"
-            , url: postUrl
-            , data: JSON.stringify({ returnUrl: returnUrl, items: selection })
-            , dataType: "JSON"
-            , contentType: "application/json; charset=utf-8"
-            , success: function(returnData)
-            {
-                if ($.trim(returnData.message).length > 0)
-                {
+            type: "POST",
+            url: postUrl,
+            data: JSON.stringify({ returnUrl: returnUrl, items: selection }),
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function(returnData) {
+                if ($.trim(returnData.message).length > 0) {
                     $("body")
                         .append('<div aria-labelledby="Ajax Return Message" class="fade modal modal-info" id="AjaxReturnDataMessageModal" role="dialog" tabindex="-1">'
                             + '<div class="modal-dialog" role="document">'
@@ -41,18 +46,14 @@
                     $("#AjaxReturnDataMessageModal").modal("toggle");
                 }
 
-                setTimeout(function()
-                {
-                    if (returnData.redirect)
-                    {
+                setTimeout(function() {
+                    if (returnData.redirect) {
                         window.location.replace(returnData.newurl);
                     }
                 }, 500);
             }
         });
-    }
-    else
-    {
+    } else {
         $("body")
             .append('<div aria-labelledby="No Selection Message" class="fade modal modal-info" id="NoSelectionMessageModal" role="dialog" tabindex="-1">'
                 + '<div class="modal-dialog" role="document">'
@@ -73,34 +74,26 @@
 };
 
 $(document)
-    .on("ajaxError", function(event, jqXHR)
-    {
+    .on("ajaxError", function(event, jqXHR) {
         var json_response = jqXHR.getResponseHeader("X-Responded-JSON");
 
-        if (json_response)
-        {
+        if (json_response) {
             var json_response_obj = JSON.parse(json_response);
 
-            if (json_response_obj.status == 401)
-            {
+            if (json_response_obj.status == 401) {
                 $(location).attr("href", json_response_obj.headers.location); //login URL
                 return;
             }
         }
     });
 
-error_handler = function(e)
-{
-    if (e.errors)
-    {
+error_handler = function(e) {
+    if (e.errors) {
         var message = "There are some errors:\n";
         // Create a message containing all errors.
-        $.each(e.errors, function(key, value)
-        {
-            if ("errors" in value)
-            {
-                $.each(value.errors, function()
-                {
+        $.each(e.errors, function(key, value) {
+            if ("errors" in value) {
+                $.each(value.errors, function() {
                     message += this + "\n";
                 });
             }
@@ -115,8 +108,7 @@ error_handler = function(e)
     }
 };
 
-showPopupMessage = function(message)
-{
+showPopupMessage = function(message) {
     $("body")
         .append('<div aria-labelledby="Error Handler Message" class="fade modal modal-info" id="ErrorHandlerModal" role="dialog" tabindex="-1">'
             + '<div class="modal-dialog" role="document">'
@@ -136,8 +128,7 @@ showPopupMessage = function(message)
 };
 
 $(document)
-    .ready(function()
-    {
+    .ready(function() {
         setTelephoneMask();
 
         $("#LinkoExchangeForm").submit(disableButtonsOnSubmit);
@@ -147,48 +138,38 @@ $(document)
     });
 
 $(document)
-    .keypress(function(e)
-    {
+    .keypress(function(e) {
         // http://www.itorian.com/2012/07/stop-from-submission-posting-on-enter.html
         var evt = (e) ? e : ((event) ? event : null);
         var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
 
-        if (evt.which === 13 && node.type && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button" && node.type.toLowerCase() !== "submit")
-        {
+        if (evt.which === 13 && node.type && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button" && node.type.toLowerCase() !== "submit") {
             return false;
         }
         return true;
     });
 
 
-if (!String.prototype.startsWith)
-{
-    String.prototype.startsWith = function(searchString, position)
-    {
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position) {
         position = position || 0;
         return this.indexOf(searchString, position) === position;
     };
 }
 
-function disableAutoComplete()
-{
+function disableAutoComplete() {
     $("input[type='text'").attr("autocomplete", "off");
     $("input[type='tel'").attr("autocomplete", "off");
 }
 
-function disableButtonsOnSubmit()
-{
+function disableButtonsOnSubmit() {
     var isFormValid = true;
 
-    try
-    {
+    try {
         isFormValid = $(this).valid();
-    }
-    catch (e)
-    {}
+    } catch (e) {}
 
-    if (isFormValid)
-    {
+    if (isFormValid) {
         $("input[type='submit']").prop("disabled", true);
         $("input[type='button']").prop("disabled", true);
         //setTimeout(function()
@@ -200,8 +181,7 @@ function disableButtonsOnSubmit()
     }
 }
 
-function limitTextAreaMaxCharacters()
-{
+function limitTextAreaMaxCharacters() {
     //Counts all the newline characters (\r = return for macs, \r\n for Windows, \n for Linux/unix)
     var newLineCharacterRegexMatch = /\r?\n|\r/g;
 
@@ -220,8 +200,7 @@ function limitTextAreaMaxCharacters()
     var length = replacedValue.length + (newLineCount * 2);
 
     // Trim the field if it has content over the maxlength.
-    if (length > maxlength)
-    {
+    if (length > maxlength) {
         $(this).val(val.slice(0, val.length - (length - maxlength)));
     }
 }
@@ -231,10 +210,11 @@ function setTelephoneMask() {
 
     function init(eleType) {
         var key = "input[type='" + eleType + "']";
-        $(key).each(function (idx, obj) {
-            obj.onchange = onValueChanged;
-            $(obj).val(obj.value).change();
-        });
+        $(key)
+            .each(function(idx, obj) {
+                obj.onchange = onValueChanged;
+                $(obj).val(obj.value).change();
+            });
     }
 
     function onValueChanged() {
@@ -249,7 +229,7 @@ function setTelephoneMask() {
         var digitalMask10 = "(XXX) XXX-XXXX";
         var digitalMask7 = "XXX-XXXX";
 
-        var telephoneNumbers = this.value.split('');
+        var telephoneNumbers = this.value.split("");
         var formatOutPut = "";
 
         // format the string
@@ -265,8 +245,7 @@ function setTelephoneMask() {
                     formatOutPut = formatOutPut + digitalMask7.charAt(j);
                 }
             }
-        }
-        else if (telephoneNumbers.length === 10) {
+        } else if (telephoneNumbers.length === 10) {
             for (var j = 0; j < digitalMask10.length; j++) {
                 if (digitalMask10.charAt(j) === "X") {
                     if (telephoneNumbers.length === 0) {

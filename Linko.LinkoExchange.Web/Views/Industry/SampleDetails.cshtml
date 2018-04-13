@@ -1254,11 +1254,11 @@
             function ReloadParameterGroups()
             {
                 //Start date
-                $("#StartDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
+                $("#StartDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                 $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
                 //End date
-                $("#EndDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
+                $("#EndDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                 $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
                 if ($('#StartDateTimeLocal').val() == "" || $('#EndDateTimeLocal').val() == "" || $('#CollectionMethodId').val() < 1)
@@ -1272,14 +1272,14 @@
                 viewModel.endDateTime = $('#EndDateTimeLocal').val();
                 viewModel.collectionMethodId = $('#CollectionMethodId').val();
 
-                var postUrl =
-                    "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
+                var postUrl ="@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
 
                 $.ajax({
-                    type: "POST",
-                    url: postUrl,
-                    data: viewModel,
-                    success: function(response) {
+                        type: "POST",
+                        url: postUrl,
+                        data: viewModel
+                    })
+                    .done(function(response) {
                         if (response.hasError != null && response.hasError) {
                             alert(response.message);
                         } else {
@@ -1317,12 +1317,9 @@
                                     displayMassLoadingCompliance(paramId);
                                 });
                         }
-                    }
-                    //, error: function()
-                    //    {}
-                });
-            }
+                    });
 
+            }
         </script>
     }
 
