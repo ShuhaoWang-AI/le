@@ -296,7 +296,7 @@ namespace Linko.LinkoExchange.Services.Organization
             var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:orgRegProgram);
             var signatoryUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                                                .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
-                                                           && o.IsSignatory);
+                                                           && o.IsSignatory && !o.IsRemoved);
             dto.HasSignatory = signatoryUserCount > 0;
             var adminUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
                                            .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
@@ -360,7 +360,7 @@ namespace Linko.LinkoExchange.Services.Organization
             {
                 var dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:childOrgRegProg);
                 dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
-                                             .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
+                                             .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory && !o.IsRemoved)
                                    > 0;
                 dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include(path:"PermissionGroup")
                                                .Count(o => o.OrganizationRegulatoryProgramId == childOrgRegProg.OrganizationRegulatoryProgramId
