@@ -1712,8 +1712,8 @@ namespace Linko.LinkoExchange.Services.Report
                                                                                       settingType:SettingType.EmailContactInfoPhone);
 
                     contentReplacements.Add(key:"authorityName", value:authorityName);
-                    contentReplacements.Add(key:"supportEmail", value:authorityEmail);
-                    contentReplacements.Add(key:"supportPhoneNumber", value:authorityPhone);
+                    contentReplacements.Add(key:"authoritySupportEmail", value:authorityEmail);
+                    contentReplacements.Add(key:"authoritySupportPhoneNumber", value:authorityPhone);
 
                     //For Cromerr
                     contentReplacements.Add(key:"organizationName", value:reportPackage.OrganizationName);
@@ -2160,8 +2160,8 @@ namespace Linko.LinkoExchange.Services.Report
                                                                                   settingType:SettingType.EmailContactInfoPhone);
 
             emailContentReplacements.Add(key:"authorityName", value:contactUserNameOnEmail);
-            emailContentReplacements.Add(key:"supportEmail", value:emailAddressOnEmail);
-            emailContentReplacements.Add(key:"supportPhoneNumber", value:phoneNumberOnEmail);
+            emailContentReplacements.Add(key:"authoritySupportEmail", value:emailAddressOnEmail);
+            emailContentReplacements.Add(key:"authoritySupportPhoneNumber", value:phoneNumberOnEmail);
 
             emailContentReplacements.Add(key:"corViewLink", value:$"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/Details");
 

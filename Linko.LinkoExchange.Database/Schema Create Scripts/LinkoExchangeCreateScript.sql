@@ -4996,7 +4996,7 @@ Your LinkoExchange Registration has been denied for the following:
     Authority:  {authorityOrganizationName} 
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}. 
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}. 
                 </pre>
             </body>
          </html>' 
@@ -5025,7 +5025,7 @@ Your LinkoExchange Registration has been denied for the following:
                 {cityName}, {stateName} 
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}. 
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}. 
                 </pre>
             </body>
         </html>' 
@@ -5056,7 +5056,7 @@ Your LinkoExchange Registration has been approved for the following:
 You can log in here: {link} 
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
          </html>'
@@ -5084,7 +5084,7 @@ Your LinkoExchange Registration has been approved for the following:
 You can log in here: {link} 
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5110,7 +5110,6 @@ For security reasons, your account has been locked by the Authority. Please cont
     {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}  
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                  </pre>
             </body>
         </html>' 
@@ -5164,7 +5163,7 @@ Please click the link below or copy and paste the link into your web browser.
     {link}
                         
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'  
@@ -5194,7 +5193,7 @@ To accept the invitation, please click here or copy and paste the link below int
     {link}
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5238,7 +5237,7 @@ To accept the invitation, please click here or copy and paste the link below int
     {link}
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5269,7 +5268,7 @@ Your signatory rights have been granted for
 You are now able to electronically sign report submissions. 
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5299,7 +5298,7 @@ Signatory rights have been granted for:
                {cityName}, {stateName} 
     
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
             </pre>
             </body>
 </html>'
@@ -5330,7 +5329,7 @@ Your signatory rights have been removed for
 You are no longer able to electronically sign report submissions.
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'  
@@ -5360,7 +5359,7 @@ Signatory rights have been revoked for:
                {cityName}, {stateName} 
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
               </pre>
            </body>
 </html>'  
@@ -5619,7 +5618,7 @@ The following user has registered at LinkoExchange and requires action:
                     {cityName}, {stateName}
                       
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>' 
@@ -5645,7 +5644,7 @@ The following user has registered at LinkoExchange and requires action:
      Authority:  {authorityOrganizationName} 
                       
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>' 
@@ -5696,7 +5695,7 @@ The following user has completed a registration reset and requires action:
     Registrant:  {firstName} {lastName}
                       
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'  
@@ -5729,7 +5728,7 @@ To accept the invitation, please click here or copy and paste the link below int
     {link}
                      
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5779,7 +5778,7 @@ To view the report in LinkoExchange, click the link below or copy and paste the 
 
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5980,7 +5979,7 @@ To view the report in LinkoExchange, click the link below or copy and paste the 
 	
                             
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact {authorityName} at {authoritySupportEmail} or {authoritySupportPhoneNumber}.
                 </pre>
             </body>
         </html>'  

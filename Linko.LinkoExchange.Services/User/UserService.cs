@@ -1275,10 +1275,8 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add(key:"lastName", value:orgRegProgUserDto.UserProfileDto.LastName);
                 contentReplacements.Add(key:"authorityName", value:authorityName);
                 contentReplacements.Add(key:"authorityOrganizationName", value:authority.OrganizationDto.OrganizationName);
-                contentReplacements.Add(key:"phoneNumber", value:authorityPhoneNumber);
-                contentReplacements.Add(key:"emailAddress", value:authorityEmail);
-                contentReplacements.Add(key:"supportPhoneNumber", value:authorityPhoneNumber);
-                contentReplacements.Add(key:"supportEmail", value:authorityEmail);
+                contentReplacements.Add(key:"authoritySupportPhoneNumber", value:authorityPhoneNumber);
+                contentReplacements.Add(key:"authoritySupportEmail", value:authorityEmail);
 
                 if (!isAuthorityUser)
                 {
@@ -1434,9 +1432,9 @@ namespace Linko.LinkoExchange.Services.User
             var stateName = orgRegProgram.Organization.JurisdictionId.HasValue
                                 ? _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code
                                 : "";
-            var emailAddress = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
                                                                             settingType:SettingType.EmailContactInfoEmailAddress);
-            var phoneNumber = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
+            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:authority.OrganizationRegulatoryProgramId,
                                                                            settingType:SettingType.EmailContactInfoPhone);
 
             var contentReplacements = new Dictionary<string, string>
@@ -1451,8 +1449,8 @@ namespace Linko.LinkoExchange.Services.User
                                           {"addressLine1", orgRegProgram.Organization.AddressLine1},
                                           {"cityName", orgRegProgram.Organization.CityName},
                                           {"stateName", stateName},
-                                          {"supportEmail", emailAddress},
-                                          {"supportPhoneNumber", phoneNumber}
+                                          {"authoritySupportEmail", authorityEmail},
+                                          {"authoritySupportPhoneNumber", authorityPhone}
                                       };
 
             //Email user
@@ -1507,8 +1505,8 @@ namespace Linko.LinkoExchange.Services.User
                                                       {"addressLine1", orgRegProgram.Organization.AddressLine1},
                                                       {"cityName", orgRegProgram.Organization.CityName},
                                                       {"stateName", stateName},
-                                                      {"emailAddress", emailAddress},
-                                                      {"phoneNumber", phoneNumber}
+                                                      {"authoritySupportEmail", authorityEmail},
+                                                      {"authoritySupportPhoneNumber", authorityPhone}
                                                   };
 
                 emailEntries.Add(item:_linkoExchangeEmailService.GetEmailEntryForUser(user:admin, emailType:adminEmailType,

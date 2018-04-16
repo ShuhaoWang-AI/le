@@ -324,10 +324,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     contentReplacements.Add(key:"authorityName", value:authorityName);
                     contentReplacements.Add(key:"authorityOrganizationName", value:authority.OrganizationDto.OrganizationName);
-                    contentReplacements.Add(key:"emailAddress", value:authorityEmail);
-                    contentReplacements.Add(key:"phoneNumber", value:authorityPhone);
-                    contentReplacements.Add(key:"supportEmail", value:authorityEmail);
-                    contentReplacements.Add(key:"supportPhoneNumber", value:authorityPhone);
+                    contentReplacements.Add(key:"authoritySupportEmail", value:authorityEmail);
+                    contentReplacements.Add(key:"authoritySupportPhoneNumber", value:authorityPhone);
 
                     if (invitationType == InvitationType.AuthorityToIndustry
                         || invitationType == InvitationType.IndustryToIndustry)
@@ -512,7 +510,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 _crommerAuditLogService.Log(eventType:CromerrEvent.Registration_InviteDeleted, dto:cromerrAuditLogEntryDto, contentReplacements:contentReplacements);
             }
 
-            _logger.Info(message: $"End: InvitationService.DeleteInvitation.");
+            _logger.Info(message: "End: InvitationService.DeleteInvitation.");
         }
 
         public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)

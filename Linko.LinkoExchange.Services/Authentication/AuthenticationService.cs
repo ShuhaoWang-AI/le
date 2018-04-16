@@ -1511,8 +1511,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                                            {
                                                {"firstName", registeredUser.FirstName},
                                                {"lastName", registeredUser.LastName},
-                                               {"supportEmail", emailAddressOnEmail},
-                                               {"supportPhoneNumber", phoneNumberOnEmail},
+                                               {"authoritySupportEmail", emailAddressOnEmail},
+                                               {"authoritySupportPhoneNumber", phoneNumberOnEmail},
                                                {"authorityName", authorityName},
                                                {"authorityOrganizationName", authorityOrg.OrganizationName},
                                                {"organizationName", registeredOrganizationRegulatoryProgram.OrganizationDto.OrganizationName}
