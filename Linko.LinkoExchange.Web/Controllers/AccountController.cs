@@ -408,7 +408,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             model.AgreeTermsAndConditions = false;
 
-            ViewBag.invalidKbqMessages = inValidSqMessages.Distinct();
+            ViewBag.invalidKbqMessages = inValidKbqMessages.Distinct();
             ViewBag.inValidSqMessages = inValidSqMessages.Distinct();
             ViewBag.inValidUserProfileMessages = inValidUserProfileMessages.Distinct();
             _logger.Info(message:$"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result}");

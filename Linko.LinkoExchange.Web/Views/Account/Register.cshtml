@@ -31,15 +31,11 @@
     }
 </style>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
 {
-    @Html.HiddenFor(model => model.Token)
-
     @Html.AntiForgeryToken()
-    @*<input id="profileCollapsed" name="profileCollapsed" type="hidden" value="false" />
-        <input id="kbqCollapsed" name="kbqCollapsed" type="hidden" value="false" />
-        <input id="sqCollapsed" name="sqCollapsed" type="hidden" value="false" />*@
 
+    @Html.HiddenFor(model => model.Token)
     @Html.HiddenFor(m => m.RegistrationType)
 
     if (Model.RegistrationType == RegistrationType.ReRegistration)
@@ -73,7 +69,7 @@
             <div>
                 @if (inValidProfile)
                 {
-                    <div class="alert alert-danger validation-summary-errors">
+                    <div class="alert alert-danger validation-summary-errors" id="ValidationSummaryUserProfile">
                         <ul>
                             @foreach (var message in inValidUserProfileMessages)
                             {
@@ -416,12 +412,6 @@
                 }
 
             </section>
-
-            @*<div class="box-footer">
-                    <div class="form-group">
-                        <div id="profileNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                    </div>
-                </div>*@
         </div>
     </div>
 
@@ -441,7 +431,7 @@
             <div>
                 @if (inValidKBQ)
                 {
-                    <div class="alert alert-danger validation-summary-errors">
+                    <div class="alert alert-danger validation-summary-errors" id="ValidationSummaryKbq">
                         <ul>
                             @foreach (var message in inValidKbqMessages)
                             {
@@ -450,7 +440,6 @@
                         </ul>
                     </div>
                 }
-
             </div>
 
             <section class="box-body form-horizontal">
@@ -734,13 +723,7 @@
                         </div>
                     </div>
                 </div>
-
             </section>
-            @*<div class="box-footer">
-                    <div class="form-group">
-                        <div id="kbqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                    </div>
-                </div>*@
         </div>
     </div>
 
@@ -760,7 +743,7 @@
             <div>
                 @if (inValidSQ)
                 {
-                    <div class="alert alert-danger validation-summary-errors">
+                    <div class="alert alert-danger validation-summary-errors" id="ValidationSummarySq">
                         <ul>
                             @foreach (var message in inValidSqMessages)
                             {
@@ -900,13 +883,6 @@
             <h3 class="box-title">Terms and Conditions</h3>
         </div>
         <div class="box-body">
-            @*<div class="form-group">
-                    <div class="col-md-8 col-md-offset-2 well">
-                        <div id="divTermsAndConditions">
-                            @Html.Raw(value:ViewBag.TermsAndConditionsHtml)
-                        </div>
-                    </div>
-                </div>*@
             <div class="form-group">
                 <div class="col-md-10 col-md-offset-2">
                     <div class="checkbox-inline input-group" style="margin-left: -35px">
@@ -936,10 +912,8 @@
         var registrationType = '@Html.Raw(value:Model.RegistrationType.ToString())';
 
         $(document)
-            .ready(function()
-            {
-                if (registrationType == 'ReRegistration')
-                {
+            .ready(function() {
+                if (registrationType == 'ReRegistration') {
                     // User can not change any thing
                     $("input").attr("readonly", true);
                     $(".editabledDiv select").attr("disabled", "disabled");
@@ -947,15 +921,11 @@
                     // Hide KBQ and SQ panels 
                     $("#kbq-panel").hide();
                     $("#sq-panel").hide();
-                }
-                else if (registrationType == 'ResetRegistration')
-                {
+                } else if (registrationType == 'ResetRegistration') {
                     // Everything should be editable except email and username
                     $("#UserProfile_Email").attr("readonly", true);
                     $("#UserProfile_UserName").attr("readonly", true);
-                }
-                else if (registrationType == 'NewRegistration')
-                {
+                } else if (registrationType == 'NewRegistration') {
                     // All inputs are open to user
                 }
 
@@ -963,32 +933,31 @@
 
                 $(document)
                     .find("#kbq-panel select")
-                    .on("change", function()
-                    {
+                    .on("change", function() {
                         $(this).closest(".form-group").next().find("input[type=text]").val("");
                     });
                 $(document)
                     .find("#sq-panel select")
-                    .on("change", function()
-                    {
+                    .on("change", function() {
                         $(this).closest(".form-group").next().find("input[type=text]").val("");
                     });
 
                 $('#AgreeTermsAndConditions')
-                    .on('ifChecked', function()
-                    {
+                    .on('ifChecked', function() {
                         $('#register').prop('disabled', false);
                     })
-                    .on('ifUnchecked', function()
-                    {
+                    .on('ifUnchecked', function() {
                         $('#register').prop('disabled', true);
                     });
 
                 $('#AgreeTermsAndConditions').iCheck('uncheck');
 
                 $(document)
-                    .on("click", "#register", function()
-                        {});
+                    .on("click", "#register", function() {
+                        $('#ValidationSummaryUserProfile').remove();
+                        $('#ValidationSummaryKbq').remove();
+                        $('#ValidationSummarySq').remove();
+                    });
 
 
                 disableAutoComplete();
