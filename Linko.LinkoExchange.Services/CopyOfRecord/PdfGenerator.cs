@@ -78,6 +78,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             // report info part  
             ReportInfoTable(pdfPage:_pdfPage);
 
+            if(!_reportPackage.ReportPackageElementCategories.Contains(item:ReportElementCategoryName.SamplesAndResults))
+            {
+                CommentTable();
+            }
+
             //TO determine the order of the following 3 sections 
             foreach (var elementCategory in _reportPackage.ReportPackageElementCategories)
             {

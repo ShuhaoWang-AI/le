@@ -2207,6 +2207,11 @@ namespace Linko.LinkoExchange.Services.Report
             var attachmentsCloned = TakeOffXElementNode(node:attachments);
             var commentCloned = TakeOffXElementNode(node:comment);
 
+            if(comment != null && !reportPackageDto.ReportPackageElementCategories.Contains(item:ReportElementCategoryName.SamplesAndResults))
+            {
+                xmlDoc.Root.Add(content:commentCloned);
+            }
+
             foreach (var categoryName in reportPackageDto.ReportPackageElementCategories)
             {
                 switch (categoryName)
