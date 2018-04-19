@@ -33,6 +33,7 @@ namespace Linko.LinkoExchange.Web
                                                     AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                                                     LoginPath = new PathString(value:"/Account/SignIn"),
                                                     ExpireTimeSpan = TimeSpan.FromMinutes(value:cookieValidateInterval),
+                                                    SlidingExpiration = true,
                                                     Provider = new CookieAuthenticationProvider
                                                                {
                                                                    OnResponseSignIn = context => { context.Properties.IsPersistent = false; },
