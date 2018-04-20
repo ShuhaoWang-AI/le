@@ -89,12 +89,12 @@ $(document)
 
 error_handler = function(e) {
     if (e.errors) {
-        var message = "There are some errors:\n";
+        var message = "<br>There are some errors:</br>";
         // Create a message containing all errors.
         $.each(e.errors, function(key, value) {
             if ("errors" in value) {
                 $.each(value.errors, function() {
-                    message += this + "\n";
+                    message +="<br>" + this + "</br>";
                 });
             }
         });

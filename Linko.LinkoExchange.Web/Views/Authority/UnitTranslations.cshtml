@@ -1,0 +1,86 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.Authority
+@{
+    ViewBag.Title = "Unit Translations";
+}
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
+{
+    @Html.AntiForgeryToken()
+
+    <section class="">
+        <ol class="breadcrumb">
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li class="active">Unit Translations</li>
+        </ol>
+    </section>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Units</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <section class="box-body form-horizontal">
+            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-info"})
+            <p>
+                <h5>
+                    For LinkoExchange to automatically convert results to the unit identified in an industry's permit, it must be translated to a known System Unit.
+                    If you want the Authority unit to be available for an industry to choose when importing data into the system, select that here too.
+                </h5>
+            </p>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<AuthorityUnitViewModel>()
+                          .Name(componentName:"gridAuthorityUnitTranslation")
+                          .Columns(columns =>
+                                   {
+                                       columns.Bound(c => c.Name)
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.SystemUnit).ClientTemplate(value:"#= (SystemUnit==null)? '' : SystemUnit.Name #")
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
+                                   })
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled:true)
+                                                    .Refresh(enabled:true)
+                                                    .Input(enabled:true)
+                                                    .Numeric(enabled:false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
+                          //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                          .Resizable(resizable => resizable.Columns(value:true))
+                          .Scrollable(s => s.Height(value:"auto"))
+                          .NoRecords(text:"No authority unit exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled:false)
+                                                        .Batch(enabled:false)
+                                                        .Sort(sort => { sort.Add(memberName:"Name").Ascending(); }) // <-- initial sort expression
+                                                        .Read(read => read.Action(actionName:"UnitTranslations_Read", controllerName:"Authority"))
+                                                        .Update(update => update.Action(actionName:"UnitTranslations_Update", controllerName:"Authority"))
+                                                        .PageSize(pageSize:25)
+                                                        .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                               {
+                                                                   model.Id(p => p.Id);
+                                                                   model.Field(p => p.Id).Editable(enabled:false);
+                                                                   model.Field(p => p.Name).Editable(enabled:false);
+                                                                   model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
+                                                                   model.Field(p => p.IsAvailableToRegulatee);
+                                                               })
+                          )
+                          )
+                </div>
+            </div>
+        </section>
+    </div>
+}

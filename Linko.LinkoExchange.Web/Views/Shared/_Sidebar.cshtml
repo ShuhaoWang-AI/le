@@ -98,20 +98,6 @@
                                 <i class="fa fa-fw"></i>
                                 <span>Report Elements</span>
                             </a>
-                            @*<ul class="treeview-menu">
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-fw"></i>
-                                        <span>Certifications</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-fw"></i>
-                                        <span>Attachments</span>
-                                    </a>
-                                </li>
-                            </ul>*@
                         </li>
                         <li class="@Html.IsActive(actions:"ParameterGroups,ParameterGroupDetails", controllers:"Authority")">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ParameterGroups", controllerName:"Authority")'">
@@ -122,10 +108,16 @@
                     </ul>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings", controllers:"Authority")">
+                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings,UnitTranslations", controllers:"Authority")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Authority Account</span>
+                        @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
+                        {
+                            <span class="pull-right-container">
+                                <span class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                            </span>
+                        }
                     </a>
                     <ul class="treeview-menu">
                         <li class="@Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset", controllers:"Authority")">
@@ -138,6 +130,18 @@
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Settings", controllerName:"Authority")'">
                                 <i class="fa fa-cog fa-fw"></i>
                                 <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="@Html.IsActive(actions:"UnitTranslations", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"UnitTranslations", controllerName:"Authority")'">
+                                <i class="fa fa-cog fa-fw"></i>
+                                <span>Unit Translations</span>
+                                @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                     </ul>

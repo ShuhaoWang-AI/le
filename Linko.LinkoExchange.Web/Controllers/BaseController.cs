@@ -65,6 +65,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                         filterContext.Controller.ViewBag.SampleCount_Draft = sampleStatusCounts.SingleOrDefault(c => c.Status == SampleStatusName.Draft)?.Count;
                         filterContext.Controller.ViewBag.SampleCount_ReadyToReport = sampleStatusCounts.SingleOrDefault(c => c.Status == SampleStatusName.ReadyToReport)?.Count;
                     }
+                    else if (portalName.ToLower().Equals(value:"authority"))
+                    {
+                        filterContext.Controller.ViewBag.PendingUnitTranslationsCount = 5;//TODO: Update when service layer is done
+                    }
                 }
             }
             else

@@ -465,6 +465,8 @@
     <Content Include="Views\Home\PrivacyPolicy.cshtml" />
     <Content Include="Views\Shared\_ConfirmationMessageView.cshtml" />
     <Content Include="Views\User\_QuestionAnswer.cshtml" />
+    <Content Include="Views\Authority\UnitTranslations.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\SystemUnitEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -507,6 +509,8 @@
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuditLogViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthoritySettingsViewModel.cs" />
+    <Compile Include="ViewModels\Authority\SystemUnitViewModel.cs" />
+    <Compile Include="ViewModels\Authority\AuthorityUnitViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />

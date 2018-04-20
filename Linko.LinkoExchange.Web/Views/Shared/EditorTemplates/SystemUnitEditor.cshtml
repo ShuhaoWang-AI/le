@@ -1,0 +1,9 @@
+﻿@using System.Collections
+@model Linko.LinkoExchange.Web.ViewModels.Authority.SystemUnitViewModel
+
+@(Html.Kendo().DropDownList() //.DropDownListFor(m => m)
+      .Name(componentName:"SystemUnit")
+      .DataValueField(field:"Id")
+      .DataTextField(field:"Name")
+      .BindTo(data:(IEnumerable) ViewData[key:"availableSystemUnits"])
+      )

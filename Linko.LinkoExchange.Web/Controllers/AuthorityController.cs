@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -310,10 +309,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ReportRepudiatedDaysDefault = programSettings.Settings
                                                                              .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                              .Select(s => s.DefaultValue).First(),
-                                ComplianceDeterminationDate = (ComplianceDeterminationDate)Enum.Parse(typeof(ComplianceDeterminationDate), 
-                                                                    programSettings.Settings
-                                                                                    .Where(s => s.TemplateName.Equals(obj: SettingType.ComplianceDeterminationDate))
-                                                                                    .Select(s => s.DefaultValue).First()),
+                                ComplianceDeterminationDate = (ComplianceDeterminationDate) Enum.Parse(enumType:typeof(ComplianceDeterminationDate),
+                                                                                                       value:programSettings.Settings
+                                                                                                                            .Where(s => s.TemplateName.Equals(obj:SettingType
+                                                                                                                                                                  .ComplianceDeterminationDate))
+                                                                                                                            .Select(s => s.DefaultValue).First()),
                                 MassLoadingConversionFactorPounds = programSettings.Settings
                                                                                    .Where(s => s.TemplateName.Equals(obj:SettingType.MassLoadingConversionFactorPounds))
                                                                                    .Select(s => s.Value).First(),
@@ -993,7 +993,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(model:model);
         }
- 
+
         public ActionResult Industries_Read([DataSourceRequest] DataSourceRequest request, string searchString)
         {
             var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -2381,20 +2381,21 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                               Name = t.Name,
                                                                                                               Description = t.Description,
                                                                                                               IsRequired = t.IsRequiredInTemplate
-                                                                                                    }).ToList(),
-                                ReportPackageTemplateAssignments = reportPackageTemplate.ReportPackageTemplateAssignments.Select(vm => new IndustryViewModel
-                                                                                                                                       {
-                                                                                                                                           Id = vm.OrganizationRegulatoryProgramId,
-                                                                                                                                           IndustryNo = vm.OrganizationDto.OrganizationId,
-                                                                                                                                           ReferenceNumber = vm.ReferenceNumber,
-                                                                                                                                           IndustryName = vm.OrganizationDto.OrganizationName,
-                                                                                                                                           AddressLine1 = vm.OrganizationDto.AddressLine1,
-                                                                                                                                           AddressLine2 = vm.OrganizationDto.AddressLine2,
-                                                                                                                                           CityName = vm.OrganizationDto.CityName,
-                                                                                                                                           State = vm.OrganizationDto.State,
-                                                                                                                                           ZipCode = vm.OrganizationDto.ZipCode,
-                                                                                                                                           Classification = vm.OrganizationDto.Classification
-                                                                                                                                       }).ToList(),
+                                                                                                          }).ToList(),
+                                ReportPackageTemplateAssignments = reportPackageTemplate.ReportPackageTemplateAssignments
+                                                                                        .Select(vm => new IndustryViewModel
+                                                                                                      {
+                                                                                                          Id = vm.OrganizationRegulatoryProgramId,
+                                                                                                          IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                                                                          ReferenceNumber = vm.ReferenceNumber,
+                                                                                                          IndustryName = vm.OrganizationDto.OrganizationName,
+                                                                                                          AddressLine1 = vm.OrganizationDto.AddressLine1,
+                                                                                                          AddressLine2 = vm.OrganizationDto.AddressLine2,
+                                                                                                          CityName = vm.OrganizationDto.CityName,
+                                                                                                          State = vm.OrganizationDto.State,
+                                                                                                          ZipCode = vm.OrganizationDto.ZipCode,
+                                                                                                          Classification = vm.OrganizationDto.Classification
+                                                                                                      }).ToList(),
                                 ReportPackageTemplateElementCategories = reportPackageTemplate.ReportPackageTemplateElementCategories
                             };
             }
@@ -2452,12 +2453,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             viewModel.AllSamplesAndResultsTypes = _reportElementService
-                .GetReportElementTypes(categoryName: ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
-                                                                                                         {
-                                                                                                             Id = vm.ReportElementTypeId,
-                                                                                                             Name = vm.Name,
-                                                                                                             Description = vm.Description
-                                                                                                         }).ToList();
+                .GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
+                                                                                                              {
+                                                                                                                  Id = vm.ReportElementTypeId,
+                                                                                                                  Name = vm.Name,
+                                                                                                                  Description = vm.Description
+                                                                                                              }).ToList();
 
             viewModel.AllAttachmentTypes = _reportElementService
                 .GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
@@ -2494,12 +2495,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
-                                                                                                                                                           {
-                                                                                                                                                               Text = $@"{c.Name} ({c.CtsEventCategoryName})",
-                                                                                                                                                               Value = c.CtsEventTypeId.ToString(),
-                                                                                                                                                               Selected =c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                                                                           }).ToList();
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName)
+                                                                     .Select(c => new SelectListItem
+                                                                                  {
+                                                                                      Text = $@"{c.Name} ({c.CtsEventCategoryName})",
+                                                                                      Value = c.CtsEventTypeId.ToString(),
+                                                                                      Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                  }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
             if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected) && viewModel.CtsEventTypeName.Trim().Length > 0)
@@ -2546,11 +2548,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 reportPackageTemplateDto.EffectiveDateTimeLocal = model.EffectiveDateTimeLocal;
                 reportPackageTemplateDto.CtsEventTypeId = (int?) (model.CtsEventTypeId == 0 ? (ValueType) null : model.CtsEventTypeId);
                 reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?
-                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired}).ToList();
+                                                                       .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired})
+                                                                       .ToList();
                 reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?
-                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired }).ToList();
+                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired}).ToList();
                 reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?
-                    .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired }).ToList();
+                                                                   .Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id, IsRequiredInTemplate = p.IsRequired})
+                                                                   .ToList();
                 reportPackageTemplateDto.ReportPackageTemplateAssignments = model
                     .ReportPackageTemplateAssignments?
                     .Select(p => new OrganizationRegulatoryProgramDto {OrganizationRegulatoryProgramId = p.Id}).ToList();
@@ -2573,6 +2577,64 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return View(viewName:"ReportPackageTemplateDetails", model:model);
+        }
+
+        #endregion
+
+        #region unit translation
+
+        public ActionResult UnitTranslations()
+        {
+            PopulateSystemUnits();
+            return View();
+        }
+
+        public ActionResult UnitTranslations_Read([CustomDataSourceRequest] DataSourceRequest request)
+        {
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var units = _unitService.GetFlowUnits(); //TODO: Update when service layer is done Service 
+            var viewModels = units.Select(vm => new AuthorityUnitViewModel
+                                                {
+                                                    Id = vm.UnitId,
+                                                    Name = vm.Name,
+                                                    SystemUnit = new SystemUnitViewModel {Id = vm.UnitId, Name = vm.Name},
+                                                    IsAvailableToRegulatee = false
+                                                });
+
+            var result = viewModels.ToDataSourceResult(request:request);
+
+            return Json(data:result);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult UnitTranslations_Update([DataSourceRequest] DataSourceRequest request, AuthorityUnitViewModel authorityUnit)
+        {
+            if (authorityUnit.IsAvailableToRegulatee && (authorityUnit.SystemUnit?.Id == null || authorityUnit.SystemUnit.Id == 0))
+            {
+                ModelState.AddModelError(key:"SystemUnit", errorMessage:@"System Unit is required when the unit is available to industry.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                //_unitService.Update(authorityUnit);
+            }
+
+            return Json(data:new[] {authorityUnit}.ToDataSourceResult(request:request, modelState:ModelState));
+        }
+
+        private void PopulateSystemUnits()
+        {
+            var systemUnits = _unitService.GetFlowUnits(); //TODO: Update when service layer is done Service 
+            var availableSystemUnits = systemUnits.Select(vm => new SystemUnitViewModel
+                                                                {
+                                                                    Id = vm.UnitId,
+                                                                    Name = vm.Name,
+                                                                    UnitDimensionId = 1,
+                                                                    UnitDimensionName = "test dimension"
+                                                                }).OrderBy(x => x.UnitDimensionName).ThenBy(x => x.Name).ToList();
+            availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel {Name = @"Select System Unit", Id = null, UnitDimensionId = null, UnitDimensionName = ""});
+            ViewData[key:"availableSystemUnits"] = availableSystemUnits;
+            ViewData[key:"defaultSystemUnit"] = availableSystemUnits.First();
         }
 
         #endregion
