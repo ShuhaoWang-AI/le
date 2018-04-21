@@ -435,7 +435,7 @@
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">
-                                @attachmentType.Name<div style="color: red;display:@( Model.Status == ReportStatusName.Draft && attachmentType.IsRequired ? "inline-block" : "none");">&nbsp;(Required)</div>
+                                @attachmentType.Name<span style="color: red;display:@( Model.Status == ReportStatusName.Draft && attachmentType.IsRequired ? "inline-block" : "none");">&nbsp;(Required)</span>
                             </h3>
                             <div class="box-tools pull-right">
                                 <button class="btn btn-box-tool" data-widget="collapse">

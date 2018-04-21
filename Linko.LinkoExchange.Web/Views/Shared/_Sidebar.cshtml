@@ -208,6 +208,13 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </ul>
                 </li>
 
+                <li class="@Html.IsActive(actions:"Attachments,NewAttachmentDetails,AttachmentDetails", controllers:"Industry")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"Attachments", controllerName:"Industry")'">
+                        <i class="fa fa-file-text fa-fw"></i>
+                        <span>Attachments</span>
+                    </a>
+                </li>
+
                 <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers:"ReportPackage")">
                     <a href="#">
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
@@ -261,13 +268,6 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             </a>
                         </li>
                     </ul>
-                </li>
-
-                <li class="@Html.IsActive(actions:"Attachments,NewAttachmentDetails,AttachmentDetails", controllers:"Industry")">
-                    <a href="#" onclick="location.href = '@Url.Action(actionName:"Attachments", controllerName:"Industry")'">
-                        <i class="fa fa-file-text fa-fw"></i>
-                        <span>Attachments</span>
-                    </a>
                 </li>
 
                 <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails", controllers:"Industry")">
