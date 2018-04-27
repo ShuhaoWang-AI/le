@@ -42,6 +42,14 @@
 
             @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
+        <div class="col-md-12 k-grid-header">
+            <div class="pull-right" style="height: 35px; padding-top: 5px;">
+                <a class="k-button" href="#" id="saveGridSetting">Save Grid Setting</a>
+                <a class="k-button" href="#" id="loadGridSetting">Load Grid Setting</a>
+                <a class="k-button" href="#" id="removeGridSetting">Remove Grid Setting</a>
+            </div>
+        </div>
+
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
@@ -87,16 +95,16 @@
                                   })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable =>
-                      {
-                          if (new[] { "Submitted", "Repudiated", "All" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()))
-                          {
-                              filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
-                          }
-                          else
-                          {
-                              filterable.Enabled(value: false);
-                          }
-                      })
+                                  {
+                                      if (new[] {"Submitted", "Repudiated", "All"}.Contains(value:(string) ViewBag.ReportStatusName.ToString()))
+                                      {
+                                          filterable.Enabled(value:true).Mode(value:GridFilterMode.Row);
+                                      }
+                                      else
+                                      {
+                                          filterable.Enabled(value:false);
+                                      }
+                                  })
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
                       .NoRecords(text:"No report package exists.")
@@ -135,13 +143,74 @@
 
 @section Scripts {
     <script type="text/javascript">
-        gotoNextPage = function()
-        {
+        gotoNextPage = function() {
             var grid = $("#gridReportPackage").data("kendoGrid");
             var postUrl = "@Url.Action(actionName:"ReportPackages_Select", controllerName:"ReportPackage")";
 
             doAjaxAction(grid, postUrl, "", "Select a report package.");
-        }
+        };
+
+        $(function() {
+            var gridId = "gridReportPackage";
+            var grid = $("#" + gridId).data("kendoGrid");
+            var localStorageKey = "@ViewBag.UserName.ToLower()" + "_" + "@ViewBag.PortalName.ToLower()" + "_" + "@ViewBag.ReportStatusName" + "_" + gridId + "_gridOptions";
+
+            $("#saveGridSetting")
+                .click(function(e) {
+                    e.preventDefault();
+                    localStorage[localStorageKey] = window.kendo.stringify(grid.getOptions());
+                    $.notify({
+                        // options
+                        message: 'Grid setting saved in current browser successfully!'
+                    }, {
+                        type: 'success'
+                    });
+                });
+
+            $("#loadGridSetting")
+                .click(function(e) {
+                    e.preventDefault();
+                    var options = localStorage[localStorageKey];
+                    if (options) {
+                        grid.setOptions(JSON.parse(options));
+                        $.notify({
+                            // options
+                            message: 'Grid setting loaded successfully!'
+                        }, {
+                            type: 'success'
+                        });
+                    } else {
+                        $.notify({
+                            // options
+                            message: 'There is no grid setting was saved before to load!'
+                        }, {
+                            type: 'danger'
+                        });
+                    }
+                });
+
+            $("#removeGridSetting")
+                .click(function(e) {
+                    e.preventDefault();
+                    var options = localStorage[localStorageKey];
+                    if (options) {
+                        localStorage.removeItem(localStorageKey);
+                        $.notify({
+                            // options
+                            message: 'Grid setting removed from current browser successfully!'
+                        }, {
+                            type: 'success'
+                        });
+                    } else {
+                        $.notify({
+                            // options
+                            message: 'There is no grid setting was saved before to removed!'
+                        }, {
+                            type: 'danger'
+                        });
+                    }
+                });
+        });
 
     </script>
 }

@@ -215,6 +215,7 @@
     <Content Include="Content\AdminLTE\css\datepicker3.css" />
     <Content Include="Content\AdminLTE\css\skins\skin-blue-light.css" />
     <Content Include="Content\AdminLTE\css\skins\skin-blue-light.min.css" />
+    <Content Include="Content\animate.css" />
     <Content Include="Content\bootstrap-switch\bootstrap2\bootstrap-switch.css" />
     <Content Include="Content\bootstrap-switch\bootstrap2\bootstrap-switch.min.css" />
     <Content Include="Content\bootstrap-switch\bootstrap3\bootstrap-switch.css" />
@@ -371,6 +372,8 @@
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.js" />
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.min.js" />
     <Content Include="Scripts\AuditLogs.js" />
+    <Content Include="Scripts\bootstrap-notify.js" />
+    <Content Include="Scripts\bootstrap-notify.min.js" />
     <Content Include="Scripts\bootstrap-switch.js" />
     <Content Include="Scripts\bootstrap-switch.min.js" />
     <Content Include="Scripts\bootstrap.js" />

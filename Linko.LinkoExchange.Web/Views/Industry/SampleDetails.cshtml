@@ -1261,7 +1261,7 @@
                 $("#EndDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                 $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
-                if ($('#StartDateTimeLocal').val() == "" || $('#EndDateTimeLocal').val() == "" || $('#CollectionMethodId').val() < 1)
+                if ($('#StartDateTimeLocal').val() === "" || $('#EndDateTimeLocal').val() === "" || $('#CollectionMethodId').val() < 1)
                 {
                     return;
                 }

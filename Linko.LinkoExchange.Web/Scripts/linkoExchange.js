@@ -94,7 +94,7 @@ error_handler = function(e) {
         $.each(e.errors, function(key, value) {
             if ("errors" in value) {
                 $.each(value.errors, function() {
-                    message +="<br>" + this + "</br>";
+                    message += "<br>" + this + "</br>";
                 });
             }
         });
@@ -268,3 +268,32 @@ function setTelephoneMask() {
 function isEmptyOrSpaces(str) {
     return str === null || str.match(/^ *$/) !== null;
 }
+
+
+//setting Defaults Globally for notifications
+//http://bootstrap-notify.remabledesigns.com/#documentation
+$.notifyDefaults({
+    placement: {
+        from: "top",
+        align: "right"
+    },
+    animate: {
+        enter: "animated fadeInRight",
+        exit: "animated fadeOutLeft"
+    },
+    newest_on_top: false,
+    delay: 5000, //miliseconds
+    timer: 500, //miliseconds
+    icon_type: "class",
+    template:
+        '<div data-notify="container" class="col-xs-11 col-md-5 alert alert-le-{0}" role="alert"> '
+            + '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button> '
+            + '<span data-notify="icon" class="fa fa-info-circle fa-lg text-{0}"> '
+            + '<span data-notify="title">{1}</span> '
+            + '<span data-notify="message">{2}</span></span> '
+            + '<div class="progress" data-notify="progressbar"> '
+            + '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div> '
+            + "</div> "
+            + '<a href="{3}" target="{4}" data-notify="url"></a> '
+            + "</div>"
+});

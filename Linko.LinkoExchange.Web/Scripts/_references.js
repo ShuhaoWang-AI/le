@@ -8,6 +8,7 @@
 /// <reference path="adminlte/jquery.slimscroll.js" />
 /// <reference path="auditlogs.js" />
 /// <reference path="bootstrap.js" />
+/// <reference path="bootstrap-notify.min.js" />
 /// <reference path="bootstrap-switch.min.js" />
 /// <reference path="fastclick.js" />
 /// <reference path="inputmask/bindings/inputmask.binding.min.js" />
