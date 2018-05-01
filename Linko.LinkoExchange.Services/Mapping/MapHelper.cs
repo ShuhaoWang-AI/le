@@ -1297,6 +1297,36 @@ namespace Linko.LinkoExchange.Services.Mapping
                    };
         }
 
+        public DataSourceDto GetDataSourceDtoFroDataSource(Core.Domain.DataSource dataSource)
+        {
+            if (dataSource == null)
+            {
+                return null;
+            }
+
+            return new DataSourceDto
+                   {
+                       DataSourceId = dataSource.DataSourceId,
+                       Name = dataSource.Name,
+                       Description = dataSource.Description,
+                       OrganizationRegulatoryProgramId = dataSource.OrganizationRegulatoryProgramId
+                   };
+        }
+
+        public Core.Domain.DataSource GetDataSourceFroDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource)
+        {
+            if (existingDataSource == null)
+            {
+                existingDataSource = new Core.Domain.DataSource();
+            }
+
+            existingDataSource.Name = dto.Name;
+            existingDataSource.Description = dto.Description;
+            existingDataSource.OrganizationRegulatoryProgramId = dto.OrganizationRegulatoryProgramId;
+
+            return existingDataSource;
+        }
+
         #endregion
 
         private ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org, ProgramDto dto = null)

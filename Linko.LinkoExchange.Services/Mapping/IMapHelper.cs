@@ -65,5 +65,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         RepudiationReasonDto GetRepudiationReasonDtoFromRepudiationReason(RepudiationReason repudiationReason);
 
         ReportPackageElementTypeDto GetReportPackageElementTypeDtoFromReportPackageElementType(ReportPackageElementType reportPackageElementType);
+
+        DataSourceDto GetDataSourceDtoFroDataSource(Core.Domain.DataSource dataSource);
+        Core.Domain.DataSource GetDataSourceFroDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource);
     }
 }
