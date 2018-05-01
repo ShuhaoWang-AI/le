@@ -92,6 +92,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<ReportPackage> ReportPackages { get; set; }
 
+        public virtual ICollection<DataSource> DataSources { get; set; }
         #endregion
     }
 }
