@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Core.Validation
 {
@@ -14,6 +15,11 @@ namespace Linko.LinkoExchange.Core.Validation
         public RuleViolationException(string message, List<RuleViolation> validationIssues) : base(message:message)
         {
             ValidationIssues = validationIssues;
+        }
+
+        public RuleViolationException(string message, params RuleViolation[] validationIssues) 
+            : this(message:message, validationIssues:validationIssues.ToList())
+        {
         }
 
         #endregion

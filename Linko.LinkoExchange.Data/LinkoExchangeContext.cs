@@ -100,6 +100,8 @@ namespace Linko.LinkoExchange.Data
         public DbSet<TermCondition> TermConditions { get; set; }
         public DbSet<PrivacyPolicy> PrivacyPolicies { get; set; }
 
+        public DbSet<DataSource> DataSources { get; set; }
+
         #endregion
 
         #region utilities
@@ -135,6 +137,11 @@ namespace Linko.LinkoExchange.Data
         public void Rollback(DbContextTransaction transaction)
         {
             transaction?.Commit();
+        }
+
+        public virtual AutoCommitScope CreateAutoCommitScope()
+        {
+            return new AutoCommitScope(transaction:BeginTransaction());
         }
 
         #endregion

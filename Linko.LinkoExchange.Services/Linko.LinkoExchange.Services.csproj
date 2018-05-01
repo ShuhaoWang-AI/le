@@ -116,9 +116,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseService.cs" />
+    <Compile Include="Base\MethodLogger.cs" />
     <Compile Include="Cache\ApplicationCache.cs" />
     <Compile Include="Cache\IApplicationCache.cs" />
     <Compile Include="Config\ConfigSettingService.cs" />
+    <Compile Include="DataSource\IDataSourceService.cs" />
+    <Compile Include="DataSource\DataSourceService.cs" />
+    <Compile Include="Dto\DataSourceDto.cs" />
     <Compile Include="CopyOfRecord\CertificateDigitalSignatureManager.cs" />
     <Compile Include="CopyOfRecord\CopyOfRecordService.cs" />
     <Compile Include="CopyOfRecord\HashHelper.cs" />
