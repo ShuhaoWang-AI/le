@@ -129,7 +129,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Editable(allowEdit:false)]
         public string ReportRepudiatedDaysDefault { get; set; }
 
-        [Editable(allowEdit: false)]
+        [Editable(allowEdit:false)]
         [Display(Name = "Compliance Determination Date")]
         public ComplianceDeterminationDate ComplianceDeterminationDate { get; set; }
 
@@ -215,6 +215,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [EmailAddress]
         public string EmailContactInfoEmailAddress { get; set; }
 
+        [Display(Name = "Attachment Type for Industry File Upload")]
+        public string ReportElementTypeIdForIndustryFileUpload { get; set; }
+        public IList<SelectListItem> AvailableReportElementTypes { get; set; }
+
         #endregion
     }
 
@@ -231,6 +235,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
                                                                       .GreaterThan(valueToCompare:0)
                                                                       .WithMessage(errorMessage:"At least one sample flow unit must be selected.");
                                                               });
+
+            RuleFor(x => x.ReportElementTypeIdForIndustryFileUpload).NotEmpty().NotEqual(toCompare:"0").WithMessage(errorMessage:"{PropertyName} is required.");
         }
 
         #endregion

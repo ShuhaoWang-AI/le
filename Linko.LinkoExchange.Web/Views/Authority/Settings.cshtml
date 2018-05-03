@@ -423,6 +423,17 @@
             }
 
             <div class="form-group">
+                @Html.LabelFor(model => model.ReportElementTypeIdForIndustryFileUpload, htmlAttributes:new
+                                                                                                       {
+                                                                                                           @class = "control-label col-md-7 col-lg-6 required"
+                                                                                                       })
+
+                <div class="col-lg-4 col-md-5">
+                    @Html.DropDownList(name:"ReportElementTypeIdForIndustryFileUpload", selectList:Model.AvailableReportElementTypes, htmlAttributes:new {@class = "form-control"})
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor(model => model.ReportRepudiatedDays, htmlAttributes:new
                                                                                    {
                                                                                        @class = "control-label col-md-7 col-lg-6"
@@ -504,19 +515,19 @@
 
             <div class="form-group">
                 @Html.LabelFor(model => model.ComplianceDeterminationDate, htmlAttributes:new
-                                                                                                {
-                                                                                                    @class = "control-label col-md-7 col-lg-6"
-                                                                                                })
+                                                                                          {
+                                                                                              @class = "control-label col-md-7 col-lg-6"
+                                                                                          })
 
                 <div class="col-lg-4 col-md-5">
                     @Html.EditorFor(model => model.ComplianceDeterminationDate, additionalViewData:new
-                                                                                                         {
-                                                                                                             htmlAttributes = new
-                                                                                                                              {
-                                                                                                                                  @class = "form-control",
-                                                                                                                                  @readonly = "readonly"
-                                                                                                                              }
-                                                                                                         })
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            @readonly = "readonly"
+                                                                                                                        }
+                                                                                                   })
                 </div>
             </div>
 
@@ -743,8 +754,7 @@
 
     <script>
         $(document)
-            .ready(function()
-            {
+            .ready(function() {
                 var tbWithIntValue = {
                     '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault',
                     '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault',
@@ -754,11 +764,9 @@
                     '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
                 };
 
-                $.each(tbWithIntValue, function(key, value)
-                {
+                $.each(tbWithIntValue, function(key, value) {
                     $(key)
-                        .blur(function()
-                        {
+                        .blur(function() {
                             var tb = $(key);
                             var hf = $(value);
                             tb.val((isNaN(parseInt(tb.val())) || $.isBlank(tb.val()))
@@ -772,11 +780,9 @@
                     '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
                 };
 
-                $.each(tbWithStringValue, function(key, value)
-                {
+                $.each(tbWithStringValue, function(key, value) {
                     $(key)
-                        .blur(function()
-                        {
+                        .blur(function() {
                             var tb = $(key);
                             var hf = $(value);
                             tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
@@ -784,10 +790,8 @@
                 });
             });
 
-        (function($)
-        {
-            $.isBlank = function(obj)
-            {
+        (function($) {
+            $.isBlank = function(obj) {
                 return(!obj || $.trim(obj) === "" || $.trim(obj) === "0");
             };
         })(jQuery);

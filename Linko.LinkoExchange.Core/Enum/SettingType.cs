@@ -23,6 +23,7 @@
         FlowUnitValidValues,
         SampleNameCreationRule,
         SendToCtsDatabaseServerName,
-        SendToCtsDatabaseName
+        SendToCtsDatabaseName,
+        ReportElementTypeIdForIndustryFileUpload
     }
 }

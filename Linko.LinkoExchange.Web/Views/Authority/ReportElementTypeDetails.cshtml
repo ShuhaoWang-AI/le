@@ -45,7 +45,16 @@
                     {
                         <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")" formmethod="post" />
 
-                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageElementModal" data-toggle="modal" type="button" value="Delete" />
+                        <input class="btn btn-primary btn-sm" id="btnDeleteReportPackageElement" data-target="#DeleteReportPackageElementModal" data-toggle="modal" type="button" value="Delete" />
+                        
+                        if (ViewBag.DisableDeleteButton)
+                         {
+                             <script>
+                                 $("#btnDeleteReportPackageElement")
+                                     .prop('disabled', true)
+                                     .attr('title', 'This is used for default file upload attachment type.');
+                             </script>
+                         }
                     }
                     else
                     {

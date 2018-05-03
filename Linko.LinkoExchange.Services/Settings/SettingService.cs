@@ -82,6 +82,7 @@ namespace Linko.LinkoExchange.Services.Settings
             return orgSettingDto;
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Get settings for one program
         /// </summary>

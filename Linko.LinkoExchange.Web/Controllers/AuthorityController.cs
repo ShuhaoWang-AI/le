@@ -194,6 +194,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var id = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId:id).Settings;
 
+                //ReportElementTypeIdForIndustryFileUpload
+                programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ReportElementTypeIdForIndustryFileUpload)).ToList()
+                               .ForEach(s => s.Value = model.ReportElementTypeIdForIndustryFileUpload);
+
                 //ReportRepudiatedDays
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays)).ToList().ForEach(s => s.Value = model.ReportRepudiatedDays);
 
@@ -344,7 +348,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 IndustryLicenseUsedCount = _organizationService.GetCurrentIndustryLicenseCount(orgRegProgramId:id).ToString(),
                                 UserPerIndustryMaxCount = programSettings.Settings
                                                                          .Where(s => s.TemplateName.Equals(obj:SettingType.UserPerIndustryMaxCount))
-                                                                         .Select(s => s.Value).First()
+                                                                         .Select(s => s.Value).First(),
+                                ReportElementTypeIdForIndustryFileUpload =
+                                    programSettings.Settings
+                                                   .Where(s => s.TemplateName.Equals(obj:SettingType.ReportElementTypeIdForIndustryFileUpload))
+                                                   .Select(s => s.Value).First()
                             };
 
             // Result Qualifier Valid Values
@@ -392,6 +400,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             //viewModel.AvailableTimeZones.Insert(index: 0, item: new SelectListItem { Text = "Select Time Zone", Value = "0" });
+
+            // Available Report Element Types
+            viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
+                                                                         .Select(r => new SelectListItem
+                                                                                      {
+                                                                                          Text = r.Name,
+                                                                                          Value = r.ReportElementTypeId.ToString(),
+                                                                                          Selected = r.ReportElementTypeId.ToString()
+                                                                                                      .Equals(value:viewModel.ReportElementTypeIdForIndustryFileUpload)
+                                                                                      }).ToList();
 
             return viewModel;
         }
@@ -2120,10 +2138,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 LastModificationDateTimeLocal = reportElementType.LastModificationDateTimeLocal,
                                 LastModifierUserName = reportElementType.LastModifierFullName
                             };
+                var settingValue = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:reportElementType.OrganizationRegulatoryProgramId,
+                                                                                settingType:SettingType.ReportElementTypeIdForIndustryFileUpload);
+
+                ViewBag.DisableDeleteButton = settingValue.Equals(value:reportElementType.ReportElementTypeId.ToString());
             }
             else
             {
                 ViewBag.Satus = "New";
+                ViewBag.DisableDeleteButton = false;
             }
 
             // CtsEventTypes
