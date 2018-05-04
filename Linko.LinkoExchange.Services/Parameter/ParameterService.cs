@@ -673,7 +673,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 			var limitReportPdfGenerator = new PermitReportGenerator(organizationRegulatoryProgram:orgRegProgram,
 			                                                        authorityRegulatoryProgramDto:authority,
-			                                                        parameterLimitsByMonitoringPoint:parameterLimitsByMonitoringPoints);
+			                                                        parameterLimitsByMonitoringPoint:parameterLimitsByMonitoringPoints,
+																	timeZoneService:_timeZoneService);
 
 
 			var dischargeLimitReportData = limitReportPdfGenerator.CreateDischargePermitLimitPdf();

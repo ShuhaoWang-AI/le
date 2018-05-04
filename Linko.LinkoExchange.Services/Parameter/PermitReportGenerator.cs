@@ -6,6 +6,7 @@ using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Services.Parameter
 {
@@ -31,7 +32,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 		public PermitReportGenerator(OrganizationRegulatoryProgramDto organizationRegulatoryProgram,
 		                             OrganizationRegulatoryProgramDto authorityRegulatoryProgramDto,
-		                             List<ParameterLimitsByMonitoringPoint> parameterLimitsByMonitoringPoint)
+		                             List<ParameterLimitsByMonitoringPoint> parameterLimitsByMonitoringPoint,
+									 ITimeZoneService timeZoneService
+									 )
 		{
 			var pdflicense = new License();
 			pdflicense.SetLicense(licenseName:@"Aspose.Pdf.lic");
@@ -56,7 +59,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 			_permitLimitReport = new PermitLimitReport(parammeterByMonitoringPoints:parameterLimitsByMonitoringPoint,
 			                                           orp:organizationRegulatoryProgram,
-			                                           authorityOrp:authorityRegulatoryProgramDto);
+			                                           authorityOrp:authorityRegulatoryProgramDto,
+													   timeZoneService:timeZoneService);
 		}
 
 		#endregion
