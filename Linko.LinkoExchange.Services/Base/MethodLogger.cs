@@ -13,14 +13,14 @@ namespace Linko.LinkoExchange.Services.Base
         public MethodLogger(ILogger logger, MethodBase methodBase, string descripition = "")
         {
             _logger = logger;
-            _methodName = methodBase.DeclaringType.Name + "." + methodBase.Name;
+            _methodName = methodBase.DeclaringType?.Name + "." + methodBase.Name;
 
-            _logger.Info(message: $"Start: ${_methodName}. ${descripition}");
+            _logger.Info(message: $"Start: {_methodName}. {descripition}");
         }
 
         public void Dispose()
         {
-            _logger.Info(message: $"End: ${_methodName}.");
+            _logger.Info(message: $"End: {_methodName}.");
         }
     }
 }
