@@ -1339,8 +1339,6 @@ namespace Linko.LinkoExchange.Services.Mapping
 			                                       ).ToList();
 		}
 		
-		#endregion
-
 		private ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org, ProgramDto dto = null)
 		{
 			if (dto == null)
