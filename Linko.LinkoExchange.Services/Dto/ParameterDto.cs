@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -9,6 +10,10 @@ namespace Linko.LinkoExchange.Services.Dto
         public int ParameterId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+		 
+		//public DateTime EffectiveDateTimeLocal { get; set; }
+		//public DateTime RetireDateTimeLocal { get; set; } 
+		//public ICollection<MonitoringPointParameterLimitDto> MonitoringPointParameterLimits { get; set; }
 
         //UC-15-3.1.2: If the parameter has a concentration limit at the Monitoring Point it also adds unit
         //

@@ -1467,7 +1467,19 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-        private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
+
+		// GET: /Industry/PermitLimits
+	    [Route(template:"PermitLimits")]
+	    public FileResult PermitLimits()
+	    { 
+		    var data = _parameterService.GetIndustryDischargeLimitReport();
+		    const string contentType = "application/pdf";
+		    var fileDownloadName = "Discharge Report Limit.pdf"; 
+
+			return File(data, contentType, fileDownloadName);
+	    }
+
+	    private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
         {
             var dto = new SampleDto
                       {

@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
         public virtual ICollection<ParameterDto> Parameters { get; set; }
-
+		public virtual ICollection<MonitoringPointParameterDto> MonitoringPointParameter { get; set; }
         #endregion
     }
 }

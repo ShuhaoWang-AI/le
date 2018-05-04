@@ -73,5 +73,11 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="collectionMethodId"> Used to further filter and obtain parameter groups related to a given collection method only.</param>
         /// <returns> Static and Dynamic Parameter Groups </returns>
         IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleDateTimeLocal, int collectionMethodId);
+
+		/// <summary>
+		///    Gets the discharge limit report file data. 
+		/// </summary>
+		/// <returns>The binary discharge limit report data</returns>
+	    byte[] GetIndustryDischargeLimitReport();
     }
 }

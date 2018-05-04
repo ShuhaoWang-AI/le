@@ -307,6 +307,12 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 }
                             </a>
                         </li>
+						<li class="@Html.IsActive(actions:"PermitLimits", controllers:"Industry")">
+							<a href="#" onclick="location.href = '@Url.Action(actionName:"PermitLimits", controllerName:"Industry")'">
+								<i class="fa fa-cog fa-fw"></i>
+								<span>Discharge Limit Report</span>
+							</a>
+						</li>
                     </ul>
                 </li>
             </ul>

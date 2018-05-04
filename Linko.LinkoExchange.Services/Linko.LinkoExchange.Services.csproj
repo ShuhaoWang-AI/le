@@ -135,6 +135,10 @@
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CopyOfRecordDataXmlFileDto.cs" />
     <Compile Include="Dto\CopyOfRecordPdfFileDto.cs" />
+    <Compile Include="Dto\LimitBasisDto.cs" />
+    <Compile Include="Dto\LimitTypeDto.cs" />
+    <Compile Include="Dto\MonitoringPointParameterDto.cs" />
+    <Compile Include="Dto\MonitoringPointParameterLimitDto.cs" />
     <Compile Include="Dto\PasswordAndKbqValidationResultDto.cs" />
     <Compile Include="Dto\ReportFileDto.cs" />
     <Compile Include="Dto\ReportPackageDto.cs" />
@@ -202,6 +206,8 @@
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
     <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
+    <Compile Include="Parameter\PermitLimitReport.cs" />
+    <Compile Include="Parameter\PermitReportGenerator.cs" />
     <Compile Include="PrivacyPolicy\IPrivacyPolicyService.cs" />
     <Compile Include="PrivacyPolicy\PrivacyPolicyService.cs" />
     <Compile Include="Report\DataXML\Certification.cs" />

@@ -2,6 +2,8 @@
 {
     public enum LimitTypeName
     {
-        Daily
+        Daily,
+		FourDay,
+		Monthly
     }
 }
