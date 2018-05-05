@@ -1,0 +1,104 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.Industry
+@using Linko.LinkoExchange.Web.ViewModels.Shared
+<section>
+    <ol class="breadcrumb">
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Home")'"><i class=""></i> Home </a>
+        </li>
+        <li class="active">DataSources</li>
+    </ol>
+</section>
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <div>
+            <span class="box-title">Data Sources</span>
+            <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" type="button"
+                    style="margin-left: 10px; max-width: 50px;"
+                    title="Data Sources identify who is providing you the sample data you are importing. A lab for example">
+                <i class="fa fa-info-circle fa-lg"></i>
+            </button>
+        </div>
+        
+        <div class="box-tools pull-right">
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
+                Create New
+            </button>
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div> @*.box-header*@
+    <div>
+        @{
+            var vm = new ConfirmationMessageViewModal
+            {
+                ShowMessage = TempData[key: "DeleteDataSourceSucceed"] != null,
+                Messaage = "Data Source deleted successfully."
+            };
+
+            @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
+        }
+    </div>
+    <section class="box-body form-horizontal">
+        <div class="form-group">
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<DataSourceViewModel>()
+                      .Name(componentName: "gridDataSource")
+                      .Columns(columns =>
+                      {
+                          columns.Bound(c => c.Name)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Description);
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                          columns.Bound(c => c.LastModifierUserName);
+                          columns.Template(m => { })
+                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth:60);
+                      })
+                      .Pageable(pageable => pageable
+                                                .PageSizes(enabled: true)
+                                                .Refresh(enabled: true)
+                                                .Input(enabled: true)
+                                                .Numeric(enabled: false)
+                      )
+                      .Selectable(selectable =>
+                      {
+                          selectable.Mode(mode: GridSelectionMode.Single);
+                          selectable.Type(type: GridSelectionType.Row);
+                      })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                      .Resizable(resizable => resizable.Columns(value: true))
+                      .Scrollable(s => s.Height(value: "auto"))
+                      .NoRecords(text: "No data source exists.")
+                      .Events(events => { events.Change(handler: "gotoNextPage"); })
+                      .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled: true)
+                                                    .Batch(enabled: true)
+                                                    .Sort(sort =>
+                                                    {
+                                                        sort.Add(memberName: "Name").Ascending();
+                                                    }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName: "DataSources_Read", controllerName: "Industry"))
+                                                    .PageSize(pageSize: 10)
+                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridDataSource'})"))
+                      )
+                )
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        gotoNextPage = function()
+        {
+            var grid = $("#gridDataSource").data("kendoGrid");
+            var postUrl = "@Url.Action(actionName: "DataSources_Select", controllerName:"Industry")";
+
+            doAjaxAction(grid, postUrl, "", "Select an Data Source");
+        };
+
+    </script>
+}

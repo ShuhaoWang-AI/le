@@ -9,6 +9,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.CopyOfRecord;
+using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.FileStore;
@@ -121,6 +122,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ISyncService, SyncService>();
             container.RegisterType<IApplicationCache, ApplicationCache>();
             container.RegisterType<IPrivacyPolicyService, PrivacyPolicyService>();
+            container.RegisterType<IDataSourceService, DataSourceService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();

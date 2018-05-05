@@ -12,6 +12,7 @@ using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
@@ -41,6 +42,8 @@ namespace Linko.LinkoExchange.Web.Controllers
     {
         #region fields
 
+        private readonly IDataSourceService _dataSourceService;
+
         private readonly IFileStoreService _fileStoreService;
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
@@ -65,7 +68,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                   IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService,
                                   IFileStoreService fileStoreService, IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService,
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
-                                  IParameterService parameterService, IReportPackageService reportPackageService)
+                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _fileStoreService = fileStoreService;
@@ -83,6 +86,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _settingService = settingService;
             _unitService = unitService;
             _userService = userService;
+            _dataSourceService = dataSourceService;
         }
 
         #endregion
@@ -819,10 +823,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
             var previousUri = HttpContext.Request.UrlReferrer;
-            ViewBag.fromCreateAttachment = previousUri != null && previousUri.AbsolutePath.Equals(Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry"), StringComparison.OrdinalIgnoreCase); 
+            ViewBag.fromCreateAttachment = previousUri != null
+                                           && previousUri.AbsolutePath.Equals(value:Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry"),
+                                                                              comparisonType:StringComparison.OrdinalIgnoreCase);
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
-            
+
             return View(model:viewModel);
         }
 
@@ -1163,7 +1169,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         viewModel.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
                     }
-                    
 
                     viewModel.ResultQualifierValidValues = programSettings
                         .Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
@@ -1185,8 +1190,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     AddAdditionalPropertyToSampleDetails(viewModel:viewModel);
 
-                    ViewBag.ShowSuccessMessage = TempData[key: "ShowSuccessMessage"] ?? false;
-                    ViewBag.SuccessMessage = TempData[key: "SuccessMessage"] ?? "";
+                    ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+                    ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
 
                     return View(viewName:"SampleDetails", model:viewModel);
                 }
@@ -1342,55 +1347,54 @@ namespace Linko.LinkoExchange.Web.Controllers
             return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
         }
 
-        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         public ActionResult CopySample(SampleViewModel model, FormCollection collection)
         {
             var objJavascript = new JavaScriptSerializer();
 
-            model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input: collection[name: "FlowUnitValidValues"]);
-            model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input: HttpUtility.HtmlDecode(s: collection[name: "SampleResults"]));
+            model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+            model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
 
             // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
-            if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
+            if (!ModelState.IsValidField(key:"FlowUnitId") || !ModelState.IsValidField(key:"StartDateTimeLocal") || !ModelState.IsValidField(key:"EndDateTimeLocal"))
             {
                 ViewBag.Satus = "Edit";
-                AddAdditionalPropertyToSampleDetails(viewModel: model);
-                return View(viewName: "SampleDetails", model: model);
+                AddAdditionalPropertyToSampleDetails(viewModel:model);
+                return View(viewName:"SampleDetails", model:model);
             }
 
-            var viewModel = new NewSampleStep1ViewModel()
-            {
-                IsClonedSample = true,
-                StartDateTimeLocal = model.StartDateTimeLocal,
-                EndDateTimeLocal = model.EndDateTimeLocal,
-                SelectedMonitoringPointId = model.MonitoringPointId,
-                FlowUnitValidValues = model.FlowUnitValidValues,
-                SampleResults = model.SampleResults,
-                CollectionMethodId = model.CollectionMethodId,
-                LabSampleIdentifier = model.LabSampleIdentifier,
-                CtsEventTypeId = model.CtsEventTypeId,
-                FlowValue = model.FlowValue,
-                FlowUnitId = model.FlowUnitId
-            };
+            var viewModel = new NewSampleStep1ViewModel
+                            {
+                                IsClonedSample = true,
+                                StartDateTimeLocal = model.StartDateTimeLocal,
+                                EndDateTimeLocal = model.EndDateTimeLocal,
+                                SelectedMonitoringPointId = model.MonitoringPointId,
+                                FlowUnitValidValues = model.FlowUnitValidValues,
+                                SampleResults = model.SampleResults,
+                                CollectionMethodId = model.CollectionMethodId,
+                                LabSampleIdentifier = model.LabSampleIdentifier,
+                                CtsEventTypeId = model.CtsEventTypeId,
+                                FlowValue = model.FlowValue,
+                                FlowUnitId = model.FlowUnitId
+                            };
 
+            TempData[key:"NewSampleStep1ViewModel"] = viewModel;
+            TempData[key:"ShowSuccessMessage"] = true;
+            TempData[key:"SuccessMessage"] = "Sample was successfully copied and is displayed below. Please update accordingly.";
 
-            TempData[key: "NewSampleStep1ViewModel"] = viewModel;
-            TempData[key: "ShowSuccessMessage"] = true;
-            TempData[key: "SuccessMessage"] = "Sample was successfully copied and is displayed below. Please update accordingly.";
-
-            return RedirectToAction(actionName: "NewSampleDetailsStep2");
-
+            return RedirectToAction(actionName:"NewSampleDetailsStep2");
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult GetParameterGroupsForSample(int monitoringPointId, 
-            DateTime startDateTime, DateTime endDateTime, int collectionMethodId)
+        public ActionResult GetParameterGroupsForSample(int monitoringPointId,
+                                                        DateTime startDateTime, DateTime endDateTime, int collectionMethodId)
         {
             try
             {
-                var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-                var complianceDeterminationDate = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.ComplianceDeterminationDate);
+                var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var complianceDeterminationDate =
+                    _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.ComplianceDeterminationDate);
                 DateTime sampleDateTimeLocal;
                 if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
                 {
@@ -1405,15 +1409,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                 if (monitoringPointId > 0 && collectionMethodId > 0)
                 {
                     parameterGroups =
-                        _parameterService.GetAllParameterGroups(monitoringPointId: monitoringPointId,
-                                                                sampleDateTimeLocal: sampleDateTimeLocal,
-                                                                collectionMethodId: collectionMethodId)
+                        _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPointId,
+                                                                sampleDateTimeLocal:sampleDateTimeLocal,
+                                                                collectionMethodId:collectionMethodId)
                                          .Select(c => new ParameterGroupViewModel
                                                       {
                                                           Id = c.ParameterGroupId,
                                                           Name = c.Name,
                                                           Description = c.Description,
-                                                          ParameterIds = string.Join(separator: ",", values: c.Parameters.Select(p => p.ParameterId).ToList())
+                                                          ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
                                                       }).OrderBy(c => c.Name).ToList();
                 }
                 else
@@ -1421,7 +1425,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     parameterGroups = new List<ParameterGroupViewModel>();
                 }
 
-                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal)
+                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleDateTimeLocal:sampleDateTimeLocal)
                                                      .Select(c => new ParameterViewModel
                                                                   {
                                                                       Id = c.ParameterId,
@@ -1433,7 +1437,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                       ConcentrationMinValue = c.ConcentrationMinValue,
                                                                       MassLoadingMaxValue = c.MassLoadingMaxValue,
                                                                       MassLoadingMinValue = c.MassLoadingMinValue
-                                                     }).OrderBy(c => c.Name).ToList();
+                                                                  }).OrderBy(c => c.Name).ToList();
                 return Json(data:new
                                  {
                                      hasError = false,
@@ -1613,8 +1617,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void AddAdditionalPropertyToSampleDetails(SampleViewModel viewModel)
         {
-            var currentOrgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var complianceDeterminationDate = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.ComplianceDeterminationDate);
+            var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var complianceDeterminationDate =
+                _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.ComplianceDeterminationDate);
             DateTime sampleDateTimeLocal;
             if (complianceDeterminationDate == ComplianceDeterminationDate.StartDateSampled.ToString())
             {
@@ -1628,22 +1633,21 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (viewModel.CollectionMethodId > 0)
             {
                 viewModel.ParameterGroups =
-                    _parameterService.GetAllParameterGroups(monitoringPointId: viewModel.MonitoringPointId,
-                    sampleDateTimeLocal: sampleDateTimeLocal,
-                    collectionMethodId: viewModel.CollectionMethodId)
+                    _parameterService.GetAllParameterGroups(monitoringPointId:viewModel.MonitoringPointId,
+                                                            sampleDateTimeLocal:sampleDateTimeLocal,
+                                                            collectionMethodId:viewModel.CollectionMethodId)
                                      .Select(c => new ParameterGroupViewModel
                                                   {
                                                       Id = c.ParameterGroupId,
                                                       Name = c.Name,
                                                       Description = c.Description,
-                                                      ParameterIds = string.Join(separator: ",", values: c.Parameters.Select(p => p.ParameterId).ToList())
+                                                      ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
                                                   }).OrderBy(c => c.Name).ToList();
             }
             else
             {
                 viewModel.ParameterGroups = new List<ParameterGroupViewModel>();
             }
-            
 
             viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
                                                                                                      {
@@ -1691,7 +1695,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Sample Type", Value = "0", Disabled = true});
 
-            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleDateTimeLocal: sampleDateTimeLocal)
+            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleDateTimeLocal:sampleDateTimeLocal)
                                                        .Select(c => new ParameterViewModel
                                                                     {
                                                                         Id = c.ParameterId,
@@ -1703,7 +1707,174 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                         ConcentrationMinValue = c.ConcentrationMinValue,
                                                                         MassLoadingMaxValue = c.MassLoadingMaxValue,
                                                                         MassLoadingMinValue = c.MassLoadingMinValue
-                                                       }).OrderBy(c => c.Name).ToList();
+                                                                    }).OrderBy(c => c.Name).ToList();
+        }
+
+        #endregion
+
+        #region DataSources List View
+
+        // GET: /Industry/DataSources
+        [Route(template:"DataSources")]
+        public ActionResult DataSources()
+        {
+            var id = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var industry = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:id);
+            ViewBag.Title = string.Format(format:"{0} Data Sources", arg0:industry.OrganizationDto.OrganizationName);
+
+            return View();
+        }
+
+        public ActionResult DataSources_Read([CustomDataSourceRequest] DataSourceRequest request)
+        {
+            var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var dataSources = _dataSourceService.GetDataSources(organziationRegulatoryProgramId:organizationRegulatoryProgramId);
+
+            var viewModels = dataSources.Select(vm => new DataSourceViewModel
+                                                      {
+                                                          Id = vm.DataSourceId,
+                                                          Name = vm.Name,
+                                                          Description = vm.Description,
+                                                          LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                          LastModifierUserName = vm.LastModifierFullName
+                                                      });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.Name,
+                                                                                           vm.Description,
+                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           vm.LastModifierUserName
+            });
+
+            return Json(data:result);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult DataSources_Select(IEnumerable<DataSourceViewModel> items)
+        {
+            try
+            {
+                if (items != null && ModelState.IsValid)
+                {
+                    var item = items.First();
+                    return Json(data:new
+                                     {
+                                         redirect = true,
+                                         newurl = Url.Action(actionName:"DataSourceDetails", controllerName:"Industry", routeValues:new
+
+                                                                                                                                    {
+                                                                                                                                        id = item.Id
+                                                                                                                                    })
+                                     });
+                }
+
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = "Please select an user."
+                                 });
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
+                                 });
+            }
+        }
+
+        #endregion
+
+        #region DataSource Details View
+        [Route(template: "DataSource/New")]
+        public ActionResult NewDataSourceDetails()
+        {
+            var viewModel = new DataSourceViewModel();
+            return View(viewName: "DataSourceDetails", model: viewModel);
+        }
+
+        // GET: /Industry/DataSource/{id}/Details
+        [Route(template:"DataSource/{id:int}/Details")]
+        public ActionResult DataSourceDetails(int id)
+        {
+            var viewModel = PrepareDataSourcesDetails(id:id);
+
+            return View(model:viewModel);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"DataSource/{id:int}/Details")]
+        public ActionResult DataSourceDetails(int id, DataSourceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model:model);
+            }
+
+            try
+            {
+                _dataSourceService.SaveDataSource(dataSourceDto:new DataSourceDto
+                                                                {
+                                                                    DataSourceId = model.Id,
+                                                                    Name = model.Name,
+                                                                    Description = model.Description
+                                                                });
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = "Data Source updated successfully!";
+                ModelState.Clear();
+                model = PrepareDataSourcesDetails(id:id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                model = PrepareDataSourcesDetails(id:id);
+            }
+
+            return View(viewName:"DataSourceDetails", model:model);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"DataSource/{id:int}/Details/Remove")]
+        public ActionResult DataSourceRemove(int id, DataSourceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewName:"DataSourceDetails", model:model);
+            }
+
+            try
+            {
+                _dataSourceService.DeleteDataSource(dataSourceId:id);
+                TempData[key: "DeleteDataSourceSucceed"] = true;
+                return RedirectToAction(actionName:"DataSources");
+            }
+            catch
+            {
+                var rve = new RuleViolationException(
+                                                     "Validation errors",
+                                                     new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:"Remove Data Source failed."));
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                model = PrepareDataSourcesDetails(id:id);
+                return View(viewName:"DataSourceDetails", model:model);
+            }
+        }
+
+        private DataSourceViewModel PrepareDataSourcesDetails(int id)
+        {
+            var dataSource = _dataSourceService.GetDataSourceById(dataSourceId:id);
+
+            var viewModel = new DataSourceViewModel
+                            {
+                                Id = dataSource.DataSourceId,
+                                Name = dataSource.Name,
+                                Description = dataSource.Description
+                            };
+            return viewModel;
         }
 
         #endregion

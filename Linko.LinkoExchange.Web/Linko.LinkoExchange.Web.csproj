@@ -470,6 +470,8 @@
     <Content Include="Views\User\_QuestionAnswer.cshtml" />
     <Content Include="Views\Authority\UnitTranslations.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\SystemUnitEditor.cshtml" />
+    <Content Include="Views\Industry\DataSources.cshtml" />
+    <Content Include="Views\Industry\DataSourceDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -517,6 +519,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Industry\DataSourceViewModel.cs" />
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\NewReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportPackageViewModel.cs" />
