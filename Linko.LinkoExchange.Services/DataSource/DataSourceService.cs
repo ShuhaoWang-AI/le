@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
@@ -9,6 +10,8 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 
 namespace Linko.LinkoExchange.Services.DataSource
@@ -21,7 +24,8 @@ namespace Linko.LinkoExchange.Services.DataSource
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
-
+        private readonly ISettingService _settings;
+        private readonly ITimeZoneService _timeZoneService;
         #endregion
 
         #region constructors and destructor
@@ -29,12 +33,16 @@ namespace Linko.LinkoExchange.Services.DataSource
         public DataSourceService(LinkoExchangeContext dbContext,
                                  IHttpContextService httpContext,
                                  ILogger logger,
-                                 IMapHelper mapHelper)
+                                 IMapHelper mapHelper,
+                                 ISettingService settings,
+                                 ITimeZoneService timeZoneService)
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
             _logger = logger;
             _mapHelper = mapHelper;
+            _settings = settings;
+            _timeZoneService = timeZoneService;
         }
 
         #endregion
@@ -57,7 +65,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 int parameterGroupIdToReturn;
                 using (_dbContext.CreateAutoCommitScope())
                 {
-                    var existingDataSource = GetExistingDataSource(organziationRegulatoryProgramId:currentOrgRegProgramId, name:dataSourceDto.Name);
+                    var existingDataSource = GetExistingDataSource(organziationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
                     Core.Domain.DataSource dataSourceToPersist;
                     if (existingDataSource != null)
                     {
@@ -119,12 +127,38 @@ namespace Linko.LinkoExchange.Services.DataSource
         public List<DataSourceDto> GetDataSources(int organziationRegulatoryProgramId)
         {
             var dataSources = _dbContext.DataSources.Where(d => d.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId).ToList();
-            return dataSources.ConvertAll(s => _mapHelper.GetDataSourceDtoFroDataSource(dataSource:s));
+
+            var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var timeZoneId = Convert.ToInt32(value: _settings.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.TimeZone));
+
+            var dataSourceDtos = new List<DataSourceDto>();
+            foreach (var ds in dataSources)
+            {
+                var dataSourceDto = _mapHelper.GetDataSourceDtoFroDataSource(dataSource:ds);
+
+                dataSourceDto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(utcDateTime:ds.LastModificationDateTimeUtc.HasValue
+                                                                             ? ds.LastModificationDateTimeUtc.Value.UtcDateTime
+                                                                             : ds.CreationDateTimeUtc.UtcDateTime, timeZoneId:timeZoneId);
+                if (ds.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == ds.LastModifierUserId.Value);
+                    dataSourceDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    dataSourceDto.LastModifierFullName = "N/A";
+                }
+
+                dataSourceDtos.Add(item:dataSourceDto);
+            }
+
+            return dataSourceDtos;
         }
 
         public DataSourceDto GetDataSource(int organziationRegulatoryProgramId, string name)
         {
-            var existingDataSource = GetExistingDataSource(organziationRegulatoryProgramId:organziationRegulatoryProgramId, name:name);
+            var existingDataSource = GetExistingDataSourceByName(organziationRegulatoryProgramId:organziationRegulatoryProgramId, name:name);
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
@@ -135,12 +169,22 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
-        private Core.Domain.DataSource GetExistingDataSource(int organziationRegulatoryProgramId, string name)
+        private Core.Domain.DataSource GetExistingDataSourceByName(int organziationRegulatoryProgramId, string name)
         {
             return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), name.Trim())
                                                                && ds.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId);
         }
 
+        private Core.Domain.DataSource GetExistingDataSource(int organziationRegulatoryProgramId, DataSourceDto dataSourceDto)
+        {
+            if (dataSourceDto.DataSourceId.HasValue)
+            {
+                return _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceDto.DataSourceId);
+            }
+
+            return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), dataSourceDto.Name.Trim())
+                                                               && ds.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId);
+        }
         #endregion
     }
 }
