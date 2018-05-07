@@ -1478,7 +1478,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 	    { 
 		    var data = _parameterService.GetIndustryDischargeLimitReport();
 		    const string contentType = "application/pdf";
-		    var fileDownloadName = "Discharge Report Limit.pdf"; 
+		    var fileDownloadName = "Discharge Permit Limits.pdf"; 
 
 			return File(data, contentType, fileDownloadName);
 	    }

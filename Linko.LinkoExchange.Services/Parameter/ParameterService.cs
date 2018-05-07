@@ -653,8 +653,12 @@ namespace Linko.LinkoExchange.Services.Parameter
 			                                       .Include(i => i.MonitoringPointParameter.MonitoringPoint)
 			                                       .Where(i => i.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId &&
 			                                                   i.MonitoringPointParameter.MonitoringPoint.IsEnabled &&
-			                                                   !i.MonitoringPointParameter.MonitoringPoint.IsRemoved
-			                                                   && !i.LimitBasis.Name.Equals(LimitBasisName.VolumeFlowRate.ToString(), StringComparison.OrdinalIgnoreCase))
+			                                                   !i.MonitoringPointParameter.MonitoringPoint.IsRemoved &&
+			                                                   (i.LimitType.Name.Equals(LimitTypeName.Daily.ToString(), StringComparison.OrdinalIgnoreCase) ||
+			                                                    i.LimitType.Name.Equals(LimitTypeName.FourDay.ToString(), StringComparison.OrdinalIgnoreCase) ||
+			                                                    i.LimitType.Name.Equals(LimitTypeName.Monthly.ToString(), StringComparison.OrdinalIgnoreCase)) &&
+			                                                   (i.LimitBasis.Name.Equals(LimitBasisName.Concentration.ToString(), StringComparison.OrdinalIgnoreCase) ||
+			                                                    i.LimitBasis.Name.Equals(LimitBasisName.MassLoading.ToString(), StringComparison.OrdinalIgnoreCase)))
 			                                       .OrderBy(i => i.MonitoringPointParameter.MonitoringPoint.Name)
 			                                       .GroupBy(j => j.MonitoringPointParameter.MonitoringPoint, (key, group) => new
 			                                                                                                                 {
@@ -680,7 +684,6 @@ namespace Linko.LinkoExchange.Services.Parameter
 			                                                        authorityRegulatoryProgramDto:authority,
 			                                                        parameterLimitsByMonitoringPoint:parameterLimitsByMonitoringPoints,
 			                                                        timeZoneService:_timeZoneService);
-
 
 			var dischargeLimitReportData = limitReportPdfGenerator.CreateDischargePermitLimitPdf();
 
