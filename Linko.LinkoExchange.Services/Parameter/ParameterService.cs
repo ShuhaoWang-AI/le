@@ -654,11 +654,16 @@ namespace Linko.LinkoExchange.Services.Parameter
 			                                       .Where(i => i.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId &&
 			                                                   i.MonitoringPointParameter.MonitoringPoint.IsEnabled &&
 			                                                   !i.MonitoringPointParameter.MonitoringPoint.IsRemoved
-															   && !i.LimitBasis.Name.Equals(LimitBasisName.VolumeFlowRate.ToString(), StringComparison.OrdinalIgnoreCase))
+			                                                   && !i.LimitBasis.Name.Equals(LimitBasisName.VolumeFlowRate.ToString(), StringComparison.OrdinalIgnoreCase))
+			                                       .OrderBy(i => i.MonitoringPointParameter.MonitoringPoint.Name)
 			                                       .GroupBy(j => j.MonitoringPointParameter.MonitoringPoint, (key, group) => new
 			                                                                                                                 {
 				                                                                                                                 MonitoringPoint = key,
-				                                                                                                                 MonitoringPointParameterLimits = group.ToList()
+				                                                                                                                 MonitoringPointParameterLimits =
+				                                                                                                                 group.OrderBy(k => k.MonitoringPointParameter.Parameter.Name)
+				                                                                                                                      .ThenBy(l => l.MonitoringPointParameter.EffectiveDateTime)
+				                                                                                                                      .ThenBy(m => m.MonitoringPointParameter.RetirementDateTime)
+				                                                                                                                      .ToList()
 			                                                                                                                 });
 
 			var parameterLimitsByMonitoringPoints = new List<ParameterLimitsByMonitoringPoint>();
@@ -674,7 +679,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 			var limitReportPdfGenerator = new PermitReportGenerator(organizationRegulatoryProgram:orgRegProgram,
 			                                                        authorityRegulatoryProgramDto:authority,
 			                                                        parameterLimitsByMonitoringPoint:parameterLimitsByMonitoringPoints,
-																	timeZoneService:_timeZoneService);
+			                                                        timeZoneService:_timeZoneService);
 
 
 			var dischargeLimitReportData = limitReportPdfGenerator.CreateDischargePermitLimitPdf();
