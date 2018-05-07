@@ -25,7 +25,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 		private readonly PermitLimitReport _permitLimitReport;
 		private readonly TextState _sectionTextSize10 = new TextState(fontFamily:"Arial", bold:false, italic:false);
 		private readonly TextState _sectionTitleBoldSize12 = new TextState(fontFamily:"Arial", bold:true, italic:false);
-
+		private readonly ITimeZoneService _timeZoneService;
+		private readonly OrganizationRegulatoryProgramDto _organizationRegulatoryProgram;
 		#endregion
 
 		#region constructors and destructor
@@ -57,10 +58,12 @@ namespace Linko.LinkoExchange.Services.Parameter
 				throw new NullReferenceException(message:"authorityRegulatoryProgramDto");
 			}
 
+			_timeZoneService = timeZoneService;
+			_organizationRegulatoryProgram = organizationRegulatoryProgram; 
+
 			_permitLimitReport = new PermitLimitReport(parammeterByMonitoringPoints:parameterLimitsByMonitoringPoint,
 			                                           orp:organizationRegulatoryProgram,
-			                                           authorityOrp:authorityRegulatoryProgramDto,
-													   timeZoneService:timeZoneService);
+			                                           authorityOrp:authorityRegulatoryProgramDto);
 		}
 
 		#endregion
@@ -79,7 +82,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 			var companyName = _permitLimitReport.CompanyName;
 
 			//TODO: footerTimeStamp = ? need to get localized data time? 
-			var footerTimeStamp = DateTime.Now.ToString(format:"MMMM dd yyyy hh:mm tt").ToUpper();
+			var timeStamp = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(DateTime.Now.ToUniversalTime(), _organizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+
+			var footerTimeStamp = timeStamp.ToString(format:"MMMM dd, yyyy hh:mm tt").ToUpper();
 			var reportName = _permitLimitReport.ReportName;
 
 			HeaderFooterTable(pdfPage:_pdfPage, authorityName:authorityName, reportName:reportName, companyName:companyName, footerTimeStamp:footerTimeStamp);

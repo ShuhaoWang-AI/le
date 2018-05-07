@@ -13,8 +13,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 		#region fields
 
 		private readonly OrganizationRegulatoryProgramDto _authorityRegulatoryProgramDto;
-		private readonly OrganizationRegulatoryProgramDto _organizationRegulatoryProgram;
-		private readonly ITimeZoneService _timeZoneService;
+		private readonly OrganizationRegulatoryProgramDto _organizationRegulatoryProgram; 
 
 		#endregion
 
@@ -22,12 +21,10 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 		public PermitLimitReport(List<ParameterLimitsByMonitoringPoint> parammeterByMonitoringPoints,
 		                         OrganizationRegulatoryProgramDto orp,
-		                         OrganizationRegulatoryProgramDto authorityOrp,
-		                         ITimeZoneService timeZoneService)
+		                         OrganizationRegulatoryProgramDto authorityOrp)
 		{
 			_organizationRegulatoryProgram = orp;
-			_authorityRegulatoryProgramDto = authorityOrp;
-			_timeZoneService = timeZoneService;
+			_authorityRegulatoryProgramDto = authorityOrp; 
 			MonitoringPoints = parammeterByMonitoringPoints.Select(i => new LimitReportMonitoringPoint
 			                                                            {
 				                                                            MonitoringPointName = i.MonitoringPoint.Name,
@@ -81,8 +78,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 				var limitReportParameterLimit = new LimitReportParameterLimit
 				                                {
 					                                ParameterName = limitGroup.ParamterName,
-					                                EffectiveDate = GetLocalizedDateTime(limitGroup.EffectiveDateTime),
-					                                ExpirationDate = GetLocalizedDateTime(limitGroup.RetirementDateTime)
+					                                EffectiveDate = limitGroup.EffectiveDateTime,
+					                                ExpirationDate = limitGroup.RetirementDateTime
 				                                };
 
 				parameterLimits.Add(item:limitReportParameterLimit);
@@ -163,11 +160,6 @@ namespace Linko.LinkoExchange.Services.Parameter
 			}
 
 			return limit.LimitType.Name.Equals(value:LimitTypeName.FourDay.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase) ? "F" : "M";
-		}
-
-		private DateTime GetLocalizedDateTime(DateTime dateTime)
-		{
-			return _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(dateTime, _organizationRegulatoryProgram.OrganizationRegulatoryProgramId);
 		}
 	}
 
