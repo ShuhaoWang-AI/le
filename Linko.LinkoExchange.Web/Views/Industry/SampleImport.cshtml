@@ -1,0 +1,246 @@
+﻿@using Linko.LinkoExchange.Core.Enum
+@using Linko.LinkoExchange.Web.ViewModels.Industry
+@model Linko.LinkoExchange.Web.ViewModels.Industry.SampleImportViewModel
+
+@{
+    ViewBag.Title = "Import Samples";
+}
+
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
+{
+    @Html.AntiForgeryToken()
+
+    <section>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name:SampleStatusName.Draft.ToString())</a>
+            </li>
+            <li class="active">
+                Import Samples
+            </li>
+        </ol>
+    </section>
+
+    @Html.HiddenFor(model => model.CurrentSampleImportStep)
+
+    // SampleImportStep.SelectDataSource
+    <section class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Select Data Source</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body form-horizontal">
+            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            {
+                @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                                {
+                                                                                                                                    @class = "alert alert-danger"
+                                                                                                                                })
+                if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                {
+                    <div class="alert alert-info">
+                        <h5>
+                            You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
+                        </h5>
+                    </div>
+                }
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2 required"
+                                                                                       })
+                    <div class="col-md-4">
+                        @Html.HiddenFor(model => model.SelectedDataSourceName)
+                        @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources, htmlAttributes:new
+                                                                                                                                                   {
+                                                                                                                                                       @class = "form-control"
+                                                                                                                                                   })
+                        @Html.ValidationMessageFor(model => model.SelectedDataSourceId, validationMessage:"", htmlAttributes:new
+                                                                                                                             {
+                                                                                                                                 @class = "text-danger"
+                                                                                                                             })
+                    </div>
+                </div>
+
+                <script>
+                    $(document)
+                        .ready(function() {
+                            $("#LinkoExchangeForm")
+                                .submit(function() {
+                                    $("#SelectedDataSourceName").val($("#SelectedDataSourceId option:selected").text());
+                                    return true;
+                                });
+                        });
+                </script>
+            }
+            else
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2"
+                                                                                       })
+                    <div class="col-md-4">
+                        @Html.HiddenFor(model => model.SelectedDataSourceId)
+                        @Html.EditorFor(model => model.SelectedDataSourceName, additionalViewData:new
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control",
+                                                                                                                           @readonly = "readonly"
+                                                                                                                       }
+                                                                                                  })
+
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+        {
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    <input class="btn btn-primary btn-sm" type="button" value="Create New Data Source" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'" />
+                    <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                </div>
+            </div>
+        }
+    </section>
+
+    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataSource)
+    {
+        // SampleImportStep.SelectDataSource
+        <section class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Select File</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-body form-horizontal">
+                @Html.HiddenFor(model => model.ImportTempFileId)
+                @Html.HiddenFor(model => model.SelectedFileName)
+
+                @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+                {
+                    <div class="alert alert-danger validation-summary-valid" id="validationSummarySelectFile">
+                        <h5>
+                            @Message.ValidationSummaryHeaderText
+                        </h5>
+                        <ul></ul>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h5>
+                            Select a .xlsx file to upload. You can drag and drop to upload.
+                        </h5>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2"
+                                                                                       })
+                        <div class="col-md-8">
+                            <input id="upload" name="upload" style="width: 100%;" type="file" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2"
+                                                                                       })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.SelectedFileName, additionalViewData:new
+                                                                                                {
+                                                                                                    htmlAttributes = new
+                                                                                                                     {
+                                                                                                                         @class = "form-control",
+                                                                                                                         @readonly = "readonly"
+                                                                                                                     }
+                                                                                                })
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+            {
+                @Scripts.Render(paths:"~/bundles/jqueryval")
+
+                <script>
+                    var allowedFileExtensions = [".xlsx"];
+
+                    $("#upload")
+                        .kendoUpload({
+                            async: {
+                                saveUrl: "@Url.Action(actionName:"ImportSampleFile", controllerName:"Industry")",
+                                autoUpload: false
+                            },
+                            upload: function(e) {
+                                var additional = {
+                                    "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
+                                    "SelectedDataSourceId": "@Model.SelectedDataSourceId",
+                                    "SelectedDataSourceName": "@Model.SelectedDataSourceName"
+                                };
+                                e.data = additional;
+                            },
+                            multiple: false,
+                            localization: {
+                                "select": "Select file to upload...",
+                                dropFilesHere: "Drop file here to upload"
+                            },
+                            validation: {
+                                allowedExtensions: allowedFileExtensions,
+                                maxFileSize: @ViewBag.MaxFileSize,
+                                minFileSize: 1
+                            },
+                            success: function(e) {
+                                var result = e.response;
+                                $("#ImportTempFileId").val(result.ImportTempFileId);
+                                $("#SelectedFileName").val(result.SelectedFileName);
+                                $("#LinkoExchangeForm").submit();
+                            },
+                            error: onFileUploadError,
+                            progress: onFileUploadProgress
+                        });
+
+                    function onFileUploadError(e) {
+                        var errorData = eval(e.XMLHttpRequest.response);
+                        var errorMessages = [];
+                        errorData.forEach(function(item, index) {
+                            errorMessages.push("<li>" + item + "</li>");
+                        });
+                        
+
+                        var validationSummary = $("#validationSummarySelectFile");
+
+                        validationSummary.removeClass("validation-summary-valid");
+                        validationSummary.addClass("validation-summary-errors");
+
+                        validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+
+                        validationSummary.find("ul").append(errorMessages);
+                    }
+
+                    function onFileUploadProgress(e) {
+                        console.log("Upload progress :: " + e.percentComplete + "% :: ");
+                    }
+                </script>
+            }
+        </section>
+    }
+}

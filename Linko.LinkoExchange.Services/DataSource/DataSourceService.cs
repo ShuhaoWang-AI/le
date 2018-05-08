@@ -65,7 +65,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 int parameterGroupIdToReturn;
                 using (_dbContext.CreateAutoCommitScope())
                 {
-                    var existingDataSource = GetExistingDataSource(organziationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
+                    var existingDataSource = GetExistingDataSource(organizationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
                     Core.Domain.DataSource dataSourceToPersist;
                     if (existingDataSource != null)
                     {
@@ -75,7 +75,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                         }
                         else
                         {
-                            dataSourceToPersist = _mapHelper.GetDataSourceFroDataSourceDto(dto:dataSourceDto, existingDataSource:existingDataSource);
+                            dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource:existingDataSource);
                             dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                             dataSourceToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                             dataSourceToPersist.LastModifierUserId = currentUserProfileId;
@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                     }
                     else
                     {
-                        dataSourceToPersist = _mapHelper.GetDataSourceFroDataSourceDto(dto:dataSourceDto, 
+                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, 
                                                                                        existingDataSource:new Core.Domain.DataSource
                                                                                                       {
                                                                                                           OrganizationRegulatoryProgramId = currentOrgRegProgramId,
@@ -124,9 +124,9 @@ namespace Linko.LinkoExchange.Services.DataSource
             }
         }
 
-        public List<DataSourceDto> GetDataSources(int organziationRegulatoryProgramId)
+        public List<DataSourceDto> GetDataSources(int organizationRegulatoryProgramId)
         {
-            var dataSources = _dbContext.DataSources.Where(d => d.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId).ToList();
+            var dataSources = _dbContext.DataSources.Where(d => d.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId).ToList();
 
             var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value: _settings.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.TimeZone));
@@ -156,9 +156,9 @@ namespace Linko.LinkoExchange.Services.DataSource
             return dataSourceDtos;
         }
 
-        public DataSourceDto GetDataSource(int organziationRegulatoryProgramId, string name)
+        public DataSourceDto GetDataSource(int organizationRegulatoryProgramId, string name)
         {
-            var existingDataSource = GetExistingDataSourceByName(organziationRegulatoryProgramId:organziationRegulatoryProgramId, name:name);
+            var existingDataSource = GetExistingDataSourceByName(organizationRegulatoryProgramId:organizationRegulatoryProgramId, name:name);
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
@@ -169,13 +169,13 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
-        private Core.Domain.DataSource GetExistingDataSourceByName(int organziationRegulatoryProgramId, string name)
+        private Core.Domain.DataSource GetExistingDataSourceByName(int organizationRegulatoryProgramId, string name)
         {
             return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), name.Trim())
-                                                               && ds.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId);
+                                                               && ds.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
         }
 
-        private Core.Domain.DataSource GetExistingDataSource(int organziationRegulatoryProgramId, DataSourceDto dataSourceDto)
+        private Core.Domain.DataSource GetExistingDataSource(int organizationRegulatoryProgramId, DataSourceDto dataSourceDto)
         {
             if (dataSourceDto.DataSourceId.HasValue)
             {
@@ -183,7 +183,7 @@ namespace Linko.LinkoExchange.Services.DataSource
             }
 
             return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), dataSourceDto.Name.Trim())
-                                                               && ds.OrganizationRegulatoryProgramId == organziationRegulatoryProgramId);
+                                                               && ds.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
         }
         #endregion
     }

@@ -10,9 +10,9 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         void DeleteDataSource(int dataSourceId);
         
-        List<DataSourceDto> GetDataSources(int organziationRegulatoryProgramId);
+        List<DataSourceDto> GetDataSources(int organizationRegulatoryProgramId);
 
-        DataSourceDto GetDataSource(int organziationRegulatoryProgramId, string name);
+        DataSourceDto GetDataSource(int organizationRegulatoryProgramId, string name);
 
         DataSourceDto GetDataSourceById(int dataSourceId);
     }

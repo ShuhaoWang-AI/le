@@ -81,6 +81,7 @@
     <Compile Include="Domain\CtsEventType.cs" />
     <Compile Include="Domain\DataSource.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
+    <Compile Include="Domain\ImportTempFile.cs" />
     <Compile Include="Domain\FileStore.cs" />
     <Compile Include="Domain\FileStoreData.cs" />
     <Compile Include="Domain\FileType.cs" />

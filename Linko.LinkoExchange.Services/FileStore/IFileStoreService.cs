@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         bool IsValidFileExtension(string ext);
 
         /// <summary>
-        ///     Get current user's (identified by OrgRegProgremId) attachment files list
+        ///     Get current user's (identified by OrgRegProgramId) attachment files list
         ///     The result doesn't include file data;
         /// </summary>
         /// <returns> </returns>

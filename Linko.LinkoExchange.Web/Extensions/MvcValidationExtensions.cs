@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Web.Extensions
@@ -6,7 +7,7 @@ namespace Linko.LinkoExchange.Web.Extensions
     public static class MvcValidationExtensions
     {
         /// <summary>
-        ///     Copies all of the rule violations to a controller class's ModelState.
+        /// Copies all of the rule violations to a controller class's ModelState.
         /// </summary>
         /// <param name="ruleViolationException"> </param>
         /// <param name="modelState"> </param>
@@ -29,6 +30,18 @@ namespace Linko.LinkoExchange.Web.Extensions
             }
 
             return errorMsgs;
+        }
+
+        public static List<string> GetViolationErrors(RuleViolationException ruleViolationException)
+        {
+            var errors = new List<string>();
+
+            foreach (var issue in ruleViolationException.ValidationIssues)
+            {
+                errors.Add(item:issue.ErrorMessage);
+            }
+
+            return errors;
         }
     }
 }

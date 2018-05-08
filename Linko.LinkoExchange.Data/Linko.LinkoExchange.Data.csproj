@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mapping\DataSourceMap.cs" />
+    <Compile Include="Mapping\ImportTempFileMap.cs" />
     <Compile Include="Mapping\PrivacyPolicyMap.cs" />
     <Compile Include="SyncContext.cs" />
     <Compile Include="LinkoExchangeContext.cs" />

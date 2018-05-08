@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -16,6 +17,7 @@ using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.ImportTempFile;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
@@ -59,6 +61,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
+        private readonly IImportTempFileService _importTempFileService;
 
         #endregion
 
@@ -68,7 +71,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                   IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService,
                                   IFileStoreService fileStoreService, IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService,
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
-                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService)
+                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService, 
+                                  IImportTempFileService importTempFileService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _fileStoreService = fileStoreService;
@@ -87,6 +91,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _unitService = unitService;
             _userService = userService;
             _dataSourceService = dataSourceService;
+            _importTempFileService = importTempFileService;
         }
 
         #endregion
@@ -1471,18 +1476,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-
-		// GET: /Industry/PermitLimits
-	    [Route(template:"PermitLimits")]
-	    public FileResult PermitLimits()
-	    { 
-		    var data = _parameterService.GetIndustryDischargeLimitReport();
-		    const string contentType = "application/pdf";
-		    var fileDownloadName = "Discharge Permit Limits.pdf"; 
-
-			return File(data, contentType, fileDownloadName);
-	    }
-
 	    private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
         {
             var dto = new SampleDto
@@ -1712,7 +1705,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region DataSources List View
+        #region dataSources list view
 
         // GET: /Industry/DataSources
         [Route(template:"DataSources")]
@@ -1728,7 +1721,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult DataSources_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var dataSources = _dataSourceService.GetDataSources(organziationRegulatoryProgramId:organizationRegulatoryProgramId);
+            var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:organizationRegulatoryProgramId);
 
             var viewModels = dataSources.Select(vm => new DataSourceViewModel
                                                       {
@@ -1788,7 +1781,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region DataSource Details View
+        #region dataSource details view
         [Route(template: "DataSource/New")]
         public ActionResult NewDataSourceDetails()
         {
@@ -1875,6 +1868,199 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Description = dataSource.Description
                             };
             return viewModel;
+        }
+
+        #endregion
+
+        #region import samples from file
+
+        [Route(template:"Sample/Import")]
+        public ActionResult SampleImport()
+        {
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+
+            var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
+            var viewModel = new SampleImportViewModel
+                            {
+                                CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource
+                            };
+
+            if (dataSources.Count == 1 && dataSources[index:0].DataSourceId.HasValue)
+            {
+                viewModel.SelectedDataSourceId = (int) dataSources[index:0].DataSourceId;
+                viewModel.SelectedDataSourceName = dataSources[index:0].Name;
+                viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+            }
+
+            if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            {
+                viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
+                                                 {
+                                                     AvailableDataSources = dataSources.Select(x => new SelectListItem
+                                                                                                    {
+                                                                                                        Text = x.Name,
+                                                                                                        Value = x.DataSourceId.ToString(),
+                                                                                                        Selected =
+                                                                                                            x.DataSourceId.ToString()
+                                                                                                             .Equals(value:viewModel
+                                                                                                                         .SelectedDataSourceId
+                                                                                                                         .ToString())
+                                                                                                    }).ToList()
+                                                 };
+                viewModel.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
+            }
+
+            return View(model:viewModel);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"Sample/Import")]
+        public ActionResult SampleImport(SampleImportViewModel model)
+        {
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    switch (model.CurrentSampleImportStep)
+                    {
+                        case SampleImportViewModel.SampleImportStep.SelectDataSource:
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+                            ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
+                            break;
+                        case SampleImportViewModel.SampleImportStep.SelectFile:
+                            if (model.ImportTempFileId.HasValue)
+                            {
+                                //var importTempFileDto = _importTempFileService.GetImportTempFileById(importTempFileId:model.ImportTempFileId.Value);
+                                ModelState.Remove(key:"CurrentSampleImportStep");
+                                model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.FileValidation;
+                            }
+                            break;
+                        case SampleImportViewModel.SampleImportStep.FileValidation: break;
+                        case SampleImportViewModel.SampleImportStep.SelectDataDefault: break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint: break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationParameter: break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationUnit: break;
+                        case SampleImportViewModel.SampleImportStep.DataValidation: break;
+                        case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: break;
+                        case SampleImportViewModel.SampleImportStep.ShowImportOutput: break;
+                        default: return RedirectToAction(actionName:"SampleImport");
+                    }
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                }
+            }
+            else
+            {
+                if (ModelState[key:"."] != null)
+                {
+                    foreach (var issue in ModelState[key:"."].Errors)
+                    {
+                        ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                    }
+                }
+
+                switch (model.CurrentSampleImportStep)
+                {
+                    case SampleImportViewModel.SampleImportStep.SelectDataSource:
+                        var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
+
+                        model.StepSelectDataSource = new StepSelectDataSourceViewModel
+                                                     {
+                                                         AvailableDataSources =
+                                                             dataSources.Select(x => new SelectListItem
+                                                                                     {
+                                                                                         Text = x.Name,
+                                                                                         Value = x.DataSourceId.ToString(),
+                                                                                         Selected =
+                                                                                             x.DataSourceId.ToString()
+                                                                                              .Equals(value:model.SelectedDataSourceId
+                                                                                                                 .ToString())
+                                                                                     }).ToList()
+                                                     };
+                        model.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
+
+                        break;
+                    case SampleImportViewModel.SampleImportStep.SelectFile: break;
+                    case SampleImportViewModel.SampleImportStep.FileValidation: break;
+                    case SampleImportViewModel.SampleImportStep.SelectDataDefault: break;
+                    case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint: break;
+                    case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: break;
+                    case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: break;
+                    case SampleImportViewModel.SampleImportStep.DataTranslationParameter: break;
+                    case SampleImportViewModel.SampleImportStep.DataTranslationUnit: break;
+                    case SampleImportViewModel.SampleImportStep.DataValidation: break;
+                    case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: break;
+                    case SampleImportViewModel.SampleImportStep.ShowImportOutput: break;
+                    default: return RedirectToAction(actionName:"SampleImport");
+                }
+            }
+
+            return View(model:model);
+        }
+
+        public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
+        {
+            try
+            {
+                int id;
+
+                if (upload != null && upload.ContentLength > 0)
+                {
+                    using (var reader = new BinaryReader(input:upload.InputStream))
+                    {
+                        var content = reader.ReadBytes(count:upload.ContentLength);
+
+                        var importTempFileDto = new ImportTempFileDto
+                        {
+                            OriginalFileName = upload.FileName,
+                            RawFile = content,
+                            MediaType = upload.ContentType
+                        };
+
+                        id = _importTempFileService.CreateImportTempFile(importTempFileDto: importTempFileDto);
+                    }
+                }
+                else
+                {
+                    var validationIssues = new List<RuleViolation>();
+                    var message = "No file was selected.";
+                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                }
+
+                model.ImportTempFileId = id;
+                model.SelectedFileName = upload.FileName;
+
+                return Json(data:model, behavior:JsonRequestBehavior.AllowGet);
+            }
+            catch (RuleViolationException rve)
+            {
+                Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                return Json(data:MvcValidationExtensions.GetViolationErrors(ruleViolationException:rve), behavior:JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        #endregion
+
+        #region permit limits
+
+        // GET: /Industry/PermitLimits
+        [Route(template:"PermitLimits")]
+        public FileResult PermitLimits()
+        { 
+            var data = _parameterService.GetIndustryDischargeLimitReport();
+            const string contentType = "application/pdf";
+            var fileDownloadName = "Discharge Permit Limits.pdf"; 
+
+            return File(data, contentType, fileDownloadName);
         }
 
         #endregion

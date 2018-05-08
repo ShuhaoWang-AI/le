@@ -178,6 +178,18 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Telerik.Web.Spreadsheet">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Web.Spreadsheet.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Core">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Spreadsheet">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Spreadsheet.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="WebActivatorEx">
       <HintPath>..\..\XternalObjects\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
       <Private>True</Private>
@@ -472,6 +484,7 @@
     <Content Include="Views\Shared\EditorTemplates\SystemUnitEditor.cshtml" />
     <Content Include="Views\Industry\DataSources.cshtml" />
     <Content Include="Views\Industry\DataSourceDetails.cshtml" />
+    <Content Include="Views\Industry\SampleImport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -521,6 +534,7 @@
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\DataSourceViewModel.cs" />
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
+    <Compile Include="ViewModels\Industry\SampleImportViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\NewReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportSummaryViewModel.cs" />

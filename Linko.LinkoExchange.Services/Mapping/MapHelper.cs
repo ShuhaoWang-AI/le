@@ -537,14 +537,14 @@ namespace Linko.LinkoExchange.Services.Mapping
 			//var dtos = new List<ReportPackageTemplateElementTypeDto>();
 			//foreach (var c in cat.ReportPackageTemplateElementTypes)
 			//{
-			//    dtos.Add(this.GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(c));
+			//    dtos.Add(this.GetReportPackageTemplateElementTypeDtoFromReportPackageTemplateElementType(c));
 			//}
 			//reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = dtos;
 
 			return reportPackageTemplateElementCategory;
 		}
 
-		public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet)
+		public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElementTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet)
 		{
 			if (rptet == null)
 			{
@@ -565,7 +565,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return rptetDto;
 		}
 
-		public ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto)
+		public ReportPackageTemplateElementType GetReportPackageTemplateElementTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto)
 		{
 			if (rptetDto == null)
 			{
@@ -608,7 +608,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 			//var rptetps = new List<ReportPackageTemplateElementType>();
 			//foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
 			//{
-			//    rptetps.Add(this.GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(rptetDto));
+			//    rptetps.Add(this.GetReportPackageTemplateElementTypeFromReportPackageTemplateElementTypeDto(rptetDto));
 			//}
 
 			//reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = rptetps;
@@ -745,21 +745,21 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return rpt;
 		}
 
-		public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElmentTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptet)
+		public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElementTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptElementType)
 		{
-			if (rptet == null)
+			if (rptElementType == null)
 			{
 				return null;
 			}
 
 			var dto = new ReportPackageTemplateElementTypeDto
 			          {
-				          ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId,
-				          ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId,
+				          ReportPackageTemplateElementTypeId = rptElementType.ReportPackageTemplateElementTypeId,
+				          ReportPackageTemplateElementCategoryId = rptElementType.ReportPackageTemplateElementCategoryId,
 				          ReportPackageTemplateElementCategory =
-					          GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat:rptet.ReportPackageTemplateElementCategory),
-				          ReportElementTypeId = rptet.ReportElementTypeId,
-				          ReportElementType = GetReportElementTypeDtoFromReportElementType(reportElementType:rptet.ReportElementType)
+					          GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat:rptElementType.ReportPackageTemplateElementCategory),
+				          ReportElementTypeId = rptElementType.ReportElementTypeId,
+				          ReportElementType = GetReportElementTypeDtoFromReportElementType(reportElementType:rptElementType.ReportElementType)
 			          };
 
 			return dto;
@@ -812,7 +812,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return reportElementType;
 		}
 
-		public ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet)
+		public ReportPackageTemplateElementType GetReportPackageTemplateElementTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptElementTypeDto)
 		{
 			throw new NotImplementedException();
 		}
@@ -1314,7 +1314,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                    };
         }
 
-        public Core.Domain.DataSource GetDataSourceFroDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource)
+        public Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource)
         {
             if (existingDataSource == null)
             {
@@ -1328,7 +1328,57 @@ namespace Linko.LinkoExchange.Services.Mapping
             return existingDataSource;
         }
 
-        #endregion
+		/// <inheritdoc />
+		public ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile)
+		{
+			if (importTempFile == null)
+			{
+				return null;
+			}
+
+			return new ImportTempFileDto
+			       {
+				       ImportTempFileId = importTempFile.ImportTempFileId,
+				       MediaType = importTempFile.MediaType,
+				       OriginalFileName = importTempFile.OriginalName,
+				       FileTypeId = importTempFile.FileTypeId,
+				       SizeByte = importTempFile.SizeByte,
+				       OrganizationRegulatoryProgramId = importTempFile.OrganizationRegulatoryProgramId,
+				       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:importTempFile.OrganizationRegulatoryProgram),
+				       UploadDateTimeLocal = importTempFile.UploadDateTimeUtc.UtcDateTime,
+				       UploaderUserId = importTempFile.UploaderUserId,
+					   RawFile = importTempFile.RawFile
+					   //FileExtension = implemented in service
+			       };
+		}
+
+		/// <inheritdoc />
+		public Core.Domain.ImportTempFile GetImportTempFileFromImportTempFileDto(ImportTempFileDto dto, Core.Domain.ImportTempFile existingDataSource = null)
+		{
+			if (dto == null)
+			{
+				return null;
+			}
+
+			if (existingDataSource == null)
+			{
+				existingDataSource = new Core.Domain.ImportTempFile();
+			}
+
+			if (dto.ImportTempFileId != null)
+			{
+				existingDataSource.ImportTempFileId = dto.ImportTempFileId.Value;
+			}
+
+			existingDataSource.OriginalName = dto.OriginalFileName;
+			existingDataSource.MediaType = dto.MediaType;
+			existingDataSource.SizeByte = dto.RawFile.Length;
+			existingDataSource.RawFile = dto.RawFile;
+
+			return existingDataSource;
+		}
+
+		#endregion
 		public List<MonitoringPointParameterDto> GetMonitoringPointParameterDtoFromMonitoringPointParameter(ICollection<MonitoringPointParameter> monitoringPointParameters)
 		{
 			return monitoringPointParameters?.Select(i => new MonitoringPointParameterDto

@@ -35,8 +35,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ReportPackageTemplateElementCategoryDto GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(ReportPackageTemplateElementCategory cat);
         ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat);
 
-        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet);
-        ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto);
+        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElementTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet);
+        ReportPackageTemplateElementType GetReportPackageTemplateElementTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto);
 
         CtsEventTypeDto GetCtsEventTypeDtoFromEventType(CtsEventType ctsEventType);
         CtsEventType GetCtsEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
@@ -44,8 +44,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ReportPackageTemplateDto GetReportPackageTemplateDtoFromReportPackageTemplate(ReportPackageTemplate reportPackageTemplate);
         ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(ReportPackageTemplateDto reportPackageTemplateDto);
 
-        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElmentTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptet);
-        ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet);
+        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElementTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptElementType);
+        ReportPackageTemplateElementType GetReportPackageTemplateElementTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptElementTypeDto);
 
         ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType);
         ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementTypeDto, ReportElementType existingReportElementType = null);
@@ -67,6 +67,9 @@ namespace Linko.LinkoExchange.Services.Mapping
         ReportPackageElementTypeDto GetReportPackageElementTypeDtoFromReportPackageElementType(ReportPackageElementType reportPackageElementType);
 
         DataSourceDto GetDataSourceDtoFroDataSource(Core.Domain.DataSource dataSource);
-        Core.Domain.DataSource GetDataSourceFroDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource);
+        Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource);
+
+        ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile);
+        Core.Domain.ImportTempFile GetImportTempFileFromImportTempFileDto(ImportTempFileDto dto, Core.Domain.ImportTempFile existingDataSource = null);
     }
 }

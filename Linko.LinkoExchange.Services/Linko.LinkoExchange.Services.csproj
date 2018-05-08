@@ -139,6 +139,7 @@
     <Compile Include="Dto\LimitTypeDto.cs" />
     <Compile Include="Dto\MonitoringPointParameterDto.cs" />
     <Compile Include="Dto\MonitoringPointParameterLimitDto.cs" />
+    <Compile Include="Dto\ImportTempFileDto.cs" />
     <Compile Include="Dto\PasswordAndKbqValidationResultDto.cs" />
     <Compile Include="Dto\ReportFileDto.cs" />
     <Compile Include="Dto\ReportPackageDto.cs" />
@@ -197,6 +198,8 @@
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />
     <Compile Include="Cache\IRequestCache.cs" />
+    <Compile Include="ImportTempFile\IImportTempFileService.cs" />
+    <Compile Include="ImportTempFile\ImportTempFileService.cs" />
     <Compile Include="HttpContext\HttpContextService.cs" />
     <Compile Include="HttpContext\IHttpContextService.cs" />
     <Compile Include="Config\IConfigSettingService.cs" />
@@ -206,8 +209,6 @@
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
     <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
-    <Compile Include="Parameter\PermitLimitReport.cs" />
-    <Compile Include="Parameter\PermitReportGenerator.cs" />
     <Compile Include="PrivacyPolicy\IPrivacyPolicyService.cs" />
     <Compile Include="PrivacyPolicy\PrivacyPolicyService.cs" />
     <Compile Include="Report\DataXML\Certification.cs" />
@@ -231,6 +232,8 @@
     <Compile Include="Mapping\MapHelper.cs" />
     <Compile Include="Organization\IOrganizationService.cs" />
     <Compile Include="Organization\OrganizationService.cs" />
+    <Compile Include="Parameter\PermitLimitReport.cs" />
+    <Compile Include="Parameter\PermitReportGenerator.cs" />
     <Compile Include="Parameter\IParameterService.cs" />
     <Compile Include="Parameter\ParameterService.cs" />
     <Compile Include="Permission\IPermissionService.cs" />

@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(expected:dataSourceDto.Description, actual:savedDataSourceDto.Description);
             Assert.AreEqual(expected:dataSourceDto.OrganizationRegulatoryProgramId, actual:savedDataSourceDto.OrganizationRegulatoryProgramId);
 
-            var resultDtos = _dataSourceService.GetDataSources(organziationRegulatoryProgramId:orpId);
+            var resultDtos = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:orpId);
             Assert.IsNotNull(value:resultDtos.FirstOrDefault(c => c.DataSourceId == dataSourceId));
 
             var dataSourceToModify = savedDataSourceDto;
@@ -118,7 +118,7 @@ namespace Linko.LinkoExchange.Test
 
         private void DeleteDataSourceByNameIfExist(int orpId, string dataSourceName)
         {
-            var dataSource = _dataSourceService.GetDataSource(organziationRegulatoryProgramId:orpId, name:dataSourceName);
+            var dataSource = _dataSourceService.GetDataSource(organizationRegulatoryProgramId:orpId, name:dataSourceName);
             if (dataSource?.DataSourceId != null && dataSource.DataSourceId.Value > 0)
             {
                 _dataSourceService.DeleteDataSource(dataSourceId:dataSource.DataSourceId.Value);

@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.ImportTempFile;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
@@ -123,6 +124,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IApplicationCache, ApplicationCache>();
             container.RegisterType<IPrivacyPolicyService, PrivacyPolicyService>();
             container.RegisterType<IDataSourceService, DataSourceService>();
+            container.RegisterType<IImportTempFileService, ImportTempFileService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
