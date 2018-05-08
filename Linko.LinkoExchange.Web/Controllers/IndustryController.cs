@@ -1786,7 +1786,37 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult NewDataSourceDetails()
         {
             var viewModel = new DataSourceViewModel();
+
             return View(viewName: "DataSourceDetails", model: viewModel);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template: "DataSource/New")]
+        public ActionResult NewDataSourceDetails(DataSourceViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewName: "DataSourceDetails", model: model);
+            }
+
+            try
+            {
+                var id = _dataSourceService.SaveDataSource(dataSourceDto:new DataSourceDto
+                                                                         {
+                                                                             Name = model.Name,
+                                                                             Description = model.Description
+                                                                         });
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = "Data Source created successfully!";
+                ModelState.Clear();
+                return RedirectToAction(actionName: "DataSourceDetails", controllerName: "Industry", routeValues: new { id });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                return View(viewName: "DataSourceDetails", model: model);
+            }
         }
 
         // GET: /Industry/DataSource/{id}/Details

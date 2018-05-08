@@ -1,5 +1,7 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
@@ -7,6 +9,7 @@ using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,6 +25,9 @@ namespace Linko.LinkoExchange.Test
 
         private Mock<IHttpContextService> _httpContext;
         private Mock<ILogger> _logger;
+        private Mock<IOrganizationService> _orgService;
+        private Mock<ITimeZoneService> _timeZoneService;
+        private Mock<ISettingService> _settingService;
         private DataSourceService _dataSourceService;
 
         #endregion
@@ -33,22 +39,24 @@ namespace Linko.LinkoExchange.Test
             var connection = new LinkoExchangeContext(nameOrConnectionString:connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _logger = new Mock<ILogger>();
-
-            var actualTimeZoneService = new TimeZoneService(dbContext: connection,
-                                                            settings: new SettingService(dbContext: connection, logger: _logger.Object, mapHelper: new MapHelper(),
-                                                                                         cache: new Mock<IRequestCache>().Object, globalSettings: new Mock<IGlobalSettings>().Object),
-                                                            mapHelper: new MapHelper(), appCache: new Mock<IApplicationCache>().Object, logger: _logger.Object);
-            var actualSettings = new SettingService(dbContext: connection, logger: _logger.Object, mapHelper: new MapHelper(), cache: new Mock<IRequestCache>().Object,
-                                                    globalSettings: new Mock<IGlobalSettings>().Object);
+            _orgService = new Mock<IOrganizationService>();
+            _timeZoneService = new Mock<ITimeZoneService>();
+            _settingService = new Mock<ISettingService>();
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns(value:"1");
+            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>()))
+                       .Returns(value: new OrganizationRegulatoryProgramDto { OrganizationRegulatoryProgramId = 1, OrganizationId = 1000 });
+            _timeZoneService.Setup(s => s.GetLocalizedDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>()))
+                            .Returns((DateTime dt, int tzId) => dt);
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("6");
 
             _dataSourceService = new DataSourceService(dbContext:connection,
                                                        httpContext:_httpContext.Object,
                                                        mapHelper:new MapHelper(),
                                                        logger:_logger.Object,
-                                                       settings: actualSettings,
-                                                       timeZoneService: actualTimeZoneService);
+                                                       orgService:_orgService.Object,
+                                                       settings: _settingService.Object,
+                                                       timeZoneService: _timeZoneService.Object);
         }
 
         [TestMethod]
@@ -57,26 +65,6 @@ namespace Linko.LinkoExchange.Test
         {
             var dataSourceDto = new DataSourceDto();
             _dataSourceService.SaveDataSource(dataSourceDto);
-        }
-
-        [TestMethod]
-        public void Create5DataSources()
-        {
-            const int orpId = 31;
-            for (var i = 0; i < 5; i++)
-            {
-                var dataSourceName = "DataSource00" + i;
-                DeleteDataSourceByNameIfExist(orpId:1, dataSourceName:dataSourceName);
-
-                var dataSourceDto = new DataSourceDto
-                                    {
-                                        Name = dataSourceName,
-                                        Description = "Description",
-                                        OrganizationRegulatoryProgramId = orpId
-                                    };
-                var dataSourceId = _dataSourceService.SaveDataSource(dataSourceDto:dataSourceDto);
-                Assert.IsTrue(condition:dataSourceId > 0);
-            }
         }
 
         [TestMethod]

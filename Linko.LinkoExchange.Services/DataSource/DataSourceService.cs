@@ -10,6 +10,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
@@ -24,6 +25,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
+        private readonly IOrganizationService _orgService;
         private readonly ISettingService _settings;
         private readonly ITimeZoneService _timeZoneService;
         #endregion
@@ -34,6 +36,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                                  IHttpContextService httpContext,
                                  ILogger logger,
                                  IMapHelper mapHelper,
+                                 IOrganizationService orgService,
                                  ISettingService settings,
                                  ITimeZoneService timeZoneService)
         {
@@ -41,6 +44,7 @@ namespace Linko.LinkoExchange.Services.DataSource
             _httpContext = httpContext;
             _logger = logger;
             _mapHelper = mapHelper;
+            _orgService = orgService;
             _settings = settings;
             _timeZoneService = timeZoneService;
         }
@@ -83,14 +87,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                     }
                     else
                     {
-                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, 
-                                                                                       existingDataSource:new Core.Domain.DataSource
-                                                                                                      {
-                                                                                                          OrganizationRegulatoryProgramId = currentOrgRegProgramId,
-                                                                                                          CreationDateTimeUtc = DateTimeOffset.Now,
-                                                                                                          LastModificationDateTimeUtc = DateTimeOffset.Now,
-                                                                                                          LastModifierUserId = currentUserProfileId
-                                                                                                      });
+                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource: null);
+                        dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                        dataSourceToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
+                        dataSourceToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                        dataSourceToPersist.LastModifierUserId = currentUserProfileId;
 
                         _dbContext.DataSources.Add(entity:dataSourceToPersist);
                     }
@@ -129,7 +130,8 @@ namespace Linko.LinkoExchange.Services.DataSource
             var dataSources = _dbContext.DataSources.Where(d => d.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId).ToList();
 
             var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var timeZoneId = Convert.ToInt32(value: _settings.GetOrganizationSettingValue(orgRegProgramId: currentOrgRegProgramId, settingType: SettingType.TimeZone));
+            var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId: currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+            var timeZoneId = Convert.ToInt32(value: _settings.GetOrganizationSettingValue(orgRegProgramId: authOrgRegProgramId, settingType: SettingType.TimeZone));
 
             var dataSourceDtos = new List<DataSourceDto>();
             foreach (var ds in dataSources)

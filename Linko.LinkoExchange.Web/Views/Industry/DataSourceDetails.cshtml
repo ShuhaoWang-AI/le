@@ -112,11 +112,16 @@
         <div class="box-footer">
             <div class="form-group">
                 <div class="pull-right">
-                    <input class="btn btn-primary btn-sm" type="submit" value="Save"
-                           formaction="@Url.Action(actionName:"DataSourceDetails", controllerName:"Industry")" formmethod="post" >
                     @if (Model.Id.HasValue)
                     {
+                        <input class="btn btn-primary btn-sm" type="submit" value="Save"
+                               formaction="@Url.Action(actionName:"DataSourceDetails", controllerName:"Industry")" formmethod="post" >
                         <input class="btn btn-primary btn-sm " type="button" value="Remove" data-target="#RemoveModal" data-toggle="modal" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" 
+                               formaction="@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")" formmethod="post" />
                     }
                 </div>
             </div>
