@@ -1306,12 +1306,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             return new DataSourceDto
-                   {
-                       DataSourceId = dataSource.DataSourceId,
-                       Name = dataSource.Name,
-                       Description = dataSource.Description,
-                       OrganizationRegulatoryProgramId = dataSource.OrganizationRegulatoryProgramId
-                   };
+            {
+                DataSourceId = dataSource.DataSourceId,
+                Name = dataSource.Name,
+                Description = dataSource.Description,
+                OrganizationRegulatoryProgramId = dataSource.OrganizationRegulatoryProgramId
+            };
         }
 
         public Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource)
@@ -1328,8 +1328,168 @@ namespace Linko.LinkoExchange.Services.Mapping
             return existingDataSource;
         }
 
-		/// <inheritdoc />
-		public ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile)
+        public DataSourceMonitoringPointDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceMonitoringPointDto
+            {
+                DataSourceMonitoringPointId = from.DataSourceMonitoringPointId,
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                MonitoringPointId = from.MonitoringPointId
+            };
+        }
+
+        public DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceMonitoringPointDto @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceMonitoringPoint
+            {
+                DataSourceMonitoringPointId = from.DataSourceMonitoringPointId.GetValueOrDefault(),
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                MonitoringPointId = from.MonitoringPointId
+            };
+        }
+
+        public DataSourceCtsEventTypeDto ToDataSourceCtsEventTypeDto(DataSourceCtsEventType @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceCtsEventTypeDto
+            {
+                DataSourceCtsEventTypeId = from.DataSourceCtsEventTypeId,
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                CtsEventTypeId = from.CtsEventTypeId
+            };
+        }
+
+        public DataSourceCtsEventType ToDataSourceCtsEventType(DataSourceCtsEventTypeDto @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceCtsEventType
+            {
+                DataSourceCtsEventTypeId = from.DataSourceCtsEventTypeId.GetValueOrDefault(),
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                CtsEventTypeId = from.CtsEventTypeId
+            };
+        }
+
+        public DataSourceCollectionMethodDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceCollectionMethodDto
+            {
+                DataSourceCollectionMethodId = from.DataSourceCollectionMethodId,
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                CollectionMethodId = from.CollectionMethodId
+            };
+        }
+
+        public DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceCollectionMethodDto @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceCollectionMethod
+            {
+                DataSourceCollectionMethodId = from.DataSourceCollectionMethodId.GetValueOrDefault(),
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                CollectionMethodId = from.CollectionMethodId
+            };
+        }
+
+        public DataSourceParameterDto ToDataSourceParameterDto(DataSourceParameter @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceParameterDto
+            {
+                DataSourceParameterId = from.DataSourceParameterId,
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                ParameterId = from.ParameterId
+            };
+        }
+
+        public DataSourceParameter ToDataSourceParameter(DataSourceParameterDto @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceParameter
+            {
+                DataSourceParameterId = from.DataSourceParameterId.GetValueOrDefault(),
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                ParameterId = from.ParameterId
+            };
+        }
+
+        public DataSourceUnitDto ToDataSourceUnitDto(DataSourceUnit @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceUnitDto
+            {
+                DataSourceUnitId = from.DataSourceUnitId,
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                UnitId = from.UnitId
+            };
+        }
+
+        public DataSourceUnit ToDataSourceUnit(DataSourceUnitDto @from)
+        {
+            if (from == null)
+            {
+                return null;
+            }
+
+            return new DataSourceUnit
+            {
+                DataSourceUnitId = from.DataSourceUnitId.GetValueOrDefault(),
+                DataSourceTerm = from.DataSourceTerm,
+                DataSourceId = from.DataSourceId,
+                UnitId = from.UnitId
+            };
+        }
+
+        /// <inheritdoc />
+        public ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile)
 		{
 			if (importTempFile == null)
 			{

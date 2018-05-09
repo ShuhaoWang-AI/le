@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         private readonly IOrganizationService _orgService;
         private readonly ISettingService _settings;
         private readonly ITimeZoneService _timeZoneService;
+
         #endregion
 
         #region constructors and destructor
@@ -61,9 +62,9 @@ namespace Linko.LinkoExchange.Services.DataSource
                 var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var currentUserProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
 
-                if (string.IsNullOrWhiteSpace(value: dataSourceDto.Name))
+                if (string.IsNullOrWhiteSpace(value:dataSourceDto.Name))
                 {
-                    throw CreateRuleViolationExceptionForValidationError(errorMessage: "Name is required.");
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Name is required.");
                 }
 
                 int parameterGroupIdToReturn;
@@ -87,7 +88,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                     }
                     else
                     {
-                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource: null);
+                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource:null);
                         dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         dataSourceToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
                         dataSourceToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
@@ -105,23 +106,18 @@ namespace Linko.LinkoExchange.Services.DataSource
             }
         }
 
-        private static RuleViolationException CreateRuleViolationExceptionForValidationError(string errorMessage)
-        {
-            return new RuleViolationException("Validation errors", new RuleViolation(propertyName:string.Empty,
-                                                                                     propertyValue:null,
-                                                                                     errorMessage:errorMessage));
-        }
-
         public void DeleteDataSource(int dataSourceId)
         {
-            using (new MethodLogger(logger: _logger, methodBase: MethodBase.GetCurrentMethod(), descripition: $"dataSourceId={dataSourceId}"))
-            using(_dbContext.CreateAutoCommitScope())
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"dataSourceId={dataSourceId}"))
             {
-                var foundDataSource = _dbContext.DataSources.Single(pg => pg.DataSourceId == dataSourceId);
+                using (_dbContext.CreateAutoCommitScope())
+                {
+                    var foundDataSource = _dbContext.DataSources.Single(pg => pg.DataSourceId == dataSourceId);
 
-                _dbContext.DataSources.Remove(entity:foundDataSource);
+                    _dbContext.DataSources.Remove(entity:foundDataSource);
 
-                _dbContext.SaveChanges();
+                    _dbContext.SaveChanges();
+                }
             }
         }
 
@@ -129,9 +125,9 @@ namespace Linko.LinkoExchange.Services.DataSource
         {
             var dataSources = _dbContext.DataSources.Where(d => d.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId).ToList();
 
-            var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId: currentOrgRegProgramId).OrganizationRegulatoryProgramId;
-            var timeZoneId = Convert.ToInt32(value: _settings.GetOrganizationSettingValue(orgRegProgramId: authOrgRegProgramId, settingType: SettingType.TimeZone));
+            var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+            var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:authOrgRegProgramId, settingType:SettingType.TimeZone));
 
             var dataSourceDtos = new List<DataSourceDto>();
             foreach (var ds in dataSources)
@@ -164,11 +160,49 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
-        /// <inheritdoc />
         public DataSourceDto GetDataSourceById(int dataSourceId)
         {
             var existingDataSource = _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId);
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
+        }
+
+        public DataSourceTranslationsDto GetDataSourceTranslationsById(int dataSourceId)
+        {
+            var dataSourceDto = GetDataSourceById(dataSourceId: dataSourceId);
+            var monitoringPointDtos = _dbContext.DataSourceMonitoringPoints.Where(d => d.DataSourceId == dataSourceId)
+                                                .OrderBy(d => d.DataSourceTerm).ToList()
+                                                .Select(x => _mapHelper.ToDataSourceMonitoringPointDto(x)).ToList();
+            var ctsEventTypeDtos = _dbContext.DataSourceCtsEventTypes.Where(d => d.DataSourceId == dataSourceId)
+                                             .OrderBy(d => d.DataSourceTerm).ToList()
+                                             .Select(x => _mapHelper.ToDataSourceCtsEventTypeDto(x)).ToList();
+            var collectionMethodDtos = _dbContext.DataSourceCollectionMethods.Where(d => d.DataSourceId == dataSourceId)
+                                                 .OrderBy(d => d.DataSourceTerm).ToList()
+                                                 .Select(x => _mapHelper.ToDataSourceCollectionMethodDto(x)).ToList();
+            var parameterDtos = _dbContext.DataSourceParameters.Where(d => d.DataSourceId == dataSourceId)
+                                          .OrderBy(d => d.DataSourceTerm).ToList()
+                                          .Select(x => _mapHelper.ToDataSourceParameterDto(x)).ToList();
+            var unitDtos = _dbContext.DataSourceUnits.Where(d => d.DataSourceId == dataSourceId)
+                                     .OrderBy(d => d.DataSourceTerm).ToList()
+                                     .Select(x => _mapHelper.ToDataSourceUnitDto(x)).ToList();
+
+            return new DataSourceTranslationsDto
+            {
+                DataSource = dataSourceDto,
+                MonitoringPoints = monitoringPointDtos,
+                CtsEventTypes = ctsEventTypeDtos,
+                CollectionMethods = collectionMethodDtos,
+                Parameters = parameterDtos,
+                Units = unitDtos
+            };
+        }
+
+        #endregion
+
+        private static RuleViolationException CreateRuleViolationExceptionForValidationError(string errorMessage)
+        {
+            return new RuleViolationException("Validation errors", new RuleViolation(propertyName:string.Empty,
+                                                                                     propertyValue:null,
+                                                                                     errorMessage:errorMessage));
         }
 
         private Core.Domain.DataSource GetExistingDataSourceByName(int organizationRegulatoryProgramId, string name)
@@ -187,6 +221,5 @@ namespace Linko.LinkoExchange.Services.DataSource
             return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), dataSourceDto.Name.Trim())
                                                                && ds.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
         }
-        #endregion
     }
 }

@@ -101,6 +101,11 @@ namespace Linko.LinkoExchange.Data
         public DbSet<PrivacyPolicy> PrivacyPolicies { get; set; }
 
         public DbSet<DataSource> DataSources { get; set; }
+        public DbSet<DataSourceMonitoringPoint> DataSourceMonitoringPoints { get; set; }
+        public DbSet<DataSourceCtsEventType> DataSourceCtsEventTypes { get; set; }
+        public DbSet<DataSourceCollectionMethod> DataSourceCollectionMethods { get; set; }
+        public DbSet<DataSourceParameter> DataSourceParameters { get; set; }
+        public DbSet<DataSourceUnit> DataSourceUnits { get; set; }
         public DbSet<ImportTempFile> ImportTempFiles { get; set; }
 
         #endregion

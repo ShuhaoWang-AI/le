@@ -80,6 +80,11 @@
     <Compile Include="Domain\CromerrAuditLog.cs" />
     <Compile Include="Domain\CtsEventType.cs" />
     <Compile Include="Domain\DataSource.cs" />
+    <Compile Include="Domain\DataSourceCtsEventType.cs" />
+    <Compile Include="Domain\DataSourceCollectionMethod.cs" />
+    <Compile Include="Domain\DataSourceUnit.cs" />
+    <Compile Include="Domain\DataSourceParameter.cs" />
+    <Compile Include="Domain\DataSourceMonitoringPoint.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
     <Compile Include="Domain\ImportTempFile.cs" />
     <Compile Include="Domain\FileStore.cs" />

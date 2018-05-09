@@ -15,5 +15,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         DataSourceDto GetDataSource(int organizationRegulatoryProgramId, string name);
 
         DataSourceDto GetDataSourceById(int dataSourceId);
+
+        DataSourceTranslationsDto GetDataSourceTranslationsById(int dataSourceId);
     }
 }
