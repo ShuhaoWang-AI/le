@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
@@ -13,10 +15,13 @@ using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
+using Telerik.Windows.Documents.Spreadsheet.FormatProviders;
+using Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.Xlsx;
+using Telerik.Windows.Documents.Spreadsheet.Model;
 
-namespace Linko.LinkoExchange.Services.ImportTempFile
+namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 {
-    public class ImportTempFileService : BaseService, IImportTempFileService
+    public class ImportSampleFromFileService : BaseService, IImportSampleFromFileService
     {
         #region fields
 
@@ -32,7 +37,7 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
 
         #region constructors and destructor
 
-        public ImportTempFileService(
+        public ImportSampleFromFileService(
             FileStoreService fileStoreService,
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
@@ -82,10 +87,8 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
 
         #region interface implementations
 
-        #region Overrides of BaseService
-
         /// <inheritdoc />
-        public override bool CanUserExecuteApi(string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             var retVal = false;
 
@@ -96,6 +99,9 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
             switch (apiName)
             {
                 case "GetImportTempFileById":
+                case "RemoveImportTempFile":
+                case "GetWorkbook":
+                case "DoFileValidation":
                     var importTempFileId = id[0];
                     retVal = IsImportTempFileWithThisOwnerExist(importTempFileId:importTempFileId, orgRegProgramId:currentOrgRegProgramId);
                     break;
@@ -104,18 +110,6 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
 
             return retVal;
         }
-
-        #endregion
-
-        #endregion
-
-        private bool IsImportTempFileWithThisOwnerExist(int importTempFileId, int orgRegProgramId)
-        {
-            //Also handles scenarios where ImportTempFileId does not exist
-            return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
-        }
-
-        #region Implementation of IImportTempFileService
 
         /// <inheritdoc />
         public ImportTempFileDto GetImportTempFileById(int importTempFileId)
@@ -134,12 +128,6 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
                 var importTempFile = _dbContext.ImportTempFiles.Single(i => i.ImportTempFileId == importTempFileId);
 
                 importTempFileDto = _mapHelper.GetImportTempFileDtoFromImportTempFile(importTempFile:importTempFile);
-
-                var fileExtension = _dbContext.FileTypes.SingleOrDefault(x => x.FileTypeId == importTempFileDto.FileTypeId)?.Extension;
-                if (fileExtension != null)
-                {
-                    importTempFileDto.FileExtension = fileExtension;
-                }
 
                 importTempFileDto.UploadDateTimeLocal =
                     _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:importTempFileDto.UploadDateTimeLocal, orgRegProgramId:currentRegulatoryProgramId);
@@ -173,8 +161,9 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
                 }
 
                 var extension = Path.GetExtension(path:importTempFileDto.OriginalFileName)?.ToLower();
+
                 // ReSharper disable once ArgumentsStyleStringLiteral
-                var validFileTypes = _dbContext.FileTypes.Where(x => x.Extension.Equals(".xlsx")).ToList();
+                var validFileTypes = _dbContext.FileTypes.Where(x => x.Extension.ToLower().Equals(".xlsx")).ToList();
                 var validFileExtensions = validFileTypes.Select(i => i.Extension).Select(i => i.ToLower());
 
                 if (!validFileExtensions.Contains(value:extension))
@@ -194,7 +183,7 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
                 {
                     var importTempFile = _mapHelper
                         .GetImportTempFileFromImportTempFileDto(dto:importTempFileDto,
-                                                                existingDataSource:new Core.Domain.ImportTempFile
+                                                                existingDataSource:new ImportTempFile
                                                                                    {
                                                                                        OrganizationRegulatoryProgramId = currentOrgRegProgramId,
                                                                                        UploadDateTimeUtc = DateTimeOffset.Now,
@@ -214,6 +203,125 @@ namespace Linko.LinkoExchange.Services.ImportTempFile
             }
         }
 
+        public Workbook GetWorkbook(ImportTempFileDto importTempFileDto, bool isAuthorizationRequired = false)
+        {
+            if (importTempFileDto == null)
+            {
+                var validationIssues = new List<RuleViolation>();
+
+                var message = "The file is empty.";
+                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+            }
+
+            if (isAuthorizationRequired && importTempFileDto?.ImportTempFileId != null && !CanUserExecuteApi(id:importTempFileDto.ImportTempFileId.Value))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            Workbook workbook = null;
+
+            var providers = new List<IWorkbookFormatProvider>
+                            {
+                                new XlsxFormatProvider()
+                            };
+
+            if (importTempFileDto.RawFile != null)
+            {
+                var extension = importTempFileDto.FileExtension;
+                var provider = providers.FirstOrDefault(p => p.SupportedExtensions
+                                                              .Any(e => string.Compare(strA:extension, strB:e, comparisonType:StringComparison.InvariantCultureIgnoreCase) == 0));
+                if (provider != null)
+                {
+                    using (var stream = new MemoryStream(buffer:importTempFileDto.RawFile))
+                    {
+                        try
+                        {
+                            workbook = provider.Import(input:stream);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(value:ex);
+
+                            var validationIssues = new List<RuleViolation>();
+
+                            var message = "The file format is not recognized.";
+                            validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                            throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                        }
+                    }
+                }
+                else
+                {
+                    var validationIssues = new List<RuleViolation>();
+
+                    var message = "The file format is not recognized.";
+                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                }
+            }
+
+            return workbook;
+        }
+
+        public ImportSampleFromFileValidationResultDto DoFileValidation(ImportTempFileDto importTempFileDto)
+        {
+            var result = new ImportSampleFromFileValidationResultDto();
+
+            if (importTempFileDto?.ImportTempFileId != null && !CanUserExecuteApi(id:importTempFileDto.ImportTempFileId.Value))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            try
+            {
+                //TODO: Implement proper validation
+                result.Success = true;
+                result.Errors = null;
+                var importFileWorkbook = GetWorkbook(importTempFileDto:importTempFileDto);
+                result.ImportFileWorkbook = importFileWorkbook;
+            }
+            catch (RuleViolationException ruleViolationException)
+            {
+                if (importTempFileDto?.ImportTempFileId != null)
+                {
+                    RemoveImportTempFile(importTempFileId:importTempFileDto.ImportTempFileId.Value);
+                }
+
+                result.Success = false;
+                result.Errors = ruleViolationException.ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""});
+            }
+
+            return result;
+        }
+
+        public void RemoveImportTempFile(int importTempFileId)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"importTempFileId={importTempFileId}"))
+            {
+                if (!CanUserExecuteApi(id:importTempFileId))
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
+                using (_dbContext.CreateAutoCommitScope())
+                {
+                    var importTempFile = _dbContext.ImportTempFiles.Single(i => i.ImportTempFileId == importTempFileId);
+                    if (importTempFile != null)
+                    {
+                        _dbContext.ImportTempFiles.Remove(entity:importTempFile);
+                        _dbContext.SaveChanges();
+                    }
+                }
+            }
+        }
+
         #endregion
+
+        private bool IsImportTempFileWithThisOwnerExist(int importTempFileId, int orgRegProgramId)
+        {
+            //Also handles scenarios where ImportTempFileId does not exist
+            return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
+        }
     }
 }

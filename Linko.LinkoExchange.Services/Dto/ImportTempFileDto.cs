@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -11,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public double SizeByte { get; set; }
         public string MediaType { get; set; }
         public int FileTypeId { get; set; }
-        public string FileExtension { get; set; }
+        public string FileExtension => Path.GetExtension(path:OriginalFileName)?.ToLower();
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
         public DateTime UploadDateTimeLocal { get; set; }

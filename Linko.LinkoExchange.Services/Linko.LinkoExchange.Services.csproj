@@ -113,6 +113,24 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Telerik.Web.Spreadsheet">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Web.Spreadsheet.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Core">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Spreadsheet">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Spreadsheet.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Zip">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Zip.Extensions">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Zip.Extensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseService.cs" />
@@ -122,6 +140,8 @@
     <Compile Include="Config\ConfigSettingService.cs" />
     <Compile Include="DataSource\IDataSourceService.cs" />
     <Compile Include="DataSource\DataSourceService.cs" />
+    <Compile Include="Dto\ErrorWithRowNumberDto.cs" />
+    <Compile Include="Dto\ImportSampleFromFileValidationResultDto.cs" />
     <Compile Include="Dto\DataSourceDto.cs" />
     <Compile Include="CopyOfRecord\CertificateDigitalSignatureManager.cs" />
     <Compile Include="CopyOfRecord\CopyOfRecordService.cs" />
@@ -198,8 +218,8 @@
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />
     <Compile Include="Cache\IRequestCache.cs" />
-    <Compile Include="ImportTempFile\IImportTempFileService.cs" />
-    <Compile Include="ImportTempFile\ImportTempFileService.cs" />
+    <Compile Include="ImportSampleFromFile\IImportSampleFromFileService.cs" />
+    <Compile Include="ImportSampleFromFile\ImportSampleFromFileService.cs" />
     <Compile Include="HttpContext\HttpContextService.cs" />
     <Compile Include="HttpContext\IHttpContextService.cs" />
     <Compile Include="Config\IConfigSettingService.cs" />

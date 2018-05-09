@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
+using Telerik.Windows.Documents.Spreadsheet.Model;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
@@ -34,8 +35,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "File Name")]
         public string SelectedFileName { get; set; }
         public int? ImportTempFileId { get; set; }
+        public Workbook ImportFileWorkbook { get; set; }
+
         public StepSelectDataSourceViewModel StepSelectDataSource { get; set; }
         public StepSelectFileViewModel StepSelectFile { get; set; }
+        public StepFileValidationViewModel StepFileValidation { get; set; }
     }
 
 
@@ -45,6 +49,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
     }
     public class StepSelectFileViewModel
     {
+    }
+    public class StepFileValidationViewModel
+    {
+        public IEnumerable<ErrorWithRowNumberViewModel> Errors { get; set; }
+    }
+    
+    public class ErrorWithRowNumberViewModel
+    {
+        public string ErrorMessage { get; set; }
+        public string RowNumbers { get; set; }
+
     }
     public class SampleImportViewModelValidator : AbstractValidator<SampleImportViewModel>
     {

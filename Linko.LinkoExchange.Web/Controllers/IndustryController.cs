@@ -17,7 +17,7 @@ using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
-using Linko.LinkoExchange.Services.ImportTempFile;
+using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
-        private readonly IImportTempFileService _importTempFileService;
+        private readonly IImportSampleFromFileService _importSampleFromFileService;
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                   IFileStoreService fileStoreService, IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService,
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
                                   IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService, 
-                                  IImportTempFileService importTempFileService)
+                                  IImportSampleFromFileService importSampleFromFileService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
             _fileStoreService = fileStoreService;
@@ -91,7 +91,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _unitService = unitService;
             _userService = userService;
             _dataSourceService = dataSourceService;
-            _importTempFileService = importTempFileService;
+            _importSampleFromFileService = importSampleFromFileService;
         }
 
         #endregion
@@ -1961,15 +1961,47 @@ namespace Linko.LinkoExchange.Web.Controllers
                             model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
                             ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
                             break;
+
                         case SampleImportViewModel.SampleImportStep.SelectFile:
                             if (model.ImportTempFileId.HasValue)
                             {
-                                //var importTempFileDto = _importTempFileService.GetImportTempFileById(importTempFileId:model.ImportTempFileId.Value);
                                 ModelState.Remove(key:"CurrentSampleImportStep");
                                 model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.FileValidation;
+                                goto case SampleImportViewModel.SampleImportStep.FileValidation;
                             }
                             break;
-                        case SampleImportViewModel.SampleImportStep.FileValidation: break;
+
+                        case SampleImportViewModel.SampleImportStep.FileValidation:
+                            if (model.ImportTempFileId.HasValue)
+                            {
+                                var importTempFileDto = _importSampleFromFileService.GetImportTempFileById(importTempFileId:model.ImportTempFileId.Value);
+                                var fileValidationResultDto = _importSampleFromFileService.DoFileValidation(importTempFileDto:importTempFileDto);
+
+                                if (fileValidationResultDto.Success)
+                                {
+                                    model.ImportFileWorkbook = fileValidationResultDto.ImportFileWorkbook;
+                                    ModelState.Remove(key:"CurrentSampleImportStep");
+                                    model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
+                                    goto case SampleImportViewModel.SampleImportStep.SelectDataDefault;
+                                }
+                                else
+                                {
+                                    model.StepFileValidation = new StepFileValidationViewModel
+                                                               {
+                                                                   Errors = fileValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
+                                                                                                                       {
+                                                                                                                           ErrorMessage = x.ErrorMessage,
+                                                                                                                           RowNumbers = x.RowNumbers
+                                                                                                                       })
+                                                               };
+                                }
+                            }
+                            else
+                            {
+                                //throw error ??
+                            }
+                            break;
+
                         case SampleImportViewModel.SampleImportStep.SelectDataDefault: break;
                         case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint: break;
                         case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: break;
@@ -2049,13 +2081,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var content = reader.ReadBytes(count:upload.ContentLength);
 
                         var importTempFileDto = new ImportTempFileDto
-                        {
-                            OriginalFileName = upload.FileName,
-                            RawFile = content,
-                            MediaType = upload.ContentType
-                        };
+                                                {
+                                                    OriginalFileName = upload.FileName,
+                                                    RawFile = content,
+                                                    MediaType = upload.ContentType
+                                                };
 
-                        id = _importTempFileService.CreateImportTempFile(importTempFileDto: importTempFileDto);
+                        id = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
                     }
                 }
                 else
@@ -2085,12 +2117,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: /Industry/PermitLimits
         [Route(template:"PermitLimits")]
         public FileResult PermitLimits()
-        { 
+        {
             var data = _parameterService.GetIndustryDischargeLimitReport();
             const string contentType = "application/pdf";
-            var fileDownloadName = "Discharge Permit Limits.pdf"; 
+            var fileDownloadName = "Discharge Permit Limits.pdf";
 
-            return File(data, contentType, fileDownloadName);
+            return File(fileContents:data, contentType:contentType, fileDownloadName:fileDownloadName);
         }
 
         #endregion

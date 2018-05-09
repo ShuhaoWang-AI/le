@@ -190,6 +190,12 @@
     <Reference Include="Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml">
       <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="Telerik.Windows.Zip">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Windows.Zip.Extensions">
+      <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Telerik.Windows.Zip.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="WebActivatorEx">
       <HintPath>..\..\XternalObjects\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
       <Private>True</Private>
