@@ -48,6 +48,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private readonly IFileStoreService _fileStoreService;
         private readonly IHttpContextService _httpContextService;
+        private readonly IImportSampleFromFileService _importSampleFromFileService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
         private readonly IMonitoringPointService _monitoringPointService;
@@ -61,7 +62,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
-        private readonly IImportSampleFromFileService _importSampleFromFileService;
 
         #endregion
 
@@ -71,7 +71,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                   IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService,
                                   IFileStoreService fileStoreService, IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService,
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
-                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService, 
+                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService,
                                   IImportSampleFromFileService importSampleFromFileService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
         {
@@ -1476,7 +1476,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-	    private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
+        private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
         {
             var dto = new SampleDto
                       {
@@ -1739,7 +1739,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Description,
                                                                                            vm.LastModificationDateTimeLocal,
                                                                                            vm.LastModifierUserName
-            });
+                                                                                       });
 
             return Json(data:result);
         }
@@ -1782,22 +1782,23 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region dataSource details view
-        [Route(template: "DataSource/New")]
+
+        [Route(template:"DataSource/New")]
         public ActionResult NewDataSourceDetails()
         {
             var viewModel = new DataSourceViewModel();
 
-            return View(viewName: "DataSourceDetails", model: viewModel);
+            return View(viewName:"DataSourceDetails", model:viewModel);
         }
 
-        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        [Route(template: "DataSource/New")]
+        [Route(template:"DataSource/New")]
         public ActionResult NewDataSourceDetails(DataSourceViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(viewName: "DataSourceDetails", model: model);
+                return View(viewName:"DataSourceDetails", model:model);
             }
 
             try
@@ -1810,12 +1811,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "Data Source created successfully!";
                 ModelState.Clear();
-                return RedirectToAction(actionName: "DataSourceDetails", controllerName: "Industry", routeValues: new { id });
+                return RedirectToAction(actionName:"DataSourceDetails", controllerName:"Industry", routeValues:new {id});
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                return View(viewName: "DataSourceDetails", model: model);
+                return View(viewName:"DataSourceDetails", model:model);
             }
         }
 
@@ -1873,7 +1874,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _dataSourceService.DeleteDataSource(dataSourceId:id);
-                TempData[key: "DeleteDataSourceSucceed"] = true;
+                TempData[key:"DeleteDataSourceSucceed"] = true;
                 return RedirectToAction(actionName:"DataSources");
             }
             catch
@@ -1975,7 +1976,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                             if (model.ImportTempFileId.HasValue)
                             {
                                 var importTempFileDto = _importSampleFromFileService.GetImportTempFileById(importTempFileId:model.ImportTempFileId.Value);
-                                var fileValidationResultDto = _importSampleFromFileService.DoFileValidation(importTempFileDto:importTempFileDto);
+                                SampleImportDto sampleImportDto;
+                                var fileValidationResultDto =
+                                    _importSampleFromFileService.DoFileValidation(dataSourceId:model.SelectedDataSourceId, importTempFileDto:importTempFileDto,
+                                                                                  sampleImportDto:out sampleImportDto);
 
                                 if (fileValidationResultDto.Success)
                                 {

@@ -265,9 +265,14 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             return workbook;
         }
 
-        public ImportSampleFromFileValidationResultDto DoFileValidation(ImportTempFileDto importTempFileDto)
+        /// <inheritdoc />
+        public ImportSampleFromFileValidationResultDto DoFileValidation(int dataSourceId, ImportTempFileDto importTempFileDto, out SampleImportDto sampleImportDto)
         {
             var result = new ImportSampleFromFileValidationResultDto();
+            sampleImportDto = new SampleImportDto
+                              {
+                                  TempFile = importTempFileDto
+                              };
 
             if (importTempFileDto?.ImportTempFileId != null && !CanUserExecuteApi(id:importTempFileDto.ImportTempFileId.Value))
             {
@@ -316,7 +321,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto)
+        public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleImportDto> samplesDtos)
         {
             throw new NotImplementedException();
         }

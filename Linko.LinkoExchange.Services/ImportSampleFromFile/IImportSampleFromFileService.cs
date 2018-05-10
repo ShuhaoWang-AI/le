@@ -38,12 +38,14 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <summary>
         /// Checks file is valid to import or not
         /// </summary>
+        /// <param name="dataSourceId"> </param>
         /// <param name="importTempFileDto"> </param>
+        /// <param name="sampleImportDto"> </param>
         /// <returns>
         /// ImportSampleFromFileValidationResultDto.Success is equal to "true" if file is valid; otherwise "false"
         /// If success is equal to "false", then "Errors" will have value, otherwise null
         /// </returns>
-        ImportSampleFromFileValidationResultDto DoFileValidation(ImportTempFileDto importTempFileDto);
+        ImportSampleFromFileValidationResultDto DoFileValidation(int dataSourceId, ImportTempFileDto importTempFileDto, out SampleImportDto sampleImportDto);
 
         /// <summary>
         /// Checks sampleImportDto has any recommended column cell has missing value or not
@@ -65,15 +67,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sampleImportDto"> </param>
-        /// <returns> </returns>
+        /// <param name="sampleImportDto"></param>
+        /// <returns></returns>
         List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sampleImportDto"> </param>
-        /// <returns> </returns>
-        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
+        /// <param name="sampleImportDto"></param>
+        /// <param name="samplesDtos"></param>
+        /// <returns></returns>
+        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleImportDto> samplesDtos);
     }
 }
