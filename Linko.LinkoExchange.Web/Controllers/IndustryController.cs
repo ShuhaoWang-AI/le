@@ -1979,7 +1979,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                                 if (fileValidationResultDto.Success)
                                 {
-                                    model.ImportFileWorkbook = fileValidationResultDto.ImportFileWorkbook;
+                                    //model.ImportFileWorkbook = fileValidationResultDto.ImportFileWorkbook;
                                     ModelState.Remove(key:"CurrentSampleImportStep");
                                     model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
                                     goto case SampleImportViewModel.SampleImportStep.SelectDataDefault;

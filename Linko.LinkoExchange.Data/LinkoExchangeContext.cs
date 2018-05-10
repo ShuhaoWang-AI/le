@@ -142,7 +142,7 @@ namespace Linko.LinkoExchange.Data
 
         public void Rollback(DbContextTransaction transaction)
         {
-            transaction?.Commit();
+            transaction?.Rollback();
         }
 
         public virtual AutoCommitScope CreateAutoCommitScope()

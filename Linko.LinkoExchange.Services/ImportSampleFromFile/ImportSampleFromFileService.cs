@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
@@ -279,7 +280,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 result.Success = true;
                 result.Errors = null;
                 var importFileWorkbook = GetWorkbook(importTempFileDto:importTempFileDto);
-                result.ImportFileWorkbook = importFileWorkbook;
+
+                //result.ImportFileWorkbook = importFileWorkbook;
             }
             catch (RuleViolationException ruleViolationException)
             {
@@ -295,6 +297,31 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             return result;
         }
 
+        /// <inheritdoc />
+        public Dictionary<SystemFieldName, List<CustomSelectListItemDto>> GetRequiredDataDefaults(SampleImportDto sampleImportDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public void RemoveImportTempFile(int importTempFileId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"importTempFileId={importTempFileId}"))

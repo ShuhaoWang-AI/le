@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "File Name")]
         public string SelectedFileName { get; set; }
         public int? ImportTempFileId { get; set; }
-        public Workbook ImportFileWorkbook { get; set; }
+        //public Workbook ImportFileWorkbook { get; set; }
 
         public StepSelectDataSourceViewModel StepSelectDataSource { get; set; }
         public StepSelectFileViewModel StepSelectFile { get; set; }

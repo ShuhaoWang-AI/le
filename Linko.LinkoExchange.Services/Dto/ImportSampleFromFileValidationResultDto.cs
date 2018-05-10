@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Telerik.Windows.Documents.Spreadsheet.Model;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -20,14 +19,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool Success { get; set; }
 
         /// <summary>
-        /// If success is equal to false then "Errors" will have value, otherwise null 
+        /// If success is equal to false then "Errors" will have value, otherwise empty string
         /// </summary>
         public IEnumerable<ErrorWithRowNumberDto> Errors { get; set; }
-
-        /// <summary>
-        /// If success is equal to true then "importFileWorkbook" will have value, otherwise null
-        /// </summary>
-        public Workbook ImportFileWorkbook { get; set; }
 
         #endregion
     }
