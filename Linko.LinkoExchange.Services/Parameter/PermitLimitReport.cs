@@ -108,18 +108,11 @@ namespace Linko.LinkoExchange.Services.Parameter
 					                                             ? $"{massLoadingAverageLimit.MaximumValue}"
 					                                             : "--";
 
-				//TODO Units
-				// which unit should be used? use concentration daily / concentration average?   or  parameter table DefaultUnit?   
 				limitReportParameterLimit.ConcentrationUnits = concentrationDailyLimit.BaseUnit.Name;
-
-				//TODO Units 
-				// which unit should be used? mass loading daily / mass loading average? or  parameter table DefaultUnit? 
-				limitReportParameterLimit.MassUnits = massLoadingDailyLimit != null ? massLoadingDailyLimit.BaseUnit.Name : "";
-
-
-				limitReportParameterLimit.MassUnits = concentrationAverageLimit == null
+				 
+				limitReportParameterLimit.MassUnits = massLoadingDailyLimit == null
 					                                      ? (massLoadingAverageLimit == null ? string.Empty : massLoadingAverageLimit.BaseUnit.Name)
-					                                      : concentrationAverageLimit.BaseUnit.Name;
+					                                      : massLoadingDailyLimit.BaseUnit.Name;
 			}
 
 			return parameterLimits;

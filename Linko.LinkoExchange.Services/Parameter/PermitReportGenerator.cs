@@ -68,7 +68,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 		#endregion
 
-		public byte[] CreateDischargePermitLimitPdf()
+		public byte[] CreateDischargePermitLimitPdf(out string industryNumber)
 		{
 			_pdfPage.SetPageSize(width:PageSize.PageLetter.Width, height:PageSize.PageLetter.Height);
 			_pdfPage.PageInfo.IsLandscape = true;
@@ -103,6 +103,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 			var mStream = new MemoryStream();
 			_pdfDocument.Save(outputStream:mStream, format:SaveFormat.Pdf);
+			industryNumber = _permitLimitReport.IndustryNumber; 
 			return mStream.ToArray();
 		}
 

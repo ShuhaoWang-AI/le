@@ -640,7 +640,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 		}
 
 		/// <inheritdoc />
-		public byte[] GetIndustryDischargeLimitReport()
+		public byte[] GetIndustryDischargeLimitReport(out string industryNumber)
 		{
 			_logger.Info(message:$"Start: ParameterService.GetIndustryDischargeLimitReport");
 
@@ -684,8 +684,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 			                                                        authorityRegulatoryProgramDto:authority,
 			                                                        parameterLimitsByMonitoringPoint:parameterLimitsByMonitoringPoints,
 			                                                        timeZoneService:_timeZoneService);
-
-			var dischargeLimitReportData = limitReportPdfGenerator.CreateDischargePermitLimitPdf();
+			
+			var dischargeLimitReportData = limitReportPdfGenerator.CreateDischargePermitLimitPdf(out industryNumber);
 
 			_logger.Info(message:$"End: ParameterService.GetIndustryDischargeLimitReport");
 

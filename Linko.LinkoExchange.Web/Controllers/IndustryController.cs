@@ -2118,9 +2118,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"PermitLimits")]
         public FileResult PermitLimits()
         {
-            var data = _parameterService.GetIndustryDischargeLimitReport();
-            const string contentType = "application/pdf";
-            var fileDownloadName = "Discharge Permit Limits.pdf";
+	        string industryNumber;
+            var data = _parameterService.GetIndustryDischargeLimitReport(industryNumber:out industryNumber);
+            var contentType = "application/pdf";
+            var fileDownloadName = $"{industryNumber}_Discharge_Permit_Limits.pdf"; 
 
             return File(fileContents:data, contentType:contentType, fileDownloadName:fileDownloadName);
         }

@@ -77,7 +77,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 		/// <summary>
 		///    Gets the discharge limit report file data. 
 		/// </summary>
+		/// <param name="industryNumber">return the industryNumber</param>
 		/// <returns>The binary discharge limit report data</returns>
-	    byte[] GetIndustryDischargeLimitReport();
+		byte[] GetIndustryDischargeLimitReport(out string industryNumber);
     }
 }
