@@ -681,6 +681,29 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND COL_LENGTH('dbo.tUnit', 'SystemUnitId') IS NULL
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add columns to tUnit'
+    PRINT '--------------------'
+
+    ALTER TABLE dbo.tUnit ADD SystemUnitId int NULL
+    ALTER TABLE dbo.tUnit ADD IsAvailableToRegulatee bit NOT NULL CONSTRAINT DF_tUnit_IsAvailableToRegulatee DEFAULT 0
+
+    ALTER TABLE dbo.tUnit
+    ADD CONSTRAINT FK_tUnit_tSystemUnit FOREIGN KEY
+    (
+        SystemUnitId
+    )
+    REFERENCES tSystemUnit (SystemUnitId)
+
+    CREATE NONCLUSTERED INDEX IX_tUnit_SystemUnitId ON dbo.tUnit
+    (
+	    SystemUnitId ASC
+    ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tDataFormat)
 BEGIN
