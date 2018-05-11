@@ -279,6 +279,8 @@
     <Compile Include="Sample\ISampleService.cs" />
     <Compile Include="Sample\SampleCount.cs" />
     <Compile Include="Sample\SampleService.cs" />
+    <Compile Include="SelectList\ISelectListService.cs" />
+    <Compile Include="SelectList\SelectListService.cs" />
     <Compile Include="Settings\GlobalSettings.cs" />
     <Compile Include="Settings\IGlobalSettings.cs" />
     <Compile Include="Settings\ISettingService.cs" />

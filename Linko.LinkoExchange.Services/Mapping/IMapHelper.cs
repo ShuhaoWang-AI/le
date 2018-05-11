@@ -69,16 +69,16 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         DataSourceDto GetDataSourceDtoFroDataSource(Core.Domain.DataSource dataSource);
         Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource);
-        DataSourceMonitoringPointDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint from);
-        DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceMonitoringPointDto from);
-        DataSourceCtsEventTypeDto ToDataSourceCtsEventTypeDto(DataSourceCtsEventType from);
-        DataSourceCtsEventType ToDataSourceCtsEventType(DataSourceCtsEventTypeDto from);
-        DataSourceCollectionMethodDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod from);
-        DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceCollectionMethodDto from);
-        DataSourceParameterDto ToDataSourceParameterDto(DataSourceParameter from);
-        DataSourceParameter ToDataSourceParameter(DataSourceParameterDto from);
-        DataSourceUnitDto ToDataSourceUnitDto(DataSourceUnit from);
-        DataSourceUnit ToDataSourceUnit(DataSourceUnitDto from);
+        DataSourceTranslationDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint from);
+        DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceTranslationDto from);
+        DataSourceTranslationDto ToDataSourceSampleTypeDto(DataSourceCtsEventType from);
+        DataSourceCtsEventType ToDataSourceSampleType(DataSourceTranslationDto from);
+        DataSourceTranslationDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod from);
+        DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceTranslationDto from);
+        DataSourceTranslationDto ToDataSourceParameterDto(DataSourceParameter from);
+        DataSourceParameter ToDataSourceParameter(DataSourceTranslationDto from);
+        DataSourceTranslationDto ToDataSourceUnitDto(DataSourceUnit from);
+        DataSourceUnit ToDataSourceUnit(DataSourceTranslationDto from);
 
         ImportTempFileDto GetDtoFromDomainObject(ImportTempFile domainObject);
         ImportTempFile GetDomainObjectFromDto(ImportTempFileDto dto, ImportTempFile existingDomainObject = null);

@@ -1356,23 +1356,27 @@ namespace Linko.LinkoExchange.Services.Mapping
             return existingDataSource;
         }
 
-        public DataSourceMonitoringPointDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint @from)
+        public DataSourceTranslationDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint @from)
         {
             if (from == null)
             {
                 return null;
             }
 
-            return new DataSourceMonitoringPointDto
+            return new DataSourceTranslationDto
             {
-                DataSourceMonitoringPointId = from.DataSourceMonitoringPointId,
+                Id = from.DataSourceMonitoringPointId,
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                MonitoringPointId = from.MonitoringPointId
+	            TranslationItem = new DataSourceTranslationItemDto
+                {
+                    TranslationId = from.MonitoringPointId,
+	                TranslationType = DataSourceTranslationType.MonitoringPoint
+                }
             };
         }
 
-        public DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceMonitoringPointDto @from)
+        public DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceTranslationDto @from)
         {
             if (from == null)
             {
@@ -1381,30 +1385,34 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return new DataSourceMonitoringPoint
             {
-                DataSourceMonitoringPointId = from.DataSourceMonitoringPointId.GetValueOrDefault(),
+                DataSourceMonitoringPointId = from.Id.GetValueOrDefault(),
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                MonitoringPointId = from.MonitoringPointId
+                MonitoringPointId = from.TranslationItem.TranslationId
             };
         }
 
-        public DataSourceCtsEventTypeDto ToDataSourceCtsEventTypeDto(DataSourceCtsEventType @from)
+        public DataSourceTranslationDto ToDataSourceSampleTypeDto(DataSourceCtsEventType @from)
         {
             if (from == null)
             {
                 return null;
             }
 
-            return new DataSourceCtsEventTypeDto
+            return new DataSourceTranslationDto
             {
-                DataSourceCtsEventTypeId = from.DataSourceCtsEventTypeId,
+                Id = from.DataSourceCtsEventTypeId,
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                CtsEventTypeId = from.CtsEventTypeId
+	            TranslationItem = new DataSourceTranslationItemDto
+                {
+                    TranslationId = from.CtsEventTypeId,
+	                TranslationType = DataSourceTranslationType.SampleType
+                }
             };
         }
 
-        public DataSourceCtsEventType ToDataSourceCtsEventType(DataSourceCtsEventTypeDto @from)
+        public DataSourceCtsEventType ToDataSourceSampleType(DataSourceTranslationDto @from)
         {
             if (from == null)
             {
@@ -1413,30 +1421,34 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return new DataSourceCtsEventType
             {
-                DataSourceCtsEventTypeId = from.DataSourceCtsEventTypeId.GetValueOrDefault(),
+                DataSourceCtsEventTypeId = from.Id.GetValueOrDefault(),
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                CtsEventTypeId = from.CtsEventTypeId
+                CtsEventTypeId = from.TranslationItem.TranslationId
             };
         }
 
-        public DataSourceCollectionMethodDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod @from)
+        public DataSourceTranslationDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod @from)
         {
             if (from == null)
             {
                 return null;
             }
 
-            return new DataSourceCollectionMethodDto
+            return new DataSourceTranslationDto
             {
-                DataSourceCollectionMethodId = from.DataSourceCollectionMethodId,
+                Id = from.DataSourceCollectionMethodId,
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                CollectionMethodId = from.CollectionMethodId
+	            TranslationItem = new DataSourceTranslationItemDto
+                {
+                    TranslationId = from.CollectionMethodId,
+	                TranslationType = DataSourceTranslationType.CollectionMethod
+                }
             };
         }
 
-        public DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceCollectionMethodDto @from)
+        public DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceTranslationDto @from)
         {
             if (from == null)
             {
@@ -1445,30 +1457,34 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return new DataSourceCollectionMethod
             {
-                DataSourceCollectionMethodId = from.DataSourceCollectionMethodId.GetValueOrDefault(),
+                DataSourceCollectionMethodId = from.Id.GetValueOrDefault(),
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                CollectionMethodId = from.CollectionMethodId
+                CollectionMethodId = from.TranslationItem.TranslationId
             };
         }
 
-        public DataSourceParameterDto ToDataSourceParameterDto(DataSourceParameter @from)
+        public DataSourceTranslationDto ToDataSourceParameterDto(DataSourceParameter @from)
         {
             if (from == null)
             {
                 return null;
             }
 
-            return new DataSourceParameterDto
+            return new DataSourceTranslationDto
             {
-                DataSourceParameterId = from.DataSourceParameterId,
+                Id = from.DataSourceParameterId,
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                ParameterId = from.ParameterId
+                TranslationItem = new DataSourceTranslationItemDto
+                {
+                    TranslationId = from.ParameterId,
+	                TranslationType = DataSourceTranslationType.Parameter
+                }
             };
         }
 
-        public DataSourceParameter ToDataSourceParameter(DataSourceParameterDto @from)
+        public DataSourceParameter ToDataSourceParameter(DataSourceTranslationDto @from)
         {
             if (from == null)
             {
@@ -1477,30 +1493,34 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return new DataSourceParameter
             {
-                DataSourceParameterId = from.DataSourceParameterId.GetValueOrDefault(),
+                DataSourceParameterId = from.Id.GetValueOrDefault(),
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                ParameterId = from.ParameterId
+                ParameterId = from.TranslationItem.TranslationId
             };
         }
 
-        public DataSourceUnitDto ToDataSourceUnitDto(DataSourceUnit @from)
+        public DataSourceTranslationDto ToDataSourceUnitDto(DataSourceUnit @from)
         {
             if (from == null)
             {
                 return null;
             }
 
-            return new DataSourceUnitDto
+            return new DataSourceTranslationDto
             {
-                DataSourceUnitId = from.DataSourceUnitId,
+                Id = from.DataSourceUnitId,
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                UnitId = from.UnitId
+                TranslationItem = new DataSourceTranslationItemDto
+                {
+                    TranslationId = from.UnitId,
+					TranslationType = DataSourceTranslationType.Unit
+                }
             };
         }
 
-        public DataSourceUnit ToDataSourceUnit(DataSourceUnitDto @from)
+        public DataSourceUnit ToDataSourceUnit(DataSourceTranslationDto @from)
         {
             if (from == null)
             {
@@ -1509,10 +1529,10 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return new DataSourceUnit
             {
-                DataSourceUnitId = from.DataSourceUnitId.GetValueOrDefault(),
+                DataSourceUnitId = from.Id.GetValueOrDefault(),
                 DataSourceTerm = from.DataSourceTerm,
                 DataSourceId = from.DataSourceId,
-                UnitId = from.UnitId
+                UnitId = from.TranslationItem.TranslationId
             };
         }
 
