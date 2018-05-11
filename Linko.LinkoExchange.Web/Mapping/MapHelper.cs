@@ -1,4 +1,5 @@
 ﻿using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Mapping
@@ -124,6 +125,19 @@ namespace Linko.LinkoExchange.Web.Mapping
             viewModel.QuestionId = dto.QuestionId;
 
             return viewModel;
+        }
+
+        public DropdownOptionViewModel ToDropdownOptionViewModel(ListItemDto fromDto)
+        {
+            if (fromDto == null)
+            {
+                return null;
+            }
+            return new DropdownOptionViewModel
+            {
+                Id = fromDto.Id,
+                DisplayName = fromDto.DisplayValue
+            };
         }
     }
 }

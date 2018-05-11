@@ -1,0 +1,9 @@
+﻿@using System.Collections
+@model Linko.LinkoExchange.Web.ViewModels.Shared.DropdownOptionViewModel
+
+@(Html.Kendo().DropDownList()
+      .Name(componentName: "authorityMonitoringPointsDropdown")
+      .DataValueField(field: "Id")
+      .DataTextField(field: "DisplayName")
+      .BindTo(data:(IEnumerable) ViewData[key: "authorityMonitoringPointsDropdown"])
+      )

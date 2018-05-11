@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
@@ -166,36 +167,58 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
-        public DataSourceTranslationsDto GetDataSourceTranslationsById(int dataSourceId)
+        public List<DataSourceTranslationDto> GetDataSourceTranslations(int dataSourceId, DataSourceTranslationType translationType)
         {
-            var dataSourceDto = GetDataSourceById(dataSourceId: dataSourceId);
-            var monitoringPointDtos = _dbContext.DataSourceMonitoringPoints.Where(d => d.DataSourceId == dataSourceId)
-                                                .OrderBy(d => d.DataSourceTerm).ToList()
-                                                .Select(x => _mapHelper.ToDataSourceMonitoringPointDto(x)).ToList();
-            var ctsEventTypeDtos = _dbContext.DataSourceCtsEventTypes.Where(d => d.DataSourceId == dataSourceId)
-                                             .OrderBy(d => d.DataSourceTerm).ToList()
-                                             .Select(x => _mapHelper.ToDataSourceCtsEventTypeDto(x)).ToList();
-            var collectionMethodDtos = _dbContext.DataSourceCollectionMethods.Where(d => d.DataSourceId == dataSourceId)
-                                                 .OrderBy(d => d.DataSourceTerm).ToList()
-                                                 .Select(x => _mapHelper.ToDataSourceCollectionMethodDto(x)).ToList();
-            var parameterDtos = _dbContext.DataSourceParameters.Where(d => d.DataSourceId == dataSourceId)
-                                          .OrderBy(d => d.DataSourceTerm).ToList()
-                                          .Select(x => _mapHelper.ToDataSourceParameterDto(x)).ToList();
-            var unitDtos = _dbContext.DataSourceUnits.Where(d => d.DataSourceId == dataSourceId)
-                                     .OrderBy(d => d.DataSourceTerm).ToList()
-                                     .Select(x => _mapHelper.ToDataSourceUnitDto(x)).ToList();
-
-            return new DataSourceTranslationsDto
+            var dataSource = _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId);
+            if (dataSource == null)
             {
-                DataSource = dataSourceDto,
-                MonitoringPoints = monitoringPointDtos,
-                CtsEventTypes = ctsEventTypeDtos,
-                CollectionMethods = collectionMethodDtos,
-                Parameters = parameterDtos,
-                Units = unitDtos
-            };
-        }
+                throw CreateRuleViolationExceptionForValidationError(errorMessage:"Data Source is not found");
+            }
 
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint: return GetDataSourceMonitoringPointTranslations(dataSource: dataSource);
+                case DataSourceTranslationType.SampleType: return GetDataSourceSampleTypeTranslations(dataSource: dataSource);
+                case DataSourceTranslationType.CollectionMethod: return GetDataSourceCollectionMethodTranslations(dataSource: dataSource);
+                case DataSourceTranslationType.Parameter: return GetDataSourceParameterTranslations(dataSource: dataSource);
+                case DataSourceTranslationType.Unit: return GetDataSourceUnitTranslations(dataSource: dataSource);
+                default: throw CreateRuleViolationExceptionForValidationError(errorMessage:"DataSourceType is unsupported");
+            }
+        }
+        private List<DataSourceTranslationDto> GetDataSourceMonitoringPointTranslations(Core.Domain.DataSource dataSource) {
+            return _dbContext.DataSourceMonitoringPoints.Where(d => d.DataSourceId == dataSource.DataSourceId)
+                             .OrderBy(d => d.DataSourceTerm).ToList()
+                             .Select(x => _mapHelper.ToDataSourceMonitoringPointDto(x))
+                             .ToList();
+        }
+        private List<DataSourceTranslationDto> GetDataSourceSampleTypeTranslations(Core.Domain.DataSource dataSource)
+        {
+            return _dbContext.DataSourceCtsEventTypes.Where(d => d.DataSourceId == dataSource.DataSourceId)
+                             .OrderBy(d => d.DataSourceTerm).ToList()
+                             .Select(x => _mapHelper.ToDataSourceSampleTypeDto(x))
+                             .ToList();
+        }
+        private List<DataSourceTranslationDto> GetDataSourceCollectionMethodTranslations(Core.Domain.DataSource dataSource)
+        {
+            return _dbContext.DataSourceCollectionMethods.Where(d => d.DataSourceId == dataSource.DataSourceId)
+                             .OrderBy(d => d.DataSourceTerm).ToList()
+                             .Select(x => _mapHelper.ToDataSourceCollectionMethodDto(x))
+                             .ToList();
+        }
+        private List<DataSourceTranslationDto> GetDataSourceParameterTranslations(Core.Domain.DataSource dataSource)
+        {
+            return _dbContext.DataSourceParameters.Where(d => d.DataSourceId == dataSource.DataSourceId)
+                             .OrderBy(d => d.DataSourceTerm).ToList()
+                             .Select(x => _mapHelper.ToDataSourceParameterDto(x))
+                             .ToList();
+        }
+        private List<DataSourceTranslationDto> GetDataSourceUnitTranslations(Core.Domain.DataSource dataSource)
+        {
+            return _dbContext.DataSourceUnits.Where(d => d.DataSourceId == dataSource.DataSourceId)
+                             .OrderBy(d => d.DataSourceTerm).ToList()
+                             .Select(x => _mapHelper.ToDataSourceUnitDto(x))
+                             .ToList();
+        }
         #endregion
 
         private static RuleViolationException CreateRuleViolationExceptionForValidationError(string errorMessage)

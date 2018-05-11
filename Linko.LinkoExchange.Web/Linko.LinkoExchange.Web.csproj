@@ -491,6 +491,12 @@
     <Content Include="Views\Industry\DataSources.cshtml" />
     <Content Include="Views\Industry\DataSourceDetails.cshtml" />
     <Content Include="Views\Industry\SampleImport.cshtml" />
+    <Content Include="Views\Industry\DataSourceDetailsTranslations.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AuthorityUnitEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AuthorityParameterEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AuthorityCollectionMethodEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AuthoritySampleTypeEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\AuthorityMonitoringPointEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -538,9 +544,11 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Industry\DataSourceTranslationViewModel.cs" />
     <Compile Include="ViewModels\Industry\DataSourceViewModel.cs" />
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
     <Compile Include="ViewModels\Industry\SampleImportViewModel.cs" />
+    <Compile Include="ViewModels\Shared\DropdownOptionViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\NewReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportSummaryViewModel.cs" />

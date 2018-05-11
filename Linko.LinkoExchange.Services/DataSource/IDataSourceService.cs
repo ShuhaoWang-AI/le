@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.DataSource
@@ -16,6 +17,6 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         DataSourceDto GetDataSourceById(int dataSourceId);
 
-        DataSourceTranslationsDto GetDataSourceTranslationsById(int dataSourceId);
+        List<DataSourceTranslationDto> GetDataSourceTranslations(int dataSourceId, DataSourceTranslationType translationType);
     }
 }

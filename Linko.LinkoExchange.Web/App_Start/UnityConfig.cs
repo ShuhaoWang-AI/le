@@ -38,6 +38,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
 using Linko.LinkoExchange.Services.PrivacyPolicy;
+using Linko.LinkoExchange.Services.SelectList;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -124,6 +125,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IApplicationCache, ApplicationCache>();
             container.RegisterType<IPrivacyPolicyService, PrivacyPolicyService>();
             container.RegisterType<IDataSourceService, DataSourceService>();
+            container.RegisterType<ISelectListService, SelectListService>();
             container.RegisterType<IImportSampleFromFileService, ImportSampleFromFileService>();
 
             // Custom identity services           

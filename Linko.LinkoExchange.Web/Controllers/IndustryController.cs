@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
@@ -26,10 +27,12 @@ using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.SelectList;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
+using Linko.LinkoExchange.Web.Mapping;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -52,6 +55,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
         private readonly IMonitoringPointService _monitoringPointService;
+        private readonly ISelectListService _selectListService;
         private readonly IOrganizationService _organizationService;
         private readonly IParameterService _parameterService;
         private readonly IPermissionService _permissionService;
@@ -62,22 +66,23 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
-
+        private readonly IMapHelper _mapHelper;
         #endregion
 
         #region constructors and destructor
 
-        public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
+        public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IMapHelper mapHelper,
                                   IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService,
                                   IFileStoreService fileStoreService, IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService,
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
-                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService,
+                                  IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService, ISelectListService selectListService,
                                   IImportSampleFromFileService importSampleFromFileService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _fileStoreService = fileStoreService;
             _httpContextService = httpContextService;
             _invitationService = invitationService;
+            _mapHelper = mapHelper;
             _logger = logger;
             _monitoringPointService = monitoringPointService;
             _organizationService = organizationService;
@@ -91,6 +96,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _unitService = unitService;
             _userService = userService;
             _dataSourceService = dataSourceService;
+            _selectListService = selectListService;
             _importSampleFromFileService = importSampleFromFileService;
         }
 
@@ -1766,7 +1772,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:new
                                  {
                                      redirect = false,
-                                     message = "Please select an user."
+                                     message = "Please select an Data Source."
                                  });
             }
             catch (RuleViolationException rve)
@@ -1901,6 +1907,99 @@ namespace Linko.LinkoExchange.Web.Controllers
             return viewModel;
         }
 
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DataSourceDetails_ImportSamples(DataSourceViewModel model)
+        {
+            return RedirectToAction(actionName: "SampleImport", controllerName: "Industry",
+                                    routeValues: new
+                                                 {
+                                                     id = model.Id
+                                                 });
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DataSourceDetails_ViewTranslations(DataSourceViewModel model)
+        {
+            return RedirectToAction(actionName: "DataSourceDetailsTranslations", controllerName: "Industry",
+                                    routeValues: new
+                                                 {
+                                                     id = model.Id
+                                                 });
+        }
+        #endregion
+
+        #region DataSource Details View Translations
+        [Route(template:"DataSource/{id:int}/Details/Translations")]
+        public ActionResult DataSourceDetailsTranslations(int id)
+        {
+            PrepareDataSourceTranslationsDropdownLists(dataSourceId: id);
+            return View();
+        }
+
+        private void PrepareDataSourceTranslationsDropdownLists(int dataSourceId)
+        {
+            ViewData[key: "dataSourceId"] = dataSourceId;
+            ViewData[key: "authorityMonitoringPointsDropdown"] = _selectListService.GetIndustryMonitoringPointSelectList()
+                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "authoritySampleTypesDropdown"] = _selectListService.GetAuthoritySampleTypeSelectList()
+                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "authorityCollectionMethodsDropdown"] = _selectListService.GetAuthorityCollectionMethodSelectList()
+                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "authorityParametersDropdown"] = _selectListService.GetAuthorityParameterSelectList()
+                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "authorityUnitsDropdown"] = _selectListService.GetAuthorityUnitSelectList()
+                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+        }
+
+        public ActionResult DataSourceDetailsTranslations_Read([CustomDataSourceRequest] DataSourceRequest request,
+                                                               int dataSourceId,
+                                                               DataSourceTranslationType translationType)
+        {
+            var dataSourceTranslations = _dataSourceService.GetDataSourceTranslations(dataSourceId: dataSourceId, translationType: translationType);
+            var translationNameDict = GetTranslationSelectListDictionay(translationType: translationType);
+
+            var viewModels = dataSourceTranslations.Select(x => CreateDataSourceTranslationViewModel(x, translationType, translationNameDict));
+            var result = viewModels.ToDataSourceResult(request: request);
+            return Json(data: result);
+        }
+
+        private Dictionary<int, string> GetTranslationSelectListDictionay(DataSourceTranslationType translationType)
+        {
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint: return _selectListService.GetIndustryMonitoringPointSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
+                case DataSourceTranslationType.SampleType: return _selectListService.GetAuthoritySampleTypeSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
+                case DataSourceTranslationType.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
+                case DataSourceTranslationType.Parameter: return _selectListService.GetAuthorityParameterSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
+                case DataSourceTranslationType.Unit: return _selectListService.GetAuthorityUnitSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
+                default: throw new NotImplementedException(message: "DataSourceType is unsupported");
+            }
+        }
+
+        private DataSourceTranslationViewModel CreateDataSourceTranslationViewModel(DataSourceTranslationDto dataSourceTranslation,
+                                                                                    DataSourceTranslationType translationType,
+                                                                                    IReadOnlyDictionary<int, string> translationNameDict)
+        {
+            var viewModel = DataSourceTranslationViewModel.Create(translationType);
+
+            viewModel.Id = dataSourceTranslation.Id;
+            viewModel.DataSourceId = dataSourceTranslation.DataSourceId;
+            viewModel.DataSourceTerm = dataSourceTranslation.DataSourceTerm;
+            viewModel.TranslationType = translationType;
+            viewModel.TranslatedItem = new DropdownOptionViewModel
+            {
+                Id = dataSourceTranslation.TranslationItem.TranslationId,
+                DisplayName = translationNameDict[dataSourceTranslation.TranslationItem.TranslationId]
+            };
+
+            return viewModel;
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DataSourceDetailsTranslations_Update([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region import samples from file

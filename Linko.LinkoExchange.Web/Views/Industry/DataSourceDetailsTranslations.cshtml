@@ -1,0 +1,355 @@
+﻿@using Linko.LinkoExchange.Core.Domain
+@using Linko.LinkoExchange.Web.ViewModels.Industry
+@{
+    ViewBag.Title = "Data Source Details Translations";
+}
+
+<section>
+    <ol class="breadcrumb">
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+        </li>
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"DataSources", controllerName:"Industry")'"><i class=""></i> Data Sources </a>
+        </li>
+        <li>
+            <a href="#"><i class=""></i> Details </a>
+        </li>
+        <li class="active">Translations</li>
+    </ol>
+</section>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Monitoring Point</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceMonitoringPointTranslationViewModel>()
+                          .Name(componentName: "gridDataSourceMonitoringPointTranslation")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
+                              columns.Bound(c => c.TranslatedItem)
+                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command => { command.Edit(); });
+                          })
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled: true)
+                                                    .Refresh(enabled: true)
+                                                    .Input(enabled: true)
+                                                    .Numeric(enabled: false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .NoRecords(text: "No Monitoring Point Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled: false)
+                                                        .Batch(enabled: false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
+                                                        {
+                                                            dataSourceId = ViewData[key: "dataSourceId"],
+                                                            translationType = DataSourceTranslationType.MonitoringPoint
+                                                        }))
+                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 10)
+                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                            model.Field(p => p.TranslatedItem);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Collection Methods</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceCollectionMethodTranslationViewModel>()
+                          .Name(componentName: "gridDataSourceCollectionMethodTranslation")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
+                              columns.Bound(c => c.TranslatedItem)
+                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command => { command.Edit(); });
+                          })
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled: true)
+                                                    .Refresh(enabled: true)
+                                                    .Input(enabled: true)
+                                                    .Numeric(enabled: false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .NoRecords(text: "No Collection Method Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled: false)
+                                                        .Batch(enabled: false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
+                                                        {
+                                                            dataSourceId = ViewData[key: "dataSourceId"],
+                                                            translationType = DataSourceTranslationType.CollectionMethod
+                                                        }))
+                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 10)
+                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                            model.Field(p => p.TranslatedItem);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Sample Types</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceSampleTypeTranslationViewModel>()
+                          .Name(componentName: "gridDataSourceSampleTypeTranslation")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
+                              columns.Bound(c => c.TranslatedItem)
+                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command => { command.Edit(); });
+                          })
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled: true)
+                                                    .Refresh(enabled: true)
+                                                    .Input(enabled: true)
+                                                    .Numeric(enabled: false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .NoRecords(text: "No Sample Type Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled: false)
+                                                        .Batch(enabled: false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
+                                                        {
+                                                            dataSourceId = ViewData[key: "dataSourceId"],
+                                                            translationType = DataSourceTranslationType.SampleType
+                                                        }))
+                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 10)
+                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                            model.Field(p => p.TranslatedItem);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Parameters</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceParameterTranslationViewModel>()
+                          .Name(componentName: "gridDataSourceParameterTranslation")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
+                              columns.Bound(c => c.TranslatedItem)
+                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command => { command.Edit(); });
+                          })
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled: true)
+                                                    .Refresh(enabled: true)
+                                                    .Input(enabled: true)
+                                                    .Numeric(enabled: false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .NoRecords(text: "No Parameter Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled: false)
+                                                        .Batch(enabled: false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
+                                                        {
+                                                            dataSourceId = ViewData[key: "dataSourceId"],
+                                                            translationType = DataSourceTranslationType.Parameter
+                                                        }))
+                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 10)
+                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                            model.Field(p => p.TranslatedItem);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Units</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceUnitTranslationViewModel>()
+                          .Name(componentName:"gridDataSourceUnitTranslation")
+                          .Columns(columns =>
+                                   {
+                                       columns.Bound(c => c.DataSourceTerm)
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-3"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"});
+                              columns.Bound(c => c.TranslatedItem)
+                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command => { command.Edit(); });
+                          })
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(enabled:true)
+                                                    .Refresh(enabled:true)
+                                                    .Input(enabled:true)
+                                                    .Numeric(enabled:false)
+                          )
+                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value:true))
+                          .Scrollable(s => s.Height(value:"auto"))
+                          .NoRecords(text: "No Unit Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled:false)
+                                                        .Batch(enabled:false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Read(read => read.Action(actionName:"DataSourceDetailsTranslations_Read", controllerName:"Industry", routeValues:new
+                                                        {
+                                                            dataSourceId = ViewData[key: "dataSourceId"],
+                                                            translationType = DataSourceTranslationType.Unit
+                                                        }))
+                                                        .Update(update => update.Action(actionName:"DataSourceDetailsTranslations_Update", controllerName:"Industry"))
+                                                        .PageSize(pageSize:10)
+                                                        .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled:false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceTerm).Editable(enabled:false);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                            model.Field(p => p.TranslatedItem);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+}

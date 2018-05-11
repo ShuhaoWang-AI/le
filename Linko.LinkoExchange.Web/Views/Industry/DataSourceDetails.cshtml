@@ -12,7 +12,7 @@
         <li>
             <a href="#" onclick="location.href = '@Url.Action(actionName:"DataSources", controllerName:"Industry")'"><i class=""></i> Data Sources </a>
         </li>
-        <li class="active">Data Source Details</li>
+        <li class="active">Details</li>
     </ol>
 </section>
 
@@ -27,8 +27,10 @@
                 <div class="pull-right">
                     @if (Model.Id.HasValue)
                     {
-                        <input class="btn btn-primary btn-sm" type="button" value="Import Samples" />
-                        <input class="btn btn-primary btn-sm" type="button" value="View Translations" />
+                        <input class="btn btn-primary btn-sm" type="submit" value="Import Samples" 
+                               formaction="@Url.Action(actionName:"DataSourceDetails_ImportSamples", controllerName:"Industry")" formmethod="post"/>
+                        <input class="btn btn-primary btn-sm" type="submit" value="View Translations" 
+                               formaction="@Url.Action(actionName:"DataSourceDetails_ViewTranslations", controllerName:"Industry")" formmethod="post"/>
                     }
                 </div>
             </div>

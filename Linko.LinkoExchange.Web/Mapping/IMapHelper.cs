@@ -1,4 +1,5 @@
 ﻿using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Mapping
@@ -9,5 +10,6 @@ namespace Linko.LinkoExchange.Web.Mapping
         UserProfileViewModel GetUserProfileViewModelFromUserDto(UserDto userDto, UserProfileViewModel viewModel = null);
         QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto, QuestionAnswerPairViewModel viewModel = null);
         QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto, QuestionViewModel viewModel = null);
+        DropdownOptionViewModel ToDropdownOptionViewModel(ListItemDto fromDto);
     }
 }
