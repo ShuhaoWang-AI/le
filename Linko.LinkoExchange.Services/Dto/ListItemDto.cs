@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Services.Dto
 {
-    public class CustomSelectListItemDto
+    public class ListItemDto
     {
         #region public properties
 

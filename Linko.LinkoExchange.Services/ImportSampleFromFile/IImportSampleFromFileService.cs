@@ -49,13 +49,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         /// <summary>
         /// Checks sampleImportDto has any recommended column cell has missing value or not
-        /// If missing then return a Dictionary
-        /// Dictionary Key is column name (FileVersionFieldDto.SystemFieldName)
-        /// Dictionary Value is list of options (CustomSelectListItem) to choose for that column
+        /// If missing then return list of RequiredDataDefaultsDto
         /// </summary>
         /// <param name="sampleImportDto"> </param>
         /// <returns> </returns>
-        Dictionary<SystemFieldName, List<CustomSelectListItemDto>> GetRequiredDataDefaults(SampleImportDto sampleImportDto);
+        List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto);
 
         /// <summary>
         /// 

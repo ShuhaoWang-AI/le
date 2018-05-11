@@ -312,7 +312,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public Dictionary<SystemFieldName, List<CustomSelectListItemDto>> GetRequiredDataDefaults(SampleImportDto sampleImportDto)
+        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto)
         {
             throw new NotImplementedException();
         }

@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Dto
         /// <summary>
         /// System column name
         /// </summary>
-        public SystemFieldName SystemFieldName { get; set; }
+        public SampleImportColumnName SystemFieldName { get; set; }
         /// <summary>
         /// Authority's column name
         /// </summary>

@@ -3,7 +3,7 @@
     /// <summary>
     /// Values are in tSystemField table
     /// </summary>
-    public enum SystemFieldName
+    public enum SampleImportColumnName
     {
         MonitoringPoint,
         SampleType,
