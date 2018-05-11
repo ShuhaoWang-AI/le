@@ -424,7 +424,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 				               ParameterId = parameter.ParameterId,
 				               Name = parameter.Name,
 				               Description = parameter.Description,
-				               DefaultUnit = GetUnitDtoFromUnit(unit:parameter.DefaultUnit),
+				               DefaultUnit = GetDtoFromDomainObject(domainObject:parameter.DefaultUnit),
 				               TrcFactor = parameter.TrcFactor,
 				               OrganizationRegulatoryProgramId = parameter.OrganizationRegulatoryProgramId,
 				               IsRemoved = parameter.IsRemoved
@@ -475,22 +475,50 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return parameterGroup;
 		}
 
-		public UnitDto GetUnitDtoFromUnit(Core.Domain.Unit unit)
+		public UnitDto GetDtoFromDomainObject(Core.Domain.Unit domainObject)
 		{
 			var unitDto = new UnitDto
 			              {
-				              UnitId = unit.UnitId,
-				              Name = unit.Name,
-				              Description = unit.Description,
-				              IsFlowUnit = unit.IsFlowUnit,
-				              OrganizationId = unit.OrganizationId,
-				              IsRemoved = unit.IsRemoved,
-				              CreationDateTimeUtc = unit.CreationDateTimeUtc,
-				              LastModificationDateTimeUtc = unit.LastModificationDateTimeUtc,
-				              LastModifierUserId = unit.LastModifierUserId
+				              UnitId = domainObject.UnitId,
+				              Name = domainObject.Name,
+				              Description = domainObject.Description,
+				              IsFlowUnit = domainObject.IsFlowUnit,
+				              OrganizationId = domainObject.OrganizationId,
+				              IsRemoved = domainObject.IsRemoved,
+				              CreationDateTimeUtc = domainObject.CreationDateTimeUtc,
+				              LastModificationDateTimeUtc = domainObject.LastModificationDateTimeUtc,
+				              LastModifierUserId = domainObject.LastModifierUserId,
+							  SystemUnitId = domainObject.SystemUnitId,
+				              SystemUnit = GetDtoFromDomainObject(domainObject:domainObject.SystemUnit),
+							  IsAvailableToRegulatee = domainObject.IsAvailableToRegulatee
 			              };
 
 			return unitDto;
+		}
+
+		/// <inheritdoc />
+		public Core.Domain.Unit GetDomainObjectFromDto(UnitDto dto, Core.Domain.Unit existingDomainObject = null)
+		{
+			if (dto == null)
+			{
+				return null;
+			}
+
+			if (existingDomainObject == null)
+			{
+				existingDomainObject = new Core.Domain.Unit();
+			}
+
+			existingDomainObject.UnitId = dto.UnitId;
+			existingDomainObject.Name = dto.Name;
+			existingDomainObject.Description = dto.Description;
+			existingDomainObject.IsFlowUnit = dto.IsFlowUnit;
+			existingDomainObject.OrganizationId = dto.OrganizationId;
+			existingDomainObject.IsRemoved = dto.IsRemoved;
+			existingDomainObject.SystemUnitId = dto.SystemUnitId;
+			existingDomainObject.IsAvailableToRegulatee = dto.IsAvailableToRegulatee;
+
+			return existingDomainObject;
 		}
 
 		public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat)
@@ -1489,53 +1517,143 @@ namespace Linko.LinkoExchange.Services.Mapping
         }
 
         /// <inheritdoc />
-        public ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile)
+        public ImportTempFileDto GetDtoFromDomainObject(Core.Domain.ImportTempFile domainObject)
 		{
-			if (importTempFile == null)
+			if (domainObject == null)
 			{
 				return null;
 			}
 
 			return new ImportTempFileDto
 			       {
-				       ImportTempFileId = importTempFile.ImportTempFileId,
-				       MediaType = importTempFile.MediaType,
-				       OriginalFileName = importTempFile.OriginalName,
-				       FileTypeId = importTempFile.FileTypeId,
-				       SizeByte = importTempFile.SizeByte,
-				       OrganizationRegulatoryProgramId = importTempFile.OrganizationRegulatoryProgramId,
-				       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:importTempFile.OrganizationRegulatoryProgram),
-				       UploadDateTimeLocal = importTempFile.UploadDateTimeUtc.UtcDateTime,
-				       UploaderUserId = importTempFile.UploaderUserId,
-					   RawFile = importTempFile.RawFile
+				       ImportTempFileId = domainObject.ImportTempFileId,
+				       MediaType = domainObject.MediaType,
+				       OriginalFileName = domainObject.OriginalName,
+				       FileTypeId = domainObject.FileTypeId,
+				       SizeByte = domainObject.SizeByte,
+				       OrganizationRegulatoryProgramId = domainObject.OrganizationRegulatoryProgramId,
+				       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:domainObject.OrganizationRegulatoryProgram),
+				       UploadDateTimeLocal = domainObject.UploadDateTimeUtc.UtcDateTime,
+				       UploaderUserId = domainObject.UploaderUserId,
+					   RawFile = domainObject.RawFile
 					   //FileExtension = implemented in service
 			       };
 		}
 
 		/// <inheritdoc />
-		public Core.Domain.ImportTempFile GetImportTempFileFromImportTempFileDto(ImportTempFileDto dto, Core.Domain.ImportTempFile existingDataSource = null)
+		public Core.Domain.ImportTempFile GetDomainObjectFromDto(ImportTempFileDto dto, Core.Domain.ImportTempFile existingDomainObject = null)
 		{
 			if (dto == null)
 			{
 				return null;
 			}
 
-			if (existingDataSource == null)
+			if (existingDomainObject == null)
 			{
-				existingDataSource = new Core.Domain.ImportTempFile();
+				existingDomainObject = new Core.Domain.ImportTempFile();
 			}
 
 			if (dto.ImportTempFileId != null)
 			{
-				existingDataSource.ImportTempFileId = dto.ImportTempFileId.Value;
+				existingDomainObject.ImportTempFileId = dto.ImportTempFileId.Value;
 			}
 
-			existingDataSource.OriginalName = dto.OriginalFileName;
-			existingDataSource.MediaType = dto.MediaType;
-			existingDataSource.SizeByte = dto.RawFile.Length;
-			existingDataSource.RawFile = dto.RawFile;
+			existingDomainObject.OriginalName = dto.OriginalFileName;
+			existingDomainObject.MediaType = dto.MediaType;
+			existingDomainObject.SizeByte = dto.RawFile.Length;
+			existingDomainObject.RawFile = dto.RawFile;
 
-			return existingDataSource;
+			return existingDomainObject;
+		}
+
+		/// <inheritdoc />
+		public SystemUnitDto GetDtoFromDomainObject(Core.Domain.SystemUnit domainObject)
+		{
+			if (domainObject == null)
+			{
+				return null;
+			}
+
+			return new SystemUnitDto
+			       {
+				       SystemUnitId = domainObject.SystemUnitId,
+				       Name = domainObject.Name,
+				       Description = domainObject.Description,
+				       ConversionFactor = domainObject.ConversionFactor,
+				       AdditiveFactor = domainObject.AdditiveFactor,
+				       UnitDimensionId = domainObject.UnitDimensionId,
+					   UnitDimension = GetDtoFromDomainObject(domainObject:domainObject.UnitDimension),
+				       CreationDateTimeUtc = domainObject.CreationDateTimeUtc,
+				       LastModificationDateTimeUtc = domainObject.LastModificationDateTimeUtc,
+				       LastModifierUserId = domainObject.LastModifierUserId,
+				       //LastModifierFullName = service will populate later
+			       };
+		}
+
+		/// <inheritdoc />
+		public Core.Domain.SystemUnit GetDomainObjectFromDto(SystemUnitDto dto, Core.Domain.SystemUnit existingDomainObject = null)
+		{
+			if (dto == null)
+			{
+				return null;
+			}
+
+			if (existingDomainObject == null)
+			{
+				existingDomainObject = new Core.Domain.SystemUnit();
+			}
+
+
+			existingDomainObject.SystemUnitId = dto.SystemUnitId;
+			existingDomainObject.Name = dto.Name;
+			existingDomainObject.Description = dto.Description;
+			existingDomainObject.ConversionFactor = dto.ConversionFactor;
+			existingDomainObject.AdditiveFactor = dto.AdditiveFactor;
+			existingDomainObject.UnitDimensionId = dto.UnitDimensionId;
+
+			return existingDomainObject;
+		}
+		
+
+		/// <inheritdoc />
+		public UnitDimensionDto GetDtoFromDomainObject(Core.Domain.UnitDimension domainObject)
+		{
+			if (domainObject == null)
+			{
+				return null;
+			}
+
+			return new UnitDimensionDto
+			       {
+				       UnitDimensionId = domainObject.UnitDimensionId,
+				       Name = domainObject.Name,
+				       Description = domainObject.Description,
+				       CreationDateTimeUtc = domainObject.CreationDateTimeUtc,
+				       LastModificationDateTimeUtc = domainObject.LastModificationDateTimeUtc,
+				       LastModifierUserId = domainObject.LastModifierUserId,
+				       //LastModifierFullName = service will populate later
+			       };
+		}
+
+		/// <inheritdoc />
+		public Core.Domain.UnitDimension GetDomainObjectFromDto(UnitDimensionDto dto, Core.Domain.UnitDimension existingDomainObject = null)
+		{
+			if (dto == null)
+			{
+				return null;
+			}
+
+			if (existingDomainObject == null)
+			{
+				existingDomainObject = new Core.Domain.UnitDimension();
+			}
+
+
+			existingDomainObject.UnitDimensionId = dto.UnitDimensionId;
+			existingDomainObject.Name = dto.Name;
+			existingDomainObject.Description = dto.Description;
+
+			return existingDomainObject;
 		}
 
 		#endregion

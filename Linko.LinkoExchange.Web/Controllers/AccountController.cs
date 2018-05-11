@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mapping;
@@ -66,8 +67,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             IMapHelper mapHelper,
             IHttpContextService httpContextService,
             IReportPackageService reportPackageService,
-            ISampleService sampleService
-        ) : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            ISampleService sampleService,
+            IUnitService unitService
+        ) : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;

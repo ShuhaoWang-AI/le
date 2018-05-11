@@ -28,7 +28,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter);
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
-        UnitDto GetUnitDtoFromUnit(Core.Domain.Unit unit);
+        UnitDto GetDtoFromDomainObject(Core.Domain.Unit domainObject);
+        Core.Domain.Unit GetDomainObjectFromDto(UnitDto dto, Core.Domain.Unit existingDomainObject = null);
         ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
         ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat);
 
@@ -79,7 +80,11 @@ namespace Linko.LinkoExchange.Services.Mapping
         DataSourceUnitDto ToDataSourceUnitDto(DataSourceUnit from);
         DataSourceUnit ToDataSourceUnit(DataSourceUnitDto from);
 
-        ImportTempFileDto GetImportTempFileDtoFromImportTempFile(Core.Domain.ImportTempFile importTempFile);
-        Core.Domain.ImportTempFile GetImportTempFileFromImportTempFileDto(ImportTempFileDto dto, Core.Domain.ImportTempFile existingDataSource = null);
+        ImportTempFileDto GetDtoFromDomainObject(ImportTempFile domainObject);
+        ImportTempFile GetDomainObjectFromDto(ImportTempFileDto dto, ImportTempFile existingDomainObject = null);
+        SystemUnitDto GetDtoFromDomainObject(SystemUnit domainObject);
+        SystemUnit GetDomainObjectFromDto(SystemUnitDto dto, SystemUnit existingDomainObject = null);
+        UnitDimensionDto GetDtoFromDomainObject(UnitDimension domainObject);
+        UnitDimension GetDomainObjectFromDto(UnitDimensionDto dto, UnitDimension existingDomainObject = null);
     }
 }

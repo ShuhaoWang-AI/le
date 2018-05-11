@@ -172,6 +172,8 @@
     <Compile Include="Dto\ReportSampleDto.cs" />
     <Compile Include="Dto\RepudiationReasonDto.cs" />
     <Compile Include="Dto\SampleRequirementDto.cs" />
+    <Compile Include="Dto\SystemUnitDto.cs" />
+    <Compile Include="Dto\UnitDimensionDto.cs" />
     <Compile Include="Email\EmailEntry.cs" />
     <Compile Include="Email\ILinkoExchangeEmailService.cs" />
     <Compile Include="Email\LinkoExchangeEmailServiceSimple.cs" />

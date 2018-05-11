@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -37,8 +38,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService,
             IUserService userService,
             IReportPackageService reportPackageService,
-            ISampleService sampleService)
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            ISampleService sampleService,
+            IUnitService unitService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _invitationService = invitationService;
             _logger = logger;

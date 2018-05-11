@@ -107,6 +107,8 @@ namespace Linko.LinkoExchange.Data
         public DbSet<DataSourceParameter> DataSourceParameters { get; set; }
         public DbSet<DataSourceUnit> DataSourceUnits { get; set; }
         public DbSet<ImportTempFile> ImportTempFiles { get; set; }
+        public DbSet<UnitDimension> UnitDimensions { get; set; }
+        public DbSet<SystemUnit> SystemUnits { get; set; }
 
         #endregion
 

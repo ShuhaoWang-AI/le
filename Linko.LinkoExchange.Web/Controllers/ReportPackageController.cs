@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Sync;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -60,8 +61,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService,
             IQuestionAnswerService questionAnswerService,
             IUserService userService,
-            ISyncService syncService)
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            ISyncService syncService,
+            IUnitService unitService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService )
         {
             _authenticationService = authenticationService;
             _reportPackageService = reportPackageService;

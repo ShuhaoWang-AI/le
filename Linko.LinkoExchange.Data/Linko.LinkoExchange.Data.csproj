@@ -85,6 +85,8 @@
     <Compile Include="Mapping\DataSourceMap.cs" />
     <Compile Include="Mapping\ImportTempFileMap.cs" />
     <Compile Include="Mapping\PrivacyPolicyMap.cs" />
+    <Compile Include="Mapping\SystemUnitMap.cs" />
+    <Compile Include="Mapping\UnitDimensionMap.cs" />
     <Compile Include="SyncContext.cs" />
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />

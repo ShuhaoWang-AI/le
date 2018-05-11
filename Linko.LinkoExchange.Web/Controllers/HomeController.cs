@@ -6,6 +6,7 @@ using Linko.LinkoExchange.Services.PrivacyPolicy;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.TermCondition;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 
@@ -30,8 +31,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             IUserService userService,
             IReportPackageService reportPackageService,
             ISampleService sampleService,
-            IPrivacyPolicyService privacyPolicyService)
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            IPrivacyPolicyService privacyPolicyService,
+            IUnitService unitService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _authenticationService = authenticationService;
             _termConditionService = termConditionService;

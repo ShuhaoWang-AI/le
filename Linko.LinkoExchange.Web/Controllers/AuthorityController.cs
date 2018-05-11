@@ -78,7 +78,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             IUnitService unitService,
             IReportPackageService reportPackageService,
             ISampleService sampleService)
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -2614,14 +2614,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult UnitTranslations_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var units = _unitService.GetFlowUnits(); //TODO: Update when service layer is done Service 
+            var units = _unitService.GetUnits();  
             var viewModels = units.Select(vm => new AuthorityUnitViewModel
                                                 {
                                                     Id = vm.UnitId,
                                                     Name = vm.Name,
-                                                    SystemUnit = new SystemUnitViewModel {Id = vm.UnitId, Name = vm.Name},
-                                                    IsAvailableToRegulatee = false
+                                                    SystemUnit = new SystemUnitViewModel {Id = vm.SystemUnitId, Name = vm.SystemUnit?.Name ?? ""},
+                                                    IsAvailableToRegulatee = vm.IsAvailableToRegulatee
                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request);
@@ -2630,30 +2629,30 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult UnitTranslations_Update([DataSourceRequest] DataSourceRequest request, AuthorityUnitViewModel authorityUnit)
+        public ActionResult UnitTranslations_Update([DataSourceRequest] DataSourceRequest request, AuthorityUnitViewModel viewModel)
         {
-            if (authorityUnit.IsAvailableToRegulatee && (authorityUnit.SystemUnit?.Id == null || authorityUnit.SystemUnit.Id == 0))
+            if (viewModel.IsAvailableToRegulatee && (viewModel.SystemUnit?.Id == null || viewModel.SystemUnit.Id == 0))
             {
                 ModelState.AddModelError(key:"SystemUnit", errorMessage:@"System Unit is required when the unit is available to industry.");
             }
 
             if (ModelState.IsValid)
             {
-                //_unitService.Update(authorityUnit);
+                //_unitService.Update(viewModel);
             }
 
-            return Json(data:new[] {authorityUnit}.ToDataSourceResult(request:request, modelState:ModelState));
+            return Json(data:new[] {viewModel}.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
         private void PopulateSystemUnits()
         {
-            var systemUnits = _unitService.GetFlowUnits(); //TODO: Update when service layer is done Service 
+            var systemUnits = _unitService.GetSystemUnits(); 
             var availableSystemUnits = systemUnits.Select(vm => new SystemUnitViewModel
                                                                 {
-                                                                    Id = vm.UnitId,
+                                                                    Id = vm.SystemUnitId,
                                                                     Name = vm.Name,
-                                                                    UnitDimensionId = 1,
-                                                                    UnitDimensionName = "test dimension"
+                                                                    UnitDimensionId = vm.UnitDimensionId,
+                                                                    UnitDimensionName = vm.UnitDimension.Name
                                                                 }).OrderBy(x => x.UnitDimensionName).ThenBy(x => x.Name).ToList();
             availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel {Name = @"Select System Unit", Id = null, UnitDimensionId = null, UnitDimensionName = ""});
             ViewData[key:"availableSystemUnits"] = availableSystemUnits;

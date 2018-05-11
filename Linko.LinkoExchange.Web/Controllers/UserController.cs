@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Mapping;
 using Linko.LinkoExchange.Web.Mvc;
@@ -50,9 +51,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService,
             IReportPackageService reportPackageService,
             ISampleService sampleService,
-            IOrganizationService organizationService
+            IOrganizationService organizationService,
+            IUnitService unitService
         )
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService )
         {
             if (authenticateService == null)
             {

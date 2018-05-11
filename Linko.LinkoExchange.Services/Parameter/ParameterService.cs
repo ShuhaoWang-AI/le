@@ -718,7 +718,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 			if (foundMonitoringPointParameter?.DefaultUnit != null)
 			{
-				paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(unit:foundMonitoringPointParameter.DefaultUnit);
+				paramDto.DefaultUnit = _mapHelper.GetDtoFromDomainObject(domainObject:foundMonitoringPointParameter.DefaultUnit);
 
 				var foundLimits = _dbContext.MonitoringPointParameterLimits
 				                            .Include(mppl => mppl.LimitBasis)

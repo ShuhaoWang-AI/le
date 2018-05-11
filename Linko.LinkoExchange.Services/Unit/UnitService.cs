@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using System.Reflection;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
@@ -94,6 +97,37 @@ namespace Linko.LinkoExchange.Services.Unit
         #endregion
 
         #region interface implementations
+
+        /// <inheritdoc />
+        public IEnumerable<UnitDto> GetUnits()
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
+
+                var units = _dbContext.Units.Where(i => i.OrganizationId == authOrganizationId).ToList();
+
+                var unitDtos = UnitDtosHelper(units:units);
+
+                return unitDtos;
+                
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<SystemUnitDto> GetSystemUnits()
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var systemUnits = _dbContext.SystemUnits.Include(x => x.UnitDimension).ToList();
+
+                var systemUnitDtos = systemUnits.Select(i => _mapHelper.GetDtoFromDomainObject(domainObject:i));
+
+                return systemUnitDtos;
+                
+            }
+        }
 
         /// <summary>
         ///     Gets all available flow units for an Organization where IsFlowUnit = true in tUnit table
@@ -207,6 +241,18 @@ namespace Linko.LinkoExchange.Services.Unit
             return unitDtos.First();
         }
 
+        /// <inheritdoc />
+        public int GetMissingAuthorityUnitToSystemUnitTranslationCount()
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
+
+                return _dbContext.Units.Where(i => i.OrganizationId == authOrganizationId && !i.SystemUnitId.HasValue).ToList().Count;
+            }
+        }
+
         #endregion
 
         private List<UnitDto> UnitDtosHelper(List<Core.Domain.Unit> units)
@@ -216,7 +262,7 @@ namespace Linko.LinkoExchange.Services.Unit
             var unitDtos = new List<UnitDto>();
             foreach (var unit in units)
             {
-                var unitDto = _mapHelper.GetUnitDtoFromUnit(unit:unit);
+                var unitDto = _mapHelper.GetDtoFromDomainObject(domainObject:unit);
 
                 unitDto.LastModificationDateTimeLocal =
                     _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:unit.LastModificationDateTimeUtc?.UtcDateTime ?? unit.CreationDateTimeUtc.UtcDateTime,

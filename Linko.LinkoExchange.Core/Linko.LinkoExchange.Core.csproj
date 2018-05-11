@@ -143,6 +143,8 @@
     <Compile Include="Domain\PrivacyPolicy.cs" />
     <Compile Include="Domain\TermCondition.cs" />
     <Compile Include="Domain\TimeZone.cs" />
+    <Compile Include="Domain\SystemUnit.cs" />
+    <Compile Include="Domain\UnitDimension.cs" />
     <Compile Include="Domain\Unit.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
     <Compile Include="Domain\UserProfile.cs" />

@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
@@ -17,17 +18,19 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IReportPackageService _reportPackageService;
         private readonly ISampleService _sampleService;
         private readonly IUserService _userService;
+        private readonly IUnitService _unitService;
 
         #endregion
 
         #region constructors and destructor
 
-        public BaseController(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService)
+        public BaseController(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService, IUnitService unitService)
         {
             _httpContextService = httpContextService;
             _userService = userService;
             _reportPackageService = reportPackageService;
             _sampleService = sampleService;
+            _unitService = unitService;
         }
 
         #endregion
@@ -67,7 +70,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     }
                     else if (portalName.ToLower().Equals(value:"authority"))
                     {
-                        filterContext.Controller.ViewBag.PendingUnitTranslationsCount = 5;//TODO: Update when service layer is done
+                        filterContext.Controller.ViewBag.PendingUnitTranslationsCount = _unitService.GetMissingAuthorityUnitToSystemUnitTranslationCount();
                     }
                 }
             }

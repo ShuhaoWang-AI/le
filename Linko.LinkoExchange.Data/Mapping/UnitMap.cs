@@ -31,6 +31,14 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.LastModificationDateTimeUtc).IsOptional();
 
             Property(x => x.LastModifierUserId).IsOptional();
+            
+            HasOptional(a => a.SystemUnit)
+                .WithMany()
+                .HasForeignKey(c => c.SystemUnitId)
+                .WillCascadeOnDelete(value:false);
+            
+            Property(x => x.IsAvailableToRegulatee).IsRequired();
+
         }
 
         #endregion

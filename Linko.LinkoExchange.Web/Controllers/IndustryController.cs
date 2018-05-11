@@ -73,7 +73,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                   IMonitoringPointService monitoringPointService, IReportTemplateService reportTemplateService, ISettingService settingService,
                                   IParameterService parameterService, IReportPackageService reportPackageService, IDataSourceService dataSourceService,
                                   IImportSampleFromFileService importSampleFromFileService)
-            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _fileStoreService = fileStoreService;
             _httpContextService = httpContextService;
