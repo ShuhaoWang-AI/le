@@ -330,7 +330,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleImportDto> samplesDtos)
+        public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> sampleDtos)
         {
             throw new NotImplementedException();
         }

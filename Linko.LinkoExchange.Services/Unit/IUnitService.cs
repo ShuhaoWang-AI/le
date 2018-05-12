@@ -12,10 +12,22 @@ namespace Linko.LinkoExchange.Services.Unit
         IEnumerable<UnitDto> GetUnits();
 
         /// <summary>
+        /// Gets unit
+        /// </summary>
+        /// <returns> </returns>
+        UnitDto GetUnit(int unitId);
+
+        /// <summary>
         /// Gets all available system units in tSystemUnit table
         /// </summary>
         /// <returns> </returns>
         IEnumerable<SystemUnitDto> GetSystemUnits();
+
+        /// <summary>
+        /// Gets SystemUnitDto
+        /// </summary>
+        /// <returns> </returns>
+        SystemUnitDto GetSystemUnit(int systemUnitId);
 
         /// <summary>
         /// Gets all available flow units for an Organization where IsFlowUnit = true in tUnit table
@@ -51,5 +63,11 @@ namespace Linko.LinkoExchange.Services.Unit
         /// </summary>
         /// <returns></returns>
         int GetMissingAuthorityUnitToSystemUnitTranslationCount();
+
+        /// <summary>
+        /// Update unit for the current authority in tUnit table
+        /// </summary>
+        /// <param name="unitDto"></param>
+        void UpdateAuthorityUnit(UnitDto unitDto);
     }
 }

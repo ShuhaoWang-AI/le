@@ -73,8 +73,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// 
         /// </summary>
         /// <param name="sampleImportDto"></param>
-        /// <param name="samplesDtos"></param>
+        /// <param name="sampleDtos"></param>
         /// <returns></returns>
-        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleImportDto> samplesDtos);
+        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> sampleDtos);
     }
 }

@@ -2614,7 +2614,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult UnitTranslations_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
-            var units = _unitService.GetUnits();  
+            var units = _unitService.GetUnits();
             var viewModels = units.Select(vm => new AuthorityUnitViewModel
                                                 {
                                                     Id = vm.UnitId,
@@ -2636,9 +2636,25 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ModelState.AddModelError(key:"SystemUnit", errorMessage:@"System Unit is required when the unit is available to industry.");
             }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && viewModel.Id.HasValue)
             {
-                //_unitService.Update(viewModel);
+                var unitDto = _unitService.GetUnit(unitId:viewModel.Id.Value);
+
+                if (viewModel.SystemUnit?.Id == null || viewModel.SystemUnit.Id == 0)
+                {
+                    unitDto.SystemUnitId = null;
+                    unitDto.SystemUnit = null;
+                }
+                else
+                {
+                    var systemUnitDto = _unitService.GetSystemUnit(systemUnitId:viewModel.SystemUnit.Id.Value);
+                    unitDto.SystemUnit = systemUnitDto;
+                    unitDto.SystemUnitId = systemUnitDto.SystemUnitId;
+                }
+
+                unitDto.IsAvailableToRegulatee = viewModel.IsAvailableToRegulatee;
+
+                _unitService.UpdateAuthorityUnit(unitDto:unitDto);
             }
 
             return Json(data:new[] {viewModel}.ToDataSourceResult(request:request, modelState:ModelState));
@@ -2646,7 +2662,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void PopulateSystemUnits()
         {
-            var systemUnits = _unitService.GetSystemUnits(); 
+            var systemUnits = _unitService.GetSystemUnits();
             var availableSystemUnits = systemUnits.Select(vm => new SystemUnitViewModel
                                                                 {
                                                                     Id = vm.SystemUnitId,

@@ -116,6 +116,44 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <inheritdoc />
+        public UnitDto GetUnit(int unitId)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"unitId={unitId}"))
+            {
+                var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
+
+                var unit = _dbContext.Units.SingleOrDefault(i => i.OrganizationId == authOrganizationId && i.UnitId == unitId);
+
+                if (unit == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var unitDto = _mapHelper.GetDtoFromDomainObject(domainObject:unit);
+
+                    unitDto.LastModificationDateTimeLocal =
+                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:unit.LastModificationDateTimeUtc?.UtcDateTime ?? unit.CreationDateTimeUtc.UtcDateTime,
+                                                                                    orgRegProgramId:currentOrgRegProgramId);
+
+                    if (unit.LastModifierUserId.HasValue)
+                    {
+                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == unit.LastModifierUserId.Value);
+                        unitDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                    }
+                    else
+                    {
+                        unitDto.LastModifierFullName = "N/A";
+                    }
+
+                    return unitDto;
+                }
+            }
+
+        }
+
+        /// <inheritdoc />
         public IEnumerable<SystemUnitDto> GetSystemUnits()
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
@@ -126,6 +164,26 @@ namespace Linko.LinkoExchange.Services.Unit
 
                 return systemUnitDtos;
                 
+            }
+        }
+
+        /// <inheritdoc />
+        public SystemUnitDto GetSystemUnit(int systemUnitId)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var systemUnit = _dbContext.SystemUnits.Include(x => x.UnitDimension).SingleOrDefault(i=> i.SystemUnitId == systemUnitId);
+
+                if (systemUnit == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var systemUnitDto = _mapHelper.GetDtoFromDomainObject(domainObject:systemUnit);
+
+                    return systemUnitDto;
+                }
             }
         }
 
@@ -250,6 +308,25 @@ namespace Linko.LinkoExchange.Services.Unit
                 var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
 
                 return _dbContext.Units.Where(i => i.OrganizationId == authOrganizationId && !i.SystemUnitId.HasValue).ToList().Count;
+            }
+        }
+
+        /// <inheritdoc />
+        public void UpdateAuthorityUnit(UnitDto unitDto)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
+                var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+
+                var unitToPersist = _dbContext.Units.SingleOrDefault(i => i.OrganizationId == authOrganizationId && i.UnitId == unitDto.UnitId);
+                unitToPersist = _mapHelper.GetDomainObjectFromDto(dto:unitDto, existingDomainObject:unitToPersist);
+                
+                unitToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                unitToPersist.LastModifierUserId = currentUserId;
+
+                _dbContext.SaveChanges();
             }
         }
 

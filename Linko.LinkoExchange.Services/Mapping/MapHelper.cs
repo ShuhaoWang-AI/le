@@ -506,14 +506,16 @@ namespace Linko.LinkoExchange.Services.Mapping
 
 			if (existingDomainObject == null)
 			{
-				existingDomainObject = new Core.Domain.Unit();
+				existingDomainObject = new Core.Domain.Unit
+				                       {
+					                       UnitId = dto.UnitId,
+					                       OrganizationId = dto.OrganizationId
+				                       };
 			}
 
-			existingDomainObject.UnitId = dto.UnitId;
 			existingDomainObject.Name = dto.Name;
 			existingDomainObject.Description = dto.Description;
 			existingDomainObject.IsFlowUnit = dto.IsFlowUnit;
-			existingDomainObject.OrganizationId = dto.OrganizationId;
 			existingDomainObject.IsRemoved = dto.IsRemoved;
 			existingDomainObject.SystemUnitId = dto.SystemUnitId;
 			existingDomainObject.IsAvailableToRegulatee = dto.IsAvailableToRegulatee;
@@ -1620,11 +1622,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
 			if (existingDomainObject == null)
 			{
-				existingDomainObject = new Core.Domain.SystemUnit();
+				existingDomainObject = new Core.Domain.SystemUnit {SystemUnitId = dto.SystemUnitId};
 			}
 
-
-			existingDomainObject.SystemUnitId = dto.SystemUnitId;
 			existingDomainObject.Name = dto.Name;
 			existingDomainObject.Description = dto.Description;
 			existingDomainObject.ConversionFactor = dto.ConversionFactor;
@@ -1665,11 +1665,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
 			if (existingDomainObject == null)
 			{
-				existingDomainObject = new Core.Domain.UnitDimension();
+				existingDomainObject = new Core.Domain.UnitDimension {UnitDimensionId = dto.UnitDimensionId};
 			}
 
-
-			existingDomainObject.UnitDimensionId = dto.UnitDimensionId;
 			existingDomainObject.Name = dto.Name;
 			existingDomainObject.Description = dto.Description;
 
