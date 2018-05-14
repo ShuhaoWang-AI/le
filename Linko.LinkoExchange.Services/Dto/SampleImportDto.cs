@@ -10,17 +10,22 @@ namespace Linko.LinkoExchange.Services.Dto
         public ImportTempFileDto TempFile { get; set; }
         public DataSourceDto DataSource { get; set; }
         public FileVersionDto FileVersion { get; set; }
-        public List<ImportCellObject> FileCells { get; set; }
-
+        public List<ImportRowObject> Rows { get; set; } 
+ 
         #endregion
     }
+	
+	public class ImportRowObject
+	{
+		public int RowNumber { get; set; }
+		public List<ImportCellObject> Cells { get; set; }
+	}
 
     public class ImportCellObject
     {
-        #region public properties
-
-        public int RowNumber { get; set; }
-        public SampleImportColumnName SampleImportColumnName { get; set; }
+		public int RowNumber { get; set; }
+		#region public properties
+		public SampleImportColumnName SampleImportColumnName { get; set; }
         public string OriginalValue { get; set; }
         public dynamic TranslatedValue { get; set; }
         public int? TranslatedValueId { get; set; }
