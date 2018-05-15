@@ -17,7 +17,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.DataSourceId).IsRequired();
 
-            Property(x => x.DataSourceCtsEventTypeId).IsRequired();
+            HasRequired(x => x.CtsEventType)
+                .WithMany()
+                .HasForeignKey(x => x.CtsEventTypeId)
+                .WillCascadeOnDelete(value:false);
         }
 
         #endregion

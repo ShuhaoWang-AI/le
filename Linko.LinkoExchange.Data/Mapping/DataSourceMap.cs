@@ -17,7 +17,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
-            Property(x => x.OrganizationRegulatoryProgramId).IsRequired();
+            HasRequired(x => x.OrganizationRegulatoryProgram)
+                .WithMany()
+                .HasForeignKey(x => x.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(value:false);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 

@@ -14,6 +14,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int OrganizationRegulatoryProgramId { get; set; }
 
+        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
