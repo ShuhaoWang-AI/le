@@ -28,8 +28,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter);
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
-        UnitDto GetDtoFromDomainObject(Core.Domain.Unit domainObject);
-        Core.Domain.Unit GetDomainObjectFromDto(UnitDto dto, Core.Domain.Unit existingDomainObject = null);
+        UnitDto ToDto(Core.Domain.Unit fromDomainObject);
+        Core.Domain.Unit ToDomainObject(UnitDto fromDto, Core.Domain.Unit existingDomainObject = null);
         ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
         ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat);
 
@@ -80,11 +80,14 @@ namespace Linko.LinkoExchange.Services.Mapping
         DataSourceTranslationDto ToDataSourceUnitDto(DataSourceUnit from);
         DataSourceUnit ToDataSourceUnit(DataSourceTranslationDto from);
 
-        ImportTempFileDto GetDtoFromDomainObject(ImportTempFile domainObject);
-        ImportTempFile GetDomainObjectFromDto(ImportTempFileDto dto, ImportTempFile existingDomainObject = null);
-        SystemUnitDto GetDtoFromDomainObject(SystemUnit domainObject);
-        SystemUnit GetDomainObjectFromDto(SystemUnitDto dto, SystemUnit existingDomainObject = null);
-        UnitDimensionDto GetDtoFromDomainObject(UnitDimension domainObject);
-        UnitDimension GetDomainObjectFromDto(UnitDimensionDto dto, UnitDimension existingDomainObject = null);
+        ImportTempFileDto ToDto(ImportTempFile fromDomainObject);
+        ImportTempFile ToDomainObject(ImportTempFileDto fromDto, ImportTempFile existingDomainObject = null);
+        SystemUnitDto ToDto(SystemUnit fromDomainObject);
+        SystemUnit ToDomainObject(SystemUnitDto fromDto, SystemUnit existingDomainObject = null);
+
+
+        UnitDimensionDto ToDto(UnitDimension fromDomainObject);
+        UnitDimension ToDomainObject(UnitDimensionDto fromDto, UnitDimension existingDomainObject = null);
+
     }
 }

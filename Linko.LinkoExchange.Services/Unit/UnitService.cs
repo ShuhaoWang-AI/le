@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
@@ -17,7 +18,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.Unit
 {
-    public class UnitService : IUnitService
+    public class UnitService : BaseService, IUnitService
     {
         #region fields
 
@@ -99,6 +100,23 @@ namespace Linko.LinkoExchange.Services.Unit
         #region interface implementations
 
         /// <inheritdoc />
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            //var retVal = false;
+
+            //var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            //var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+            //currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                default: throw new Exception(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            //return retVal;
+        }
+
+        /// <inheritdoc />
         public IEnumerable<UnitDto> GetUnits()
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
@@ -111,7 +129,6 @@ namespace Linko.LinkoExchange.Services.Unit
                 var unitDtos = UnitDtosHelper(units:units);
 
                 return unitDtos;
-                
             }
         }
 
@@ -131,11 +148,11 @@ namespace Linko.LinkoExchange.Services.Unit
                 }
                 else
                 {
-                    var unitDto = _mapHelper.GetDtoFromDomainObject(domainObject:unit);
+                    var unitDto = _mapHelper.ToDto(fromDomainObject:unit);
 
                     unitDto.LastModificationDateTimeLocal =
-                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:unit.LastModificationDateTimeUtc?.UtcDateTime ?? unit.CreationDateTimeUtc.UtcDateTime,
-                                                                                    orgRegProgramId:currentOrgRegProgramId);
+                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:unit.LastModificationDateTimeUtc?.UtcDateTime
+                                                                                                ?? unit.CreationDateTimeUtc.UtcDateTime, orgRegProgramId:currentOrgRegProgramId);
 
                     if (unit.LastModifierUserId.HasValue)
                     {
@@ -150,7 +167,6 @@ namespace Linko.LinkoExchange.Services.Unit
                     return unitDto;
                 }
             }
-
         }
 
         /// <inheritdoc />
@@ -160,10 +176,9 @@ namespace Linko.LinkoExchange.Services.Unit
             {
                 var systemUnits = _dbContext.SystemUnits.Include(x => x.UnitDimension).ToList();
 
-                var systemUnitDtos = systemUnits.Select(i => _mapHelper.GetDtoFromDomainObject(domainObject:i));
+                var systemUnitDtos = systemUnits.Select(i => _mapHelper.ToDto(fromDomainObject:i));
 
                 return systemUnitDtos;
-                
             }
         }
 
@@ -172,7 +187,7 @@ namespace Linko.LinkoExchange.Services.Unit
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-                var systemUnit = _dbContext.SystemUnits.Include(x => x.UnitDimension).SingleOrDefault(i=> i.SystemUnitId == systemUnitId);
+                var systemUnit = _dbContext.SystemUnits.Include(x => x.UnitDimension).SingleOrDefault(i => i.SystemUnitId == systemUnitId);
 
                 if (systemUnit == null)
                 {
@@ -180,7 +195,7 @@ namespace Linko.LinkoExchange.Services.Unit
                 }
                 else
                 {
-                    var systemUnitDto = _mapHelper.GetDtoFromDomainObject(domainObject:systemUnit);
+                    var systemUnitDto = _mapHelper.ToDto(fromDomainObject:systemUnit);
 
                     return systemUnitDto;
                 }
@@ -188,7 +203,7 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <summary>
-        ///     Gets all available flow units for an Organization where IsFlowUnit = true in tUnit table
+        /// Gets all available flow units for an Organization where IsFlowUnit = true in tUnit table
         /// </summary>
         /// <returns> </returns>
         public IEnumerable<UnitDto> GetFlowUnits()
@@ -208,7 +223,7 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <summary>
-        ///     Reads unit labels from the Org Reg Program Setting "FlowUnitValidValues"
+        /// Reads unit labels from the Org Reg Program Setting "FlowUnitValidValues"
         /// </summary>
         /// <returns> Collection of unit dto's corresponding to the labels read from the setting </returns>
         public IEnumerable<UnitDto> GetFlowUnitValidValues()
@@ -236,12 +251,12 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <summary>
-        ///     Reads unit labels from passed in comma delimited string
+        /// Reads unit labels from passed in comma delimited string
         /// </summary>
         /// <param name="commaDelimitedString"> </param>
         /// <param name="isLoggingEnabled"> </param>
         /// <returns>
-        ///     Collection of unit dto's corresponding to the labels read from passed in string
+        /// Collection of unit dto's corresponding to the labels read from passed in string
         /// </returns>
         public IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString, bool isLoggingEnabled = true)
         {
@@ -279,7 +294,7 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <summary>
-        ///     Always ppd as per client's requirements
+        /// Always ppd as per client's requirements
         /// </summary>
         /// <returns> </returns>
         public UnitDto GetUnitForMassLoadingCalculations()
@@ -321,8 +336,8 @@ namespace Linko.LinkoExchange.Services.Unit
                 var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
                 var unitToPersist = _dbContext.Units.SingleOrDefault(i => i.OrganizationId == authOrganizationId && i.UnitId == unitDto.UnitId);
-                unitToPersist = _mapHelper.GetDomainObjectFromDto(dto:unitDto, existingDomainObject:unitToPersist);
-                
+                unitToPersist = _mapHelper.ToDomainObject(fromDto:unitDto, existingDomainObject:unitToPersist);
+
                 unitToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 unitToPersist.LastModifierUserId = currentUserId;
 
@@ -330,7 +345,62 @@ namespace Linko.LinkoExchange.Services.Unit
             }
         }
 
+        /// <inheritdoc />
+        public double? ConvertResultToTargetUnit(double? result, Core.Domain.Unit currentAuthorityUnit, Core.Domain.Unit targetAuthorityUnit)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
+                                    descripition:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
+            {
+                return ConvertResultToTargetUnit(result:result, currentAuthorityUnit:_mapHelper.ToDto(fromDomainObject:currentAuthorityUnit),
+                                                 targetAuthorityUnit:_mapHelper.ToDto(fromDomainObject:targetAuthorityUnit));
+            }
+        }
+
+        /// <inheritdoc />
+        public double? ConvertResultToTargetUnit(double? result, UnitDto currentAuthorityUnit, UnitDto targetAuthorityUnit)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
+                                    descripition:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
+            {
+                var currentSystemUnit = currentAuthorityUnit.SystemUnit;
+                var targetSystemUnit = targetAuthorityUnit.SystemUnit;
+
+                if (currentSystemUnit == null)
+                {
+                    throw ThrowRuleViolationException(message:"Can not convert current unit to system unit.");
+                }
+                else if (targetSystemUnit == null)
+                {
+                    throw ThrowRuleViolationException(message:"Can not convert target unit to system unit.");
+                }
+                else if (currentSystemUnit.UnitDimensionId == targetSystemUnit.UnitDimensionId)
+                {
+                    return ConvertResultToTargetUnit(result:result, currentUnitConversionFactor:currentSystemUnit.ConversionFactor,
+                                                     currentUnitAdditiveFactor:currentSystemUnit.AdditiveFactor,
+                                                     targetUnitConversionFactor:targetSystemUnit.ConversionFactor, targetUnitAdditiveFactor:targetSystemUnit.AdditiveFactor);
+                }
+                else
+                {
+                    throw ThrowRuleViolationException(message:"Current unit and target unit are not in same unit dimension.");
+                }
+            }
+        }
+
         #endregion
+
+        private double? ConvertResultToTargetUnit(double? result, double currentUnitConversionFactor, double currentUnitAdditiveFactor, double targetUnitConversionFactor,
+                                                  double targetUnitAdditiveFactor)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
+                                    descripition:$"currentUnitConversionFactor:{currentUnitConversionFactor}, "
+                                                 + $"currentUnitAdditiveFactor:{currentUnitAdditiveFactor}, "
+                                                 + $"targetUnitConversionFactor:{targetUnitConversionFactor}, "
+                                                 + $"targetUnitAdditiveFactor:{targetUnitAdditiveFactor}")
+            )
+            {
+                return (result * currentUnitConversionFactor + currentUnitAdditiveFactor - targetUnitAdditiveFactor) / targetUnitConversionFactor;
+            }
+        }
 
         private List<UnitDto> UnitDtosHelper(List<Core.Domain.Unit> units)
         {
@@ -339,7 +409,7 @@ namespace Linko.LinkoExchange.Services.Unit
             var unitDtos = new List<UnitDto>();
             foreach (var unit in units)
             {
-                var unitDto = _mapHelper.GetDtoFromDomainObject(domainObject:unit);
+                var unitDto = _mapHelper.ToDto(fromDomainObject:unit);
 
                 unitDto.LastModificationDateTimeLocal =
                     _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:unit.LastModificationDateTimeUtc?.UtcDateTime ?? unit.CreationDateTimeUtc.UtcDateTime,

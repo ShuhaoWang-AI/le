@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Services.Base
 {
@@ -17,5 +19,12 @@ namespace Linko.LinkoExchange.Services.Base
         /// <param name="id"> Method specific "target" id of the object which the user is acting upon </param>
         /// <returns> </returns>
         public abstract bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id);
+
+        protected static RuleViolationException ThrowRuleViolationException(string message)
+        {
+            var validationIssues = new List<RuleViolation> { new RuleViolation(propertyName: string.Empty, propertyValue: null, errorMessage: message) };
+
+            return new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+        }
     }
 }

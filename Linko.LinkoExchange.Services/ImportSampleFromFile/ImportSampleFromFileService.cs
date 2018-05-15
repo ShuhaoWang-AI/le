@@ -128,7 +128,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 var importTempFile = _dbContext.ImportTempFiles.Single(i => i.ImportTempFileId == importTempFileId);
 
-                importTempFileDto = _mapHelper.GetDtoFromDomainObject(domainObject:importTempFile);
+                importTempFileDto = _mapHelper.ToDto(fromDomainObject:importTempFile);
 
                 importTempFileDto.UploadDateTimeLocal =
                     _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:importTempFileDto.UploadDateTimeLocal, orgRegProgramId:currentRegulatoryProgramId);
@@ -183,7 +183,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 using (_dbContext.CreateAutoCommitScope())
                 {
                     var importTempFile = _mapHelper
-                        .GetDomainObjectFromDto(dto:importTempFileDto,
+                        .ToDomainObject(fromDto:importTempFileDto,
                                                 existingDomainObject:new ImportTempFile
                                                                      {
                                                                          OrganizationRegulatoryProgramId = currentOrgRegProgramId,

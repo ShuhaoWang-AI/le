@@ -69,5 +69,8 @@ namespace Linko.LinkoExchange.Services.Unit
         /// </summary>
         /// <param name="unitDto"></param>
         void UpdateAuthorityUnit(UnitDto unitDto);
+
+        double? ConvertResultToTargetUnit(double? result, Core.Domain.Unit currentAuthorityUnit, Core.Domain.Unit targetAuthorityUnit);
+        double? ConvertResultToTargetUnit(double? result, UnitDto currentAuthorityUnit, UnitDto targetAuthorityUnit);
     }
 }
