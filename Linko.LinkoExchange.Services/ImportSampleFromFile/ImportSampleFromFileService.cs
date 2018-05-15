@@ -28,7 +28,7 @@ using Telerik.Windows.Documents.Spreadsheet.Model;
 
 namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 {
-	public class ImportSampleFromFileService : BaseService, IImportSampleFromFileService
+	public partial class ImportSampleFromFileService : BaseService, IImportSampleFromFileService
 	{
 		#region fields
 
@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		private readonly IHttpContextService _httpContextService;
 		private readonly ILogger _logger;
 		private readonly IMapHelper _mapHelper;
-		private readonly ITimeZoneService _timeZoneService; 
+		private readonly ITimeZoneService _timeZoneService;
 		private readonly ISettingService _settingService;
 		private readonly IUnitService _unitService;
 		private readonly IReportTemplateService _reportTemplateService;
@@ -171,7 +171,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 				var importTempFile = _dbContext.ImportTempFiles.Single(i => i.ImportTempFileId == importTempFileId);
 
-                importTempFileDto = _mapHelper.ToDto(fromDomainObject:importTempFile);
+				importTempFileDto = _mapHelper.ToDto(fromDomainObject:importTempFile);
 
 				importTempFileDto.UploadDateTimeLocal =
 					_timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:importTempFileDto.UploadDateTimeLocal, orgRegProgramId:currentRegulatoryProgramId);
@@ -222,19 +222,19 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 				var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
-                int importTempFileIdToReturn;
-                using (_dbContext.CreateAutoCommitScope())
-                {
-                    var importTempFile = _mapHelper
-                        .ToDomainObject(fromDto:importTempFileDto,
-                                                existingDomainObject:new ImportTempFile
-                                                                     {
-                                                                         OrganizationRegulatoryProgramId = currentOrgRegProgramId,
-                                                                         UploadDateTimeUtc = DateTimeOffset.Now,
-                                                                         UploaderUserId = currentUserProfileId,
-                                                                         FileTypeId = validFileTypes
-                                                                             .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
-                                                                     });
+				int importTempFileIdToReturn;
+				using (_dbContext.CreateAutoCommitScope())
+				{
+					var importTempFile = _mapHelper
+						.ToDomainObject(fromDto:importTempFileDto,
+						                existingDomainObject:new ImportTempFile
+						                                     {
+							                                     OrganizationRegulatoryProgramId = currentOrgRegProgramId,
+							                                     UploadDateTimeUtc = DateTimeOffset.Now,
+							                                     UploaderUserId = currentUserProfileId,
+							                                     FileTypeId = validFileTypes
+								                                     .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
+						                                     });
 
 					_dbContext.ImportTempFiles.Add(entity:importTempFile);
 
@@ -372,40 +372,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			throw new NotImplementedException();
 		}
 
-		/// <inheritdoc />
-		public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> samplesDtos)
-		{
-			// Create a list of samples 
-			var dataRows = GetImportSampleResultRows(sampleImportDto);
-
-			if (!dataRows[0].ColumnMap.ContainsKey(SampleImportColumnName.LabSampleId))
-			{
-				foreach (var row in dataRows)
-				{
-					var fakeCell = new ImportCellObject
-					               {
-						               OriginalValue = "",
-						               TranslatedValue = ""
-					               };
-
-					row.ColumnMap.Add(SampleImportColumnName.LabSampleId, fakeCell);
-				}
-			}
-			
-			samplesDtos = GetSampleDtosFromRows(dataRows);
-
-			//TODO:  merge samples
-			// 1. to determine sample result duplication 
-			// 2. parameter result convert
-			// 2. to determine if the sample already reported?  readyToReport?  or only Draft
-			//        1. if in draft,  to add or update?  --> update
-			//        2. if the sample is new --> just save 
-
-			var validationResult = ValidateSamples(samplesDtos);
-
-			return validationResult;
-		}
-
+		
 		/// <inheritdoc />
 		public void RemoveImportTempFile(int importTempFileId)
 		{
@@ -435,282 +402,5 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			//Also handles scenarios where ImportTempFileId does not exist
 			return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
 		}
-		
-		private ImportSampleFromFileValidationResultDto ValidateSamples(List<SampleDto> sampleDtos)
-		{
-			//TODO do validation 
-			return null;
-		}
-
-		private static SampleResultDto CreateSampleResult(ImportSampleResultRow resultRow)
-		{
-			if (!resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ParameterName))
-			{
-				throw new NoNullAllowedException("SampleImportColumnName.TranslatedValueId");
-			}
-
-			var sampleResultDto = new SampleResultDto();
-			var parameterid = resultRow.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId;
-			if (parameterid != null)
-			{
-				sampleResultDto.ParameterId = parameterid.Value;
-			}
-
-			sampleResultDto.ParameterName = resultRow.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValue;
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultQualifier))
-			{
-				sampleResultDto.Qualifier = resultRow.ColumnMap[SampleImportColumnName.ResultQualifier].TranslatedValue;
-			}
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
-			{
-				sampleResultDto.EnteredValue = resultRow.ColumnMap[SampleImportColumnName.Result].OriginalValue;
-				sampleResultDto.Value = resultRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
-			}
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
-			{
-				sampleResultDto.UnitName = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
-				var resultUnitId = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-				if (resultUnitId != null)
-				{
-					sampleResultDto.UnitId = resultUnitId.Value;
-				}
-			}
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.MethodDetectionLimit))
-			{
-				sampleResultDto.EnteredMethodDetectionLimit = resultRow.ColumnMap[SampleImportColumnName.MethodDetectionLimit].TranslatedValue.ToString();
-				sampleResultDto.MethodDetectionLimit = resultRow.ColumnMap[SampleImportColumnName.MethodDetectionLimit].TranslatedValue;
-			}
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.AnalysisMethod))
-			{
-				sampleResultDto.AnalysisMethod = resultRow.ColumnMap[SampleImportColumnName.AnalysisMethod].TranslatedValue.ToString();
-			}
-
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.AnalysisDateTime))
-			{
-				sampleResultDto.AnalysisDateTimeLocal = resultRow.ColumnMap[SampleImportColumnName.AnalysisDateTime].TranslatedValue;
-			}
-
-			sampleResultDto.IsApprovedEPAMethod = true;
-			sampleResultDto.IsCalcMassLoading = false;
-
-			return sampleResultDto;
-		}
-
-		private static void CreateMassLoadingSampleResult(ImportSampleResultRow importFlowRow, SampleResultDto sampleResultDto, List<SampleResultDto> sampleResults)
-		{
-			if (importFlowRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
-			{
-				throw new NoNullAllowedException("Flow ResultUnit is missing");
-			}
-
-			if (importFlowRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
-			{
-				throw new NoNullAllowedException("Flow Result is missing");
-			}
-
-			var mgPerLiter = "mg/l";
-
-			string flowUnitName = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].OriginalValue;
-			double flowResult = importFlowRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
-
-			double massLoadingMultiplier = flowUnitName.Equals(UnitName.pgd.ToString(), StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
-
-			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(mgPerLiter, StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
-
-			var massLoadingValue = flowResult * sampleResultDto.Value * massLoadingMultiplier * resultUnitConversionFactor;
-
-			var massloadingResult = new SampleResultDto();
-
-			sampleResults.Add(massloadingResult);
-
-			massloadingResult.ParameterId = sampleResultDto.ParameterId;
-			massloadingResult.ParameterName = sampleResultDto.ParameterName;
-
-			massloadingResult.Qualifier = sampleResultDto.Qualifier;
-			massloadingResult.EnteredValue = sampleResultDto.EnteredValue;
-
-			sampleResultDto.EnteredValue = massLoadingValue.ToString();
-			sampleResultDto.Value = massLoadingValue;
-
-			var translatedValueId = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-			if (translatedValueId != null)
-			{
-				int flowUnitId = translatedValueId.Value;
-				sampleResultDto.UnitId = flowUnitId;
-			}
-
-			sampleResultDto.UnitName = flowUnitName;
-
-			sampleResultDto.EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit;
-			sampleResultDto.MethodDetectionLimit = sampleResultDto.MethodDetectionLimit;
-
-			sampleResultDto.AnalysisMethod = sampleResultDto.AnalysisMethod;
-
-			sampleResultDto.AnalysisDateTimeLocal = sampleResultDto.AnalysisDateTimeLocal;
-		}
-
-		private static List<ImportSampleResultRow> GetImportSampleResultRows(SampleImportDto sampleImportDto)
-		{
-			var dataTable = new List<ImportSampleResultRow>();
-			foreach (var row in sampleImportDto.Rows)
-			{
-				var sampleRow = new ImportSampleResultRow
-				{
-					ColumnMap = new Dictionary<SampleImportColumnName, ImportCellObject>(),
-					RowNumber = row.RowNumber
-				};
-
-				foreach (var cell in row.Cells)
-				{
-					sampleRow.ColumnMap.Add(cell.SampleImportColumnName, cell);
-				}
-			}
-
-			return dataTable;
-		}
-
-		private List<SampleDto> GetSampleDtosFromRows(List<ImportSampleResultRow> dataTable)
-		{
-			var currentOrganizationRegulatoryProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-			var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId: _settingService
-																			 .GetAuthority(orgRegProgramId: currentOrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId);
-
-			var resultQualifierValidValues = programSettings
-				.Settings.Where(s => s.TemplateName.Equals(obj: SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
-
-			var flowUnitValidValues = _unitService.GetFlowUnitValidValues().ToList();
-			var massLoadingConversionFactorPoundsValue = programSettings.Settings.Where(s => s.TemplateName.Equals(obj: SettingType.MassLoadingConversionFactorPounds))
-																		.Select(s => s.Value)
-																		.FirstOrDefault();
-
-			var massLoadingConversionFactorPounds = string.IsNullOrWhiteSpace(massLoadingConversionFactorPoundsValue)
-														? 0.0f
-														: double.Parse(massLoadingConversionFactorPoundsValue);
-
-			var isMassLoadingResultToUseLessThanSignStr =
-				programSettings.Settings.Where(s => s.TemplateName.Equals(obj: SettingType.MassLoadingResultToUseLessThanSign))
-							   .Select(s => s.Value)
-							   .First();
-
-			var isMassLoadingResultToUseLessThanSign = string.IsNullOrWhiteSpace(isMassLoadingResultToUseLessThanSignStr) || bool.Parse(isMassLoadingResultToUseLessThanSignStr);
-
-
-			var massLoadingCalculationDecimalPlacesStr =
-				programSettings.Settings.Where(s => s.TemplateName.Equals(obj: SettingType.MassLoadingCalculationDecimalPlaces))
-							   .Select(s => s.Value)
-							   .First();
-
-			var massLoadingCalculationDecimalPlaces = string.IsNullOrWhiteSpace(massLoadingCalculationDecimalPlacesStr) ? 0 : int.Parse(massLoadingCalculationDecimalPlacesStr);
-
-
-			var ctsEventTypeDto = _reportTemplateService.GetCtsEventTypes(isForSample: true).FirstOrDefault();
-			var ctsEventCategoryName = ctsEventTypeDto != null ? ctsEventTypeDto.CtsEventCategoryName : "sample";
-
-			var flowCell = dataTable.SelectMany(i => i.ColumnMap.Values).ToList()
-									.SingleOrDefault(i => i.OriginalValue.Equals("Flow", StringComparison.OrdinalIgnoreCase));
-
-			ImportSampleResultRow importFlowRow = null;
-			if (flowCell != null)
-			{
-				importFlowRow = dataTable.Single(i => i.RowNumber == flowCell.RowNumber);
-			}
-
-			var hasFlow = flowCell != null;
-
-			var sampleGroups = dataTable.GroupBy(i => new
-			{
-				MonitoringPont = i.ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValue,
-				CollectionMethod = i.ColumnMap[SampleImportColumnName.CollectionMethod].TranslatedValue,
-				SampleType = i.ColumnMap[SampleImportColumnName.SampleType].TranslatedValue,
-				SampleStartDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				SampleEndDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				LabSampleId = i.ColumnMap[SampleImportColumnName.LabSampleId].TranslatedValue,
-			}, (key, group) => new
-			{
-				key.MonitoringPont,
-				key.CollectionMethod,
-				key.SampleType,
-				key.SampleStartDateTime,
-				key.SampleEndDateTime,
-				key.LabSampleId,
-				SampleResults = @group.ToList()
-			});
-
-			var sampleDtos = new List<SampleDto>();
-			foreach (var sampeGroup in sampleGroups)
-			{
-				var sampleDto = new SampleDto { MonitoringPointName = sampeGroup.MonitoringPont };
-
-
-				sampleDto.IsReadyToReport = false;
-				sampleDto.SampleStatusName = SampleStatusName.Draft;
-
-				sampleDto.FlowUnitId = 1;
-				sampleDto.FlowUnitName = "";
-				sampleDto.FlowEnteredValue = "";
-
-				sampleDto.MonitoringPointName = sampeGroup.MonitoringPont;
-				var monitoringPointId = sampeGroup.SampleResults[0].ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValueId;
-				if (!monitoringPointId.HasValue)
-				{
-					throw new NoNullAllowedException("MonitoringPoint.TranslatedValueId");
-				}
-
-				sampleDto.MonitoringPointId = monitoringPointId.Value;
-
-				sampleDto.CollectionMethodName = sampeGroup.CollectionMethod;
-				var collectionMethodId = sampeGroup.SampleResults[0].ColumnMap[SampleImportColumnName.CollectionMethod].TranslatedValueId;
-				if (collectionMethodId == null)
-				{
-					throw new NoNullAllowedException("CollectionMethod.TranslatedValueId");
-				}
-
-				sampleDto.CollectionMethodId = collectionMethodId.Value;
-				sampleDto.CtsEventTypeName = sampeGroup.SampleType;
-				sampleDto.CtsEventCategoryName = ctsEventCategoryName;
-
-				sampleDto.StartDateTimeLocal = sampeGroup.SampleStartDateTime;
-				sampleDto.EndDateTimeLocal = sampeGroup.SampleEndDateTime;
-
-				sampleDto.FlowUnitValidValues = flowUnitValidValues;
-				sampleDto.ResultQualifierValidValues = resultQualifierValidValues;
-				sampleDto.IsMassLoadingResultToUseLessThanSign = isMassLoadingResultToUseLessThanSign;
-				sampleDto.MassLoadingCalculationDecimalPlaces = massLoadingCalculationDecimalPlaces;
-				sampleDto.MassLoadingConversionFactorPounds = massLoadingConversionFactorPounds;
-				sampleDto.LabSampleIdentifier = sampeGroup.LabSampleId;
-
-				var sampleResults = new List<SampleResultDto>();
-				sampleDto.SampleResults = sampleResults;
-
-				// populate sampleResults 
-				foreach (var resultRow in sampeGroup.SampleResults)
-				{
-					var sampleResultDto = CreateSampleResult(resultRow);
-					sampleResults.Add(sampleResultDto);
-
-					// calculate mass loading for the sample result 
-					if (hasFlow)
-					{
-						CreateMassLoadingSampleResult(importFlowRow, sampleResultDto, sampleResults);
-					}
-				}
-
-				sampleDtos.Add(sampleDto);
-			}
-
-			return sampleDtos;
-		}
-
-	}
-
-	class ImportSampleResultRow
-	{
-		public int RowNumber { get; set; }  
-		public IDictionary<SampleImportColumnName, ImportCellObject> ColumnMap; 
 	}
 }
