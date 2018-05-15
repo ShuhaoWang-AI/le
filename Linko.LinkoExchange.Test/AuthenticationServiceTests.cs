@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Test
             //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, OrganizationTypeName.Authority)).Returns("3");
 
             _termConditionService.Setup(i => i.GetLatestTermConditionId()).Returns(value:1);
-            _termConditionService.Setup(i => i.GetTermCondtionContent()).Returns(value:"test content");
+            _termConditionService.Setup(i => i.GetTermConditionContent()).Returns(value:"test content");
 
             _authenticationService = new AuthenticationService(
                                                                userManager:_userManagerObj.Object,

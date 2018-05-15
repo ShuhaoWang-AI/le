@@ -25,11 +25,11 @@ namespace Linko.LinkoExchange.Services.TermCondition
 
         #region interface implementations
 
-        public string GetTermCondtionContent()
+        public string GetTermConditionContent()
         {
-            _logger.Info(message:"Start: TermConditionService.GetTermCondtionContent.");
+            _logger.Info(message:"Start: TermConditionService.GetTermConditionContent.");
             var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.TermConditionId).First();
-            _logger.Info(message:"End: TermConditionService.GetTermCondtionContent.");
+            _logger.Info(message:"End: TermConditionService.GetTermConditionContent.");
             return termCondition.Content;
         }
 

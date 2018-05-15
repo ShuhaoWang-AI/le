@@ -84,7 +84,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"TermsAndConditions")]
         public ActionResult TermsAndConditions()
         {
-            var termCondition = _termConditionService.GetTermCondtionContent();
+            var termCondition = _termConditionService.GetTermConditionContent();
             var model = new ConfirmationViewModel
                         {
                             Title = "Terms and Conditions",

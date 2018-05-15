@@ -73,5 +73,25 @@ namespace Linko.LinkoExchange.Test
         {
             var dtos = _unitService.GetFlowUnitsFromCommaDelimitedString(commaDelimitedString:"gpd,mgd");
         }
+
+        [TestMethod]
+        public void ConvertResultToTargetUnit()
+        {
+            var currentAuthorityUnit = _unitService.GetUnit(7); // mg/L
+            var targetAuthorityUnit = _unitService.GetUnit(13); // ug/L
+            var result = 0.001;
+
+            Assert.AreEqual("mg/L", currentAuthorityUnit.Name);
+            Assert.AreEqual("ug/L", targetAuthorityUnit.Name);
+
+            Assert.AreEqual(expected:result, actual:_unitService.ConvertResultToTargetUnit(result, currentAuthorityUnit, currentAuthorityUnit));
+            Assert.AreEqual(expected:result, actual:_unitService.ConvertResultToTargetUnit(result, targetAuthorityUnit, targetAuthorityUnit));
+            Assert.AreEqual(expected:result,
+                            actual:_unitService.ConvertResultToTargetUnit(_unitService.ConvertResultToTargetUnit(result, currentAuthorityUnit, targetAuthorityUnit),
+                                                                          targetAuthorityUnit, currentAuthorityUnit));
+            
+            Assert.AreEqual(expected:1.00, actual:_unitService.ConvertResultToTargetUnit(result, currentAuthorityUnit, targetAuthorityUnit));
+            Assert.AreEqual(expected:100000.00, actual:_unitService.ConvertResultToTargetUnit(100.00, currentAuthorityUnit, targetAuthorityUnit));
+        }
     }
 }

@@ -362,8 +362,8 @@ namespace Linko.LinkoExchange.Services.Unit
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
                                     descripition:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
             {
-                var currentSystemUnit = currentAuthorityUnit.SystemUnit;
-                var targetSystemUnit = targetAuthorityUnit.SystemUnit;
+                var currentSystemUnit = currentAuthorityUnit?.SystemUnit;
+                var targetSystemUnit = targetAuthorityUnit?.SystemUnit;
 
                 if (currentSystemUnit == null)
                 {
@@ -398,7 +398,8 @@ namespace Linko.LinkoExchange.Services.Unit
                                                  + $"targetUnitAdditiveFactor:{targetUnitAdditiveFactor}")
             )
             {
-                return (result * currentUnitConversionFactor + currentUnitAdditiveFactor - targetUnitAdditiveFactor) / targetUnitConversionFactor;
+                return (double?) (((decimal?) result * (decimal) currentUnitConversionFactor + (decimal) currentUnitAdditiveFactor - (decimal) targetUnitAdditiveFactor)
+                                  / (decimal) targetUnitConversionFactor);
             }
         }
 
