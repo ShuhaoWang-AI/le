@@ -9,10 +9,9 @@
         public string DataSourceTerm { get; set; }
 
         public int DataSourceId { get; set; }
-
-        public int UnitId { get; set; }
         public virtual DataSource DataSource { get; set; }
 
+        public int UnitId { get; set; }
         public virtual Unit Unit { get; set; }
 
         #endregion

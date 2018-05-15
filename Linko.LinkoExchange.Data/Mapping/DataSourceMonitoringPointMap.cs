@@ -9,13 +9,16 @@ namespace Linko.LinkoExchange.Data.Mapping
 
         public DataSourceMonitoringPointMap()
         {
-            ToTable(tableName: "tDataSourceMonitoringPoint");
+            ToTable(tableName:"tDataSourceMonitoringPoint");
 
             HasKey(x => x.DataSourceMonitoringPointId);
 
-            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value: 254);
+            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value:254);
 
-            Property(x => x.DataSourceId).IsRequired();
+            HasRequired(a => a.DataSource)
+                .WithMany(b => b.DataSourceMonitoringPoints)
+                .HasForeignKey(c => c.DataSourceId)
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(x => x.MonitoringPoint)
                 .WithMany()

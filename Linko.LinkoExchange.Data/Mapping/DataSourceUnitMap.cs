@@ -9,13 +9,16 @@ namespace Linko.LinkoExchange.Data.Mapping
 
         public DataSourceUnitMap()
         {
-            ToTable(tableName: "tDataSourceUnit");
+            ToTable(tableName:"tDataSourceUnit");
 
             HasKey(x => x.DataSourceUnitId);
 
-            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value: 254);
+            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value:254);
 
-            Property(x => x.DataSourceId).IsRequired();
+            HasRequired(a => a.DataSource)
+                .WithMany(b => b.DataSourceUnits)
+                .HasForeignKey(c => c.DataSourceId)
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(x => x.Unit)
                 .WithMany()

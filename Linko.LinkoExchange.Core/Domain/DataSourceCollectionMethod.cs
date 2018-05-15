@@ -9,11 +9,9 @@
         public string DataSourceTerm { get; set; }
 
         public int DataSourceId { get; set; }
-
-        public int CollectionMethodId { get; set; }
-
         public virtual DataSource DataSource { get; set; }
 
+        public int CollectionMethodId { get; set; }
         public virtual CollectionMethod CollectionMethod { get; set; }
 
         #endregion

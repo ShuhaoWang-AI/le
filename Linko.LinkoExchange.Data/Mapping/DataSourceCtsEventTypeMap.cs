@@ -9,13 +9,16 @@ namespace Linko.LinkoExchange.Data.Mapping
 
         public DataSourceCtsEventTypeMap()
         {
-            ToTable(tableName: "tDataSourceCtsEventType");
+            ToTable(tableName:"tDataSourceCtsEventType");
 
             HasKey(x => x.DataSourceCtsEventTypeId);
 
-            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value: 254);
+            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value:254);
 
-            Property(x => x.DataSourceId).IsRequired();
+            HasRequired(a => a.DataSource)
+                .WithMany(b => b.DataSourceCtsEventTypes)
+                .HasForeignKey(c => c.DataSourceId)
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(x => x.CtsEventType)
                 .WithMany()

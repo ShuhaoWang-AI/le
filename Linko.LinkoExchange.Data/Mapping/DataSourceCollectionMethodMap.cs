@@ -9,13 +9,16 @@ namespace Linko.LinkoExchange.Data.Mapping
 
         public DataSourceCollectionMethodMap()
         {
-            ToTable(tableName: "tDataSourceCollectionMethod");
+            ToTable(tableName:"tDataSourceCollectionMethod");
 
             HasKey(x => x.DataSourceCollectionMethodId);
 
-            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value: 254);
+            Property(x => x.DataSourceTerm).IsRequired().HasMaxLength(value:254);
 
-            Property(x => x.DataSourceId).IsRequired();
+            HasRequired(a => a.DataSource)
+                .WithMany(b => b.DataSourceCollectionMethods)
+                .HasForeignKey(c => c.DataSourceId)
+                .WillCascadeOnDelete(value:false);
 
             HasRequired(x => x.CollectionMethod)
                 .WithMany()

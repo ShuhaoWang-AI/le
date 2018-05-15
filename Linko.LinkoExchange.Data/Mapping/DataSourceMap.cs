@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
         public DataSourceMap()
         {
-            ToTable(tableName: "tDataSource");
+            ToTable(tableName:"tDataSource");
 
             HasKey(x => x.DataSourceId);
 

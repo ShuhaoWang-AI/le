@@ -9,11 +9,9 @@
         public string DataSourceTerm { get; set; }
 
         public int DataSourceId { get; set; }
-
-        public int MonitoringPointId { get; set; }
-
         public virtual DataSource DataSource { get; set; }
 
+        public int MonitoringPointId { get; set; }
         public virtual MonitoringPoint MonitoringPoint { get; set; }
 
         #endregion
