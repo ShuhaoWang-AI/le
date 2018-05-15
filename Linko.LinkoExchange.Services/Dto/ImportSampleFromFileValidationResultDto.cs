@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Services.Dto
         /// <summary>
         /// If success is equal to false then "Errors" will have value, otherwise empty string
         /// </summary>
-        public IEnumerable<ErrorWithRowNumberDto> Errors { get; set; }
+        public List<ErrorWithRowNumberDto> Errors { get; set; }
 
         #endregion
     }
