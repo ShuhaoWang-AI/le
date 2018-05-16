@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 		#region public properties
 
 		public string CompanyName => _organizationRegulatoryProgram.OrganizationDto.OrganizationName;
-		public string ReportName => "Discharge Permit Limits";
+		public string ReportName => "Permit Limits";
 
 		public string IndustryName => _organizationRegulatoryProgram.OrganizationDto.OrganizationName;
 		public string IndustryNumber => _organizationRegulatoryProgram.ReferenceNumber;

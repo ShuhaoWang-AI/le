@@ -135,6 +135,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 			row.Cells.Add(text:"-- No Limit defined");
 
 			row = noteTable.Rows.Add();
+			row.DefaultCellTextState = leftTextSize8;
 			row.Cells.Add(text:"* F = Four Day, M = Monthly ");
 
 			noteTable.Rows.Add();
@@ -172,6 +173,13 @@ namespace Linko.LinkoExchange.Services.Parameter
 				                        HorizontalAlignment = HorizontalAlignment.Left
 			                        };
 
+			var centerTextBoldSize9 = new TextState(fontFamily:"Arial", bold:false, italic:false)
+			                          {
+				                          FontSize = 9,
+				                          FontStyle = FontStyles.Bold,
+				                          HorizontalAlignment = HorizontalAlignment.Center
+			                          };
+
 			// cell text font
 			var centerTextSize8 = new TextState(fontFamily:"Arial", bold:false, italic:false)
 			                      {
@@ -196,19 +204,18 @@ namespace Linko.LinkoExchange.Services.Parameter
 			cell.Margin = new MarginInfo(bottom:10.0, left:5.0, right:5.0, top:5.0);
 
 			row = permitLimitTable.Rows.Add();
-			row.DefaultCellTextState = leftTextBoldSize9;
 			row.BackgroundColor = Color.LightGray;
 
-			row.Cells.Add(text:"Parameter");
-			row.Cells.Add(text:"Effective Date");
-			row.Cells.Add(text:"Expiration Date");
-			row.Cells.Add(text:"Concentration Daily Limit");
-			row.Cells.Add(text:"Concentration Average Limit");
-			row.Cells.Add(text:"Concentration Units");
-			row.Cells.Add(text:"Average Type*");
-			row.Cells.Add(text:"Mass Daily Limit");
-			row.Cells.Add(text:"Mass Average Limit");
-			row.Cells.Add(text:"Mass Units");
+			row.Cells.Add(text:"Parameter", ts:leftTextBoldSize9);
+			row.Cells.Add(text:"Effective Date", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Expiration Date", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Concentration Daily Limit", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Concentration Average Limit", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Concentration Units", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Average Type*", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Mass Daily Limit", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Mass Average Limit", ts:centerTextBoldSize9);
+			row.Cells.Add(text:"Mass Units", ts:centerTextBoldSize9);
 
 			var limits = monitoringPoint.LimitReportParameterLimits.OrderBy(i => i.ParameterName).ThenBy(j => j.EffectiveDate);
 

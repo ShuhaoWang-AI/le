@@ -2224,7 +2224,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 	        string industryNumber;
             var data = _parameterService.GetIndustryDischargeLimitReport(industryNumber:out industryNumber);
             var contentType = "application/pdf";
-            var fileDownloadName = $"{industryNumber}_Discharge_Permit_Limits.pdf"; 
+            var fileDownloadName = $"{industryNumber}_Permit_Limits.pdf"; 
 
             return File(fileContents:data, contentType:contentType, fileDownloadName:fileDownloadName);
         }
