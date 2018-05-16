@@ -167,6 +167,20 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
+        public Dictionary<string, DataSourceTranslationItemDto> GetDataSourceTranslationDict(int dataSourceId, DataSourceTranslationType translationType)
+        {
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var caseInsensitiveDictionary = new Dictionary<string, DataSourceTranslationItemDto>(comparer:comparer);
+
+            foreach (var dataSourceTranslationDto in GetDataSourceTranslations(dataSourceId:dataSourceId, translationType:translationType))
+            {
+                caseInsensitiveDictionary.Add(key: dataSourceTranslationDto.DataSourceTerm, 
+                                              value: dataSourceTranslationDto.TranslationItem);
+            }
+
+            return caseInsensitiveDictionary;
+        }
+
         public List<DataSourceTranslationDto> GetDataSourceTranslations(int dataSourceId, DataSourceTranslationType translationType)
         {
             var dataSource = _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId);

@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
@@ -42,10 +43,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		private readonly ISettingService _settingService;
 		private readonly IUnitService _unitService;
 		private readonly IReportTemplateService _reportTemplateService;
+		private readonly IDataSourceService _dataSourceService;
 
-		#endregion
+        #endregion
 
-		#region constructors and destructor
+        #region constructors and destructor
 
 		public ImportSampleFromFileService(
 			FileStoreService fileStoreService,
@@ -58,7 +60,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			IProgramService programService,
 			ISettingService settingService,
 			IUnitService unitService,
-			IReportTemplateService reportTemplateService)
+			IReportTemplateService reportTemplateService,
+			IDataSourceService dataSourceService)
 		{
 			if (fileStoreService == null)
 			{
@@ -115,7 +118,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				throw new ArgumentNullException(paramName:nameof(reportTemplateService));
 			}
 
-			_fileStoreService = fileStoreService;
+			if (dataSourceService == null)
+			{
+				throw new ArgumentNullException(paramName: nameof(dataSourceService));
+			}
+
+            _fileStoreService = fileStoreService;
 			_dbContext = dbContext;
 			_mapHelper = mapHelper;
 			_logger = logger;
@@ -124,7 +132,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			_unitService = unitService;
 			_reportTemplateService = reportTemplateService;
 			_settingService = settingService;
-		}
+			_dataSourceService = dataSourceService;
+        }
 
 		#endregion
 
@@ -360,14 +369,76 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			throw new NotImplementedException();
 		}
 
-		/// <inheritdoc />
-		public SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
-		{
-			throw new NotImplementedException();
-		}
+        /// <inheritdoc />
+        public SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
+        {
+            var validationIssues = new List<RuleViolation>();
+            foreach (var translationType in Enum.GetValues(enumType: typeof(DataSourceTranslationType)).Cast<DataSourceTranslationType>())
+            {
+                PopulateExistingTranslationData(sampleImportDto: sampleImportDto, translationType: translationType, validationIssues: validationIssues);
+            }
+            if (validationIssues.Count > 0)
+            {
+                throw new RuleViolationException(message: "Population Data Source Translation failed", validationIssues: validationIssues);
+            }
+            return sampleImportDto;
+        }
+        private SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto, DataSourceTranslationType translationType,
+                                                                ICollection<RuleViolation> validationIssues)
+        {
+            if (sampleImportDto.DataSource.DataSourceId == null)
+            {
+                validationIssues.Add(item: new RuleViolation(propertyName: string.Empty, propertyValue: null,
+                                                             errorMessage: "Data Source is required to proceed Sample Import"));
+                return sampleImportDto;
+            }
+            var translationDict = _dataSourceService.GetDataSourceTranslationDict(dataSourceId: sampleImportDto.DataSource.DataSourceId.Value,
+                                                                                  translationType: translationType);
+            var sampleImportColumnName = ToSampleImportColumnName(fromTranslationType: translationType);
+            foreach (var row in sampleImportDto.Rows)
+            {
+                foreach (var cell in row.Cells)
+                {
+                    if (cell.SampleImportColumnName != sampleImportColumnName)
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrEmpty(value: cell.OriginalValue))
+                    {
+                        validationIssues.Add(item: new RuleViolation(propertyName: string.Empty, propertyValue: null,
+                                                                     errorMessage: $"Value at row {row.RowNumber} and column {sampleImportColumnName} is required"));
+                        continue;
+                    }
+	                DataSourceTranslationItemDto translationItem;
+                    if (translationDict.TryGetValue(key: cell.OriginalValue, value: out translationItem))
+                    {
+                        cell.TranslatedValueId = translationItem.TranslationId;
+	                    cell.TranslatedValue = translationItem.TranslationName;
+                    }
+                    else
+                    {
+                        validationIssues.Add(item: new RuleViolation(propertyName: string.Empty, propertyValue: null,
+                                                                     errorMessage: $"Cannot translate '{cell.OriginalValue}' to an existing {translationType}"));
+                    }
+                }
+            }
+            return sampleImportDto;
+        }
+        private static SampleImportColumnName ToSampleImportColumnName(DataSourceTranslationType fromTranslationType)
+        {
+            switch (fromTranslationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint: return SampleImportColumnName.MonitoringPoint;
+                case DataSourceTranslationType.SampleType: return SampleImportColumnName.SampleType;
+                case DataSourceTranslationType.CollectionMethod: return SampleImportColumnName.CollectionMethod;
+                case DataSourceTranslationType.Parameter: return SampleImportColumnName.ParameterName;
+                case DataSourceTranslationType.Unit: return SampleImportColumnName.ResultUnit;
+                default: throw new NotSupportedException(message: $"DataSourceTranslationType {fromTranslationType} is unsupported");
+            }
+        }
 
-		/// <inheritdoc />
-		public List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto)
+        /// <inheritdoc />
+        public List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto)
 		{
 			throw new NotImplementedException();
 		}
