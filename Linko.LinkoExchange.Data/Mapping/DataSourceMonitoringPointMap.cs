@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasRequired(x => x.MonitoringPoint)
                 .WithMany()
-                .HasForeignKey(x => x.MonitoringPoint)
+                .HasForeignKey(x => x.MonitoringPointId)
                 .WillCascadeOnDelete(value:false);
         }
 
