@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -15,23 +17,89 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		{
 			// Create a list of samples 
 			var importSampleResultRows = GetImportSampleResultRows(sampleImportDto);
+			
+			UpdateEffectiveUnits(importSampleResultRows);
 
-			CategorizeImportSampleResultRows(importSampleResultRows);
+			ImportSampleResultRow importFlowRow;
+			CategorizeImportSampleResultRows(importSampleResultRows, out importFlowRow);
 
-			var validationResult = ValidSampleResultRows(importSampleResultRows, out samplesDtos);
+			var validationResult = ValidSampleResultRows(importSampleResultRows, importFlowRow, out samplesDtos);
 			if (validationResult.Success == false)
 			{
 				return validationResult;
 			}
 
-			// TODO. unit conversion
-
-			// 
-
 			return validationResult;
 		}
 
-		private ImportSampleFromFileValidationResultDto ValidSampleResultRows(List<ImportSampleResultRow> importSampleResultRows, out List<SampleDto> sampleDtos)
+		private void UpdateEffectiveUnits(List<ImportSampleResultRow> importSampleResultRows)
+		{
+			// for each monitoring point parameter, find out the effective unit. 
+			// TO determine the sample result parameter unit 
+			// 1. If a monitoring point limits exits and in effect in that period,  use it 
+			// 2. Use monitoring point parameter default 
+			// 3. use parameter unit 
+
+			var authorityUnits = _unitService.GetUnits();
+			var authorityUnitDict = authorityUnits.ToDictionary(unit => unit.UnitId);
+
+			var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+
+			var monitoringPointParameter = _dbContext.MonitoringPointParameters
+			                                         .Include(p => p.MonitoringPointParameterLimits)
+			                                         .Include(p => p.Parameter)
+			                                         .Where(i => i.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId &&
+			                                                     i.MonitoringPoint.IsEnabled && !i.MonitoringPoint.IsRemoved).ToList();
+
+			foreach (var row in importSampleResultRows)
+			{
+				int monitoringPointId = row.ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValueId.Value;
+				int parameterId = row.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId.Value;
+
+				DateTime start = row.ColumnMap[SampleImportColumnName.SampleStartDateTime].TranslatedValue;
+				DateTime end = row.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue;
+
+				int unitId = row.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId.Value;
+				double result = row.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
+
+				row.EffectiveUnit = GetEffectiveUnit(monitoringPointParameter, monitoringPointId, parameterId, start, end);
+
+				var fromUnit = authorityUnitDict[unitId];
+				row.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result, fromUnit, row.EffectiveUnit);
+			}
+		}
+
+		private UnitDto GetEffectiveUnit(List<MonitoringPointParameter> pool, int monitoringPointId, int parameterId, DateTime start, DateTime end)
+		{
+			var smallPool = pool.Where(i => i.ParameterId == parameterId && i.MonitoringPointId == monitoringPointId).ToList(); 
+
+			foreach (var mp in smallPool)
+			{
+				if (mp.EffectiveDateTime > start || mp.RetirementDateTime < end)
+				{
+					continue;
+				}
+
+				var mppl = mp.MonitoringPointParameterLimits.FirstOrDefault();
+
+				if (mppl?.BaseUnit != null)
+				{
+					return _mapHelper.ToDto(mppl.BaseUnit);
+				}
+				else if (mp.DefaultUnit != null)
+				{
+					return _mapHelper.ToDto(mp.DefaultUnit);
+				}
+				else
+				{
+					return _mapHelper.ToDto(mp.Parameter.DefaultUnit);
+				}
+			}
+
+			return _mapHelper.ToDto(smallPool.First().Parameter.DefaultUnit) ;
+		}
+
+		private ImportSampleFromFileValidationResultDto ValidSampleResultRows(List<ImportSampleResultRow> importSampleResultRows, ImportSampleResultRow importFlowRow, out List<SampleDto> sampleDtos)
 		{
 			ImportSampleFromFileValidationResultDto validationResult = new ImportSampleFromFileValidationResultDto();
 			sampleDtos = new List<SampleDto>(); 
@@ -86,6 +154,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							UpdateDraftSampleResult(sampleResultToUpdate, importingSampleResult);
 						}
 
+						// samples exist in draft, but not exist in importing results, calculate massloading 
+						var draftSampleResultsToRecalculateMass = draftSample.SampleResults.Except(draftSampleResultsToUpdate);
+						foreach (var sampleResultToUpdate in draftSampleResultsToRecalculateMass)
+						{
+							CreateMassLoadingSampleResult(importFlowRow, sampleResultToUpdate);
+						} 
+
 						// add the rest of sample results in importing sample result to this draft
 						var draftSampleResultsToAdd = draftSample.SampleResults.Except(draftSampleResultsToUpdate);
 						draftSample.SampleResults.ToList().AddRange(draftSampleResultsToAdd);
@@ -116,15 +191,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			                     ).ToList();
 		}
 
-		List<ErrorWithRowNumberDto> GetSampleResultErrors(List<string> rowNumbers, string message)
-		{
-			return rowNumbers.Select(i => new ErrorWithRowNumberDto
-			                              {
-				                              ErrorMessage = message,
-				                              RowNumbers = string.Join(separator:",", values:rowNumbers)
-			                              }).ToList();
-		}
-
 		private SampleResultDto CreateSampleResult(ImportSampleResultRow resultRow)
 		{
 			var sampleResultDto = new SampleResultDto();
@@ -144,22 +210,27 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				sampleResultDto.Qualifier = resultRow.ColumnMap[SampleImportColumnName.ResultQualifier].TranslatedValue;
 			}
 
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
-			{
-				sampleResultDto.Value = resultRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
-				sampleResultDto.EnteredValue = sampleResultDto.Value.ToString(); 
-			}
+			//if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
+			//{
+			//	sampleResultDto.Value = resultRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
+			//	sampleResultDto.EnteredValue = sampleResultDto.Value.ToString(); 
+			//}
+			//if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
+			//{
+			//	sampleResultDto.UnitName = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
+			//	var resultUnitId = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
+			//	if (resultUnitId != null)
+			//	{
+			//		sampleResultDto.UnitId = resultUnitId.Value;
+			//	}
+			//}
 
-			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
-			{
-				sampleResultDto.UnitName = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
-				var resultUnitId = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-				if (resultUnitId != null)
-				{
-					sampleResultDto.UnitId = resultUnitId.Value;
-				}
-			}
+			sampleResultDto.UnitName = resultRow.EffectiveUnit.Name;
+			sampleResultDto.UnitId = resultRow.EffectiveUnit.UnitId; 
+			sampleResultDto.Value = resultRow.EffectiveUnitResult;
 
+			sampleResultDto.EnteredValue = resultRow.EffectiveUnitResult.ToString();
+			
 			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.MethodDetectionLimit))
 			{
 				sampleResultDto.EnteredMethodDetectionLimit = resultRow.ColumnMap[SampleImportColumnName.MethodDetectionLimit].TranslatedValue.ToString();
@@ -184,6 +255,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private void CreateMassLoadingSampleResult(ImportSampleResultRow importFlowRow, SampleResultDto sampleResultDto)
 		{
+			if (importFlowRow == null)
+			{
+				return;
+			}
+
 			if (!importFlowRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
 			{
 				throw new NoNullAllowedException("Flow ResultUnit is missing");
@@ -219,7 +295,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private List<ImportSampleResultRow> GetImportSampleResultRows(SampleImportDto sampleImportDto)
 		{
-			var dataTable = new List<ImportSampleResultRow>();
+			//TODO:  can be multiple Flow defined in file? 
+			//  Or only one FLow line define in each group
+			var dataTable = new List<ImportSampleResultRow>(); 
+
 			foreach (var row in sampleImportDto.Rows)
 			{
 				var sampleRow = new ImportSampleResultRow
@@ -253,7 +332,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			return dataTable;
 		}
 
-		private void CategorizeImportSampleResultRows(List<ImportSampleResultRow> dataTable)
+		private void CategorizeImportSampleResultRows(List<ImportSampleResultRow> dataTable, out ImportSampleResultRow importFlowRow)
 		{
 			var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 			var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId:_settingService
@@ -292,7 +371,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var flowCell = dataTable.SelectMany(i => i.ColumnMap.Values).ToList()
 			                        .SingleOrDefault(i => i.OriginalValue.Equals("Flow", StringComparison.OrdinalIgnoreCase));
 
-			ImportSampleResultRow importFlowRow = null;
+			importFlowRow = null;
 			var flowUnitId = 0;
 			var flowUnitName = string.Empty;
 			var flowValueEntered = string.Empty;
@@ -424,5 +503,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		public SampleDto Sample { get; set; }
 		public SampleResultDto SampleResult { get; set; }
 		public string ParameterName { get; set; }
+		public UnitDto EffectiveUnit { get; set; }
+		public double? EffectiveUnitResult { get; set; }
 	}
 }
