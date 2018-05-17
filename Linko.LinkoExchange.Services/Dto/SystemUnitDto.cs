@@ -21,10 +21,10 @@ namespace Linko.LinkoExchange.Services.Dto
         public UnitDimensionDto UnitDimension { get; set; }
         public double ConversionFactor { get; set; }
         public double AdditiveFactor { get; set; }
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+        //public DateTimeOffset CreationDateTimeUtc { get; set; }
+        //public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; }
-        public string LastModifierFullName { get; set; }
+        //public string LastModifierFullName { get; set; }
 
         #endregion
     }

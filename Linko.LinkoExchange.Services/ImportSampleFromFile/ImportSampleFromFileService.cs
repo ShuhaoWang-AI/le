@@ -338,7 +338,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     {
                         throw CreateRuleViolationExceptionForValidationError(errorMessage:"Authority does not have any sample import file template.");
                     }
-                    
+
                     //populate DataSource in sampleImportDto
                     sampleImportDto.DataSource = _dataSourceService.GetDataSourceById(dataSourceId:dataSourceId);
 
@@ -346,7 +346,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     {
                         throw CreateRuleViolationExceptionForValidationError(errorMessage:"Industry did not selected data source.");
                     }
-                    
+
                     //populate Rows in sampleImportDto
                     var importFileWorkbook = GetWorkbook(importTempFileDto:importTempFileDto);
 
@@ -413,11 +413,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 var fileVersionDto = _mapHelper.ToDto(fromDomainObject:fileVersion);
 
-                if (fileVersionDto.LastModificationDateTimeLocal.HasValue)
+                if (fileVersion?.LastModificationDateTimeUtc != null)
                 {
+                    var lastModificationDateTimeUtc = (DateTime) fileVersion?.LastModificationDateTimeUtc?.UtcDateTime;
                     fileVersionDto.LastModificationDateTimeLocal =
-                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:fileVersionDto.LastModificationDateTimeLocal.Value,
-                                                                                    orgRegProgramId:currentRegulatoryProgramId);
+                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:lastModificationDateTimeUtc, orgRegProgramId:currentRegulatoryProgramId);
                 }
 
                 if (fileVersionDto.LastModifierUserId.HasValue)
@@ -466,7 +466,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             //Find column header from first row and map with FileVersionFieldDto
 
             //Check all required and recommended columns are exists or not
-            
+
             //loop through the rows
             //Check each row that any required field is missing or not
             //Validate each field has correct data format or not
@@ -474,7 +474,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             //Validate text field length
             //Validate date format
             //validate result field with qualifier
-            
 
             // check there is any validation issue or not
             if (validationIssues.Count > 0)
@@ -541,7 +540,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 case DataSourceTranslationType.Parameter: return SampleImportColumnName.ParameterName;
                 case DataSourceTranslationType.Unit: return SampleImportColumnName.ResultUnit;
                 default: throw new NotSupportedException(message:$"DataSourceTranslationType {fromTranslationType} is unsupported");
-
             }
         }
 

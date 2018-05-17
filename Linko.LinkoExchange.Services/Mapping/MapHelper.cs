@@ -1605,8 +1605,8 @@ namespace Linko.LinkoExchange.Services.Mapping
 				       AdditiveFactor = fromDomainObject.AdditiveFactor,
 				       UnitDimensionId = fromDomainObject.UnitDimensionId,
 					   UnitDimension = ToDto(fromDomainObject:fromDomainObject.UnitDimension),
-				       CreationDateTimeUtc = fromDomainObject.CreationDateTimeUtc,
-				       LastModificationDateTimeUtc = fromDomainObject.LastModificationDateTimeUtc,
+				       //CreationDateTimeUtc = service will populate later,
+				       //LastModificationDateTimeUtc = service will populate later,
 				       LastModifierUserId = fromDomainObject.LastModifierUserId,
 				       //LastModifierFullName = service will populate later
 			       };
@@ -1648,8 +1648,8 @@ namespace Linko.LinkoExchange.Services.Mapping
 				       UnitDimensionId = fromDomainObject.UnitDimensionId,
 				       Name = fromDomainObject.Name,
 				       Description = fromDomainObject.Description,
-				       CreationDateTimeUtc = fromDomainObject.CreationDateTimeUtc,
-				       LastModificationDateTimeUtc = fromDomainObject.LastModificationDateTimeUtc,
+				       //CreationDateTimeUtc = service will populate later,
+				       //LastModificationDateTimeUtc = service will populate later,
 				       LastModifierUserId = fromDomainObject.LastModifierUserId,
 				       //LastModifierFullName = service will populate later
 			       };
@@ -1689,7 +1689,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 				       Description = fromDomainObject.Description,
 				       OrganizationRegulatoryProgramId = fromDomainObject.OrganizationRegulatoryProgramId,
 				       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:fromDomainObject.OrganizationRegulatoryProgram),
-				       LastModificationDateTimeLocal = fromDomainObject.LastModificationDateTimeUtc?.UtcDateTime,
+				       //LastModificationDateTimeLocal = service will populate later,
 				       LastModifierUserId = fromDomainObject.LastModifierUserId,
 				       FileVersionFields = fromDomainObject.FileVersionFields.Select(selector:ToDto).ToList()
 			       };
