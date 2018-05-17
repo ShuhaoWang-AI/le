@@ -3,23 +3,23 @@ using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class DataSourceMap : EntityTypeConfiguration<DataSource>
+    public class FileVersionMap : EntityTypeConfiguration<FileVersion>
     {
         #region constructors and destructor
 
-        public DataSourceMap()
+        public FileVersionMap()
         {
-            ToTable(tableName:"tDataSource");
+            ToTable(tableName:"tFileVersion");
 
-            HasKey(x => x.DataSourceId);
+            HasKey(x => x.FileVersionId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(value:50);
 
             Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.DataSources)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WithMany()
+                .HasForeignKey(b => b.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(value:false);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();

@@ -77,14 +77,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\DataOptionalityMap.cs" />
     <Compile Include="Mapping\DataSourceCollectionMethodMap.cs" />
     <Compile Include="Mapping\DataSourceCtsEventTypeMap.cs" />
+    <Compile Include="Mapping\DataFormatMap.cs" />
     <Compile Include="Mapping\DataSourceMonitoringPointMap.cs" />
     <Compile Include="Mapping\DataSourceParameterMap.cs" />
     <Compile Include="Mapping\DataSourceUnitMap.cs" />
     <Compile Include="Mapping\DataSourceMap.cs" />
+    <Compile Include="Mapping\FileVersionFieldMap.cs" />
+    <Compile Include="Mapping\FileVersionMap.cs" />
+    <Compile Include="Mapping\FileVersionTemplateFieldMap.cs" />
+    <Compile Include="Mapping\FileVersionTemplateMap.cs" />
     <Compile Include="Mapping\ImportTempFileMap.cs" />
     <Compile Include="Mapping\PrivacyPolicyMap.cs" />
+    <Compile Include="Mapping\SystemFieldMap.cs" />
     <Compile Include="Mapping\SystemUnitMap.cs" />
     <Compile Include="Mapping\UnitDimensionMap.cs" />
     <Compile Include="SyncContext.cs" />

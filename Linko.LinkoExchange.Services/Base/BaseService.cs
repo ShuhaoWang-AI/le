@@ -20,9 +20,9 @@ namespace Linko.LinkoExchange.Services.Base
         /// <returns> </returns>
         public abstract bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id);
 
-        protected static RuleViolationException ThrowRuleViolationException(string message)
+        protected static RuleViolationException CreateRuleViolationExceptionForValidationError(string errorMessage)
         {
-            var validationIssues = new List<RuleViolation> { new RuleViolation(propertyName: string.Empty, propertyValue: null, errorMessage: message) };
+            var validationIssues = new List<RuleViolation> { new RuleViolation(propertyName: string.Empty, propertyValue: null, errorMessage: errorMessage) };
 
             return new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
         }

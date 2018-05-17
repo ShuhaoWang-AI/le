@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
@@ -18,7 +18,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.DataSource
 {
-    public class DataSourceService : IDataSourceService
+    public class DataSourceService : BaseService, IDataSourceService
     {
         #region fields
 
@@ -54,6 +54,23 @@ namespace Linko.LinkoExchange.Services.DataSource
         #endregion
 
         #region interface implementations
+        
+        /// <inheritdoc />
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            //var retVal = false;
+
+            //var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+            //var currentPortalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+            //currentPortalName = string.IsNullOrWhiteSpace(value:currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                default: throw new NotSupportedException(message:$"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+            }
+
+            //return retVal;
+        }
 
         public int SaveDataSource(DataSourceDto dataSourceDto)
         {
@@ -234,13 +251,6 @@ namespace Linko.LinkoExchange.Services.DataSource
                              .ToList();
         }
         #endregion
-
-        private static RuleViolationException CreateRuleViolationExceptionForValidationError(string errorMessage)
-        {
-            return new RuleViolationException("Validation errors", new RuleViolation(propertyName:string.Empty,
-                                                                                     propertyValue:null,
-                                                                                     errorMessage:errorMessage));
-        }
 
         private Core.Domain.DataSource GetExistingDataSourceByName(int organizationRegulatoryProgramId, string name)
         {

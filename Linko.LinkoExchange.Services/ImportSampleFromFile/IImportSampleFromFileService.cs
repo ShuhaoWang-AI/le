@@ -76,5 +76,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <param name="sampleDtos"></param>
         /// <returns></returns>
         ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> sampleDtos);
+
+        FileVersionDto GetFileVersion();
     }
 }

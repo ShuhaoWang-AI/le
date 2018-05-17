@@ -1674,6 +1674,51 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return existingDomainObject;
 		}
 
+		/// <inheritdoc />
+		public FileVersionDto ToDto(FileVersion fromDomainObject)
+		{
+			if (fromDomainObject == null)
+			{
+				return null;
+			}
+
+			return new FileVersionDto
+			       {
+				       FileVersionId = fromDomainObject.FileVersionId,
+				       Name = fromDomainObject.Name,
+				       Description = fromDomainObject.Description,
+				       OrganizationRegulatoryProgramId = fromDomainObject.OrganizationRegulatoryProgramId,
+				       OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram:fromDomainObject.OrganizationRegulatoryProgram),
+				       LastModificationDateTimeLocal = fromDomainObject.LastModificationDateTimeUtc?.UtcDateTime,
+				       LastModifierUserId = fromDomainObject.LastModifierUserId,
+				       FileVersionFields = fromDomainObject.FileVersionFields.Select(selector:ToDto).ToList()
+			       };
+		}
+
+		/// <inheritdoc />
+		public FileVersionFieldDto ToDto(FileVersionField fromDomainObject)
+		{
+			if (fromDomainObject == null)
+			{
+				return null;
+			}
+
+			return new FileVersionFieldDto
+			       {
+				       FileVersionFieldId = fromDomainObject.FileVersionFieldId,
+				       FileVersionId = fromDomainObject.FileVersionId,
+					   SystemFieldName = (SampleImportColumnName)fromDomainObject.SystemFieldId,
+				       FileVersionFieldName = fromDomainObject.Name,
+					   DataFormatName = (DataFormatName)fromDomainObject.SystemField.DataFormatId,
+				       Description = fromDomainObject.Description,
+				       DataOptionalityName = (DataOptionalityName)fromDomainObject.DataOptionalityId,
+				       IsSystemRequired =fromDomainObject.SystemField.IsRequired,
+				       Size = fromDomainObject.Size,
+				       ExampleData = fromDomainObject.ExampleData,
+				       AdditionalComments = fromDomainObject.AdditionalComments
+			       };
+		}
+
 		#endregion
 		public List<MonitoringPointParameterDto> GetMonitoringPointParameterDtoFromMonitoringPointParameter(ICollection<MonitoringPointParameter> monitoringPointParameters)
 		{

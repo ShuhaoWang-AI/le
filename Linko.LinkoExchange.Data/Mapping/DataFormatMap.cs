@@ -3,24 +3,19 @@ using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class DataSourceMap : EntityTypeConfiguration<DataSource>
+    public class DataFormatMap : EntityTypeConfiguration<DataFormat>
     {
         #region constructors and destructor
 
-        public DataSourceMap()
+        public DataFormatMap()
         {
-            ToTable(tableName:"tDataSource");
+            ToTable(tableName:"tDataFormat");
 
-            HasKey(x => x.DataSourceId);
+            HasKey(x => x.DataFormatId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(value:50);
 
             Property(x => x.Description).IsOptional().HasMaxLength(value:500);
-
-            HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.DataSources)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(value:false);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 

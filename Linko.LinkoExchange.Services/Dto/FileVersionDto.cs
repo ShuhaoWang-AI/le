@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
         public DateTime? LastModificationDateTimeLocal { get; set; }
         public int? LastModifierUserId { get; set; }
-        public string LastModifierUserName { get; set; }
+        public string LastModifierFullName { get; set; }
         public List<FileVersionFieldDto> FileVersionFields { get; set; }
 
         #endregion

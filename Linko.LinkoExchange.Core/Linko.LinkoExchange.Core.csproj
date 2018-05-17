@@ -79,6 +79,12 @@
     <Compile Include="Domain\CopyOfRecordCertificate.cs" />
     <Compile Include="Domain\CromerrAuditLog.cs" />
     <Compile Include="Domain\CtsEventType.cs" />
+    <Compile Include="Domain\FileVersionField.cs" />
+    <Compile Include="Domain\FileVersion.cs" />
+    <Compile Include="Domain\FileVersionTemplateField.cs" />
+    <Compile Include="Domain\SystemField.cs" />
+    <Compile Include="Domain\FileVersionTemplate.cs" />
+    <Compile Include="Domain\DataFormat.cs" />
     <Compile Include="Domain\DataSource.cs" />
     <Compile Include="Domain\DataSourceCtsEventType.cs" />
     <Compile Include="Domain\DataSourceCollectionMethod.cs" />
@@ -87,6 +93,7 @@
     <Compile Include="Domain\DataSourceParameter.cs" />
     <Compile Include="Domain\DataSourceMonitoringPoint.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
+    <Compile Include="Domain\DataOptionality.cs" />
     <Compile Include="Domain\ImportTempFile.cs" />
     <Compile Include="Domain\FileStore.cs" />
     <Compile Include="Domain\FileStoreData.cs" />

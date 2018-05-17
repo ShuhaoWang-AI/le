@@ -88,6 +88,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         UnitDimensionDto ToDto(UnitDimension fromDomainObject);
         UnitDimension ToDomainObject(UnitDimensionDto fromDto, UnitDimension existingDomainObject = null);
-
+        FileVersionDto ToDto(FileVersion fromDomainObject);
+        FileVersionFieldDto ToDto(FileVersionField fromDomainObject);
     }
 }

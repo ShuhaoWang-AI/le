@@ -109,6 +109,14 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ImportTempFile> ImportTempFiles { get; set; }
         public DbSet<UnitDimension> UnitDimensions { get; set; }
         public DbSet<SystemUnit> SystemUnits { get; set; }
+        
+        public DbSet<DataOptionality> DataOptionalities { get; set; }
+        public DbSet<DataFormat> DataFormats { get; set; }
+        public DbSet<FileVersionTemplate> FileVersionTemplates { get; set; }
+        public DbSet<SystemField> SystemFields { get; set; }
+        public DbSet<FileVersionField> FileVersionFields { get; set; }
+        public DbSet<FileVersion> FileVersions { get; set; }
+        public DbSet<FileVersionTemplateField> FileVersionTemplateFields { get; set; }
 
         #endregion
 

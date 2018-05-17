@@ -7,7 +7,7 @@ namespace Linko.LinkoExchange.Services.Dto
         #region public properties
 
         public int? FileVersionFieldId { get; set; }
-        public int SystemFieldId { get; set; }
+        public int FileVersionId { get; set; }
         /// <summary>
         /// System column name
         /// </summary>
@@ -20,7 +20,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Description { get; set; }
         public DataOptionalityName DataOptionalityName { get; set; }
         public bool IsSystemRequired { get; set; }
-        public int Size { get; set; }
+        public int? Size { get; set; }
         public string ExampleData { get; set; }
         public string AdditionalComments { get; set; }
 

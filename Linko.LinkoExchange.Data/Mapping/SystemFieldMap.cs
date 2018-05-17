@@ -3,24 +3,32 @@ using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class DataSourceMap : EntityTypeConfiguration<DataSource>
+    public class SystemFieldMap : EntityTypeConfiguration<SystemField>
     {
         #region constructors and destructor
 
-        public DataSourceMap()
+        public SystemFieldMap()
         {
-            ToTable(tableName:"tDataSource");
+            ToTable(tableName:"tSystemField");
 
-            HasKey(x => x.DataSourceId);
+            HasKey(x => x.SystemFieldId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(value:50);
 
             Property(x => x.Description).IsOptional().HasMaxLength(value:500);
 
-            HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.DataSources)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+            HasRequired(a => a.DataFormat)
+                .WithMany()
+                .HasForeignKey(b => b.DataFormatId)
                 .WillCascadeOnDelete(value:false);
+
+            Property(x => x.IsRequired).IsRequired();
+
+            Property(x => x.Size).IsOptional();
+
+            Property(x => x.ExampleData).IsOptional().HasMaxLength(value:500);
+
+            Property(x => x.AdditionalComments).IsOptional().HasMaxLength(value:500);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 

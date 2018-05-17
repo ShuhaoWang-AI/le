@@ -367,11 +367,11 @@ namespace Linko.LinkoExchange.Services.Unit
 
                 if (currentSystemUnit == null)
                 {
-                    throw ThrowRuleViolationException(message:"Can not convert current unit to system unit.");
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Can not convert current unit to system unit.");
                 }
                 else if (targetSystemUnit == null)
                 {
-                    throw ThrowRuleViolationException(message:"Can not convert target unit to system unit.");
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Can not convert target unit to system unit.");
                 }
                 else if (currentSystemUnit.UnitDimensionId == targetSystemUnit.UnitDimensionId)
                 {
@@ -381,7 +381,7 @@ namespace Linko.LinkoExchange.Services.Unit
                 }
                 else
                 {
-                    throw ThrowRuleViolationException(message:"Current unit and target unit are not in same unit dimension.");
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Current unit and target unit are not in same unit dimension.");
                 }
             }
         }
