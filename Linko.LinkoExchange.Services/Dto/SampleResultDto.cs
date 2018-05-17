@@ -36,7 +36,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ConcentrationResultComplianceComment { get; set; }
         public ResultComplianceType MassResultCompliance { get; set; }
         public string MassResultComplianceComment { get; set; }
-
+		
         #endregion
     }
 }

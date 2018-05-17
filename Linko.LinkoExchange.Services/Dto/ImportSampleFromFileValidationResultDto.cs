@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public ImportSampleFromFileValidationResultDto()
         {
             Success = true;
-            Errors = null;
+            Errors = new List<ErrorWithRowNumberDto>();
         }
 
         #endregion
