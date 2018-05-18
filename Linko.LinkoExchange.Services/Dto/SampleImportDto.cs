@@ -23,12 +23,11 @@ namespace Linko.LinkoExchange.Services.Dto
 
     public class ImportCellObject
     {
-		public int RowNumber { get; set; }
 		#region public properties
 		public SampleImportColumnName SampleImportColumnName { get; set; }
         public string OriginalValue { get; set; }
         public dynamic TranslatedValue { get; set; }
-        public int? TranslatedValueId { get; set; }
+        public int TranslatedValueId { get; set; }
 
         #endregion
     }

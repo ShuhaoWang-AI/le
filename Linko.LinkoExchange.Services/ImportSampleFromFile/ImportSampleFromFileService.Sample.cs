@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -15,58 +15,78 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		/// <inheritdoc />
 		public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> samplesDtos)
 		{
-			// Create a list of samples 
-			var importSampleResultRows = GetImportSampleResultRows(sampleImportDto);
-			
-			UpdateEffectiveUnits(importSampleResultRows);
+			samplesDtos = null;
 
-			ImportSampleResultRow importFlowRow;
-			CategorizeImportSampleResultRows(importSampleResultRows, out importFlowRow);
+			// Create a list of validate importingSamples, and return the validation result
+			List<ImportingSample> importingSamples;
 
-			var validationResult = ValidSampleResultRows(importSampleResultRows, importFlowRow, out samplesDtos);
-			if (validationResult.Success == false)
+			var validationResult = GetValidImportingSamples(sampleImportDto, out importingSamples);
+
+			if (validationResult.Errors.Any())
 			{
+				validationResult.Success = false;
 				return validationResult;
 			}
+
+			validationResult = UpdateEffectiveUnits(importingSamples);
+
+			if (validationResult.Errors.Any())
+			{
+				validationResult.Success = false;
+				return validationResult;
+			}
+
+			CreateSamples(importingSamples);
+
+			// Merge into existing draft samples or create new samples
+			samplesDtos = MergeSamples(importingSamples);
 
 			return validationResult;
 		}
 
-		private void UpdateEffectiveUnits(List<ImportSampleResultRow> importSampleResultRows)
+		private ImportSampleFromFileValidationResultDto UpdateEffectiveUnits(List<ImportingSample> importingSamples)
 		{
 			// for each monitoring point parameter, find out the effective unit. 
-			// TO determine the sample result parameter unit 
+			// to determine the sample result parameter unit 
 			// 1. If a monitoring point limits exits and in effect in that period,  use it 
 			// 2. Use monitoring point parameter default 
-			// 3. use parameter unit 
+			// 3. Use parameter unit 
+			var validationResult = new ImportSampleFromFileValidationResultDto();
 
 			var authorityUnits = _unitService.GetUnits();
 			var authorityUnitDict = authorityUnits.ToDictionary(unit => unit.UnitId);
 
 			var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-			var monitoringPointParameter = _dbContext.MonitoringPointParameters
+			var monitoringPointParameters = _dbContext.MonitoringPointParameters
 			                                         .Include(p => p.MonitoringPointParameterLimits)
 			                                         .Include(p => p.Parameter)
 			                                         .Where(i => i.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId &&
 			                                                     i.MonitoringPoint.IsEnabled && !i.MonitoringPoint.IsRemoved).ToList();
 
-			foreach (var row in importSampleResultRows)
+			foreach (var importingSample in importingSamples)
 			{
-				int monitoringPointId = row.ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValueId.Value;
-				int parameterId = row.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId.Value;
+				//TODO : to do unit conversion check 
 
-				DateTime start = row.ColumnMap[SampleImportColumnName.SampleStartDateTime].TranslatedValue;
-				DateTime end = row.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue;
+				int monitoringPointId = importingSample.MonitoringPoint.TranslatedValueId;
 
-				int unitId = row.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId.Value;
-				double result = row.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
+				DateTime start = importingSample.SampleEndDateTime.TranslatedValue;
+				DateTime end = importingSample.SampleEndDateTime.TranslatedValue;
 
-				row.EffectiveUnit = GetEffectiveUnit(monitoringPointParameter, monitoringPointId, parameterId, start, end);
+				foreach (var importingSampleResult in importingSample.SampleResults)
+				{
+					int parameterId = importingSampleResult.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId;
+					int unitId = importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
+					double result = importingSampleResult.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
 
-				var fromUnit = authorityUnitDict[unitId];
-				row.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result, fromUnit, row.EffectiveUnit);
+					importingSampleResult.EffectiveUnit = GetEffectiveUnit(monitoringPointParameters, monitoringPointId, parameterId, start, end);
+
+					var fromUnit = authorityUnitDict[unitId];
+					importingSampleResult.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result, fromUnit, importingSampleResult.EffectiveUnit);
+				}
 			}
+
+			return validationResult;
 		}
 
 		private UnitDto GetEffectiveUnit(List<MonitoringPointParameter> pool, int monitoringPointId, int parameterId, DateTime start, DateTime end)
@@ -99,84 +119,88 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			return _mapHelper.ToDto(smallPool.First().Parameter.DefaultUnit) ;
 		}
 
-		private ImportSampleFromFileValidationResultDto ValidSampleResultRows(List<ImportSampleResultRow> importSampleResultRows, ImportSampleResultRow importFlowRow, out List<SampleDto> sampleDtos)
+		private void ExtractFlowRow(ImportingSample importingSample)
 		{
-			ImportSampleFromFileValidationResultDto validationResult = new ImportSampleFromFileValidationResultDto();
-			sampleDtos = new List<SampleDto>(); 
+			var flow = importingSample.SampleResults.SingleOrDefault(i => i.ParameterName.Equals("Flow", StringComparison.OrdinalIgnoreCase));
+			if (flow == null)
+			{
+				return;
+			}
 
-			var min = importSampleResultRows.Min(i => i.Sample.StartDateTimeLocal);
-			var max = importSampleResultRows.Min(i => i.Sample.EndDateTimeLocal);
+			importingSample.SampleResults.Remove(flow);
+			importingSample.FlowRow = new FlowRow
+			                          {
+				                          FlowValue = flow.ColumnMap[SampleImportColumnName.Result].TranslatedValue,
+				                          FlowUnitName = flow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue,
+				                          FlowUnitId = flow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId
+			                          };
+
+		}
+
+		private List<SampleDto> MergeSamples(List<ImportingSample> importingSamples)
+		{
+			var sampleDtos = new List<SampleDto>();
+
+			var min = importingSamples.Min(i => i.Sample.StartDateTimeLocal);
+			var max = importingSamples.Min(i => i.Sample.EndDateTimeLocal);
 
 			// Get existing draft samples for that user;
 			var draftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
-			
-			//To check each sample has duplicated rows 
-			var importingSampleGroups = importSampleResultRows.GroupBy(i => i.Sample, (key, group) =>
-				                                                                          new
-				                                                                          {
-					                                                                          Sample = key,
-					                                                                          SampleResultRows = group.ToList()
-				                                                                          });
 
-			foreach (var importingSampleGroup in importingSampleGroups)
+
+			foreach (var importingSample in importingSamples)
 			{
-				var parameterGroup = importingSampleGroup.SampleResultRows.GroupBy(i => i.ParameterName);
-
-				foreach (var pg in parameterGroup)
-				{
-					// Check if sample has duplicate parameters 
-					if (pg.Count() > 1)
-					{
-						validationResult.Success = false;
-						validationResult.Errors.Add(item:new ErrorWithRowNumberDto
-						                                 {
-							                                 ErrorMessage = "Duplicated parameter",
-							                                 RowNumbers = string.Join(separator:",", values:pg.ToList().Select(i => i.RowNumber.ToString()))
-						                                 });
-					}
-				}
-
-				var importingSample = importingSampleGroup.Sample;
-			 
 				// Sample results are in a draft sample, then update that draft
-				var drftSamplesToUpdate = SearchSamplesInCategorySamples(draftSamples, importingSample);
+				var drftSamplesToUpdate = SearchSamplesInCategorySamples(draftSamples, importingSample.Sample);
 				if (drftSamplesToUpdate.Any())
 				{
-					var importingSampleResultParameterIds = importingSampleGroup.SampleResultRows.Select(j => j.SampleResult).Select(k => k.ParameterId);
+					var importingSampleResultParameterIds = importingSample.Sample.SampleResults.Select(k => k.ParameterId);
 
 					//Update all the drafts
 					foreach (var draftSample in drftSamplesToUpdate)
 					{
+						// update sample results that are in draft
 						var draftSampleResultsToUpdate = draftSample.SampleResults.Where(i => importingSampleResultParameterIds.Contains(i.ParameterId)).ToList();
 						foreach (var sampleResultToUpdate in draftSampleResultsToUpdate)
 						{
-							var importingSampleResult = importingSample.SampleResults.Single(i => i.ParameterId == sampleResultToUpdate.ParameterId);
+							var importingSampleResult = importingSample.Sample.SampleResults.Single(i => i.ParameterId == sampleResultToUpdate.ParameterId);
 							UpdateDraftSampleResult(sampleResultToUpdate, importingSampleResult);
 						}
-
-						// samples exist in draft, but not exist in importing results, calculate massloading 
-						var draftSampleResultsToRecalculateMass = draftSample.SampleResults.Except(draftSampleResultsToUpdate);
-						foreach (var sampleResultToUpdate in draftSampleResultsToRecalculateMass)
-						{
-							CreateMassLoadingSampleResult(importFlowRow, sampleResultToUpdate);
-						} 
 
 						// add the rest of sample results in importing sample result to this draft
 						var draftSampleResultsToAdd = draftSample.SampleResults.Except(draftSampleResultsToUpdate);
 						draftSample.SampleResults.ToList().AddRange(draftSampleResultsToAdd);
+
+						// recalculate all mass loading in draftSample
+						if (importingSample.FlowRow != null || draftSample.FlowValue.HasValue)
+						{
+							FlowRow flowRow = importingSample.FlowRow ?? new FlowRow
+							                                             {
+								                                             FlowUnitId = draftSample.FlowUnitId.Value,
+								                                             FlowUnitName = draftSample.FlowUnitName,
+								                                             FlowValue = draftSample.FlowValue ?? 0.0
+							                                             };
+
+							// samples exist in draft, but not exist in importing results, calculate mass loading 
+							var draftSampleResultsToRecalculateMass = draftSample.SampleResults.Except(draftSampleResultsToUpdate);
+							foreach (var sampleResultToUpdate in draftSampleResultsToRecalculateMass)
+							{
+								CreateMassLoadingSampleResult(flowRow, sampleResultToUpdate);
+							}
+						}
 					}
 
 					sampleDtos.AddRange(drftSamplesToUpdate);
 				}
-				else
+				else // this sample is a new sample
 				{
-					sampleDtos.Add(importingSample);
-				}
+					sampleDtos.Add(importingSample.Sample);
+				} 
 			}
 
-			return validationResult;
+			return sampleDtos;
 		}
- 
+
 		List<SampleDto> SearchSamplesInCategorySamples(List<SampleDto> searchIn, SampleDto searchFor)
 		{
 			return searchIn.Where(i => i.MonitoringPointId == searchFor.MonitoringPointId &&
@@ -196,12 +220,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var sampleResultDto = new SampleResultDto();
 			if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ParameterName))
 			{
-				var parameterId = resultRow.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId;
-				if (parameterId != null)
-				{
-					sampleResultDto.ParameterId = parameterId.Value;
-				}
-
+				sampleResultDto.ParameterId = resultRow.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValueId;
 				sampleResultDto.ParameterName = resultRow.ColumnMap[SampleImportColumnName.ParameterName].TranslatedValue;
 			}
 			
@@ -209,22 +228,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			{
 				sampleResultDto.Qualifier = resultRow.ColumnMap[SampleImportColumnName.ResultQualifier].TranslatedValue;
 			}
-
-			//if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
-			//{
-			//	sampleResultDto.Value = resultRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
-			//	sampleResultDto.EnteredValue = sampleResultDto.Value.ToString(); 
-			//}
-			//if (resultRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
-			//{
-			//	sampleResultDto.UnitName = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
-			//	var resultUnitId = resultRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-			//	if (resultUnitId != null)
-			//	{
-			//		sampleResultDto.UnitId = resultUnitId.Value;
-			//	}
-			//}
-
+			
 			sampleResultDto.UnitName = resultRow.EffectiveUnit.Name;
 			sampleResultDto.UnitId = resultRow.EffectiveUnit.UnitId; 
 			sampleResultDto.Value = resultRow.EffectiveUnitResult;
@@ -253,51 +257,75 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			return sampleResultDto;
 		}
 
-		private void CreateMassLoadingSampleResult(ImportSampleResultRow importFlowRow, SampleResultDto sampleResultDto)
+		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto)
 		{
 			if (importFlowRow == null)
 			{
 				return;
 			}
-
-			if (!importFlowRow.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
-			{
-				throw new NoNullAllowedException("Flow ResultUnit is missing");
-			}
-
-			if (!importFlowRow.ColumnMap.ContainsKey(SampleImportColumnName.Result))
-			{
-				throw new NoNullAllowedException("Flow Result is missing");
-			}
-
+			
 			var mgPerLiter = "mg/l";
 
-			string flowUnitName = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
-			double flowResult = importFlowRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
+			string flowUnitName = importFlowRow.FlowUnitName;
+			double flowResult = importFlowRow.FlowValue;
+			var massloadingUnitId = importFlowRow.FlowUnitId; 
 
 			double massLoadingMultiplier = flowUnitName.Equals(UnitName.pgd.ToString(), StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
-
 			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(mgPerLiter, StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
-
 			var massLoadingValue = flowResult * sampleResultDto.Value * massLoadingMultiplier * resultUnitConversionFactor;
 			 
 			sampleResultDto.MassLoadingValue = massLoadingValue.ToString();
 			sampleResultDto.MassLoadingQualifier = sampleResultDto.Qualifier; 
-
-			var massloadingUnitId = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-			if (massloadingUnitId != null)
-			{
-				sampleResultDto.MassLoadingUnitId = massloadingUnitId.Value; 
-			}
-				
-			sampleResultDto.MassLoadingUnitName = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
+			
+			sampleResultDto.MassLoadingUnitId = massloadingUnitId;
+			sampleResultDto.MassLoadingUnitName = flowUnitName;
 		}
 
-		private List<ImportSampleResultRow> GetImportSampleResultRows(SampleImportDto sampleImportDto)
+		private ImportSampleFromFileValidationResultDto GetValidImportingSamples(SampleImportDto sampleImportDto, out List<ImportingSample> importingSamples)
 		{
-			//TODO:  can be multiple Flow defined in file? 
-			//  Or only one FLow line define in each group
-			var dataTable = new List<ImportSampleResultRow>(); 
+			ImportSampleFromFileValidationResultDto validationResult = new ImportSampleFromFileValidationResultDto();
+
+			importingSamples = CreateImportingSamples(sampleImportDto);
+
+			foreach (var importingSample in importingSamples)
+			{
+				ValidateDataDuplication(importingSample, validationResult);
+
+				ExtractFlowRow(importingSample);
+			}
+
+			return validationResult;
+		}
+
+		private static void ValidateDataDuplication(ImportingSample importingSample, ImportSampleFromFileValidationResultDto validationResult)
+		{
+			var parameterGroups = importingSample.SampleResults.GroupBy(i => i.ParameterName);
+
+			foreach (var parameterGroup in parameterGroups)
+			{
+				// Check if sample has duplicate parameters 
+				if (parameterGroup.Count() > 1)
+				{
+					var errorMessage = "Duplicated parameter";
+					var isFlow = parameterGroup.Key.Equals("Flow", StringComparison.OrdinalIgnoreCase);
+					if (isFlow)
+					{
+						errorMessage = "Duplicate flows exist, A sample has more than 1 parameter representing the Sample Flow used in calculating mass. One must be removed to do the import.";
+					}
+
+					validationResult.Success = false;
+					validationResult.Errors.Add(item:new ErrorWithRowNumberDto
+					                                 {
+						                                 ErrorMessage = errorMessage,
+						                                 RowNumbers = string.Join(separator:",", values:parameterGroup.ToList().Select(i => i.RowNumber.ToString()))
+					                                 });
+				}
+			}
+		}
+
+		private List<ImportingSample> CreateImportingSamples(SampleImportDto sampleImportDto)
+		{
+			var dataTable = new List<ImportSampleResultRow>();
 
 			foreach (var row in sampleImportDto.Rows)
 			{
@@ -307,32 +335,49 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					                RowNumber = row.RowNumber
 				                };
 
+				dataTable.Add(sampleRow);
+
 				foreach (var cell in row.Cells)
 				{
 					sampleRow.ColumnMap.Add(cell.SampleImportColumnName, cell);
 				}
 			}
 
-			if (!dataTable.Any() || dataTable[0].ColumnMap.ContainsKey(SampleImportColumnName.LabSampleId))
+			if (dataTable.Any() && dataTable[0].ColumnMap.ContainsKey(SampleImportColumnName.LabSampleId))
 			{
-				return dataTable;
+				foreach (var row in dataTable)
+				{
+					var fakeCell = new ImportCellObject
+					               {
+						               TranslatedValue = ""
+					               };
+
+					row.ColumnMap.Add(SampleImportColumnName.LabSampleId, fakeCell);
+				}
 			}
 
-			foreach (var row in dataTable)
-			{
-				var fakeCell = new ImportCellObject
-				               {
-					               OriginalValue = "",
-					               TranslatedValue = ""
-				               };
-
-				row.ColumnMap.Add(SampleImportColumnName.LabSampleId, fakeCell);
-			}
-
-			return dataTable;
+			//Group into samples 
+			return dataTable.GroupBy(i => new
+			                              {
+				                              MonitoringPont = i.ColumnMap[SampleImportColumnName.MonitoringPoint],
+				                              CollectionMethod = i.ColumnMap[SampleImportColumnName.CollectionMethod],
+				                              SampleType = i.ColumnMap[SampleImportColumnName.SampleType],
+				                              SampleStartDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime],
+				                              SampleEndDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime],
+				                              LabSampleId = i.ColumnMap[SampleImportColumnName.LabSampleId],
+			                              }, (key, group) => new ImportingSample
+			                                                 {
+				                                                 MonitoringPoint = key.MonitoringPont,
+				                                                 CollectionMethod = key.CollectionMethod,
+				                                                 SampleType = key.SampleType,
+				                                                 SampleStartDateTime = key.SampleStartDateTime,
+				                                                 SampleEndDateTime = key.SampleEndDateTime,
+				                                                 LabSampleId = key.LabSampleId,
+				                                                 SampleResults = @group.ToList()
+			                                                 }).ToList();
 		}
 
-		private void CategorizeImportSampleResultRows(List<ImportSampleResultRow> dataTable, out ImportSampleResultRow importFlowRow)
+		private void CreateSamples(List<ImportingSample> importingSamples)
 		{
 			var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 			var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId:_settingService
@@ -368,108 +413,50 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var ctsEventTypeDto = _reportTemplateService.GetCtsEventTypes(isForSample:true).FirstOrDefault();
 			var ctsEventCategoryName = ctsEventTypeDto != null ? ctsEventTypeDto.CtsEventCategoryName : "sample";
 
-			var flowCell = dataTable.SelectMany(i => i.ColumnMap.Values).ToList()
-			                        .SingleOrDefault(i => i.OriginalValue.Equals("Flow", StringComparison.OrdinalIgnoreCase));
 
-			importFlowRow = null;
-			var flowUnitId = 0;
-			var flowUnitName = string.Empty;
-			var flowValueEntered = string.Empty;
-			var flowValue = 0.0;
-
-			if (flowCell != null)
-			{
-				importFlowRow = dataTable.Single(i => i.RowNumber == flowCell.RowNumber);
-				var flowUnitIdTranslated = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId;
-				if (flowUnitIdTranslated != null)
-				{
-					flowUnitId = flowUnitIdTranslated.Value;
-				}
-
-				flowUnitName = importFlowRow.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue;
-				flowValue = importFlowRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue;
-				flowValueEntered = importFlowRow.ColumnMap[SampleImportColumnName.Result].TranslatedValue.toString();
-			}
-
-			var hasFlow = flowCell != null;
-
-			var sampleGroups = dataTable.GroupBy(i => new
-			                                          {
-				                                          MonitoringPont = i.ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValue,
-				                                          CollectionMethod = i.ColumnMap[SampleImportColumnName.CollectionMethod].TranslatedValue,
-				                                          SampleType = i.ColumnMap[SampleImportColumnName.SampleType].TranslatedValue,
-				                                          SampleStartDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				                                          SampleEndDateTime = i.ColumnMap[SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				                                          LabSampleId = i.ColumnMap[SampleImportColumnName.LabSampleId].TranslatedValue,
-			                                          }, (key, group) => new
-			                                                             {
-				                                                             key.MonitoringPont,
-				                                                             key.CollectionMethod,
-				                                                             key.SampleType,
-				                                                             key.SampleStartDateTime,
-				                                                             key.SampleEndDateTime,
-				                                                             key.LabSampleId,
-				                                                             SampleResults = @group.ToList()
-			                                                             });
-			foreach (var sampeGroup in sampleGroups)
+			foreach (var importingSample in importingSamples)
 			{
 				var sampleDto = new SampleDto
 				                {
-					                MonitoringPointName = sampeGroup.MonitoringPont,
+					                MonitoringPointName = importingSample.MonitoringPoint.TranslatedValue,
+					                MonitoringPointId = importingSample.MonitoringPoint.TranslatedValueId,
 					                IsReadyToReport = false,
 					                SampleStatusName = SampleStatusName.Draft,
-					                FlowUnitId = flowUnitId,
-					                FlowUnitName = flowUnitName,
-					                FlowEnteredValue = flowValueEntered,
-					                FlowValue = flowValue,
-					                CtsEventTypeName = sampeGroup.SampleType,
+					                FlowUnitId = importingSample.FlowRow?.FlowUnitId,
+					                FlowUnitName = importingSample.FlowRow != null ? importingSample.FlowRow.FlowUnitName : "",
+					                FlowEnteredValue = importingSample.FlowRow?.FlowValue.ToString(CultureInfo.InvariantCulture),
+					                FlowValue = importingSample.FlowRow?.FlowValue,
+					                CtsEventTypeId = importingSample.SampleType.TranslatedValueId,
+					                CtsEventTypeName = importingSample.SampleType.TranslatedValue,
 					                CtsEventCategoryName = ctsEventCategoryName,
-					                StartDateTimeLocal = sampeGroup.SampleStartDateTime,
-					                EndDateTimeLocal = sampeGroup.SampleEndDateTime,
+					                CollectionMethodId = importingSample.CollectionMethod.TranslatedValueId,
+					                CollectionMethodName = importingSample.CollectionMethod.TranslatedValue,
+					                LabSampleIdentifier = importingSample.LabSampleId.TranslatedValue,
+					                StartDateTimeLocal = importingSample.SampleStartDateTime.TranslatedValue,
+					                EndDateTimeLocal = importingSample.SampleEndDateTime.TranslatedValue,
 					                FlowUnitValidValues = flowUnitValidValues,
 					                ResultQualifierValidValues = resultQualifierValidValues,
 					                IsMassLoadingResultToUseLessThanSign = isMassLoadingResultToUseLessThanSign,
 					                MassLoadingCalculationDecimalPlaces = massLoadingCalculationDecimalPlaces,
-					                MassLoadingConversionFactorPounds = massLoadingConversionFactorPounds,
-					                LabSampleIdentifier = sampeGroup.LabSampleId
+					                MassLoadingConversionFactorPounds = massLoadingConversionFactorPounds
 				                };
-
-				var monitoringPointId = sampeGroup.SampleResults[0].ColumnMap[SampleImportColumnName.MonitoringPoint].TranslatedValueId;
-				if (!monitoringPointId.HasValue)
-				{
-					throw new NoNullAllowedException("MonitoringPoint.TranslatedValueId");
-				}
-				sampleDto.MonitoringPointId = monitoringPointId.Value;
-
-				sampleDto.CollectionMethodName = sampeGroup.CollectionMethod;
-				var collectionMethodId = sampeGroup.SampleResults[0].ColumnMap[SampleImportColumnName.CollectionMethod].TranslatedValueId;
-				if (collectionMethodId == null)
-				{
-					throw new NoNullAllowedException("CollectionMethod.TranslatedValueId");
-				}
-
-				sampleDto.CollectionMethodId = collectionMethodId.Value;
 
 				var sampleResults = new List<SampleResultDto>();
 				sampleDto.SampleResults = sampleResults;
 
+				importingSample.Sample = sampleDto;
+
 				// populate sampleResults 
-				foreach (var importSampleResultRow in sampeGroup.SampleResults)
+				foreach (var importSampleResultRow in importingSample.SampleResults)
 				{
 					var sampleResultDto = CreateSampleResult(importSampleResultRow);
 					sampleResults.Add(sampleResultDto);
-
-					// calculate mass loading for the sample result 
-					if (hasFlow)
-					{
-						CreateMassLoadingSampleResult(importFlowRow, sampleResultDto);
-					}
 
 					// Set up mapping between sample and sample result ImportSampleResultRow object. 
 					importSampleResultRow.Sample = sampleDto;
 					importSampleResultRow.SampleResult = sampleResultDto;
 					importSampleResultRow.ParameterName = sampleResultDto.ParameterName;
-				} 
+				}
 			}
 		}
 
@@ -499,11 +486,31 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 	class ImportSampleResultRow
 	{
 		public int RowNumber { get; set; }
-		public IDictionary<SampleImportColumnName, ImportCellObject> ColumnMap;
+	    public IDictionary<SampleImportColumnName, ImportCellObject> ColumnMap; 
 		public SampleDto Sample { get; set; }
 		public SampleResultDto SampleResult { get; set; }
 		public string ParameterName { get; set; }
 		public UnitDto EffectiveUnit { get; set; }
 		public double? EffectiveUnitResult { get; set; }
+	}
+
+	class ImportingSample
+	{
+		public ImportCellObject MonitoringPoint { get; set; }
+		public ImportCellObject CollectionMethod { get; set; }
+		public ImportCellObject SampleType { get; set; }
+		public ImportCellObject SampleStartDateTime { get; set; }
+		public ImportCellObject SampleEndDateTime { get; set; }
+		public ImportCellObject LabSampleId { get; set; }
+		public FlowRow FlowRow { get; set; }
+		public List<ImportSampleResultRow> SampleResults { get; set; }
+		public SampleDto Sample { get; set; }
+	}
+
+	class FlowRow
+	{
+		public int FlowUnitId { get; set; }
+		public string FlowUnitName { get; set; }
+		public double FlowValue { get; set; } 
 	}
 }
