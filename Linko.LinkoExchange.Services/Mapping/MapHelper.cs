@@ -1373,6 +1373,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 	            TranslationItem = new DataSourceTranslationItemDto
                 {
                     TranslationId = from.MonitoringPointId,
+					TranslationName = from.MonitoringPoint.Name,
 	                TranslationType = DataSourceTranslationType.MonitoringPoint
                 }
             };
@@ -1409,6 +1410,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 	            TranslationItem = new DataSourceTranslationItemDto
                 {
                     TranslationId = from.CtsEventTypeId,
+					TranslationName = from.CtsEventType.Name,
 	                TranslationType = DataSourceTranslationType.SampleType
                 }
             };
@@ -1445,6 +1447,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 	            TranslationItem = new DataSourceTranslationItemDto
                 {
                     TranslationId = from.CollectionMethodId,
+					TranslationName = from.CollectionMethod.Name,
 	                TranslationType = DataSourceTranslationType.CollectionMethod
                 }
             };
@@ -1481,6 +1484,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 TranslationItem = new DataSourceTranslationItemDto
                 {
                     TranslationId = from.ParameterId,
+					TranslationName=from.Parameter.Name,
 	                TranslationType = DataSourceTranslationType.Parameter
                 }
             };
@@ -1517,6 +1521,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 TranslationItem = new DataSourceTranslationItemDto
                 {
                     TranslationId = from.UnitId,
+					TranslationName = from.Unit.Name,
 					TranslationType = DataSourceTranslationType.Unit
                 }
             };

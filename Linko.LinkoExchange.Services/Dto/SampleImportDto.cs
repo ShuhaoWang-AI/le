@@ -25,7 +25,8 @@ namespace Linko.LinkoExchange.Services.Dto
     {
 		#region public properties
 		public SampleImportColumnName SampleImportColumnName { get; set; }
-        public string OriginalValue { get; set; }
+        public string OriginalValueString { get; set; }
+	    public dynamic OriginalValue { get; set; }
         public dynamic TranslatedValue { get; set; }
         public int TranslatedValueId { get; set; }
 

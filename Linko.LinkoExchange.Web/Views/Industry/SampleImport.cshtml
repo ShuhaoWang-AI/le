@@ -264,11 +264,10 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">
-                        <div id="gridFileValidationErrors"></div>
                         @if (Model.StepFileValidation.Errors != null)
                         {
                             @(Html.Kendo().Grid(dataSource:Model.StepFileValidation.Errors)
-                                  .Name(componentName:"gridAttachment")
+                                  .Name(componentName:"gridFileValidationErrors")
                                   .Columns(columns =>
                                            {
                                                columns.Bound(c => c.ErrorMessage).Title(text:"Error");
@@ -276,6 +275,87 @@
                                            })
                                   .Scrollable(s => s.Height(value:"auto")))
                         }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    
+    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation)
+    {
+        // SampleImportStep.SelectDataSource
+        <section class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Data Validation</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                <div class="alert alert-danger">
+                    <h5>
+                        Data Validation failed! Check the errors below.
+                    </h5>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @if (Model.StepDataValidation.Errors != null)
+                        {
+                            @(Html.Kendo().Grid(dataSource:Model.StepDataValidation.Errors)
+                                  .Name(componentName: "gridDataValidationErrors")
+                                  .Columns(columns =>
+                                  {
+                                      columns.Bound(c => c.ErrorMessage).Title(text:"Error");
+                                      columns.Bound(c => c.RowNumbers).Title(text:"Row Number");
+                                  })
+                                  .Scrollable(s => s.Height(value:"auto")))
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowImportOutput)
+    {
+        // SampleImportStep.ShowImportOutput
+        <section class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Data Imported</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                <div class="alert alert-success">
+                    <h5>
+                        Samples imported successfully!
+                    </h5>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="box box-group box-solid" style="padding: 0 0 0 10px;">
+                            <div class="box-header">
+                            <button class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                                &nbsp;
+                                <h3 class="box-title">Import Summary </h3>
+                            </div>
+                            <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
+                                @Model.SampleImportDto.Rows.Count sample result(s) imported. <br/> <br/>
+
+                                @if (Model.SampleDtos != null)
+                                {
+                                    <span>@Model.SampleDtos.Count(x => !x.SampleId.HasValue) new draft sample(s) created. <br /></span>
+                                    <span>@Model.SampleDtos.Count(x => x.SampleId.HasValue) exixting draft sample(s) updated. <br /></span>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

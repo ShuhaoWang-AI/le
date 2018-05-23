@@ -2,9 +2,9 @@
 {
     public enum DataFormatName
     {
-        Text,
-        Float,
-        DateTime,
-        Bit,
+        Text = 1,
+        Float = 2,
+        DateTime = 3,
+        Bit = 4,
     }
 }

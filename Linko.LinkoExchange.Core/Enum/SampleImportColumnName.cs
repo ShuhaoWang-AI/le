@@ -5,18 +5,18 @@
     /// </summary>
     public enum SampleImportColumnName
     {
-        MonitoringPoint,
-        SampleType,
-        CollectionMethod,
-        SampleStartDateTime,
-        SampleEndDateTime,
-        ParameterName,
-        ResultQualifier,
-        Result,
-        ResultUnit,
-        LabSampleId,
-        MethodDetectionLimit,
-        AnalysisDateTime,
-        AnalysisMethod
+        MonitoringPoint = 1,
+        SampleType = 2,
+        CollectionMethod = 3,
+        SampleStartDateTime = 4,
+        SampleEndDateTime = 5,
+        ParameterName = 6,
+        ResultQualifier = 7,
+        Result = 8,
+        ResultUnit = 9,
+        LabSampleId = 10,
+        MethodDetectionLimit = 13,
+        AnalysisDateTime = 15,
+        AnalysisMethod = 16
     }
 }

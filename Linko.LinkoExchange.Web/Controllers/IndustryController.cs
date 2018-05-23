@@ -2082,7 +2082,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                                 if (fileValidationResultDto.Success)
                                 {
-                                    //model.ImportFileWorkbook = fileValidationResultDto.ImportFileWorkbook;
+                                    model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto:sampleImportDto);
                                     ModelState.Remove(key:"CurrentSampleImportStep");
                                     model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
                                     goto case SampleImportViewModel.SampleImportStep.SelectDataDefault;
@@ -2105,15 +2105,74 @@ namespace Linko.LinkoExchange.Web.Controllers
                             }
                             break;
 
-                        case SampleImportViewModel.SampleImportStep.SelectDataDefault: break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint: break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationParameter: break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationUnit: break;
-                        case SampleImportViewModel.SampleImportStep.DataValidation: break;
-                        case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: break;
-                        case SampleImportViewModel.SampleImportStep.ShowImportOutput: break;
+                        case SampleImportViewModel.SampleImportStep.SelectDataDefault:
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint;
+                            goto case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint:
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod;
+                            goto case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: 
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationSampleType;
+                            goto case SampleImportViewModel.SampleImportStep.DataTranslationSampleType;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: 
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationParameter;
+                            goto case SampleImportViewModel.SampleImportStep.DataTranslationParameter;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationParameter: 
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationUnit;
+                            goto case SampleImportViewModel.SampleImportStep.DataTranslationUnit;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataTranslationUnit: 
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataValidation;
+                            goto case SampleImportViewModel.SampleImportStep.DataValidation;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.DataValidation: 
+                            //TODO: do proper action
+                            List<SampleDto> sampleDtos;
+                            //var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto, sampleDtos:out sampleDtos);
+
+                            //    if (dataValidationResultDto.Success)
+                            //    {
+                            //        model.SampleDtos = sampleDtos;
+                                    ModelState.Remove(key:"CurrentSampleImportStep");
+                                    model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
+                                    goto case SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
+                                //}
+                                //else
+                                //{
+                                //    model.StepDataValidation = new StepDataValidationViewModel
+                                //                               {
+                                //                                   Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
+                                //                                                                                       {
+                                //                                                                                           ErrorMessage = x.ErrorMessage,
+                                //                                                                                           RowNumbers = x.RowNumbers
+                                //                                                                                       })
+                                //                               };
+                                //}
+                            break;
+                        case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: 
+                            //TODO: do proper action
+                            ModelState.Remove(key:"CurrentSampleImportStep");
+                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowImportOutput;
+                            goto case SampleImportViewModel.SampleImportStep.ShowImportOutput;
+                            break;
+                        case SampleImportViewModel.SampleImportStep.ShowImportOutput:
+                            break;
                         default: return RedirectToAction(actionName:"SampleImport");
                     }
                 }
