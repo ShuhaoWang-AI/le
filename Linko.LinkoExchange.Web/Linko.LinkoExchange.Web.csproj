@@ -506,6 +506,7 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\IndustryController.DataSource.cs" />
     <Compile Include="Extensions\HtmlExtensions.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
