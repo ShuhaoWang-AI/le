@@ -43,6 +43,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
         private readonly IOrganizationService _organizationService;
+        private readonly IReportElementService _reportElementService;
         private readonly IReportTemplateService _reportTemplateService;
         private readonly ISampleService _sampleService;
         private readonly ISettingService _settingService;
@@ -65,6 +66,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             IProgramService programService,
             ISettingService settingService,
             IUnitService unitService,
+            IReportElementService reportElementService,
             IReportTemplateService reportTemplateService,
             IDataSourceService dataSourceService)
         {
@@ -122,6 +124,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             {
                 throw new ArgumentNullException(paramName:nameof(unitService));
             }
+            if (reportTemplateService == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(reportElementService));
+            }
 
             if (reportTemplateService == null)
             {
@@ -141,6 +147,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _unitService = unitService;
+            _reportElementService = reportElementService;
             _reportTemplateService = reportTemplateService;
             _settingService = settingService;
             _sampleService = sampleService;
@@ -452,6 +459,57 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
 
                 return fileVersionDto;
+            }
+        }
+
+        /// <inheritdoc />
+        public void ImportSampleAndCreateAttachment(SampleImportDto sampleImportDto)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                //using (_dbContext.CreateAutoCommitScope()) //TODO: add proper transaction
+                {
+                    var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+
+                    //TODO: Add and update samples
+
+                    // Create new attachment
+                    var tempFile = sampleImportDto.TempFile;
+                    var reportElementTypeIdForIndustryFileUpload =
+                        _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentRegulatoryProgramId, settingType:SettingType.ReportElementTypeIdForIndustryFileUpload);
+
+                    if (string.IsNullOrWhiteSpace(value:reportElementTypeIdForIndustryFileUpload))
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage:"Attachment Type for Industry File Upload is missing !");
+                    }
+                    else
+                    {
+                        var reportElementTypeId = Convert.ToInt32(reportElementTypeIdForIndustryFileUpload);
+                        var reportElementType = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
+                                                                     .First(c => c.ReportElementTypeId == reportElementTypeId);
+
+                        var attachment = new FileStoreDto
+                                         {
+                                             OriginalFileName = tempFile.OriginalFileName,
+                                             ReportElementTypeId = reportElementTypeId,
+                                             ReportElementTypeName = reportElementType.Name,
+                                             Description = "Imported data",
+                                             Data = tempFile.RawFile,
+                                             SizeByte = tempFile.SizeByte,
+                                             MediaType = tempFile.MediaType,
+                                             FileTypeId = tempFile.FileTypeId,
+                                             OrganizationRegulatoryProgramId = currentRegulatoryProgramId
+                                         };
+
+                        _fileStoreService.CreateFileStore(fileStoreDto:attachment);
+                    }
+
+                    // remove temp import file
+                    if (sampleImportDto.TempFile.ImportTempFileId.HasValue)
+                    {
+                        RemoveImportTempFile(importTempFileId:sampleImportDto.TempFile.ImportTempFileId.Value);
+                    }
+                }
             }
         }
 

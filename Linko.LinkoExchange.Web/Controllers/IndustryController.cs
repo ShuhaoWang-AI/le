@@ -2172,6 +2172,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             goto case SampleImportViewModel.SampleImportStep.ShowImportOutput;
                             break;
                         case SampleImportViewModel.SampleImportStep.ShowImportOutput:
+                            _importSampleFromFileService.ImportSampleAndCreateAttachment(sampleImportDto:model.SampleImportDto);
                             break;
                         default: return RedirectToAction(actionName:"SampleImport");
                     }
