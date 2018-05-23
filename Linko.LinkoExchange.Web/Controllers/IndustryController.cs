@@ -1853,7 +1853,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         case SampleImportViewModel.SampleImportStep.DataValidation: 
                             //TODO: do proper action
                             List<SampleDto> sampleDtos;
-                            //var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto, sampleDtos:out sampleDtos);
+                            var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto, sampleDtos:out sampleDtos);
 
                             //    if (dataValidationResultDto.Success)
                             //    {
