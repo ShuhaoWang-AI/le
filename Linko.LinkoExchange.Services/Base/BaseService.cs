@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Validation;
 
@@ -25,6 +27,19 @@ namespace Linko.LinkoExchange.Services.Base
             var validationIssues = new List<RuleViolation> { new RuleViolation(propertyName: string.Empty, propertyValue: null, errorMessage: errorMessage) };
 
             return new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+        }
+
+        protected void RemoveEntities<TEntity>(DbSet<TEntity> entitySet, ICollection<TEntity> entitiesToRemove) where TEntity : class
+        {
+            foreach (var entityToRemove in entitiesToRemove.ToList())
+            {
+                entitySet.Remove(entity: entityToRemove);
+            }
+        }
+
+        protected void RemoveEntity<TEntity>(DbSet<TEntity> entitySet, TEntity entityToRemove) where TEntity : class
+        {
+            entitySet.Remove(entity: entityToRemove);
         }
     }
 }

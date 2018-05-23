@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -130,9 +131,20 @@ namespace Linko.LinkoExchange.Services.DataSource
             {
                 using (_dbContext.CreateAutoCommitScope())
                 {
-                    var foundDataSource = _dbContext.DataSources.Single(pg => pg.DataSourceId == dataSourceId);
+                    var foundDataSource = _dbContext.DataSources
+                                                    .Include(ds => ds.DataSourceMonitoringPoints)
+                                                    .Include(ds => ds.DataSourceCollectionMethods)
+                                                    .Include(ds => ds.DataSourceCtsEventTypes)
+                                                    .Include(ds => ds.DataSourceParameters)
+                                                    .Include(ds => ds.DataSourceUnits)
+                                                    .First(ds => ds.DataSourceId == dataSourceId);
 
-                    _dbContext.DataSources.Remove(entity:foundDataSource);
+                    RemoveEntities(entitySet:_dbContext.DataSourceMonitoringPoints, entitiesToRemove:foundDataSource.DataSourceMonitoringPoints);
+                    RemoveEntities(entitySet: _dbContext.DataSourceCollectionMethods, entitiesToRemove: foundDataSource.DataSourceCollectionMethods);
+                    RemoveEntities(entitySet: _dbContext.DataSourceCtsEventTypes, entitiesToRemove: foundDataSource.DataSourceCtsEventTypes);
+                    RemoveEntities(entitySet: _dbContext.DataSourceParameters, entitiesToRemove: foundDataSource.DataSourceParameters);
+                    RemoveEntities(entitySet: _dbContext.DataSourceUnits, entitiesToRemove: foundDataSource.DataSourceUnits);
+                    RemoveEntity(entitySet: _dbContext.DataSources, entityToRemove: foundDataSource);
 
                     _dbContext.SaveChanges();
                 }

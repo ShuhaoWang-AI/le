@@ -381,7 +381,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              TranslationId = viewModel.TranslatedItem.Id.Value
                                                                          }
                                                    };
-                    _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation:dataSourceTranslationDto, translationType:translationType);
+                    viewModel.Id = _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation:dataSourceTranslationDto, translationType:translationType);
                 }
             }
             catch (RuleViolationException rve)
@@ -453,7 +453,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              TranslationName = viewModel.TranslatedItem.DisplayName
                                                                          }
                                                    };
-                    _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation:dataSourceTranslationDto, translationType:translationType);
+                    viewModel.Id = _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation:dataSourceTranslationDto, translationType:translationType);
                 }
             }
             catch (RuleViolationException rve)
