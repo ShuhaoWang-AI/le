@@ -85,23 +85,25 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 				importingSampleResult.EffectiveUnit = GetEffectiveUnit(monitoringPointId:monitoringPointId, parameterId:parameterId, start:start, end:end);
 
-				if (importingSampleResult.EffectiveUnit == null)
+				var fromUnit = _authorityUnitDict[key:unitId];
+				if (importingSampleResult.EffectiveUnit?.SystemUnit == null || fromUnit?.SystemUnit == null)
 				{
 					var errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
 					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
 				}
-
-				var fromUnit = _authorityUnitDict[key:unitId];
-				importingSampleResult.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result:result, currentAuthorityUnit:fromUnit,
-				                                                                                   targetAuthorityUnit:importingSampleResult.EffectiveUnit);
+				else
+				{
+					importingSampleResult.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result:result, currentAuthorityUnit:fromUnit,
+					                                                                                   targetAuthorityUnit:importingSampleResult.EffectiveUnit);
+				}
 			}
 		}
 
 		private UnitDto GetEffectiveUnit(int monitoringPointId, int parameterId, DateTime start, DateTime end)
 		{
+			var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 			if (_monitoringPointParameters == null)
 			{
-				var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 				_monitoringPointParameters = _dbContext.MonitoringPointParameters
 				                                       .Include(p => p.MonitoringPointParameterLimits)
 				                                       .Include(p => p.Parameter)
@@ -111,30 +113,50 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			var monitoringParameters = _monitoringPointParameters.Where(i => i.ParameterId == parameterId && i.MonitoringPointId == monitoringPointId).ToList();
 
-			foreach (var mp in monitoringParameters)
+			if (monitoringParameters.Count > 0)
 			{
-				if (mp.EffectiveDateTime > start || mp.RetirementDateTime < end)
+				foreach (var mp in monitoringParameters)
 				{
-					continue;
+					if (mp.EffectiveDateTime > start || mp.RetirementDateTime < end)
+					{
+						continue;
+					}
+
+					var mppl = mp.MonitoringPointParameterLimits.FirstOrDefault();
+
+					if (mppl?.BaseUnit != null)
+					{
+						return _mapHelper.ToDto(fromDomainObject:mppl.BaseUnit);
+					}
+					else if (mp.DefaultUnit != null)
+					{
+						return _mapHelper.ToDto(fromDomainObject:mp.DefaultUnit);
+					}
+					else
+					{
+						return _mapHelper.ToDto(fromDomainObject:mp.Parameter.DefaultUnit);
+					}
 				}
 
-				var mppl = mp.MonitoringPointParameterLimits.FirstOrDefault();
-
-				if (mppl?.BaseUnit != null)
+				return _mapHelper.ToDto(fromDomainObject:monitoringParameters.First().Parameter.DefaultUnit);
+			}
+			else
+			{
+				var authOrgRegProgramId = _organizationService.GetAuthority(orgRegProgramId:orgRegProgramId).OrganizationRegulatoryProgramId;
+				//TODO: move to parameter service
+				var parameter = _dbContext.Parameters
+				                          .Include(p => p.DefaultUnit).FirstOrDefault(param => !param.IsRemoved //excluded deleted parameters
+				                                          && param.OrganizationRegulatoryProgramId == authOrgRegProgramId
+														  && param.ParameterId == parameterId);
+				if (parameter != null)
 				{
-					return _mapHelper.ToDto(fromDomainObject:mppl.BaseUnit);
-				}
-				else if (mp.DefaultUnit != null)
-				{
-					return _mapHelper.ToDto(fromDomainObject:mp.DefaultUnit);
+					return _mapHelper.ToDto(fromDomainObject:parameter.DefaultUnit);
 				}
 				else
 				{
-					return _mapHelper.ToDto(fromDomainObject:mp.Parameter.DefaultUnit);
+					throw CreateRuleViolationExceptionForValidationError(errorMessage:"Effective unit for parameter not found.");
 				}
 			}
-
-			return _mapHelper.ToDto(fromDomainObject:monitoringParameters.First().Parameter.DefaultUnit);
 		}
 
 		private void ExtractFlowRow(ImportingSample importingSample, ImportSampleFromFileValidationResultDto validationResult)
@@ -394,6 +416,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				foreach (var cell in row.Cells)
 				{
 					sampleRow.ColumnMap.Add(key:cell.SampleImportColumnName, value:cell);
+					if (cell.SampleImportColumnName == SampleImportColumnName.ParameterName)
+					{
+						sampleRow.ParameterName = cell.TranslatedValue;
+					}
 				}
 			}
 

@@ -1855,24 +1855,24 @@ namespace Linko.LinkoExchange.Web.Controllers
                             List<SampleDto> sampleDtos;
                             var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto, sampleDtos:out sampleDtos);
 
-                            //    if (dataValidationResultDto.Success)
-                            //    {
-                            //        model.SampleDtos = sampleDtos;
-                                    ModelState.Remove(key:"CurrentSampleImportStep");
-                                    model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
-                                    goto case SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
-                                //}
-                                //else
-                                //{
-                                //    model.StepDataValidation = new StepDataValidationViewModel
-                                //                               {
-                                //                                   Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
-                                //                                                                                       {
-                                //                                                                                           ErrorMessage = x.ErrorMessage,
-                                //                                                                                           RowNumbers = x.RowNumbers
-                                //                                                                                       })
-                                //                               };
-                                //}
+                            if (dataValidationResultDto.Success)
+                            {
+                                model.SampleDtos = sampleDtos;
+                                ModelState.Remove(key: "CurrentSampleImportStep");
+                                model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
+                                goto case SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
+                            }
+                            else
+                            {
+                                model.StepDataValidation = new StepDataValidationViewModel
+                                {
+                                    Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
+                                    {
+                                        ErrorMessage = x.ErrorMessage,
+                                        RowNumbers = x.RowNumbers
+                                    })
+                                };
+                            }
                             break;
                         case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: 
                             //TODO: do proper action
