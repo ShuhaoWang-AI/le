@@ -1,8 +1,9 @@
 ﻿@using System.Collections
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 @model Linko.LinkoExchange.Web.ViewModels.Shared.DropdownOptionViewModel
 
 @(Html.Kendo().DropDownList()
-      .Name(componentName: "authoritySampleTypesDropdown")
+      .Name(componentName: "TranslatedItem")
       .DataValueField(field: "Id")
       .DataTextField(field: "DisplayName")
       .BindTo(data:(IEnumerable) ViewData[key: "availableAuthoritySampleTypes"])
