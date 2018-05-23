@@ -1939,16 +1939,30 @@ namespace Linko.LinkoExchange.Web.Controllers
         private void PrepareDataSourceTranslationsDropdownLists(int dataSourceId)
         {
             ViewData[key: "dataSourceId"] = dataSourceId;
-            ViewData[key: "authorityMonitoringPointsDropdown"] = _selectListService.GetIndustryMonitoringPointSelectList()
-                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
-            ViewData[key: "authoritySampleTypesDropdown"] = _selectListService.GetAuthoritySampleTypeSelectList()
-                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
-            ViewData[key: "authorityCollectionMethodsDropdown"] = _selectListService.GetAuthorityCollectionMethodSelectList()
-                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
-            ViewData[key: "authorityParametersDropdown"] = _selectListService.GetAuthorityParameterSelectList()
-                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
-            ViewData[key: "authorityUnitsDropdown"] = _selectListService.GetAuthorityUnitSelectList()
-                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            var monitoryPointsDropdown = _selectListService.GetIndustryMonitoringPointSelectList()
+                                                   .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "availableAuthorityMonitoringPoints"] = monitoryPointsDropdown;
+            ViewData[key:"defaultAuthorityMonitoringPoint"] = monitoryPointsDropdown.FirstOrDefault();
+
+            var sampleTypesDropdown = _selectListService.GetAuthoritySampleTypeSelectList()
+                                                        .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "availableAuthoritySampleTypes"] = sampleTypesDropdown;
+            ViewData[key: "defaultAuthoritySampleType"] = sampleTypesDropdown.FirstOrDefault();
+
+            var collectionMethodsDropdown = _selectListService.GetAuthorityCollectionMethodSelectList()
+                                                              .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "availableAuthorityCollectionMethods"] = collectionMethodsDropdown;
+            ViewData[key: "defaultAuthorityCollectionMethod"] = collectionMethodsDropdown.FirstOrDefault();
+
+            var parameterDropdownOptionViewModels = _selectListService.GetAuthorityParameterSelectList()
+                                                             .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "availableAuthorityParameters"] = parameterDropdownOptionViewModels;
+            ViewData[key: "defaultAuthorityParameter"] = parameterDropdownOptionViewModels.FirstOrDefault();
+
+            var unitDropdownOptionViewModels = _selectListService.GetAuthorityUnitSelectList()
+                                                             .Select(x => _mapHelper.ToDropdownOptionViewModel(x));
+            ViewData[key: "availableAuthorityUnits"] = unitDropdownOptionViewModels;
+            ViewData[key: "defaultAuthorityUnit"] = unitDropdownOptionViewModels.FirstOrDefault();
         }
 
         public ActionResult DataSourceDetailsTranslations_Read([CustomDataSourceRequest] DataSourceRequest request,
@@ -1972,7 +1986,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case DataSourceTranslationType.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
                 case DataSourceTranslationType.Parameter: return _selectListService.GetAuthorityParameterSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
                 case DataSourceTranslationType.Unit: return _selectListService.GetAuthorityUnitSelectList().ToDictionary(x => x.Id, x => x.DisplayValue);
-                default: throw new NotImplementedException(message: "DataSourceType is unsupported");
+                default: throw new NotImplementedException(message: $"DataSourceTranslationType {translationType} is unsupported");
             }
         }
 
@@ -1996,9 +2010,103 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs: HttpVerbs.Post)]
-        public ActionResult DataSourceDetailsTranslations_Update([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
+        public ActionResult DataSourceDetailsTranslations_Update([CustomDataSourceRequest] DataSourceRequest request, DataSourceTranslationViewModel viewModel)
         {
-            throw new NotImplementedException();
+            ValidateDataSourceTranslationViewModel(viewModel:viewModel);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var translationType = viewModel.TranslationType;
+                    var dataSourceTranslationDto = new DataSourceTranslationDto
+                    {
+                        Id = viewModel.Id,
+                        DataSourceId = viewModel.DataSourceId,
+                        DataSourceTerm = viewModel.DataSourceTerm,
+                        TranslationItem = new DataSourceTranslationItemDto
+                        {
+                            TranslationId = viewModel.TranslatedItem.Id.Value
+                        }
+                    };
+                    _dataSourceService.SaveDataSourceTranslation(dataSourceTranslationDto, translationType);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+
+            return Json(data: new[] { viewModel }.ToDataSourceResult(request: request, modelState: ModelState));
+        }
+
+        private void ValidateDataSourceTranslationViewModel(DataSourceTranslationViewModel viewModel)
+        {
+            if (viewModel.TranslatedItem?.Id == null || viewModel.TranslatedItem.Id == 0)
+            {
+                ModelState.AddModelError(key: "TranslatedItem", errorMessage: @"System Unit is required when the unit is available to industry.");
+            }
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DataSourceDetailsTranslations_Destroy([CustomDataSourceRequest] DataSourceRequest request, DataSourceTranslationViewModel viewModel)
+        {
+            try
+            {
+                if (viewModel != null && viewModel.Id.HasValue)
+                {
+                    var translationType = viewModel.TranslationType;
+                    var dataSourceTranslationDto = new DataSourceTranslationDto
+                    {
+                        Id = viewModel.Id,
+                        DataSourceId = viewModel.DataSourceId,
+                        DataSourceTerm = viewModel.DataSourceTerm,
+                        TranslationItem = new DataSourceTranslationItemDto
+                        {
+                            TranslationId = viewModel.TranslatedItem.Id.Value
+                        }
+                    };
+                    _dataSourceService.DeleteDataSourceTranslation(dataSourceTranslationDto, translationType);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+
+            return Json(data: new[] { viewModel }.ToDataSourceResult(request: request, modelState: ModelState));
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DataSourceDetailsTranslations_Create([CustomDataSourceRequest] DataSourceRequest request,
+                                                                 DataSourceTranslationViewModel viewModel)
+        {
+            ValidateDataSourceTranslationViewModel(viewModel: viewModel);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var translationType = viewModel.TranslationType;
+                    var dataSourceTranslationDto = new DataSourceTranslationDto
+                    {
+                        DataSourceId = viewModel.DataSourceId,
+                        DataSourceTerm = viewModel.DataSourceTerm,
+                        TranslationItem = new DataSourceTranslationItemDto
+                        {
+                            TranslationType = translationType,
+                            TranslationId = viewModel.TranslatedItem.Id.Value,
+                            TranslationName = viewModel.TranslatedItem.DisplayName
+
+                        }
+                    };
+                    _dataSourceService.SaveDataSourceTranslation(dataSourceTranslationDto, translationType);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+
+            return Json(data: new[] { viewModel }.ToDataSourceResult(request: request, modelState: ModelState));
         }
         #endregion
 

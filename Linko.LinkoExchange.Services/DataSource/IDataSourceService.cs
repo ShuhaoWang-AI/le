@@ -19,5 +19,9 @@ namespace Linko.LinkoExchange.Services.DataSource
         List<DataSourceTranslationDto> GetDataSourceTranslations(int dataSourceId, DataSourceTranslationType translationType);
 
         Dictionary<string, DataSourceTranslationItemDto> GetDataSourceTranslationDict(int dataSourceId, DataSourceTranslationType translationType);
+
+        int SaveDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType);
+
+        void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType);
     }
 }

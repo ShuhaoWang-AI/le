@@ -213,7 +213,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.CollectionMethod: return GetDataSourceCollectionMethodTranslations(dataSource: dataSource);
                 case DataSourceTranslationType.Parameter: return GetDataSourceParameterTranslations(dataSource: dataSource);
                 case DataSourceTranslationType.Unit: return GetDataSourceUnitTranslations(dataSource: dataSource);
-                default: throw CreateRuleViolationExceptionForValidationError(errorMessage:"DataSourceType is unsupported");
+                default: throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
             }
         }
         private List<DataSourceTranslationDto> GetDataSourceMonitoringPointTranslations(Core.Domain.DataSource dataSource) {
@@ -249,6 +249,97 @@ namespace Linko.LinkoExchange.Services.DataSource
                              .OrderBy(d => d.DataSourceTerm).ToList()
                              .Select(x => _mapHelper.ToDataSourceUnitDto(x))
                              .ToList();
+        }
+        public int SaveDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
+        {
+            using (_dbContext.CreateAutoCommitScope())
+            {
+                switch (translationType)
+                {
+                    case DataSourceTranslationType.MonitoringPoint:
+                        var existingDataSourceMonitoringPoint = _dbContext.DataSourceMonitoringPoints.FirstOrDefault(x => x.DataSourceMonitoringPointId == dataSourceTranslation.Id);
+                        var dataSourceMonitoringPointToPersist = _mapHelper.ToDataSourceMonitoringPoint(dataSourceTranslation, existingDataSourceMonitoringPoint);
+                        if (existingDataSourceMonitoringPoint == null)
+                        {
+                            _dbContext.DataSourceMonitoringPoints.Add(dataSourceMonitoringPointToPersist);
+                        }
+                        _dbContext.SaveChanges();
+                        return dataSourceMonitoringPointToPersist.DataSourceMonitoringPointId;
+                    case DataSourceTranslationType.SampleType:
+                        var existingDataSourceCtsEventType = _dbContext.DataSourceCtsEventTypes.FirstOrDefault(x => x.DataSourceCtsEventTypeId == dataSourceTranslation.Id);
+                        var dataSourceCtsEventTypeToPersist = _mapHelper.ToDataSourceSampleType(dataSourceTranslation, existingDataSourceCtsEventType);
+                        if (existingDataSourceCtsEventType == null)
+                        {
+                            _dbContext.DataSourceCtsEventTypes.Add(dataSourceCtsEventTypeToPersist);
+                        }
+                        _dbContext.SaveChanges();
+                        return dataSourceCtsEventTypeToPersist.DataSourceCtsEventTypeId;
+                    case DataSourceTranslationType.CollectionMethod:
+                        var existingDataSourceCollectionMethod = _dbContext.DataSourceCollectionMethods.FirstOrDefault(x => x.DataSourceCollectionMethodId == dataSourceTranslation.Id);
+                        var dataSourceCollectionMethodToPersist = _mapHelper.ToDataSourceCollectionMethod(dataSourceTranslation, existingDataSourceCollectionMethod);
+                        if (existingDataSourceCollectionMethod == null)
+                        {
+                            _dbContext.DataSourceCollectionMethods.Add(dataSourceCollectionMethodToPersist);
+                        }
+                        _dbContext.SaveChanges();
+                        return dataSourceCollectionMethodToPersist.DataSourceCollectionMethodId;
+                    case DataSourceTranslationType.Parameter:
+                        var existingDataSourceParameter = _dbContext.DataSourceParameters.FirstOrDefault(x => x.DataSourceParameterId == dataSourceTranslation.Id);
+                        var dataSourceParameterToPersist = _mapHelper.ToDataSourceParameter(dataSourceTranslation, existingDataSourceParameter);
+                        if (existingDataSourceParameter == null)
+                        {
+                            _dbContext.DataSourceParameters.Add(dataSourceParameterToPersist);
+                        }
+                        _dbContext.SaveChanges();
+                        return dataSourceParameterToPersist.DataSourceParameterId;
+                    case DataSourceTranslationType.Unit:
+                        var existingDataSourceUnit = _dbContext.DataSourceUnits.FirstOrDefault(x => x.DataSourceUnitId == dataSourceTranslation.Id);
+                        var dataSourceUnitToPersist = _mapHelper.ToDataSourceUnit(dataSourceTranslation, existingDataSourceUnit);
+                        if (existingDataSourceUnit == null)
+                        {
+                            _dbContext.DataSourceUnits.Add(dataSourceUnitToPersist);
+                        }
+                        _dbContext.SaveChanges();
+                        return dataSourceUnitToPersist.DataSourceUnitId;
+                    default:
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
+                }
+            }
+        }
+
+
+        public void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
+        {
+            using (_dbContext.CreateAutoCommitScope())
+            {
+                switch (translationType)
+                {
+                    case DataSourceTranslationType.MonitoringPoint:
+                        var dataSourceMonitoringPointToDelete = _dbContext.DataSourceMonitoringPoints.Single(x => x.DataSourceMonitoringPointId == dataSourceTranslation.Id);
+                        _dbContext.DataSourceMonitoringPoints.Remove(entity:dataSourceMonitoringPointToDelete);
+                        break;
+                    case DataSourceTranslationType.SampleType:
+                        var dataSourceCtsEventTypeToDelete = _dbContext.DataSourceCtsEventTypes.Single(x => x.DataSourceCtsEventTypeId == dataSourceTranslation.Id);
+                        _dbContext.DataSourceCtsEventTypes.Remove(entity: dataSourceCtsEventTypeToDelete);
+                        break;
+                    case DataSourceTranslationType.CollectionMethod:
+                        var dataSourceCollectionMethodToDelete = _dbContext.DataSourceCollectionMethods.Single(x => x.DataSourceCollectionMethodId == dataSourceTranslation.Id);
+                        _dbContext.DataSourceCollectionMethods.Remove(entity: dataSourceCollectionMethodToDelete);
+                        break;
+                    case DataSourceTranslationType.Parameter:
+                        var dataSourceParameterToDelete = _dbContext.DataSourceParameters.Single(x => x.DataSourceParameterId == dataSourceTranslation.Id);
+                        _dbContext.DataSourceParameters.Remove(entity: dataSourceParameterToDelete);
+                        break;
+                    case DataSourceTranslationType.Unit:
+                        var dataSourceUnitToDelete = _dbContext.DataSourceUnits.Single(x => x.DataSourceUnitId == dataSourceTranslation.Id);
+                        _dbContext.DataSourceUnits.Remove(entity: dataSourceUnitToDelete);
+                        break;
+                    default:
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
+                }
+            }
+
+            _dbContext.SaveChanges();
         }
         #endregion
 

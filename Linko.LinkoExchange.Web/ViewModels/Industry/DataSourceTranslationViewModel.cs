@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
-    public abstract class DataSourceTranslationViewModel
+    public class DataSourceTranslationViewModel
     {
         #region public properties
 
@@ -19,7 +21,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public DataSourceTranslationType TranslationType { get; set; }
 
-        public abstract DropdownOptionViewModel TranslatedItem { get; set; }
+        public virtual DropdownOptionViewModel TranslatedItem { get; set; }
 
         #endregion
 
@@ -32,11 +34,24 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
                 case DataSourceTranslationType.CollectionMethod: return new DataSourceCollectionMethodTranslationViewModel();
                 case DataSourceTranslationType.Parameter: return new DataSourceParameterTranslationViewModel();
                 case DataSourceTranslationType.Unit: return new DataSourceUnitTranslationViewModel();
-                default: throw new NotImplementedException(message: "DataSourceType is unsupported");
+                default: throw new NotImplementedException(message: $"DataSourceTranslationType {translationType} is unsupported");
             }
         }
     }
 
+    public abstract class DataSourceTranslationValidator<T> : AbstractValidator<T> where T : DataSourceTranslationViewModel
+    {
+        #region constructors and destructor
+
+        protected DataSourceTranslationValidator()
+        {
+            RuleFor(x => x.DataSourceTerm).NotEmpty().WithMessage(errorMessage: "Should not be empty");
+        }
+
+        #endregion
+    }
+
+    [Validator(validatorType: typeof(DataSourceMonitoringPointValidator))]
     public class DataSourceMonitoringPointTranslationViewModel : DataSourceTranslationViewModel
     {
         #region public properties
@@ -48,6 +63,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #endregion
     }
 
+    public class DataSourceMonitoringPointValidator : DataSourceTranslationValidator<DataSourceMonitoringPointTranslationViewModel>
+    {
+        #region constructors and destructor
+
+        public DataSourceMonitoringPointValidator() : base()
+        {
+            RuleFor(x => x.TranslatedItem).NotNull().WithMessage(errorMessage: "The Monitoring Point is required.");
+            RuleFor(x => x.TranslatedItem.Id).NotNull().WithMessage(errorMessage: "The Monitoring Point is required.");
+        }
+
+        #endregion
+    }
+
+    [Validator(validatorType: typeof(DataSourceSampleTypeValidator))]
     public class DataSourceSampleTypeTranslationViewModel : DataSourceTranslationViewModel
     {
         #region public properties
@@ -59,6 +88,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #endregion
     }
 
+    public class DataSourceSampleTypeValidator : DataSourceTranslationValidator<DataSourceSampleTypeTranslationViewModel>
+    {
+        #region constructors and destructor
+
+        public DataSourceSampleTypeValidator() : base()
+        {
+            RuleFor(x => x.TranslatedItem).NotNull().WithMessage(errorMessage: "The Sample Type is required.");
+            RuleFor(x => x.TranslatedItem.Id).NotNull().WithMessage(errorMessage: "The Sample Type is required.");
+        }
+
+        #endregion
+    }
+
+    [Validator(validatorType: typeof(DataSourceCollectionMethodValidator))]
     public class DataSourceCollectionMethodTranslationViewModel : DataSourceTranslationViewModel
     {
         #region public properties
@@ -70,6 +113,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #endregion
     }
 
+    public class DataSourceCollectionMethodValidator : DataSourceTranslationValidator<DataSourceCollectionMethodTranslationViewModel>
+    {
+        #region constructors and destructor
+
+        public DataSourceCollectionMethodValidator() : base()
+        {
+            RuleFor(x => x.TranslatedItem).NotNull().WithMessage(errorMessage: "The Collection Method is required.");
+            RuleFor(x => x.TranslatedItem.Id).NotNull().WithMessage(errorMessage: "The Collection Method is required.");
+        }
+
+        #endregion
+    }
+
+    [Validator(validatorType: typeof(DataSourceParameterValidator))]
     public class DataSourceParameterTranslationViewModel : DataSourceTranslationViewModel
     {
         #region public properties
@@ -81,6 +138,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #endregion
     }
 
+    public class DataSourceParameterValidator : DataSourceTranslationValidator<DataSourceParameterTranslationViewModel>
+    {
+        #region constructors and destructor
+
+        public DataSourceParameterValidator() : base()
+        {
+            RuleFor(x => x.TranslatedItem).NotNull().WithMessage(errorMessage: "The Parameter is required.");
+            RuleFor(x => x.TranslatedItem.Id).NotNull().WithMessage(errorMessage: "The Parameter is required.");
+        }
+
+        #endregion
+    }
+
+    [Validator(validatorType: typeof(DataSourceUnitValidator))]
     public class DataSourceUnitTranslationViewModel : DataSourceTranslationViewModel
     { 
         #region public properties
@@ -88,6 +159,19 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [UIHint(uiHint: "AuthorityUnitEditor")]
         [Display(Name = "Choose which Unit this is")]
         public override DropdownOptionViewModel TranslatedItem { get; set; }
+
+        #endregion
+    }
+
+    public class DataSourceUnitValidator : DataSourceTranslationValidator<DataSourceUnitTranslationViewModel>
+    {
+        #region constructors and destructor
+
+        public DataSourceUnitValidator() : base()
+        {
+            RuleFor(x => x.TranslatedItem).NotNull().WithMessage(errorMessage: "The Unit is required.");
+            RuleFor(x => x.TranslatedItem.Id).NotNull().WithMessage(errorMessage: "The Unit is required.");
+        }
 
         #endregion
     }

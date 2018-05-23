@@ -70,15 +70,15 @@ namespace Linko.LinkoExchange.Services.Mapping
         DataSourceDto GetDataSourceDtoFroDataSource(Core.Domain.DataSource dataSource);
         Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource);
         DataSourceTranslationDto ToDataSourceMonitoringPointDto(DataSourceMonitoringPoint from);
-        DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceTranslationDto from);
+        DataSourceMonitoringPoint ToDataSourceMonitoringPoint(DataSourceTranslationDto from, DataSourceMonitoringPoint existingDomainObject);
         DataSourceTranslationDto ToDataSourceSampleTypeDto(DataSourceCtsEventType from);
-        DataSourceCtsEventType ToDataSourceSampleType(DataSourceTranslationDto from);
+        DataSourceCtsEventType ToDataSourceSampleType(DataSourceTranslationDto from, DataSourceCtsEventType existingDomainObject);
         DataSourceTranslationDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod from);
-        DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceTranslationDto from);
+        DataSourceCollectionMethod ToDataSourceCollectionMethod(DataSourceTranslationDto from, DataSourceCollectionMethod existingDomainObject);
         DataSourceTranslationDto ToDataSourceParameterDto(DataSourceParameter from);
-        DataSourceParameter ToDataSourceParameter(DataSourceTranslationDto from);
+        DataSourceParameter ToDataSourceParameter(DataSourceTranslationDto from, DataSourceParameter existingDomainObject);
         DataSourceTranslationDto ToDataSourceUnitDto(DataSourceUnit from);
-        DataSourceUnit ToDataSourceUnit(DataSourceTranslationDto from);
+        DataSourceUnit ToDataSourceUnit(DataSourceTranslationDto from, DataSourceUnit existingDomainObject);
 
         ImportTempFileDto ToDto(ImportTempFile fromDomainObject);
         ImportTempFile ToDomainObject(ImportTempFileDto fromDto, ImportTempFile existingDomainObject = null);

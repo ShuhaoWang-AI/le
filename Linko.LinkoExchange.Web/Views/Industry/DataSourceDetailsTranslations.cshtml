@@ -1,5 +1,6 @@
 ﻿@using Linko.LinkoExchange.Core.Domain
 @using Linko.LinkoExchange.Web.ViewModels.Industry
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 @{
     ViewBag.Title = "Data Source Details Translations";
 }
@@ -48,40 +49,38 @@
                                      .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); });
+                              columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled: true)
-                                                    .Refresh(enabled: true)
-                                                    .Input(enabled: true)
-                                                    .Numeric(enabled: false)
-                          )
+                          .ToolBar(t => t.Create())
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Monitoring Point Translation?"))
+                          .Pageable(pager => pager.Enabled(value:false))
+                          .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .Scrollable(s => s.Height(value: "auto"))
                           .NoRecords(text: "No Monitoring Point Translation exists.")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = ViewData[key: "dataSourceId"],
                                                             translationType = DataSourceTranslationType.MonitoringPoint
                                                         }))
                                                         .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 10)
+                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
                                                             model.Field(p => p.Id).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
-                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                            model.Field(p => p.TranslatedItem);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(ViewData[key: "dataSourceId"]);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.MonitoringPoint);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityMonitoringPoint"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -114,40 +113,38 @@
                                      .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); });
+                              columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled: true)
-                                                    .Refresh(enabled: true)
-                                                    .Input(enabled: true)
-                                                    .Numeric(enabled: false)
-                          )
+                          .ToolBar(t => t.Create())
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Collection Method Translation?"))
+                          .Pageable(pager => pager.Enabled(value: false))
+                          .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .Scrollable(s => s.Height(value: "auto"))
                           .NoRecords(text: "No Collection Method Translation exists.")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = ViewData[key: "dataSourceId"],
                                                             translationType = DataSourceTranslationType.CollectionMethod
                                                         }))
                                                         .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 10)
+                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
                                                             model.Field(p => p.Id).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
-                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                            model.Field(p => p.TranslatedItem);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(ViewData[key: "dataSourceId"]);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.CollectionMethod);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityCollectionMethod"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -180,40 +177,38 @@
                                      .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); });
+                              columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled: true)
-                                                    .Refresh(enabled: true)
-                                                    .Input(enabled: true)
-                                                    .Numeric(enabled: false)
-                          )
+                          .ToolBar(t => t.Create())
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Sample Type Translation?"))
+                          .Pageable(pager => pager.Enabled(value: false))
+                          .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .Scrollable(s => s.Height(value: "auto"))
                           .NoRecords(text: "No Sample Type Translation exists.")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = ViewData[key: "dataSourceId"],
                                                             translationType = DataSourceTranslationType.SampleType
                                                         }))
                                                         .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 10)
+                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
                                                             model.Field(p => p.Id).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
-                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                            model.Field(p => p.TranslatedItem);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(ViewData[key: "dataSourceId"]);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.SampleType);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthoritySampleType"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -246,40 +241,38 @@
                                      .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); });
+                              columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled: true)
-                                                    .Refresh(enabled: true)
-                                                    .Input(enabled: true)
-                                                    .Numeric(enabled: false)
-                          )
+                          .ToolBar(t => t.Create())
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Parameter Translation?"))
+                          .Pageable(pager => pager.Enabled(value: false))
+                          .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .Scrollable(s => s.Height(value: "auto"))
                           .NoRecords(text: "No Parameter Translation exists.")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = ViewData[key: "dataSourceId"],
                                                             translationType = DataSourceTranslationType.Parameter
                                                         }))
                                                         .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 10)
+                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
                                                             model.Field(p => p.Id).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceTerm).Editable(enabled: false);
-                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                            model.Field(p => p.TranslatedItem);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(ViewData[key: "dataSourceId"]);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.Parameter);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityParameter"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -304,48 +297,46 @@
                     @(Html.Kendo().Grid<DataSourceUnitTranslationViewModel>()
                           .Name(componentName:"gridDataSourceUnitTranslation")
                           .Columns(columns =>
-                                   {
-                                       columns.Bound(c => c.DataSourceTerm)
-                                              .HtmlAttributes(attributes:new {@class = "col-sm-3"})
-                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"});
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes:new {@class = "col-sm-3"})
+                                     .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"});
                               columns.Bound(c => c.TranslatedItem)
                                      .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); });
+                              columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled:true)
-                                                    .Refresh(enabled:true)
-                                                    .Input(enabled:true)
-                                                    .Numeric(enabled:false)
-                          )
+                          .ToolBar(t => t.Create())
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Unit Translation?"))
+                          .Pageable(pager => pager.Enabled(value: false))
+                          .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value:true))
-                          .Scrollable(s => s.Height(value:"auto"))
                           .NoRecords(text: "No Unit Translation exists.")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled:false)
                                                         .Batch(enabled:false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName:"DataSourceDetailsTranslations_Create", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName:"DataSourceDetailsTranslations_Read", controllerName:"Industry", routeValues:new
                                                         {
                                                             dataSourceId = ViewData[key: "dataSourceId"],
                                                             translationType = DataSourceTranslationType.Unit
                                                         }))
                                                         .Update(update => update.Action(actionName:"DataSourceDetailsTranslations_Update", controllerName:"Industry"))
-                                                        .PageSize(pageSize:10)
+                                                        .Destroy(destroy => destroy.Action(actionName:"DataSourceDetailsTranslations_Destroy", controllerName:"Industry"))
+                                                        .PageSize(pageSize:100)
                                                         .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
                                                             model.Field(p => p.Id).Editable(enabled:false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                            model.Field(p => p.DataSourceTerm).Editable(enabled:false);
-                                                            model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                            model.Field(p => p.TranslatedItem);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(ViewData[key: "dataSourceId"]);
+                                                            model.Field(p => p.TranslationType).Editable(enabled:false).DefaultValue(DataSourceTranslationType.Unit);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityUnit"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>

@@ -249,4 +249,9 @@ input[type="search"]::-webkit-search-cancel-button
     font-weight: 400;
 }
 
+.btn
+{
+    min-width: 76px;
+}
+
 /* End: Custom notification template*/

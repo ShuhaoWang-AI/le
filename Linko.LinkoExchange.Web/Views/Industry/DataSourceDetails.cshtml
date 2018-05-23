@@ -116,13 +116,13 @@
                 <div class="pull-right">
                     @if (Model.Id.HasValue)
                     {
-                        <input class="btn btn-primary btn-sm" type="submit" value="Save"
+                        <input class="btn btn-primary btn-sm width-80" type="submit" value="Save"
                                formaction="@Url.Action(actionName:"DataSourceDetails", controllerName:"Industry")" formmethod="post" >
                         <input class="btn btn-primary btn-sm " type="button" value="Remove" data-target="#RemoveModal" data-toggle="modal" />
                     }
                     else
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" 
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm width-80" 
                                formaction="@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")" formmethod="post" />
                     }
                 </div>
