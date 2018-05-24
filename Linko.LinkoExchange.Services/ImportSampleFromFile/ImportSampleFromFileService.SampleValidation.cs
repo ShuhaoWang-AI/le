@@ -420,10 +420,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			foreach (var row in sampleImportDto.Rows)
 			{
 				var rowToGroupBy = new ImportRowObjectForGroupBySample
-				                {
-					                ColumnMap = new Dictionary<SampleImportColumnName, ImportCellObject>(),
-					                RowNumber = row.RowNumber
-				                };
+				                   {
+					                   ColumnMap = new Dictionary<SampleImportColumnName, ImportCellObject>(),
+					                   RowNumber = row.RowNumber
+				                   };
 
 				rowsToGroupBySample.Add(item:rowToGroupBy);
 
@@ -450,28 +450,29 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				}
 			}
 
-            //Group into samples 
-            //TODO: Buggy here, not grouping, can be reproduce by upload example file 'import_example-001.error.data.validation.xlsx'
-            var groupedSampleWrappers = rowsToGroupBySample.GroupBy(i => new
+			//Group into samples  
+			var groupedSampleWrappers = rowsToGroupBySample.GroupBy(i => new
 			                                                             {
-				                                                             MonitoringPont = i.ColumnMap[key:SampleImportColumnName.MonitoringPoint],
-				                                                             CollectionMethod = i.ColumnMap[key:SampleImportColumnName.CollectionMethod],
-				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType],
-				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime],
-				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime],
-				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId]
-			                                                             }, (key, group) => new ImportSampleWrapper
-			                                                                                {
-				                                                                                MonitoringPoint = key.MonitoringPont,
-				                                                                                CollectionMethod = key.CollectionMethod,
-				                                                                                SampleType = key.SampleType,
-				                                                                                SampleStartDateTime = key.SampleStartDateTime,
-				                                                                                SampleEndDateTime = key.SampleEndDateTime,
-				                                                                                LabSampleId = key.LabSampleId,
-				                                                                                SampleResults = group.ToList()
-			                                                                                }).ToList();
+				                                                             MonitoringPont = i.ColumnMap[key:SampleImportColumnName.MonitoringPoint].TranslatedValue,
+				                                                             CollectionMethod = i.ColumnMap[key:SampleImportColumnName.CollectionMethod].TranslatedValue,
+				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType].TranslatedValue,
+				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValue,
+				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValue,
+				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValue
+			                                                             })
+			                                               .Select(group =>
+				                                                       new ImportSampleWrapper
+				                                                       {
+					                                                       MonitoringPoint = group.First().ColumnMap[key:SampleImportColumnName.MonitoringPoint],
+					                                                       CollectionMethod = group.First().ColumnMap[key:SampleImportColumnName.CollectionMethod],
+					                                                       SampleType = group.First().ColumnMap[key:SampleImportColumnName.SampleType],
+					                                                       SampleStartDateTime = group.First().ColumnMap[key:SampleImportColumnName.SampleStartDateTime],
+					                                                       SampleEndDateTime = group.First().ColumnMap[key:SampleImportColumnName.SampleEndDateTime],
+					                                                       LabSampleId = group.First().ColumnMap[key:SampleImportColumnName.LabSampleId],
+					                                                       SampleResults = group.ToList()
+				                                                       }).ToList();
 
-            return groupedSampleWrappers;
+			return groupedSampleWrappers;
 		}
 
 		private void PopulateSamples(List<ImportSampleWrapper> importSampleWrappers)
