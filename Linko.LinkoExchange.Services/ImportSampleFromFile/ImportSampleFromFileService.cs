@@ -391,27 +391,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                    .ToList());
                     }
                 }
-
-                if (result.Errors.Count > 0)
-                {
-                    result.Success = false;
-                    PopulateDistinctErrors(result: result);
-                }
-
+				
                 return result;
             }
-        }
-
-        private static void PopulateDistinctErrors(ImportSampleFromFileValidationResultDto result)
-        {
-            //TODO: should distinct row numbers if the error message is the same
-            result.Errors = result.Errors.Distinct().GroupBy(x => x.ErrorMessage.Trim())
-                               .Select(gr => new ErrorWithRowNumberDto
-                                             {
-                                                 ErrorMessage = gr.First().ErrorMessage,
-                                                 RowNumbers = string.Join(separator:",", values:gr.Select(g => g.RowNumbers))
-                                             })
-                                  .ToList();
         }
 
         /// <inheritdoc />
@@ -825,7 +807,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             // check there is any validation issue or not
             if (validationIssues.Count > 0)
             {
-                result.Success = false;
                 result.Errors = validationIssues;
             }
 

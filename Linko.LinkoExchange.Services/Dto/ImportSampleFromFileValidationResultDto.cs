@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -8,7 +9,6 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public ImportSampleFromFileValidationResultDto()
         {
-            Success = true;
             Errors = new List<ErrorWithRowNumberDto>();
         }
 
@@ -16,9 +16,9 @@ namespace Linko.LinkoExchange.Services.Dto
 
         #region public properties
 
-        public bool Success { get; set; }
+	    public bool Success => !Errors.Any();
 
-        /// <summary>
+	    /// <summary>
         /// If success is equal to false then "Errors" will have value, otherwise empty string
         /// </summary>
         public List<ErrorWithRowNumberDto> Errors { get; set; }

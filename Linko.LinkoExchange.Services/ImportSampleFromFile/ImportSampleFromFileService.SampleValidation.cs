@@ -19,6 +19,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private IDictionary<int, UnitDto> _authorityUnitDict;
 		private List<MonitoringPointParameter> _monitoringPointParameters;
+		private Core.Domain.Parameter _massLoadingFlowParameter;
+		private List<Core.Domain.Parameter> _authorityParameters;
 
 		#endregion
 
@@ -39,9 +41,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 				if (validationResult.Errors.Any())
 				{
-					validationResult.Success = false;
-					PopulateDistinctErrors(result:validationResult);
-
 					return validationResult;
 				}
 
@@ -79,9 +78,24 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				var parameterId = importingSampleResult.ColumnMap[key:SampleImportColumnName.ParameterName].TranslatedValueId;
 				var unitId = importingSampleResult.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId;
 
-				if (monitoringPointId <= 0 || parameterId <= 0 || unitId <= 0)
+				if (monitoringPointId <= 0 )
 				{
-					throw new ArgumentOutOfRangeException();
+					var errorMessage = "Invalid Monitoring point translation defined by the Authority. Contact your Authority.";
+					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber);
+
+				}
+
+				if (parameterId <= 0)
+				{
+					var errorMessage = "Invalid parameter translation defined by the Authority. Contact your Authority.";
+					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber);
+
+				}
+
+				if (unitId <= 0)
+				{
+					var errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
+					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber); 
 				}
 
 				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
@@ -148,13 +162,15 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			}
 			else
 			{
-				var authOrgRegProgramId = _organizationService.GetAuthority(orgRegProgramId:orgRegProgramId).OrganizationRegulatoryProgramId;
-
-				//TODO: move to parameter service
-				var parameter = _dbContext.Parameters
-				                          .Include(p => p.DefaultUnit).FirstOrDefault(param => !param.IsRemoved //excluded deleted parameters
-				                                                                               && param.OrganizationRegulatoryProgramId == authOrgRegProgramId
-				                                                                               && param.ParameterId == parameterId);
+				if (_authorityParameters == null)
+				{
+					var authOrgRegProgramId = _organizationService.GetAuthority(orgRegProgramId: orgRegProgramId).OrganizationRegulatoryProgramId;
+					_authorityParameters = _dbContext.Parameters
+					                                 .Include(p => p.DefaultUnit)
+					                                 .Where(p => p.OrganizationRegulatoryProgramId == authOrgRegProgramId && !p.IsRemoved).ToList();
+				}
+				 
+				var parameter = _authorityParameters.FirstOrDefault(param => param.ParameterId == parameterId);
 				if (parameter != null)
 				{
 					return _mapHelper.ToDto(fromDomainObject:parameter.DefaultUnit);
@@ -168,8 +184,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private void ExtractFlowRow(ImportSampleWrapper importSampleWrapper, ImportSampleFromFileValidationResultDto validationResult)
 		{
-			var flowParameter = _parameterService.GetFlowParameter();
-            var flow = importSampleWrapper.SampleResults.SingleOrDefault(i => i.ParameterName.Equals(value: flowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase));
+			if (_massLoadingFlowParameter == null)
+			{
+				_massLoadingFlowParameter = _parameterService.GetFlowParameter();
+			} 
+			 
+            var flow = importSampleWrapper.SampleResults.FirstOrDefault(i => i.ParameterName.Equals(value: _massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase));
 			if (flow == null)
 			{
 				return;
@@ -380,7 +400,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private void ValidateDataDuplicatedParameters(ImportSampleWrapper importSampleWrapper, ImportSampleFromFileValidationResultDto validationResult)
 		{
-			var flowParameter = _parameterService.GetFlowParameter();
+			if (_massLoadingFlowParameter == null)
+			{
+				_massLoadingFlowParameter = _parameterService.GetFlowParameter();
+			}
             var parameterGroups = importSampleWrapper.SampleResults.GroupBy(i => i.ParameterName);
 
 			foreach (var parameterGroup in parameterGroups)
@@ -389,13 +412,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				if (parameterGroup.Count() > 1)
 				{
 					var errorMessage = "Duplicate parameters exist";
-                    var isFlow = parameterGroup.Key.Equals(value: flowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase);
+					var isFlow = parameterGroup.Key.Equals(value: _massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase);
 					if (isFlow)
 					{
 						errorMessage = "Duplicate flows exist";
 					}
-
-					validationResult.Success = false;
+					
 					if (validationResult.Errors.Any(i => i.ErrorMessage.Equals(value:errorMessage)))
 					{
 						var error = validationResult.Errors.Single(i => i.ErrorMessage == errorMessage);
@@ -453,12 +475,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			//Group into samples  
 			var groupedSampleWrappers = rowsToGroupBySample.GroupBy(i => new
 			                                                             {
-				                                                             MonitoringPont = i.ColumnMap[key:SampleImportColumnName.MonitoringPoint].TranslatedValue,
-				                                                             CollectionMethod = i.ColumnMap[key:SampleImportColumnName.CollectionMethod].TranslatedValue,
-				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType].TranslatedValue,
-				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValue,
-				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValue
+				                                                             MonitoringPont = i.ColumnMap[key:SampleImportColumnName.MonitoringPoint].TranslatedValueId,
+				                                                             CollectionMethod = i.ColumnMap[key:SampleImportColumnName.CollectionMethod].TranslatedValueId,
+				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType].TranslatedValueId,
+				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValueId,
+				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValueId,
+				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValueId
 			                                                             })
 			                                               .Select(group =>
 				                                                       new ImportSampleWrapper
