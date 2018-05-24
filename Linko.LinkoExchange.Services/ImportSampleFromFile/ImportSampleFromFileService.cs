@@ -386,8 +386,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 if (result.Errors.Count > 0)
                 {
                     result.Success = false;
-
-                    var errors = result.Errors.GroupBy(x => x.ErrorMessage.Trim())
+                    //TODO: should distinct row numbers if the error message is the same
+                    var errors = result.Errors.Distinct().GroupBy(x => x.ErrorMessage.Trim())
                                        .Select(gr => new ErrorWithRowNumberDto
                                                      {
                                                          ErrorMessage = gr.First().ErrorMessage,
@@ -614,13 +614,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                         }
                         else
                         {
-                            if (!fileColumnDictionary.ContainsKey(key:columnIndex))
+                            FileVersionFieldDto templateColumn;
+                            if (!fileColumnDictionary.TryGetValue(columnIndex, out templateColumn))
                             {
                                 // column is not in the Authority template. So no need to process
                                 continue;
                             }
-
-                            var templateColumn = fileColumnDictionary[key:columnIndex];
 
                             var importCellObject = new ImportCellObject
                                                    {
@@ -640,7 +639,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                   {
                                                                       ErrorMessage = $"The length of {templateColumn.FileVersionFieldName} exceeds the maximum"
                                                                                      + $" of {templateColumn.Size}",
-                                                                      RowNumbers = rowIndex.ToString()
+                                                                      RowNumbers = (rowIndex+1).ToString()
                                                                   });
                                     }
                                     
@@ -659,7 +658,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not numeric",
-                                                                      RowNumbers = rowIndex.ToString()
+                                                                      RowNumbers = (rowIndex+1).ToString()
                                                                   });
                                         importCellObject.OriginalValue = default(double?);
                                     }
@@ -679,7 +678,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not valid Date",
-                                                                      RowNumbers = rowIndex.ToString()
+                                                                      RowNumbers = (rowIndex+1).ToString()
                                                                   });
                                         importCellObject.OriginalValue = default(DateTime?);
                                     }
@@ -696,66 +695,35 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not boolean",
-                                                                      RowNumbers = rowIndex.ToString()
+                                                                      RowNumbers = ToRowNumber(rowIndex)
                                                                   });
                                         importCellObject.OriginalValue = default(bool?);
                                     }
                                     break;
-
-                                default: throw new ArgumentOutOfRangeException();
+                                default: throw new NotImplementedException();
                             }
 
                             // populate TranslatedValue where TranslatedValue is same as OriginalValue
                             switch (templateColumn.SystemFieldName)
                             {
                                 case SampleImportColumnName.SampleStartDateTime:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.SampleEndDateTime:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.ResultQualifier:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.Result:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.LabSampleId:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.MethodDetectionLimit:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.AnalysisDateTime:
-                                    importCellObject.TranslatedValue = importCellObject.OriginalValue;
-                                    break;
                                 case SampleImportColumnName.AnalysisMethod:
                                     importCellObject.TranslatedValue = importCellObject.OriginalValue;
                                     break;
                                 case SampleImportColumnName.MonitoringPoint:
-
-                                    // will be populate later 
-                                    break;
                                 case SampleImportColumnName.SampleType:
-
-                                    // will be populate later 
-                                    break;
                                 case SampleImportColumnName.CollectionMethod:
-
-                                    // will be populate later 
-                                    break;
                                 case SampleImportColumnName.ParameterName:
-
-                                    // will be populate later 
-                                    break;
                                 case SampleImportColumnName.ResultUnit:
-
                                     // will be populate later 
                                     break;
-                                default:
-
-                                    // don't throw error for the field we don't support
-                                    continue;
+                                default: throw new NotImplementedException();
                             }
 
                             switch (templateColumn.DataOptionalityName)
@@ -773,8 +741,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         {
                                             validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                       {
-                                                                          ErrorMessage = $"{templateColumn.FileVersionFieldName} is missing",
-                                                                          RowNumbers = rowIndex.ToString()
+                                                                          ErrorMessage = $"{templateColumn.FileVersionFieldName} is required",
+                                                                          RowNumbers = ToRowNumber(rowIndex)
                                                                       });
                                         }
                                     }
@@ -782,8 +750,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     break;
 
                                 case DataOptionalityName.Optional: break;
-                                case DataOptionalityName.Recommended: break;
-                                default: throw new ArgumentOutOfRangeException();
+                                case DataOptionalityName.Recommended:
+                                    //TODO: User Story 8199, could reserve cell optinality state to speed up missing default values look up
+                                    break;
+                                default: throw new NotImplementedException();
                             }
 
                             importRowObject.Cells.Add(item:importCellObject);
@@ -810,7 +780,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     validationIssues.Add(item:new ErrorWithRowNumberDto
                                                               {
                                                                   ErrorMessage = @"Result is required",
-                                                                  RowNumbers = rowIndex.ToString()
+                                                                  RowNumbers = ToRowNumber(rowIndex)
                                                               });
                                 }
                                 else if (new List<string> {"ND", "NF"}.Contains(item:resultQualifierColumnValue) && !string.IsNullOrWhiteSpace(value:resultColumnValue))
@@ -818,7 +788,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     validationIssues.Add(item:new ErrorWithRowNumberDto
                                                               {
                                                                   ErrorMessage = $"Result Qualifier {resultQualifierColumnValue} cannot be followed by a value",
-                                                                  RowNumbers = rowIndex.ToString()
+                                                                  RowNumbers = ToRowNumber(rowIndex)
                                                               });
                                 }
                             }
@@ -827,7 +797,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 validationIssues.Add(item:new ErrorWithRowNumberDto
                                                           {
                                                               ErrorMessage = $"Result Qualifier {resultQualifierColumnValue} is not valid",
-                                                              RowNumbers = rowIndex.ToString()
+                                                              RowNumbers = ToRowNumber(rowIndex)
                                                           });
                             }
                         }
@@ -846,6 +816,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
 
             return rows;
+        }
+
+        private static string ToRowNumber(int rowIndex)
+        {
+            return (rowIndex+1).ToString();
         }
 
         private static void DoColumnHeaderValidation(IEnumerable<string> requiredColumns, IEnumerable<string> fileColumns, ICollection<ErrorWithRowNumberDto> validationIssues)
