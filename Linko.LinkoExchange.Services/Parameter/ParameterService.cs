@@ -692,17 +692,27 @@ namespace Linko.LinkoExchange.Services.Parameter
 			return dischargeLimitReportData;
 		}
 
-		#endregion
+		public Core.Domain.Parameter GetFlowParameter()
+		{
+			var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+			var authOrgRegProgramId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+			var flowParameter = _dbContext.Parameters
+			                              .First(p => p.IsFlowForMassLoadingCalculation
+			                                          && p.OrganizationRegulatoryProgramId == authOrgRegProgramId);
+			return flowParameter;
+		}
 
-		/// <summary>
-		///     Overrides the given parameter's default unit with one found for the parameter at a given monitoring point
-		///     and effective date range. Also updates the default setting for IsCalcMassLoading based on "Mass Daily" limit(s)
-		///     found
-		/// </summary>
-		/// <param name="paramDto"> </param>
-		/// <param name="monitoringPointId"> </param>
-		/// <param name="sampleDateTimeLocal"> </param>
-		private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleDateTimeLocal)
+        #endregion
+
+        /// <summary>
+        ///     Overrides the given parameter's default unit with one found for the parameter at a given monitoring point
+        ///     and effective date range. Also updates the default setting for IsCalcMassLoading based on "Mass Daily" limit(s)
+        ///     found
+        /// </summary>
+        /// <param name="paramDto"> </param>
+        /// <param name="monitoringPointId"> </param>
+        /// <param name="sampleDateTimeLocal"> </param>
+        private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTime sampleDateTimeLocal)
 		{
 			var parameterId = paramDto.ParameterId;
 

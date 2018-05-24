@@ -29,5 +29,10 @@ namespace Linko.LinkoExchange.Core.Validation
         public List<RuleViolation> ValidationIssues { get; }
 
         #endregion
+
+        public string GetFirstErrorMessage()
+        {
+            return ValidationIssues[0].ErrorMessage;
+        }
     }
 }

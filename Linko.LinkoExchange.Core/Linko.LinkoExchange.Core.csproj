@@ -189,7 +189,6 @@
     <Compile Include="Enum\DataOptionalityName.cs" />
     <Compile Include="Enum\SampleImportColumnName.cs" />
     <Compile Include="Enum\SystemSettingType.cs" />
-    <Compile Include="Enum\UnitName.cs" />
     <Compile Include="Enum\UserRole.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />

@@ -360,7 +360,7 @@ namespace Linko.LinkoExchange.Services.Unit
         public double? ConvertResultToTargetUnit(double? result, UnitDto currentAuthorityUnit, UnitDto targetAuthorityUnit)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
+                                    descripition:$"current unit:{currentAuthorityUnit?.UnitId.ToString() ?? "null"}, target unit:{targetAuthorityUnit?.UnitId.ToString() ?? "null"}"))
             {
                 var currentSystemUnit = currentAuthorityUnit?.SystemUnit;
                 var targetSystemUnit = targetAuthorityUnit?.SystemUnit;

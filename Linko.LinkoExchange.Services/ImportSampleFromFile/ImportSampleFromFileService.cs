@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
@@ -45,6 +46,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         private readonly IOrganizationService _organizationService;
         private readonly IReportElementService _reportElementService;
         private readonly IReportTemplateService _reportTemplateService;
+        private readonly IParameterService _parameterService;
         private readonly ISampleService _sampleService;
         private readonly ISettingService _settingService;
         private readonly ITimeZoneService _timeZoneService;
@@ -67,6 +69,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             ISettingService settingService,
             IUnitService unitService,
             IReportElementService reportElementService,
+            IParameterService parameterService,
             IReportTemplateService reportTemplateService,
             IDataSourceService dataSourceService)
         {
@@ -124,6 +127,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             {
                 throw new ArgumentNullException(paramName:nameof(unitService));
             }
+
+            if (parameterService == null)
+            {
+                throw new ArgumentNullException(paramName: nameof(parameterService));
+            }
             if (reportTemplateService == null)
             {
                 throw new ArgumentNullException(paramName:nameof(reportElementService));
@@ -147,6 +155,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _unitService = unitService;
+            _parameterService = parameterService;
             _reportElementService = reportElementService;
             _reportTemplateService = reportTemplateService;
             _settingService = settingService;
@@ -386,18 +395,23 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 if (result.Errors.Count > 0)
                 {
                     result.Success = false;
-                    //TODO: should distinct row numbers if the error message is the same
-                    var errors = result.Errors.Distinct().GroupBy(x => x.ErrorMessage.Trim())
-                                       .Select(gr => new ErrorWithRowNumberDto
-                                                     {
-                                                         ErrorMessage = gr.First().ErrorMessage,
-                                                         RowNumbers = string.Join(separator:",", values:gr.Select(g => g.RowNumbers))
-                                                     });
-                    result.Errors = errors.ToList();
+                    PopulateDistinctErrors(result: result);
                 }
 
                 return result;
             }
+        }
+
+        private static void PopulateDistinctErrors(ImportSampleFromFileValidationResultDto result)
+        {
+            //TODO: should distinct row numbers if the error message is the same
+            result.Errors = result.Errors.Distinct().GroupBy(x => x.ErrorMessage.Trim())
+                               .Select(gr => new ErrorWithRowNumberDto
+                                             {
+                                                 ErrorMessage = gr.First().ErrorMessage,
+                                                 RowNumbers = string.Join(separator:",", values:gr.Select(g => g.RowNumbers))
+                                             })
+                                  .ToList();
         }
 
         /// <inheritdoc />
@@ -581,7 +595,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 {
                     var importRowObject = new ImportRowObject
                                           {
-                                              RowNumber = rowIndex,
+                                              RowNumber = rowIndex + 1,
                                               Cells = new List<ImportCellObject>()
                                           };
 
@@ -639,7 +653,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                   {
                                                                       ErrorMessage = $"The length of {templateColumn.FileVersionFieldName} exceeds the maximum"
                                                                                      + $" of {templateColumn.Size}",
-                                                                      RowNumbers = (rowIndex+1).ToString()
+                                                                      RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
                                     }
                                     
@@ -658,7 +672,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not numeric",
-                                                                      RowNumbers = (rowIndex+1).ToString()
+                                                                      RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
                                         importCellObject.OriginalValue = default(double?);
                                     }
@@ -678,7 +692,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not valid Date",
-                                                                      RowNumbers = (rowIndex+1).ToString()
+                                                                      RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
                                         importCellObject.OriginalValue = default(DateTime?);
                                     }
@@ -695,7 +709,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
                                                                       ErrorMessage = $"{templateColumn.FileVersionFieldName} is not boolean",
-                                                                      RowNumbers = ToRowNumber(rowIndex)
+                                                                      RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
                                         importCellObject.OriginalValue = default(bool?);
                                     }
@@ -742,7 +756,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                             validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                       {
                                                                           ErrorMessage = $"{templateColumn.FileVersionFieldName} is required",
-                                                                          RowNumbers = ToRowNumber(rowIndex)
+                                                                          RowNumbers = importRowObject.RowNumber.ToString()
                                                                       });
                                         }
                                     }
@@ -780,7 +794,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     validationIssues.Add(item:new ErrorWithRowNumberDto
                                                               {
                                                                   ErrorMessage = @"Result is required",
-                                                                  RowNumbers = ToRowNumber(rowIndex)
+                                                                  RowNumbers = importRowObject.RowNumber.ToString()
                                                               });
                                 }
                                 else if (new List<string> {"ND", "NF"}.Contains(item:resultQualifierColumnValue) && !string.IsNullOrWhiteSpace(value:resultColumnValue))
@@ -788,7 +802,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     validationIssues.Add(item:new ErrorWithRowNumberDto
                                                               {
                                                                   ErrorMessage = $"Result Qualifier {resultQualifierColumnValue} cannot be followed by a value",
-                                                                  RowNumbers = ToRowNumber(rowIndex)
+                                                                  RowNumbers = importRowObject.RowNumber.ToString()
                                                               });
                                 }
                             }
@@ -797,7 +811,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 validationIssues.Add(item:new ErrorWithRowNumberDto
                                                           {
                                                               ErrorMessage = $"Result Qualifier {resultQualifierColumnValue} is not valid",
-                                                              RowNumbers = ToRowNumber(rowIndex)
+                                                              RowNumbers = importRowObject.RowNumber.ToString()
                                                           });
                             }
                         }
@@ -816,11 +830,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
 
             return rows;
-        }
-
-        private static string ToRowNumber(int rowIndex)
-        {
-            return (rowIndex+1).ToString();
         }
 
         private static void DoColumnHeaderValidation(IEnumerable<string> requiredColumns, IEnumerable<string> fileColumns, ICollection<ErrorWithRowNumberDto> validationIssues)

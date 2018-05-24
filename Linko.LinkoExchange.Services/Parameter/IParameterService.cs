@@ -80,5 +80,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 		/// <param name="industryNumber">return the industryNumber</param>
 		/// <returns>The binary discharge limit report data</returns>
 		byte[] GetIndustryDischargeLimitReport(out string industryNumber);
+
+	    Core.Domain.Parameter GetFlowParameter();
     }
 }

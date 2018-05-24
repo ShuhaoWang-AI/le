@@ -1000,7 +1000,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-            //var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(value:_settings.GetOrganizationSettingValue(orgRegProgramId:currentOrgRegProgramId, settingType:SettingType.TimeZone));
             var sampleStartDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime:sampleDto.StartDateTimeLocal, timeZoneId:timeZoneId);
@@ -1114,8 +1114,9 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
                 var flowParameter = _dbContext.Parameters
-                                              .First(p => p
-                                                         .IsFlowForMassLoadingCalculation); //Chris: "Should be one but just get first". // TODO: Need to check OrganizationRegulatoryProgramId
+                                              .First(p => p.IsFlowForMassLoadingCalculation
+                                                     && p.OrganizationRegulatoryProgramId == authOrgRegProgramId); 
+                //Chris: "Should be one but just get first".
 
                 var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
