@@ -20,6 +20,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int? SystemUnitId { get; set; }
         public SystemUnitDto SystemUnit { get; set; }
         public bool IsAvailableToRegulatee { get; set; }
+        public bool IsReviewed { get; set; }
 
         #endregion
     }

@@ -2620,7 +2620,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     Id = vm.UnitId,
                                                     Name = vm.Name,
                                                     SystemUnit = new SystemUnitViewModel {Id = vm.SystemUnitId, Name = vm.SystemUnit?.Name ?? ""},
-                                                    IsAvailableToRegulatee = vm.IsAvailableToRegulatee
+                                                    IsAvailableToRegulatee = vm.IsAvailableToRegulatee,
+                                                    IsReviewed = vm.IsReviewed
                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request);
@@ -2653,6 +2654,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
                 unitDto.IsAvailableToRegulatee = viewModel.IsAvailableToRegulatee;
+                unitDto.IsReviewed = viewModel.IsReviewed;
 
                 _unitService.UpdateAuthorityUnit(unitDto:unitDto);
             }

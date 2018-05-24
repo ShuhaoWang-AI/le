@@ -15,8 +15,8 @@
         Result = 8,
         ResultUnit = 9,
         LabSampleId = 10,
-        MethodDetectionLimit = 13,
-        AnalysisDateTime = 15,
-        AnalysisMethod = 16
+        MethodDetectionLimit = 11,
+        AnalysisDateTime = 12,
+        AnalysisMethod = 13
     }
 }

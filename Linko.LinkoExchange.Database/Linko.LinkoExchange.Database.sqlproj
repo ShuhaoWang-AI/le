@@ -82,5 +82,6 @@
     <Build Include="Schema Create Scripts\GREDS_LE_StagingTablesAndData.sql" />
     <None Include="SQL Stored Procedures\dbo.Admin_SetupNewClient.sql" />
     <Build Include="Schema Create Scripts\LinkoExchangePhase2CreateScript.sql" />
+    <None Include="SQL Stored Procedures\Admin_AddSystemUnit.sql" />
   </ItemGroup>
 </Project>

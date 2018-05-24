@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? SystemUnitId { get; set; }
         public virtual SystemUnit SystemUnit { get; set; }
         public bool IsAvailableToRegulatee { get; set; }
-
+        public bool IsReviewed { get; set; }
 
         #endregion
     }

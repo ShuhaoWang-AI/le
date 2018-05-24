@@ -25,7 +25,7 @@ BEGIN
         UnitDimensionId                 int IDENTITY(1,1) NOT NULL  
         , Name                          varchar(50) NOT NULL  
         , Description                   varchar(500) NULL 
-        , ConversionSystemUnitId        int NULL
+        --, ConversionSystemUnitId        int NULL
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  
@@ -42,10 +42,10 @@ BEGIN
     
     ALTER TABLE dbo.tUnitDimension ADD CONSTRAINT DF_tUnitDimension_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
 
-    CREATE NONCLUSTERED INDEX IX_tUnitDimension_ConversionSystemUnitId ON dbo.tUnitDimension 
-    (
-	    ConversionSystemUnitId ASC
-    ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    --CREATE NONCLUSTERED INDEX IX_tUnitDimension_ConversionSystemUnitId ON dbo.tUnitDimension 
+    --(
+	   -- ConversionSystemUnitId ASC
+    --) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
 
@@ -85,10 +85,10 @@ BEGIN
     ALTER TABLE dbo.tSystemUnit ADD CONSTRAINT DF_tSystemUnit_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
 
     -- This is done here because it requires the existence of tSystemUnit
-    ALTER TABLE dbo.tUnitDimension ADD CONSTRAINT FK_tUnitDimension_tSystemUnit FOREIGN KEY 
-	(
-		ConversionSystemUnitId
-	) REFERENCES dbo.tSystemUnit(SystemUnitId)
+ --   ALTER TABLE dbo.tUnitDimension ADD CONSTRAINT FK_tUnitDimension_tSystemUnit FOREIGN KEY 
+	--(
+	--	ConversionSystemUnitId
+	--) REFERENCES dbo.tSystemUnit(SystemUnitId)
 
     CREATE NONCLUSTERED INDEX IX_tSystemUnit_UnitDimensionId ON dbo.tSystemUnit 
     (
@@ -690,6 +690,7 @@ BEGIN
 
     ALTER TABLE dbo.tUnit ADD SystemUnitId int NULL
     ALTER TABLE dbo.tUnit ADD IsAvailableToRegulatee bit NOT NULL CONSTRAINT DF_tUnit_IsAvailableToRegulatee DEFAULT 0
+    ALTER TABLE dbo.tUnit ADD IsReviewed bit NOT NULL CONSTRAINT DF_tUnit_IsReviewed DEFAULT 0
 
     ALTER TABLE dbo.tUnit
     ADD CONSTRAINT FK_tUnit_tSystemUnit FOREIGN KEY
@@ -901,30 +902,6 @@ This field is used to identify a unique sample in LinkoExchange.'
     INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
 		VALUES 
         (
-            'ClientSampleID'
-            , 'The sample identifier used by the customer.'
-            , @DataFormatId_Text
-            , 0
-            , 25
-            , 'Comp 12/10-11'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'ResultFlag'
-            , 'Free form entry of other result qualifiers further describing the result.'
-            , @DataFormatId_Text
-            , 0
-            , 15
-            , '"J", "E", "D", "NR", "V", "X", etc.'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
             'MethodDetectionLimit'
             , 'The Method Detection Limit.'
             , @DataFormatId_Float
@@ -932,18 +909,6 @@ This field is used to identify a unique sample in LinkoExchange.'
             , 10
             , '0.0005'
             , NULL
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'ReportingLimit'
-            , 'The Reporting Limit.'
-            , @DataFormatId_Float
-            , 0
-            , 10
-            , '0.001'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
         )
 
     INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
@@ -970,106 +935,6 @@ This field is used to identify a unique sample in LinkoExchange.'
             , 15
             , 'EPA200.7'
             , NULL
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'AnalyzedBy'
-            , 'The person who performed the analysis or test.'
-            , @DataFormatId_Text
-            , 0
-            , 25
-            , 'J. Smith'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'IsQCResult'
-            , 'Whether the Result is a QC result (Blank) or not. Use 1 for True or 0 for False.  Empty or null is treated as False.'
-            , @DataFormatId_Bit
-            , 0
-            , NULL
-            , '1'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'SampleCollector'
-            , 'The person or entity who collected the sample from the monitoring point.'
-            , @DataFormatId_Text
-            , 0
-            , 25
-            , 'CGW'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'SampleComments'
-            , 'Free form comments about the Sample.'
-            , @DataFormatId_Text
-            , 0
-            , 500
-            , 'Comments about the sample.'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'ResultComments'
-            , 'Free form comments about the Result.'
-            , @DataFormatId_Text
-            , 0
-            , 500
-            , 'Comments about the results.'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'ResultStatus'
-            , 'Indicates if the data is approved by the lab and can be used in determining permit compliance.  
-Use Approved or Not Approved. Empty or null is treated as Approved.'
-            , @DataFormatId_Text
-            , 0
-            , 15
-            , 'Approved'
-            , 'These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'DataProviderName'
-            , 'The source of the data such as the labs name.'
-            , @DataFormatId_Text
-            , 0
-            , 25
-            , 'A1 Lab'
-            , 'These optional fields are included for future use.  Currently, this data will not be stored or visible in LinkoExchange.'
-        )
-
-    INSERT INTO dbo.tSystemField (Name, Description, DataFormatId, IsRequired, Size, ExampleData, AdditionalComments)
-		VALUES 
-        (
-            'ReportedDate'
-            , 'Date & Time the analysis was Reported or Approved by the Lab.
-Format should be mm/dd/yyyy hh:mm:ss AM/PM.'
-            , @DataFormatId_DateTime
-            , 0
-            , NULL
-            , '01/15/2018  9:45:00 AM'
-            , 'LinkoExchange can accept most U.S. date and datetime formats. The formats shown here are recommended.
-
-These optional fields are included for future use. Currently, this data will not be stored or visible in LinkoExchange.'
         )
 END
 

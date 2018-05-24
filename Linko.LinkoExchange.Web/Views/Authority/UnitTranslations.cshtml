@@ -30,6 +30,8 @@
                 <h5>
                     For LinkoExchange to automatically convert results to the unit identified in an industry's permit, it must be translated to a known System Unit.
                     If you want the Authority unit to be available for an industry to choose when importing data into the system, select that here too.
+
+                    Only translate units your Industry needs. Mark other units as “Reviewed” so they do not show up in the Unit Conversion badge count on the navigation pane.
                 </h5>
             </p>
             <div class="form-group">
@@ -38,15 +40,17 @@
                     @(Html.Kendo().Grid<AuthorityUnitViewModel>()
                           .Name(componentName:"gridAuthorityUnitTranslation")
                           .Columns(columns =>
-                                   {
-                                       columns.Bound(c => c.Name)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.SystemUnit).ClientTemplate(value:"#= (SystemUnit==null)? '' : SystemUnit.Name #")
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
-                                   })
+                          {
+                              columns.Bound(c => c.Name)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                              columns.Bound(c => c.SystemUnit).ClientTemplate(value:"#= (SystemUnit==null)? '' : SystemUnit.Name #")
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                              columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                              columns.Bound(c => c.IsReviewed).ClientTemplate(value: "#= IsReviewed ? 'Yes' : 'No' #")
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(filterType: FilterType.Contains)));
+                              columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
+                          })
                           .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
                           .Pageable(pageable => pageable
                                                     .PageSizes(enabled:true)
@@ -70,13 +74,14 @@
                                                         .PageSize(pageSize:25)
                                                         .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
-                                                               {
-                                                                   model.Id(p => p.Id);
-                                                                   model.Field(p => p.Id).Editable(enabled:false);
-                                                                   model.Field(p => p.Name).Editable(enabled:false);
-                                                                   model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
-                                                                   model.Field(p => p.IsAvailableToRegulatee);
-                                                               })
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled:false);
+                                                            model.Field(p => p.Name).Editable(enabled:false);
+                                                            model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
+                                                            model.Field(p => p.IsAvailableToRegulatee);
+                                                            model.Field(p => p.IsReviewed);
+                                                        })
                           )
                           )
                 </div>

@@ -38,6 +38,8 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .WillCascadeOnDelete(value:false);
             
             Property(x => x.IsAvailableToRegulatee).IsRequired();
+            
+            Property(x => x.IsReviewed).IsRequired();
 
         }
 

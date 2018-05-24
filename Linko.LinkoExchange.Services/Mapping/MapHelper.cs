@@ -490,7 +490,8 @@ namespace Linko.LinkoExchange.Services.Mapping
 				              LastModifierUserId = fromDomainObject.LastModifierUserId,
 							  SystemUnitId = fromDomainObject.SystemUnitId,
 				              SystemUnit = ToDto(fromDomainObject:fromDomainObject.SystemUnit),
-							  IsAvailableToRegulatee = fromDomainObject.IsAvailableToRegulatee
+							  IsAvailableToRegulatee = fromDomainObject.IsAvailableToRegulatee,
+				              IsReviewed = fromDomainObject.IsReviewed
 			              };
 
 			return unitDto;
@@ -519,6 +520,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 			existingDomainObject.IsRemoved = fromDto.IsRemoved;
 			existingDomainObject.SystemUnitId = fromDto.SystemUnitId;
 			existingDomainObject.IsAvailableToRegulatee = fromDto.IsAvailableToRegulatee;
+			existingDomainObject.IsReviewed = fromDto.IsReviewed;
 
 			return existingDomainObject;
 		}
