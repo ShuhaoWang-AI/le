@@ -235,7 +235,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var sampleDtos = new List<SampleDto>();
 
 			var min = importingSamples.Min(i => i.Sample.StartDateTimeLocal);
-			var max = importingSamples.Min(i => i.Sample.EndDateTimeLocal);
+			var max = importingSamples.Min(i => i.Sample.EndDateTimeLocal); 
 
 			// Get existing draft samples for that user;
 			var draftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
@@ -478,8 +478,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				                                                             MonitoringPont = i.ColumnMap[key:SampleImportColumnName.MonitoringPoint].TranslatedValueId,
 				                                                             CollectionMethod = i.ColumnMap[key:SampleImportColumnName.CollectionMethod].TranslatedValueId,
 				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType].TranslatedValueId,
-				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValueId,
-				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValueId,
+				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValue,
+				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValue,
 				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValueId
 			                                                             })
 			                                               .Select(group =>
@@ -493,7 +493,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					                                                       LabSampleId = group.First().ColumnMap[key:SampleImportColumnName.LabSampleId],
 					                                                       SampleResults = group.ToList()
 				                                                       }).ToList();
-
 			return groupedSampleWrappers;
 		}
 

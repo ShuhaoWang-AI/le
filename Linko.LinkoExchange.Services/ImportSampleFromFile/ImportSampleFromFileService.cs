@@ -831,7 +831,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         private static DateTime? ToDateTime(ICellValue cellValue)
         {
             var rawValueAsNumber = string.IsNullOrWhiteSpace(value:cellValue.RawValue) ? default(double?) : Convert.ToDouble(value:cellValue.RawValue);
-            var resultAsDateTime = rawValueAsNumber.HasValue ? FormatHelper.ConvertDoubleToDateTime(doubleValue:rawValueAsNumber.Value)?.Date : default(DateTime?);
+            var resultAsDateTime = rawValueAsNumber.HasValue ? FormatHelper.ConvertDoubleToDateTime(doubleValue:rawValueAsNumber.Value) : default(DateTime?);
             return resultAsDateTime;
         }
 
