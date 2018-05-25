@@ -68,6 +68,9 @@
                                                                                                                                  @class = "text-danger"
                                                                                                                              })
                     </div>
+                    <div class="col-md-2">
+                        <input class="btn btn-primary btn-sm" type="button" value="Create New Data Source" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'" />
+                    </div>
                 </div>
 
                 <script>
@@ -108,7 +111,6 @@
         {
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input class="btn btn-primary btn-sm" type="button" value="Create New Data Source" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'" />
                     <input class="btn btn-primary btn-sm" type="submit" value="Next" />
                 </div>
             </div>

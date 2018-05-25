@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "Is Available to Industry")]
         public bool IsAvailableToRegulatee { get; set; }
 
-        [Display(Name = "Reviewed")]
+        [Display(Name = "Show in Badge Count")]
         public bool IsReviewed { get; set; }
 
         #endregion
