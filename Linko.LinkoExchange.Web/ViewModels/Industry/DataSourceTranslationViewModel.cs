@@ -58,7 +58,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [UIHint(uiHint: "AuthorityMonitoringPointEditor")]
         [Display(Name = "Choose which Monitoring Point this is")]
-        public override DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel MonitoringPoint { get; set; }
+
+        public override DropdownOptionViewModel TranslatedItem
+        {
+            get { return this.MonitoringPoint; }
+            set { MonitoringPoint = value; }
+        }
 
         #endregion
     }
@@ -83,7 +89,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [UIHint(uiHint: "AuthoritySampleTypeEditor")]
         [Display(Name = "Choose which Sample Type this is")]
-        public override DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel SampleType { get; set; }
+
+        public override DropdownOptionViewModel TranslatedItem
+        {
+            get { return this.SampleType; }
+            set { SampleType = value; }
+        }
 
         #endregion
     }
@@ -108,8 +120,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [UIHint(uiHint: "AuthorityCollectionMethodEditor")]
         [Display(Name = "Choose which Collection Method this is")]
-        public override DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel CollectionMethod { get; set; }
 
+        public override DropdownOptionViewModel TranslatedItem
+        {
+            get { return this.CollectionMethod; }
+            set { CollectionMethod = value; }
+        }
         #endregion
     }
 
@@ -133,8 +150,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [UIHint(uiHint: "AuthorityParameterEditor")]
         [Display(Name = "Choose which Parameter this is")]
-        public override DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel Parameter { get; set; }
 
+        public override DropdownOptionViewModel TranslatedItem
+        {
+            get { return this.Parameter; }
+            set { Parameter = value; }
+        }
         #endregion
     }
 
@@ -158,8 +180,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [UIHint(uiHint: "AuthorityUnitEditor")]
         [Display(Name = "Choose which Unit this is")]
-        public override DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel Unit { get; set; }
 
+        public override DropdownOptionViewModel TranslatedItem
+        {
+            get { return this.Unit; }
+            set { Unit = value; }
+        }
         #endregion
     }
 

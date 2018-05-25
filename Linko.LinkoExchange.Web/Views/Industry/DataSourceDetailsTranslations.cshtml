@@ -52,8 +52,8 @@
                               columns.Bound(c => c.DataSourceTerm)
                                      .HtmlAttributes(attributes: new { @class = "col-sm-3" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
-                              columns.Bound(c => c.TranslatedItem)
-                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                              columns.Bound(c => c.MonitoringPoint)
+                                     .ClientTemplate(value: "#= (MonitoringPoint==null)? '' : MonitoringPoint.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
@@ -87,7 +87,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.MonitoringPoint);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityMonitoringPoint"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.MonitoringPoint).DefaultValue(ViewData[key: "defaultAuthorityMonitoringPoint"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -116,8 +116,8 @@
                               columns.Bound(c => c.DataSourceTerm)
                                      .HtmlAttributes(attributes: new { @class = "col-sm-3" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
-                              columns.Bound(c => c.TranslatedItem)
-                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                              columns.Bound(c => c.CollectionMethod)
+                                     .ClientTemplate(value: "#= (CollectionMethod==null)? '' : CollectionMethod.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
@@ -151,7 +151,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.CollectionMethod);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityCollectionMethod"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.CollectionMethod).DefaultValue(ViewData[key: "defaultAuthorityCollectionMethod"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -180,8 +180,8 @@
                               columns.Bound(c => c.DataSourceTerm)
                                      .HtmlAttributes(attributes: new { @class = "col-sm-3" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
-                              columns.Bound(c => c.TranslatedItem)
-                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                              columns.Bound(c => c.SampleType)
+                                     .ClientTemplate(value: "#= (SampleType==null)? '' : SampleType.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
@@ -215,7 +215,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.SampleType);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthoritySampleType"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.SampleType).DefaultValue(ViewData[key: "defaultAuthoritySampleType"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -244,8 +244,8 @@
                               columns.Bound(c => c.DataSourceTerm)
                                      .HtmlAttributes(attributes: new { @class = "col-sm-3" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
-                              columns.Bound(c => c.TranslatedItem)
-                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                              columns.Bound(c => c.Parameter)
+                                     .ClientTemplate(value: "#= (Parameter==null)? '' : Parameter.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
@@ -279,7 +279,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.Parameter);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityParameter"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.Parameter).DefaultValue(ViewData[key: "defaultAuthorityParameter"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -308,8 +308,8 @@
                               columns.Bound(c => c.DataSourceTerm)
                                      .HtmlAttributes(attributes:new {@class = "col-sm-3"})
                                      .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"});
-                              columns.Bound(c => c.TranslatedItem)
-                                     .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                              columns.Bound(c => c.Unit)
+                                     .ClientTemplate(value: "#= (Unit==null)? '' : Unit.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
@@ -343,7 +343,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled:false).DefaultValue(DataSourceTranslationType.Unit);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultAuthorityUnit"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.Unit).DefaultValue(ViewData[key: "defaultAuthorityUnit"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
