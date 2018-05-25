@@ -1,9 +1,27 @@
 ﻿@using System.Collections
 @model Linko.LinkoExchange.Web.ViewModels.Authority.SystemUnitViewModel
 
+
 @(Html.Kendo().DropDownList() //.DropDownListFor(m => m)
       .Name(componentName:"SystemUnit")
       .DataValueField(field:"Id")
       .DataTextField(field:"Name")
+      .Filter(filter:FilterType.Contains)
+      .Template(template:"<b> #:data.Name# </b> <p> #:data.Description# </p>")
+      .DataSource(source => source.Custom().Group(g => g.Add(memberName:"UnitDimensionName", memberType:typeof(string))).ServerFiltering(enabled:false))
       .BindTo(data:(IEnumerable) ViewData[key:"availableSystemUnits"])
+      .Events(e => e.Filtering(@<text>
+                                   function (ev) {
+                                   var filterValue = ev.filter.value;
+                                   ev.preventDefault();
+                                   this.dataSource.filter(
+                                   {
+                                   logic: 'or',
+                                   filters: [
+                                   { field: 'Name', operator: 'contains', value: filterValue },
+                                   { field: 'Description', operator: 'contains', value: filterValue }
+                                   ]
+                                   });
+                                   }
+                                </text>))
       )

@@ -351,8 +351,19 @@
 
                                 @if (Model.SampleDtos != null)
                                 {
-                                    <span>@Model.SampleDtos.Count(x => !x.SampleId.HasValue) new draft sample(s) created. <br /></span>
-                                    <span>@Model.SampleDtos.Count(x => x.SampleId.HasValue) exixting draft sample(s) updated. <br /></span>
+                                    var newSampleAddCount = Model.SampleDtos.Count(x => !x.SampleId.HasValue);
+
+                                    if (newSampleAddCount > 0)
+                                    {
+                                        <span>@newSampleAddCount new draft sample(s) created. <br /></span>
+                                    }
+
+                                    var existingSampleUpdateCount = Model.SampleDtos.Count(x => x.SampleId.HasValue);
+
+                                    if (existingSampleUpdateCount > 0)
+                                    {
+                                        <span>@existingSampleUpdateCount existing draft sample(s) updated. <br /></span>
+                                    }
                                 }
                             </div>
                         </div>

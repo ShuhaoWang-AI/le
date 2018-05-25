@@ -2669,10 +2669,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                 {
                                                                     Id = vm.SystemUnitId,
                                                                     Name = vm.Name,
+                                                                    Description = vm.Description,
                                                                     UnitDimensionId = vm.UnitDimensionId,
                                                                     UnitDimensionName = vm.UnitDimension.Name
                                                                 }).OrderBy(x => x.UnitDimensionName).ThenBy(x => x.Name).ToList();
-            availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel {Name = @"Select System Unit", Id = null, UnitDimensionId = null, UnitDimensionName = ""});
+            availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel {Name = @"Select System Unit", Description = "", Id = null, UnitDimensionId = null, UnitDimensionName = ""});
             ViewData[key:"availableSystemUnits"] = availableSystemUnits;
             ViewData[key:"defaultSystemUnit"] = availableSystemUnits.First();
         }

@@ -14,6 +14,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Display(Name = "System Unit")]
         public string Name { get; set; }
+        
+        public string Description { get; set; }
 
         public int? UnitDimensionId { get; set; }
 
