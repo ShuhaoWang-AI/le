@@ -58,7 +58,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .ToolBar(t => t.Create())
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
                           .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Monitoring Point Translation?"))
                           .Pageable(pager => pager.Enabled(value:false))
                           .Scrollable(s => s.Enabled(value: false))
@@ -122,7 +122,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .ToolBar(t => t.Create())
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
                           .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Collection Method Translation?"))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
@@ -186,7 +186,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .ToolBar(t => t.Create())
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
                           .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Sample Type Translation?"))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
@@ -250,7 +250,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .ToolBar(t => t.Create())
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
                           .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Parameter Translation?"))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
@@ -314,7 +314,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command => { command.Edit(); command.Destroy(); });
                           })
-                          .ToolBar(t => t.Create())
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
                           .Editable(editable => editable.Mode(mode:GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Unit Translation?"))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))

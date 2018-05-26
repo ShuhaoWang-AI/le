@@ -84,7 +84,8 @@ namespace Linko.LinkoExchange.Services.SelectList
                 var industryOrganizationRegulatoryProgramId = GetIndustryOrganizationRegulatoryProgramId();
 
                 var monitoringPoints = _dbContext.MonitoringPoints
-                                                 .Where(x => x.OrganizationRegulatoryProgramId == industryOrganizationRegulatoryProgramId)
+                                                 .Where(x => x.OrganizationRegulatoryProgramId == industryOrganizationRegulatoryProgramId
+                                                             && x.IsRemoved == false)
                                                  .Select(x => new {x.MonitoringPointId, x.Name})
                                                  .ToList();
 
@@ -105,7 +106,8 @@ namespace Linko.LinkoExchange.Services.SelectList
 
                 var sampleTypes = _dbContext.CtsEventTypes
                                             .Where(x => x.OrganizationRegulatoryProgramId == authorityOrganizationRegulatoryProgramId
-                                                        && x.CtsEventCategoryName == "SAMPLE")
+                                                        && x.CtsEventCategoryName == "SAMPLE"
+                                                        && x.IsRemoved == false)
                                             .Select(x => new {x.CtsEventTypeId, x.Name})
                                             .ToList();
 
@@ -125,7 +127,8 @@ namespace Linko.LinkoExchange.Services.SelectList
                 var authrotyOrganizationId = GetAuthorityOrganizationId();
 
                 var collectionMethods = _dbContext.CollectionMethods
-                                                  .Where(x => x.OrganizationId == authrotyOrganizationId)
+                                                  .Where(x => x.OrganizationId == authrotyOrganizationId 
+                                                              && x.IsRemoved == false)
                                                   .Select(x => new {x.CollectionMethodId, x.Name})
                                                   .ToList();
 
@@ -145,7 +148,8 @@ namespace Linko.LinkoExchange.Services.SelectList
                 var authorityOrganizationRegulatoryProgramId = GetAuthorityOrganizationRegulatoryProgramId();
 
                 var parameters = _dbContext.Parameters
-                                           .Where(x => x.OrganizationRegulatoryProgramId == authorityOrganizationRegulatoryProgramId)
+                                           .Where(x => x.OrganizationRegulatoryProgramId == authorityOrganizationRegulatoryProgramId 
+                                                       && x.IsRemoved == false)
                                            .Select(x => new {x.ParameterId, x.Name})
                                            .ToList();
 
@@ -165,15 +169,18 @@ namespace Linko.LinkoExchange.Services.SelectList
                 var authorityOrganizationId = GetAuthorityOrganizationId();
 
                 var units = _dbContext.Units
-                                      .Where(x => x.OrganizationId == authorityOrganizationId)
-                                      .Select(x => new {x.UnitId, x.Name})
+                                      .Where(x => x.OrganizationId == authorityOrganizationId 
+                                                  && x.IsRemoved == false 
+                                                  && x.IsAvailableToRegulatee)
+                                      .Select(x => new {x.UnitId, x.Name, x.Description})
                                       .ToList();
 
                 return units.Select(x => new ListItemDto
                 {
-                                             Id = x.UnitId,
-                                             DisplayValue = x.Name
-                                         });
+                    Id = x.UnitId,
+                    DisplayValue = x.Name,
+                    Description = x.Description
+                });
             }
         }
 

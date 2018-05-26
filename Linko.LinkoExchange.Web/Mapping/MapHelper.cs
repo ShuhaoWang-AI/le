@@ -1,4 +1,5 @@
-﻿using Linko.LinkoExchange.Services.Dto;
+﻿using System;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
@@ -136,7 +137,8 @@ namespace Linko.LinkoExchange.Web.Mapping
             return new DropdownOptionViewModel
             {
                 Id = fromDto.Id,
-                DisplayName = fromDto.DisplayValue
+                DisplayName = fromDto.DisplayValue,
+                Description = fromDto.Description?? string.Empty
             };
         }
     }
