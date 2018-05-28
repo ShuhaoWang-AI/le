@@ -1,17 +1,22 @@
 using System;
-using System.Reflection;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Data
 {
 	public class CustomTransactionScope : IDisposable
 	{
-		private CustomTransactionWrapper RequestScopedTransaction { get; }
+		#region fields
+
+		private readonly CustomTransactionWrapper _requestScopedTransaction;
+
+		#endregion
+
 		#region constructors and destructor
 
 		public CustomTransactionScope(CustomTransactionWrapper requestScopedTransaction, string from)
 		{
-			RequestScopedTransaction = requestScopedTransaction;
-			requestScopedTransaction.CallStacks.Push(from);
+			_requestScopedTransaction = requestScopedTransaction;
+			requestScopedTransaction.CallStacks.Push(item:from);
 		}
 
 		#endregion
@@ -20,25 +25,25 @@ namespace Linko.LinkoExchange.Data
 
 		public void Dispose()
 		{
-			RequestScopedTransaction.CallStacks.Pop();
-			if (RequestScopedTransaction.CallStacks.Count == 0)
+			if (_requestScopedTransaction.CallStacks == null || !_requestScopedTransaction.CallStacks.Any())
+			{
+				return;
+			}
+
+			_requestScopedTransaction.CallStacks.Pop();
+			if (_requestScopedTransaction.CallStacks.Count == 0)
 			{
 				try
 				{
-					RequestScopedTransaction.Transaction.Commit();
+					_requestScopedTransaction.Transaction.Commit();
 				}
 				catch
 				{
-					RequestScopedTransaction.Transaction.Rollback();
+					_requestScopedTransaction.Transaction.Rollback();
 					throw;
 				}
 			}
 		}
-
-		#endregion
-
-		#region public properties
-
 
 		#endregion
 	}
