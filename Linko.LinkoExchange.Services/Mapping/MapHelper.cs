@@ -1004,11 +1004,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
 		public Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null)
 		{
-			var isNewSample = false;
 			if (existingSample == null)
 			{
-				existingSample = new Core.Domain.Sample();
-				isNewSample = true;
+				existingSample = new Core.Domain.Sample(); 
 			}
 
 			//existingSample.Name = sampleDto.Name; //set after exit this method
@@ -1026,14 +1024,11 @@ namespace Linko.LinkoExchange.Services.Mapping
 			existingSample.IsSystemGenerated = false; //not currently used
 			existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
 
-			if (isNewSample) //SNAPSHOT TAKEN WHEN SAMPLE FIRST CREATED -- no need to keep overwriting
-			{
-				//existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues; //set after we exit this method
-				existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
-				existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
-				existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
-				existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
-			}
+			//existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues; //set after we exit this method
+			existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
+			existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
+			existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
+			existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
 
 			//existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
