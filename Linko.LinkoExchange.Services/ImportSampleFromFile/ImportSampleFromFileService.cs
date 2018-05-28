@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -463,15 +464,21 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-                using (_dbContext.CreateAutoCommitScope())  
+	            var  stackFrame = new StackTrace().GetFrame(1);
+	            var methodBase = stackFrame.GetMethod(); 
+
+                using (_dbContext.BeginTranactionScope(methodBase))  
                 {
                     var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-                    //TODO: Add and update samples
-					SaveSamples(sampleImportDto.SampleDtos, false); 
+                    // Add or update samples
+					foreach (var sampleDto in sampleImportDto.SampleDtos)
+					{
+						_sampleService.SaveSample(sampleDto);
+					}
 
-                    // Create new attachment
-                    var tempFile = sampleImportDto.TempFile;
+					// Create new attachment
+					var tempFile = sampleImportDto.TempFile;
                     var reportElementTypeIdForIndustryFileUpload =
                         _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentRegulatoryProgramId, settingType:SettingType.ReportElementTypeIdForIndustryFileUpload);
 
@@ -910,14 +917,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             //Also handles scenarios where ImportTempFileId does not exist
             return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
-        }
-
-	    private void SaveSamples(List<SampleDto> samplesDtos, bool useIsolatedTransaction)
-	    {
-		    foreach (var sampleDto in samplesDtos)
-		    {
-			    var ret = _sampleService.SaveSample(sampleDto, useIsolatedTransaction); 
-		    }
-	    }
+        } 
     }
 }

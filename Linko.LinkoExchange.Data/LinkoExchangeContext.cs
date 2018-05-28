@@ -182,7 +182,7 @@ namespace Linko.LinkoExchange.Data
 			return BeginTranactionScope("Obsoleted");
 		}
 
-		public virtual CustomTransactionScope BeginTranactionScope(MethodInfo from)
+		public virtual CustomTransactionScope BeginTranactionScope(MethodBase from)
 		{
 			return BeginTranactionScope(from.DeclaringType?.Name + "." + from.Name);
 		}

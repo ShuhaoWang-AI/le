@@ -42,9 +42,8 @@ namespace Linko.LinkoExchange.Services.Sample
 	    ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
 	    /// </summary>
 	    /// <param name="sample"> Sample Dto </param>
-	    /// <param name="useIsolatedTransaction">Flag to indicate whether or not using isolated transaction inside the function </param>
 	    /// <returns> Existing Sample Id or newly created Sample Id </returns>
-	    int SaveSample(SampleDto sample, bool useIsolatedTransaction = true);
+	    int SaveSample(SampleDto sample);
 
         /// <summary>
         ///     Deletes a sample from the database
