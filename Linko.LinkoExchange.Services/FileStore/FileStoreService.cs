@@ -275,7 +275,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     _dbContext.FileStoreDatas.Add(entity:fileStoreData);
                     _dbContext.SaveChanges();
-                    _dbContext.Commit(transaction:transaction);
+                    _dbContext.Commit();
                     _logger.Info(message:"End: FileStoreService.CreateFileStore.");
 
                     return fileStore.FileStoreId;
@@ -315,60 +315,50 @@ namespace Linko.LinkoExchange.Services.FileStore
             return fileStoreDto;
         }
 
-        public void UpdateFileStore(FileStoreDto fileStoreDto)
-        {
-            _logger.Info(message:"Start: FileStoreService.UpdateFileStore.");
+	    public void UpdateFileStore(FileStoreDto fileStoreDto)
+	    {
+		    _logger.Info(message:"Start: FileStoreService.UpdateFileStore.");
 
-            if (fileStoreDto == null || fileStoreDto.FileStoreId.HasValue == false)
-            {
-                _logger.Info(message:"End: FileStoreService.UpdateFileStore. null fileStoreDto or fileStoreDto.FileStoreId");
-                return;
-            }
+		    if (fileStoreDto == null || fileStoreDto.FileStoreId.HasValue == false)
+		    {
+			    _logger.Info(message:"End: FileStoreService.UpdateFileStore. null fileStoreDto or fileStoreDto.FileStoreId");
+			    return;
+		    }
 
-            if (!CanUserExecuteApi(id:fileStoreDto.FileStoreId.Value))
-            {
-                throw new UnauthorizedAccessException();
-            }
+		    if (!CanUserExecuteApi(id:fileStoreDto.FileStoreId.Value))
+		    {
+			    throw new UnauthorizedAccessException();
+		    }
 
-            //Check if the file is already set to be 'reported' or not 
-            var fileStoreToUpdate = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
+		    //Check if the file is already set to be 'reported' or not 
+		    var fileStoreToUpdate = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
 
-            // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a report  
-            if (IsFileInReports(fileStoreId:fileStoreDto.FileStoreId.Value))
-            {
-                var message = "The attachment is used in a Report Package, and cannot be changed.";
-                var validationIssues = new List<RuleViolation>
-                                       {
-                                           new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
-                                       };
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
+		    // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a report  
+		    if (IsFileInReports(fileStoreId:fileStoreDto.FileStoreId.Value))
+		    {
+			    var message = "The attachment is used in a Report Package, and cannot be changed.";
+			    var validationIssues = new List<RuleViolation>
+			                           {
+				                           new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message)
+			                           };
+			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+		    }
 
-            using (var transaction = _dbContext.BeginTransaction())
-            {
-                try
-                {
-                    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-                    fileStoreToUpdate.LastModifierUserId = currentUserId;
-                    fileStoreToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
+		    using (_dbContext.CreateAutoCommitScope())
+		    {
+			    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+			    fileStoreToUpdate.LastModifierUserId = currentUserId;
+			    fileStoreToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
-                    fileStoreToUpdate.Description = fileStoreDto.Description;
-                    fileStoreToUpdate.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
-                    fileStoreToUpdate.ReportElementTypeId = fileStoreDto.ReportElementTypeId;
+			    fileStoreToUpdate.Description = fileStoreDto.Description;
+			    fileStoreToUpdate.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
+			    fileStoreToUpdate.ReportElementTypeId = fileStoreDto.ReportElementTypeId;
+			    _dbContext.SaveChanges();
+			    _logger.Info(message:"End: FileStoreService.UpdateFileStore.");
+		    }
+	    }
 
-                    _dbContext.SaveChanges();
-                    _dbContext.Commit(transaction:transaction);
-                    _logger.Info(message:"End: FileStoreService.UpdateFileStore.");
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
-
-        public void DeleteFileStore(int fileStoreId)
+	    public void DeleteFileStore(int fileStoreId)
         {
             _logger.Info(message:$"Start: FileStoreService.DeleteFileStore. fileStoreId = {fileStoreId}");
 
@@ -386,24 +376,16 @@ namespace Linko.LinkoExchange.Services.FileStore
                 throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }
 
-            using (var transaction = _dbContext.BeginTransaction())
-            {
-                try
-                {
-                    var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
-                    var fileStoreData = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
-                    _dbContext.FileStoreDatas.Remove(entity:fileStoreData);
-                    _dbContext.FileStores.Remove(entity:testFileStore);
-                    _dbContext.SaveChanges();
-                    _dbContext.Commit(transaction:transaction);
-                    _logger.Info(message:"End: FileStoreService.DeleteFileStore.");
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+	        using (_dbContext.CreateAutoCommitScope())
+	        {
+
+		        var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
+		        var fileStoreData = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
+		        _dbContext.FileStoreDatas.Remove(entity:fileStoreData);
+		        _dbContext.FileStores.Remove(entity:testFileStore);
+		        _dbContext.SaveChanges();
+		        _logger.Info(message:"End: FileStoreService.DeleteFileStore."); 
+	        }
         }
 
         public bool IsFileInReports(int fileStoreId)

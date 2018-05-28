@@ -105,48 +105,64 @@ namespace Linko.LinkoExchange.Services.Sample
             return retVal;
         }
 
-        /// <summary>
-        ///     Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
-        ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
-        /// </summary>
-        /// <param name="sampleDto"> Sample Dto </param>
-        /// <returns> Existing Sample Id or newly created Sample Id </returns>
-        public int SaveSample(SampleDto sampleDto)
-        {
-            var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
-            _logger.Info(message:$"Start: SampleService.SaveSample. SampleId={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
+	    /// <summary>
+	    ///     Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
+	    ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
+	    /// </summary>
+	    /// <param name="sampleDto"> Sample Dto </param>
+	    /// <param name="useIsolatedTransaction">Flag to indicate whether or not using isolated scope inside the function. </param>
+	    /// <returns> Existing Sample Id or newly created Sample Id </returns>
+	    public int SaveSample(SampleDto sampleDto, bool useIsolatedTransaction = true)
+	    {
+		    var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
+		    _logger.Info(message:$"Start: SampleService.SaveSample. SampleId={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
 
-            var sampleId = -1;
-            using (var transaction = _dbContext.BeginTransaction())
-            {
-                try
-                {
-                    //Cannot save if included in a report
-                    //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
-                    //      Actor cannot perform any actions of any kind except view all details.)
-                    if (sampleDto.SampleId.HasValue && IsSampleIncludedInReportPackage(sampleId:sampleDto.SampleId.Value))
-                    {
-                        ThrowSimpleException(message:"Sample is in use in a Report Package and is therefore READ-ONLY.");
-                    }
+		    var sampleId = -1;
+		    var transaction = useIsolatedTransaction ? _dbContext.BeginTransaction() : _dbContext.Transaction;
 
-                    if (IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false))
-                    {
-                        sampleId = SimplePersist(sampleDto:sampleDto);
-                        transaction.Commit();
-                    }
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+		    try
+		    {
+			    //Cannot save if included in a report
+			    //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
+			    //      Actor cannot perform any actions of any kind except view all details.)
+			    if (sampleDto.SampleId.HasValue && IsSampleIncludedInReportPackage(sampleId:sampleDto.SampleId.Value))
+			    {
+				    ThrowSimpleException(message:"Sample is in use in a Report Package and is therefore READ-ONLY.");
+			    }
 
-            _logger.Info(message:"End: SampleService.SaveSample.");
-            return sampleId;
-        }
+			    if (IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false))
+			    {
+				    sampleId = SimplePersist(sampleDto:sampleDto);
 
-        /// <summary>
+				    if (useIsolatedTransaction)
+				    {
+					    transaction.Commit();
+				    }
+			    }
+		    }
+		    catch
+		    {
+			    if (useIsolatedTransaction)
+			    {
+				    transaction.Rollback();
+			    }
+
+			    throw;
+		    }
+		    finally
+		    {
+			    if (useIsolatedTransaction)
+			    {
+				    transaction.Dispose();
+			    }
+		    }
+
+
+		    _logger.Info(message:"End: SampleService.SaveSample.");
+		    return sampleId;
+	    }
+
+	    /// <summary>
         ///     Tests validation of a passed in Sample in either Draft Mode (sampleDto.IsReadyToReport = false)
         ///     or ReadyToReport Mode (sampleDto.IsReadyToReport = true)
         /// </summary>

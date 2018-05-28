@@ -12,6 +12,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public FileVersionDto FileVersion { get; set; }
         public List<ImportRowObject> Rows { get; set; } 
  
+		public List<SampleDto> SampleDtos { get; set; }
         #endregion
     }
 	

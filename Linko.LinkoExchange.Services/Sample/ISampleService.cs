@@ -37,13 +37,14 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns> Collection of filtered Sample Dto's </returns>
         IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null, bool isIncludeChildObjects = false);
 
-        /// <summary>
-        ///     Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
-        ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
-        /// </summary>
-        /// <param name="sample"> Sample Dto </param>
-        /// <returns> Existing Sample Id or newly created Sample Id </returns>
-        int SaveSample(SampleDto sample);
+	    /// <summary>
+	    ///     Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
+	    ///     for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
+	    /// </summary>
+	    /// <param name="sample"> Sample Dto </param>
+	    /// <param name="useIsolatedTransaction">Flag to indicate whether or not using isolated transaction inside the function </param>
+	    /// <returns> Existing Sample Id or newly created Sample Id </returns>
+	    int SaveSample(SampleDto sample, bool useIsolatedTransaction = true);
 
         /// <summary>
         ///     Deletes a sample from the database

@@ -463,11 +463,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-                //using (_dbContext.CreateAutoCommitScope()) //TODO: add proper transaction
+                using (_dbContext.CreateAutoCommitScope())  
                 {
                     var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
                     //TODO: Add and update samples
+					SaveSamples(sampleImportDto.SampleDtos, false); 
 
                     // Create new attachment
                     var tempFile = sampleImportDto.TempFile;
@@ -910,5 +911,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             //Also handles scenarios where ImportTempFileId does not exist
             return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
         }
+
+	    private void SaveSamples(List<SampleDto> samplesDtos, bool useIsolatedTransaction)
+	    {
+		    foreach (var sampleDto in samplesDtos)
+		    {
+			    var ret = _sampleService.SaveSample(sampleDto, useIsolatedTransaction); 
+		    }
+	    }
     }
 }

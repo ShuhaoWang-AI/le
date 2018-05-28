@@ -77,6 +77,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomTransactionScope.cs" />
+    <Compile Include="CustomTransactionWrapper.cs" />
     <Compile Include="Mapping\DataOptionalityMap.cs" />
     <Compile Include="Mapping\DataSourceCollectionMethodMap.cs" />
     <Compile Include="Mapping\DataSourceCtsEventTypeMap.cs" />
