@@ -413,20 +413,29 @@ namespace Linko.LinkoExchange.Services.Settings
         public string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType)
         {
             var authority = GetAuthority(organizationId:organizationId, regProgramId:regProgramId);
-            return _dbContext.OrganizationSettings
-                             .Single(s => s.OrganizationId == authority.OrganizationId
-                                          && s.SettingTemplate.Name == settingType.ToString()).Value;
+            return _dbContext.OrganizationSettings.Single(s => s.OrganizationId == authority.OrganizationId
+                                                               && s.SettingTemplate.Name == settingType.ToString()).Value;
         }
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
+            var cacheKey = $"OrgRegProgramId-{orgRegProgramId}-{settingType}";
+            if (_cache.GetValue(key:cacheKey) != null)
+            {
+                return (string) _cache.GetValue(key:cacheKey);
+            }
+
             var authority = GetAuthority(orgRegProgramId:orgRegProgramId);
             var orgTypeId = authority.Organization.OrganizationType.OrganizationTypeId;
 
-            return _dbContext.OrganizationRegulatoryProgramSettings
+            var settingValue = _dbContext.OrganizationRegulatoryProgramSettings
                              .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
                                           && s.SettingTemplate.Name == settingType.ToString()
                                           && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
+
+            _cache.SetValue(key:cacheKey, value:settingValue);
+
+            return settingValue;
         }
 
         public string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType)
