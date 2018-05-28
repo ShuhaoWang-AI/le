@@ -235,7 +235,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var sampleDtos = new List<SampleDto>();
 
 			var min = importingSamples.Min(i => i.Sample.StartDateTimeLocal);
-			var max = importingSamples.Min(i => i.Sample.EndDateTimeLocal); 
+			var max = importingSamples.Max(i => i.Sample.EndDateTimeLocal); 
 
 			// Get existing draft samples for that user;
 			var draftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
@@ -251,17 +251,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					//Update all the drafts
 					foreach (var draftSample in drftSamplesToUpdate)
 					{
-						// update sample results that are in draft
-						var draftSampleResultsToUpdate = draftSample.SampleResults.Where(i => importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
-						foreach (var sampleResultToUpdate in draftSampleResultsToUpdate)
-						{
-							var importingSampleResult = importingSample.Sample.SampleResults.Single(i => i.ParameterId == sampleResultToUpdate.ParameterId);
-							UpdateDraftSampleResult(sampleResultToUpdate:sampleResultToUpdate, importingSampleResult:importingSampleResult);
-						}
+						// remove sample results that exists in draft and importing samples
+						var newSampleResults = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value: i.ParameterId)).ToList();
 
-						// add the rest of sample results in importing sample result to this draft
-						var draftSampleResultsToAdd = draftSample.SampleResults.Except(second:draftSampleResultsToUpdate);
-						draftSample.SampleResults.ToList().AddRange(collection:draftSampleResultsToAdd);
+						// update sample results that are in draft
+						newSampleResults.AddRange(collection: importingSample.Sample.SampleResults);
+						draftSample.SampleResults = newSampleResults; 
 
 						// re-calculate all mass loadings 
 						if (importingSample.FlowRow != null || draftSample.FlowValue.HasValue)
@@ -575,28 +570,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					importSampleResultRow.ParameterName = sampleResultDto.ParameterName;
 				}
 			}
-		}
-
-		private void UpdateDraftSampleResult(SampleResultDto sampleResultToUpdate, SampleResultDto importingSampleResult)
-		{
-			sampleResultToUpdate.Qualifier = importingSampleResult.Qualifier;
-			sampleResultToUpdate.EnteredValue = importingSampleResult.EnteredValue;
-			sampleResultToUpdate.Value = importingSampleResult.Value;
-			sampleResultToUpdate.UnitId = importingSampleResult.UnitId;
-			sampleResultToUpdate.UnitName = importingSampleResult.UnitName;
-			sampleResultToUpdate.EnteredMethodDetectionLimit = importingSampleResult.EnteredMethodDetectionLimit;
-			sampleResultToUpdate.MethodDetectionLimit = importingSampleResult.MethodDetectionLimit;
-			sampleResultToUpdate.AnalysisMethod = importingSampleResult.AnalysisMethod;
-			sampleResultToUpdate.AnalysisDateTimeLocal = importingSampleResult.AnalysisDateTimeLocal;
-			sampleResultToUpdate.IsApprovedEPAMethod = importingSampleResult.IsApprovedEPAMethod;
-			sampleResultToUpdate.IsCalcMassLoading = importingSampleResult.IsCalcMassLoading;
-			sampleResultToUpdate.LastModificationDateTimeLocal = importingSampleResult.LastModificationDateTimeLocal;
-
-			// Update mass loading properties
-			sampleResultToUpdate.MassLoadingValue = importingSampleResult.MassLoadingValue;
-			sampleResultToUpdate.MassLoadingQualifier = importingSampleResult.MassLoadingQualifier;
-			sampleResultToUpdate.MassLoadingUnitId = importingSampleResult.MassLoadingUnitId;
-			sampleResultToUpdate.MassLoadingUnitName = importingSampleResult.MassLoadingUnitName;
 		}
 
 		private static void AddValidationError(ImportSampleFromFileValidationResultDto validationResult, string errorMessage, int rowNumber)
