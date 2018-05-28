@@ -407,16 +407,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				if (parameterGroup.Count() > 1)
 				{
 					var errorMessage = "Duplicate parameters exist";
-					var isFlow = parameterGroup.Key.Equals(value: _massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase);
-					if (isFlow)
-					{
-						errorMessage = "Duplicate flows exist";
-					}
-					
 					if (validationResult.Errors.Any(i => i.ErrorMessage.Equals(value:errorMessage)))
 					{
 						var error = validationResult.Errors.Single(i => i.ErrorMessage == errorMessage);
-						error.RowNumbers = string.Join(separator:",", values:parameterGroup.ToList().Select(i => i.RowNumber.ToString()));
+						error.RowNumbers = $"{error.RowNumbers},{string.Join(separator: ",", values: parameterGroup.ToList().Select(i => i.RowNumber.ToString()))}";
 					}
 					else
 					{
