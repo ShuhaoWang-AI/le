@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 }
 
                 int parameterGroupIdToReturn;
-                using (_dbContext.CreateAutoCommitScope())
+                using (_dbContext.BeginTranactionScope(@from:MethodBase.GetCurrentMethod()))
                 {
                     var existingDataSource = GetExistingDataSource(organizationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
                     Core.Domain.DataSource dataSourceToPersist;
@@ -128,26 +128,24 @@ namespace Linko.LinkoExchange.Services.DataSource
         public void DeleteDataSource(int dataSourceId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"dataSourceId={dataSourceId}"))
+            using (_dbContext.BeginTranactionScope(@from: MethodBase.GetCurrentMethod()))
             {
-                using (_dbContext.CreateAutoCommitScope())
-                {
-                    var foundDataSource = _dbContext.DataSources
-                                                    .Include(ds => ds.DataSourceMonitoringPoints)
-                                                    .Include(ds => ds.DataSourceCollectionMethods)
-                                                    .Include(ds => ds.DataSourceCtsEventTypes)
-                                                    .Include(ds => ds.DataSourceParameters)
-                                                    .Include(ds => ds.DataSourceUnits)
-                                                    .First(ds => ds.DataSourceId == dataSourceId);
+                var foundDataSource = _dbContext.DataSources
+                                                .Include(ds => ds.DataSourceMonitoringPoints)
+                                                .Include(ds => ds.DataSourceCollectionMethods)
+                                                .Include(ds => ds.DataSourceCtsEventTypes)
+                                                .Include(ds => ds.DataSourceParameters)
+                                                .Include(ds => ds.DataSourceUnits)
+                                                .First(ds => ds.DataSourceId == dataSourceId);
 
-                    RemoveEntities(entitySet:_dbContext.DataSourceMonitoringPoints, entitiesToRemove:foundDataSource.DataSourceMonitoringPoints);
-                    RemoveEntities(entitySet: _dbContext.DataSourceCollectionMethods, entitiesToRemove: foundDataSource.DataSourceCollectionMethods);
-                    RemoveEntities(entitySet: _dbContext.DataSourceCtsEventTypes, entitiesToRemove: foundDataSource.DataSourceCtsEventTypes);
-                    RemoveEntities(entitySet: _dbContext.DataSourceParameters, entitiesToRemove: foundDataSource.DataSourceParameters);
-                    RemoveEntities(entitySet: _dbContext.DataSourceUnits, entitiesToRemove: foundDataSource.DataSourceUnits);
-                    RemoveEntity(entitySet: _dbContext.DataSources, entityToRemove: foundDataSource);
+                RemoveEntities(entitySet:_dbContext.DataSourceMonitoringPoints, entitiesToRemove:foundDataSource.DataSourceMonitoringPoints);
+                RemoveEntities(entitySet: _dbContext.DataSourceCollectionMethods, entitiesToRemove: foundDataSource.DataSourceCollectionMethods);
+                RemoveEntities(entitySet: _dbContext.DataSourceCtsEventTypes, entitiesToRemove: foundDataSource.DataSourceCtsEventTypes);
+                RemoveEntities(entitySet: _dbContext.DataSourceParameters, entitiesToRemove: foundDataSource.DataSourceParameters);
+                RemoveEntities(entitySet: _dbContext.DataSourceUnits, entitiesToRemove: foundDataSource.DataSourceUnits);
+                RemoveEntity(entitySet: _dbContext.DataSources, entityToRemove: foundDataSource);
 
-                    _dbContext.SaveChanges();
-                }
+                _dbContext.SaveChanges();
             }
         }
 
@@ -264,7 +262,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         }
         public int SaveDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
-            using (_dbContext.CreateAutoCommitScope())
+            using (_dbContext.BeginTranactionScope(@from: MethodBase.GetCurrentMethod()))
             {
                 switch (translationType)
                 {
@@ -322,7 +320,7 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         public void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
-            using (_dbContext.CreateAutoCommitScope())
+            using (_dbContext.BeginTranactionScope(@from: MethodBase.GetCurrentMethod()))
             {
                 switch (translationType)
                 {

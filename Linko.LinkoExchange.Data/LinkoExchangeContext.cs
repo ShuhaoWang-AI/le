@@ -151,12 +151,7 @@ namespace Linko.LinkoExchange.Data
 
 		public virtual DbContextTransaction BeginTransaction()
 		{
-			if (Transaction != null)
-			{
-				Transaction = Database.BeginTransaction();
-			}
-
-			return Transaction;
+			return Transaction ?? (Transaction = Database.BeginTransaction());
 		}
 
 		public void Commit()
