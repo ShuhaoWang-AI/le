@@ -320,42 +320,39 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         private void ThrowRuleViolationErrroIfDataSourceTermIsInvalid(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
-            if (dataSourceTranslation.Id.HasValue)
-            {
-                return;
-            }
+            var unexpectedExistingTranslationCount = dataSourceTranslation.Id.HasValue ? 1 : 0;
 
             var dataSourceTerm = dataSourceTranslation.DataSourceTerm.ToLower();
             switch (translationType)
             {
                 case DataSourceTranslationType.MonitoringPoint:
-                    if (_dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    if (_dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > unexpectedExistingTranslationCount)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Monitoring Point {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Monitoring Point");
                     }
                     break;
                 case DataSourceTranslationType.SampleType:
-                    if (_dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    if (_dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > unexpectedExistingTranslationCount)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Sample Type {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Sample Type");
                     }
                     break;
                 case DataSourceTranslationType.CollectionMethod:
-                    if (_dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    if (_dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > unexpectedExistingTranslationCount)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Collection Method {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Collection Method");
                     }
                     break;
                 case DataSourceTranslationType.Parameter:
-                    if (_dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    if (_dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > unexpectedExistingTranslationCount)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Parameter {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Parameter");
                     }
                     break;
                 case DataSourceTranslationType.Unit:
-                    if (_dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    if (_dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > unexpectedExistingTranslationCount)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Unit {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to an Unit");
                     }
                     break;
                 default:
