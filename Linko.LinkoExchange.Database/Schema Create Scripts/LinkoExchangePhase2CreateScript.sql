@@ -1059,7 +1059,7 @@ BEGIN
         INNER JOIN dbo.tSystemField sf ON sf.SystemFieldId = fvtf.SystemFieldId
 END
 
-IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tFileVersionTemplateField)
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tLimitType WHERE Name = 'FourDay')
 BEGIN
     PRINT CHAR(13)
     PRINT CHAR(13)
