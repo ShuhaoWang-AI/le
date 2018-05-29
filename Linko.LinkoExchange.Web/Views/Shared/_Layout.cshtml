@@ -81,6 +81,26 @@
                             </div>
                         </div>
 
+                        <div aria-labelledby="Delete Pending Invitation" class="col-md-12 fade modal modal-info" id="CommonDeleteConfirmationModal" role="dialog" tabindex="-1">
+                            <div class="modal-dialog" role="document">
+                                <div class="alert alert-dismissible alert-info modal-content">
+                                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                                    <h4 class="box-title">Delete Confirmation</h4>
+                                    <div class="form-horizontal">
+                                        <p>
+                                            Are you sure to delete this?
+                                        </p>
+                                        <div class="form-group">
+                                            <div class="pull-right">
+                                                <button aria-label="Yes" class="btn btn-primary btn-sm" id="YesDelete" type="button" value="Yes">Yes</button>
+                                                <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" id="CancelDelete" type="button">No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <script>
                             $(document)
                                 .ready(function()

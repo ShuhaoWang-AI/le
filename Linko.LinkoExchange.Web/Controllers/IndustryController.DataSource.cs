@@ -296,12 +296,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                       string dropdownOptionsKey,
                                                                       string defaultDropdownOptionKey)
         {
-            dropdownOptions.Insert(index:0, item:new DropdownOptionViewModel
-                                                 {
-                                                     Id = 0,
-                                                     DisplayName = "Please select an existing " + GetTranslatedTypeDomainName(translationType:translationType),
-                                                     Description = ""
-                                                 });
             ViewData[key:dropdownOptionsKey] = dropdownOptions;
             ViewData[key:defaultDropdownOptionKey] = dropdownOptions.First();
         }

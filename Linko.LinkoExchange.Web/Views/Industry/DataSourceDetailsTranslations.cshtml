@@ -60,10 +60,14 @@
                                      .ClientTemplate(value: "#= (MonitoringPoint==null)? '' : MonitoringPoint.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); command.Destroy(); });
+                              columns.Command(command =>
+                                              {
+                                                  command.Edit();
+                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                              });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Monitoring Point Translation?"))
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
                           .Pageable(pager => pager.Enabled(value:false))
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
@@ -128,10 +132,14 @@
                                      .ClientTemplate(value: "#= (CollectionMethod==null)? '' : CollectionMethod.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); command.Destroy(); });
+                              columns.Command(command =>
+                                              {
+                                                  command.Edit();
+                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                              });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Collection Method Translation?"))
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
@@ -196,10 +204,14 @@
                                      .ClientTemplate(value: "#= (SampleType==null)? '' : SampleType.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); command.Destroy(); });
+                              columns.Command(command =>
+                                              {
+                                                  command.Edit();
+                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                              });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Sample Type Translation?"))
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
@@ -264,10 +276,14 @@
                                      .ClientTemplate(value: "#= (Parameter==null)? '' : Parameter.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); command.Destroy(); });
+                              columns.Command(command =>
+                                              {
+                                                  command.Edit();
+                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                              });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Parameter Translation?"))
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
@@ -332,10 +348,14 @@
                                      .ClientTemplate(value: "#= (Unit==null)? '' : Unit.DisplayName #")
                                      .HtmlAttributes(attributes: new { @class = "col-sm-6" })
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command => { command.Edit(); command.Destroy(); });
+                              columns.Command(command =>
+                                              {
+                                                  command.Edit();
+                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                              });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).ConfirmDelete("Confirm").DisplayDeleteConfirmation("Delete this Unit Translation?"))
+                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
                           .Pageable(pager => pager.Enabled(value: false))
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })

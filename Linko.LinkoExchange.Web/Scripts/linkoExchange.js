@@ -269,6 +269,21 @@ function isEmptyOrSpaces(str) {
     return str === null || str.match(/^ *$/) !== null;
 }
 
+function commonConfirmDelete(e) {
+    e.preventDefault();
+    var grid = this;
+    var modelObject = $("#CommonDeleteConfirmationModal");
+    modelObject.modal();
+    console.log('commonConfirmDelete grid:', grid);
+
+    $("#YesDelete").click(function () {
+        modelObject.modal('hide');
+        modelObject.hide();
+        var row = $(e.currentTarget).closest("tr");
+        grid.removeRow(row);
+    });
+}
+
 
 //setting Defaults Globally for notifications
 //http://bootstrap-notify.remabledesigns.com/#documentation
