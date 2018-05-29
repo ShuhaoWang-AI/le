@@ -264,6 +264,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         {
             using (_dbContext.BeginTranactionScope(@from: MethodBase.GetCurrentMethod()))
             {
+                ThrowRuleViolationErrroIfDataSourceTermIsInvalid(dataSourceTranslation: dataSourceTranslation, translationType: translationType);
                 switch (translationType)
                 {
                     case DataSourceTranslationType.MonitoringPoint:
@@ -314,6 +315,51 @@ namespace Linko.LinkoExchange.Services.DataSource
                     default:
                         throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
                 }
+            }
+        }
+
+        private void ThrowRuleViolationErrroIfDataSourceTermIsInvalid(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
+        {
+            if (dataSourceTranslation.Id.HasValue)
+            {
+                return;
+            }
+
+            var dataSourceTerm = dataSourceTranslation.DataSourceTerm.ToLower();
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint:
+                    if (_dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Monitoring Point {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                    }
+                    break;
+                case DataSourceTranslationType.SampleType:
+                    if (_dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Sample Type {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                    }
+                    break;
+                case DataSourceTranslationType.CollectionMethod:
+                    if (_dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Collection Method {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                    }
+                    break;
+                case DataSourceTranslationType.Parameter:
+                    if (_dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Parameter {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                    }
+                    break;
+                case DataSourceTranslationType.Unit:
+                    if (_dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm) && x.DataSourceId == dataSourceTranslation.DataSourceId) > 0)
+                    {
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: $"Unit {dataSourceTranslation.DataSourceTerm} in the file is already added");
+                    }
+                    break;
+                default:
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported"); 
             }
         }
 

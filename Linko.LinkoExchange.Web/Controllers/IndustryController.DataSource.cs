@@ -426,6 +426,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void ValidateDataSourceTranslationViewModel(DataSourceTranslationViewModel viewModel, DataSourceTranslationType translationType)
         {
+            if (string.IsNullOrEmpty(value:viewModel.DataSourceTerm))
+            {
+                ModelState.AddModelError(key:"DataSourceTerm", errorMessage:@"The value in the file should not be empty");
+            }
+
             if (viewModel.TranslatedItem?.Id != null && viewModel.TranslatedItem.Id != 0)
             {
                 return;

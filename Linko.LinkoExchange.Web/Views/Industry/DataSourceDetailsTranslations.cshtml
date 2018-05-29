@@ -31,6 +31,7 @@
 {
     @Html.AntiForgeryToken()
 
+    <!-- gridDataSourceMonitoringPointTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
             <h3 class="box-title">Monitoring Point</h3>
@@ -42,6 +43,9 @@
         </div>
 
         <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryMonitoringPoint">
+                <ul></ul>
+            </div>
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
@@ -79,7 +83,7 @@
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceMonitoringPointTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceMonitoringPointTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
-                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceMonitoringPointTranslation', errorDivId: '#validationSummaryMonitoringPoint'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
@@ -95,6 +99,7 @@
         </section>
     </div>
 
+    <!-- gridDataSourceCollectionMethodTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
             <h3 class="box-title">Collection Methods</h3>
@@ -106,6 +111,9 @@
         </div>
 
         <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryCollectionMethod">
+                <ul></ul>
+            </div>
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
@@ -143,7 +151,7 @@
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceCollectionMethodTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceCollectionMethodTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
-                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceCollectionMethodTranslation', errorDivId: '#validationSummaryCollectionMethod'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
@@ -159,6 +167,7 @@
         </section>
     </div>
 
+    <!-- gridDataSourceSampleTypeTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
             <h3 class="box-title">Sample Types</h3>
@@ -170,6 +179,9 @@
         </div>
 
         <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummarySampleType">
+                <ul></ul>
+            </div>
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
@@ -207,7 +219,7 @@
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceSampleTypeTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceSampleTypeTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
-                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceSampleTypeTranslation', errorDivId: '#validationSummarySampleType'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
@@ -223,6 +235,7 @@
         </section>
     </div>
 
+    <!-- gridDataSourceParameterTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
             <h3 class="box-title">Parameters</h3>
@@ -234,6 +247,9 @@
         </div>
 
         <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryParameter">
+                <ul></ul>
+            </div>
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
@@ -271,7 +287,7 @@
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceParameterTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceParameterTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
-                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceParameterTranslation', errorDivId: '#validationSummaryParameter'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
@@ -287,6 +303,7 @@
         </section>
     </div>
 
+    <!-- gridDataSourceUnitTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
             <h3 class="box-title">Units</h3>
@@ -298,6 +315,9 @@
         </div>
 
         <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryUnit">
+                <ul></ul>
+            </div>
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
@@ -335,7 +355,7 @@
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceUnitTranslation", controllerName:"Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourcUnitTranslation", controllerName:"Industry"))
                                                         .PageSize(pageSize:100)
-                                                        .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceUnitTranslation', errorDivId: '#validationSummaryUnit'})"))
                                                         .Model(model =>
                                                         {
                                                             model.Id(p => p.Id);
@@ -350,4 +370,42 @@
             </div>
         </section>
     </div>
+
+    <script>
+        function dataSourceManipulatingErrorHandler(e) {
+            console.log('dataSourceManipulatingErrorHandler called', this);
+            if (e.errors) {
+                var errorMessages = [];
+                $.each(e.errors, function(key, value) {
+                    if ("errors" in value) {
+                        $.each(value.errors, function() {
+                            errorMessages.push("<li>" + this + "</li>");
+                        });
+                    }
+                });
+
+
+                var validationSummary = $(this.errorDivId);
+                console.log('validationSummary: ', validationSummary);
+                validationSummary.removeClass("validation-summary-valid");
+                validationSummary.addClass("validation-summary-errors");
+
+                validationSummary.find("ul").empty();
+                validationSummary.find("ul").append(errorMessages);
+
+                // Cancel the changes.
+                var grid = $(this.gridId).data("kendoGrid");
+                grid.one("dataBinding", function(e) {
+                    e.preventDefault(); // cancel grid rebind if error occurs
+                });
+
+                $(".k-button").click(function () {
+                    console.log('validationSummary: ', validationSummary);
+                    validationSummary.addClass("validation-summary-valid");
+                    validationSummary.removeClass("validation-summary-errors");
+                    validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                });
+            }
+        }
+    </script>
 }
