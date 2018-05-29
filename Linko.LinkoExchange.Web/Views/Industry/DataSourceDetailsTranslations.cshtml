@@ -70,14 +70,14 @@
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceMonitoringPointTranslation", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = Model.Id,
                                                             translationType = DataSourceTranslationType.MonitoringPoint
                                                         }))
-                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceMonitoringPointTranslation", controllerName: "Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceMonitoringPointTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
@@ -134,14 +134,14 @@
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceCollectionMethodTranslation", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = Model.Id,
                                                             translationType = DataSourceTranslationType.CollectionMethod
                                                         }))
-                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceCollectionMethodTranslation", controllerName: "Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceCollectionMethodTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
@@ -198,14 +198,14 @@
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceSampleTypeTranslation", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = Model.Id,
                                                             translationType = DataSourceTranslationType.SampleType
                                                         }))
-                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceSampleTypeTranslation", controllerName: "Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceSampleTypeTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
@@ -262,14 +262,14 @@
                                                         .ServerOperation(enabled: false)
                                                         .Batch(enabled: false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName: "DataSourceDetailsTranslations_Create", controllerName: "Industry"))
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceParameterTranslation", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
                                                         {
                                                             dataSourceId = Model.Id,
                                                             translationType = DataSourceTranslationType.Parameter
                                                         }))
-                                                        .Update(update => update.Action(actionName: "DataSourceDetailsTranslations_Update", controllerName: "Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName: "DataSourceDetailsTranslations_Destroy", controllerName: "Industry"))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceParameterTranslation", controllerName: "Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceParameterTranslation", controllerName: "Industry"))
                                                         .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
@@ -326,14 +326,14 @@
                                                         .ServerOperation(enabled:false)
                                                         .Batch(enabled:false)
                                                         .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName:"DataSourceDetailsTranslations_Create", controllerName: "Industry"))
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceUnitTranslation", controllerName: "Industry"))
                                                         .Read(read => read.Action(actionName:"DataSourceDetailsTranslations_Read", controllerName:"Industry", routeValues:new
                                                         {
                                                             dataSourceId = Model.Id,
                                                             translationType = DataSourceTranslationType.Unit
                                                         }))
-                                                        .Update(update => update.Action(actionName:"DataSourceDetailsTranslations_Update", controllerName:"Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName:"DataSourceDetailsTranslations_Destroy", controllerName:"Industry"))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceUnitTranslation", controllerName:"Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourcUnitTranslation", controllerName:"Industry"))
                                                         .PageSize(pageSize:100)
                                                         .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>

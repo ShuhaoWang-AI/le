@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using DataSource = Kendo.Mvc.UI.DataSource;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -240,11 +241,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"DataSource/{id:int}/Details/Translations")]
         public ActionResult DataSourceDetailsTranslations(int id)
         {
-            var viewModel = PrepareDataSourcesDetails(id: id);
+            var viewModel = PrepareDataSourcesDetails(id:id);
 
             PrepareDataSourceTranslationsDropdownLists();
 
-            return View(model: viewModel);
+            return View(model:viewModel);
         }
 
         private void PrepareDataSourceTranslationsDropdownLists()
@@ -300,8 +301,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                      Id = 0,
                                                      DisplayName = "Please select an existing " + GetTranslatedTypeDomainName(translationType:translationType),
                                                      Description = ""
-
-            });
+                                                 });
             ViewData[key:dropdownOptionsKey] = dropdownOptions;
             ViewData[key:defaultDropdownOptionKey] = dropdownOptions.First();
         }
@@ -315,7 +315,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case DataSourceTranslationType.CollectionMethod: return "Collection Method";
                 case DataSourceTranslationType.Parameter: return "Parameter";
                 case DataSourceTranslationType.Unit: return "Unit";
-                default: throw new NotImplementedException(message: $"DataSourceTranslationType {translationType} is unsupported");
+                default: throw new NotImplementedException(message:$"DataSourceTranslationType {translationType} is unsupported");
             }
         }
 
@@ -365,9 +365,39 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult DataSourceDetailsTranslations_Update([CustomDataSourceRequest] DataSourceRequest request, DataSourceTranslationViewModel viewModel)
+        public ActionResult UpdateDataSourceMonitoringPointTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceMonitoringPointTranslationViewModel viewModel)
         {
-            var translationType = viewModel.TranslationType;
+            return UpdateDataSourceDetailsTranslation(request:request, viewModel:viewModel, translationType:DataSourceTranslationType.MonitoringPoint);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult UpdateDataSourceCollectionMethodTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceCollectionMethodTranslationViewModel viewModel)
+        {
+            return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.CollectionMethod);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult UpdateDataSourceSampleTypeTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceSampleTypeTranslationViewModel viewModel)
+        {
+            return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.SampleType);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult UpdateDataSourceParameterTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceParameterTranslationViewModel viewModel)
+        {
+            return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Parameter);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult UpdateDataSourceUnitTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
+        {
+            return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Unit);
+        }
+
+        private ActionResult UpdateDataSourceDetailsTranslation([CustomDataSourceRequest] DataSourceRequest request, 
+                                                                DataSourceTranslationViewModel viewModel,
+                                                                DataSourceTranslationType translationType)
+        {
             ValidateDataSourceTranslationViewModel(viewModel:viewModel, translationType:translationType);
             try
             {
@@ -402,17 +432,48 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var errorMessage = $"{GetTranslatedTypeDomainName(translationType:translationType)} is required";
-            ModelState.AddModelError(key:"TranslatedItem", errorMessage: errorMessage);
+            ModelState.AddModelError(key:"TranslatedItem", errorMessage:errorMessage);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult DataSourceDetailsTranslations_Destroy([CustomDataSourceRequest] DataSourceRequest request, DataSourceTranslationViewModel viewModel)
+        public ActionResult DestroyDataSourceMonitoringPointTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceMonitoringPointTranslationViewModel viewModel)
+        {
+            return DestroyDataSourceTranslations(request:request, viewModel:viewModel, translationType:DataSourceTranslationType.MonitoringPoint);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DestroyDataSourceCollectionMethodTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceCollectionMethodTranslationViewModel viewModel)
+        {
+            return DestroyDataSourceTranslations(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.CollectionMethod);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DestroyDataSourceSampleTypeTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceSampleTypeTranslationViewModel viewModel)
+        {
+            return DestroyDataSourceTranslations(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.SampleType);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DestroyDataSourceParameterTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceParameterTranslationViewModel viewModel)
+        {
+            return DestroyDataSourceTranslations(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Parameter);
+        }
+
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult DestroyDataSourcUnitTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
+        {
+            return DestroyDataSourceTranslations(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Unit);
+        }
+
+
+        public ActionResult DestroyDataSourceTranslations([CustomDataSourceRequest] DataSourceRequest request, 
+                                                          DataSourceTranslationViewModel viewModel,
+                                                          DataSourceTranslationType translationType)
         {
             try
             {
                 if (viewModel != null && viewModel.Id.HasValue)
                 {
-                    var translationType = viewModel.TranslationType;
                     var dataSourceTranslationDto = new DataSourceTranslationDto
                                                    {
                                                        Id = viewModel.Id,
@@ -435,10 +496,43 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult DataSourceDetailsTranslations_Create([CustomDataSourceRequest] DataSourceRequest request,
-                                                                 DataSourceTranslationViewModel viewModel)
+        public ActionResult CreateDataSourceMonitoringPointTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceMonitoringPointTranslationViewModel viewModel)
         {
-            var translationType = viewModel.TranslationType;
+            return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel, translationType:DataSourceTranslationType.MonitoringPoint);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult CreateDataSourceCollectionMethodTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceCollectionMethodTranslationViewModel viewModel)
+        {
+            return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
+                                                      translationType:DataSourceTranslationType.CollectionMethod);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult CreateDataSourceSampleTypeTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceSampleTypeTranslationViewModel viewModel)
+        {
+            return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
+                                                      translationType:DataSourceTranslationType.SampleType);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult CreateDataSourceParameterTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceParameterTranslationViewModel viewModel)
+        {
+            return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
+                                                      translationType:DataSourceTranslationType.Parameter);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult CreateDataSourceUnitTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
+        {
+            return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
+                                                      translationType:DataSourceTranslationType.Unit);
+        }
+
+        private ActionResult CreateDataSourceDetailsTranslation([CustomDataSourceRequest] DataSourceRequest request,
+                                                                DataSourceTranslationViewModel viewModel,
+                                                                DataSourceTranslationType translationType)
+        {
             ValidateDataSourceTranslationViewModel(viewModel:viewModel, translationType:translationType);
             try
             {
