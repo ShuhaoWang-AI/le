@@ -35,11 +35,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "File Name")]
         public string SelectedFileName { get; set; }
         public int? ImportTempFileId { get; set; }
-
-        
+		
         public SampleImportDto SampleImportDto { get; set; } //TODO:Remove later
-        public List<SampleDto> SampleDtos { get; set; } //TODO:Remove later
-
         public StepSelectDataSourceViewModel StepSelectDataSource { get; set; }
         public StepSelectFileViewModel StepSelectFile { get; set; }
         public StepFileValidationViewModel StepFileValidation { get; set; }

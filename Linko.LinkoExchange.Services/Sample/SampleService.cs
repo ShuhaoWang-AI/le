@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -119,26 +119,24 @@ namespace Linko.LinkoExchange.Services.Sample
 
 		    var sampleId = -1;
 		    
-		    var stackFrame = new StackTrace().GetFrame(1);
-		    var methodBase = stackFrame.GetMethod();
-			using (_dbContext.BeginTranactionScope(methodBase))
-		    {
+			using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
+			{
 				//Cannot save if included in a report
-			    //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
-			    //      Actor cannot perform any actions of any kind except view all details.)
-			    if (sampleDto.SampleId.HasValue && IsSampleIncludedInReportPackage(sampleId:sampleDto.SampleId.Value))
-			    {
-				    ThrowSimpleException(message:"Sample is in use in a Report Package and is therefore READ-ONLY.");
-			    }
+				//      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
+				//      Actor cannot perform any actions of any kind except view all details.)
+				if (sampleDto.SampleId.HasValue && IsSampleIncludedInReportPackage(sampleId: sampleDto.SampleId.Value))
+				{
+					ThrowSimpleException(message:"Sample is in use in a Report Package and is therefore READ-ONLY.");
+				}
 
-			    if (IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false))
-			    {
-				    sampleId = SimplePersist(sampleDto:sampleDto);
-			    }
+				if (IsValidSample(sampleDto:sampleDto, isSuppressExceptions:false))
+				{
+					sampleId = SimplePersist(sampleDto:sampleDto);
+				}
 
 
-			    _logger.Info(message:"End: SampleService.SaveSample.");
-		    } 
+				_logger.Info(message:"End: SampleService.SaveSample.");
+			} 
 
 		    return sampleId;
 	    }

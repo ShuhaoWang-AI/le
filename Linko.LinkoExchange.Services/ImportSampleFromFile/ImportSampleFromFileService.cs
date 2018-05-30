@@ -252,7 +252,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
                 int importTempFileIdToReturn;
-                using (_dbContext.CreateAutoCommitScope())
+                using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
                 {
                     var importTempFile = _mapHelper
                         .ToDomainObject(fromDto:importTempFileDto,
@@ -464,10 +464,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-	            var  stackFrame = new StackTrace().GetFrame(1);
-	            var methodBase = stackFrame.GetMethod(); 
-
-                using (_dbContext.BeginTranactionScope(methodBase))  
+                using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))  
                 {
                     var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 

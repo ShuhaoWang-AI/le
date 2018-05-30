@@ -27,10 +27,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		#region interface implementations
 
 		/// <inheritdoc />
-		public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> samplesDtos)
+		public ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto)
 		{
-			samplesDtos = null;
-
 			// Create a list of validate importSampleWrappers, and return the validation results
 			ImportSampleFromFileValidationResultDto validationResult;
 
@@ -47,7 +45,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				PopulateSamples(importSampleWrappers:importingSamples);
 
 				// Merge into existing draft samples or create new samples
-				samplesDtos = MergeSamples(importingSamples:importingSamples);
+				sampleImportDto.SampleDtos = MergeSamples(importingSamples:importingSamples); 
 			}
 
 			return validationResult;

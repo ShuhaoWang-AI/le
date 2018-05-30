@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Web.Configuration;
 using Linko.LinkoExchange.Core.Domain;
@@ -202,93 +203,84 @@ namespace Linko.LinkoExchange.Services.FileStore
             return fileStoreDtos;
         }
 
-        public int CreateFileStore(FileStoreDto fileStoreDto)
-        {
-            _logger.Info(message:"Start: FileStoreService.CreateFileStore.");
+	    public int CreateFileStore(FileStoreDto fileStoreDto)
+	    {
+		    _logger.Info(message:"Start: FileStoreService.CreateFileStore.");
 
-            if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
-            {
-                var validationIssues = new List<RuleViolation>();
-                var message = "No file was selected.";
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
+		    if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
+		    {
+			    var validationIssues = new List<RuleViolation>();
+			    var message = "No file was selected.";
+			    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+		    }
 
-            if (fileStoreDto.Data.Length > MaxFileSize)
-            {
-                var validationIssues = new List<RuleViolation>();
+		    if (fileStoreDto.Data.Length > MaxFileSize)
+		    {
+			    var validationIssues = new List<RuleViolation>();
 
-                var message = $"The file size exceeds that {MaxFileSize / 1024 / 1024} MB limit.";
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
+			    var message = $"The file size exceeds that {MaxFileSize / 1024 / 1024} MB limit.";
+			    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+		    }
 
-            var extension = Path.GetExtension(path:fileStoreDto.OriginalFileName)?.ToLower();
-            var validFileTypes = _dbContext.FileTypes.ToList();
-            var validFileExtensions = validFileTypes.Select(i => i.Extension).Select(i => i.ToLower());
+		    var extension = Path.GetExtension(path:fileStoreDto.OriginalFileName)?.ToLower();
+		    var validFileTypes = _dbContext.FileTypes.ToList();
+		    var validFileExtensions = validFileTypes.Select(i => i.Extension).Select(i => i.ToLower());
 
-            if (!validFileExtensions.Contains(value:extension))
-            {
-                var validationIssues = new List<RuleViolation>();
+		    if (!validFileExtensions.Contains(value:extension))
+		    {
+			    var validationIssues = new List<RuleViolation>();
 
-                var message = "The file type selected is not supported.";
-                validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-            }
+			    var message = "The file type selected is not supported.";
+			    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+		    }
 
-            using (var transaction = _dbContext.BeginTransaction())
-            {
-                try
-                {
-                    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-                    var currentRegulatoryProgramId =
-                        int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+		    using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
+		    {
+			    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+			    var currentRegulatoryProgramId =
+				    int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-                    // Try to reduce the image file size  
-                    if (IsImageFile(extension:extension) && fileStoreDto.Data.Length > SizeToReduce)
-                    {
-                        TryToReduceFileDataSize(fileStoreDto:fileStoreDto);
-                    }
+			    // Try to reduce the image file size  
+			    if (IsImageFile(extension:extension) && fileStoreDto.Data.Length > SizeToReduce)
+			    {
+				    TryToReduceFileDataSize(fileStoreDto:fileStoreDto);
+			    }
 
-                    fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
-                    fileStoreDto.UploaderUserId = currentUserId;
-                    fileStoreDto.SizeByte = fileStoreDto.Data.Length;
-                    fileStoreDto.FileTypeId = validFileTypes.Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId;
-                    var fileName = Path.GetFileNameWithoutExtension(path:fileStoreDto.OriginalFileName);
-                    var timeTick = DateTimeOffset.UtcNow.Ticks.ToString();
-                    fileStoreDto.Name = $"{fileName}_{timeTick}_{extension}";
+			    fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
+			    fileStoreDto.UploaderUserId = currentUserId;
+			    fileStoreDto.SizeByte = fileStoreDto.Data.Length;
+			    fileStoreDto.FileTypeId = validFileTypes.Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId;
+			    var fileName = Path.GetFileNameWithoutExtension(path:fileStoreDto.OriginalFileName);
+			    var timeTick = DateTimeOffset.UtcNow.Ticks.ToString();
+			    fileStoreDto.Name = $"{fileName}_{timeTick}_{extension}";
 
-                    var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto:fileStoreDto);
+			    var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto:fileStoreDto);
 
-                    fileStore.UploadDateTimeUtc = DateTimeOffset.Now;
+			    fileStore.UploadDateTimeUtc = DateTimeOffset.Now;
 
-                    fileStore = _dbContext.FileStores.Add(entity:fileStore);
-                    _dbContext.SaveChanges();
+			    fileStore = _dbContext.FileStores.Add(entity:fileStore);
+			    _dbContext.SaveChanges();
 
-                    // File name is the file name plus id plus extension
-                    fileStore.Name = $"{fileName}_{fileStore.FileStoreId}{extension}";
-                    var fileStoreData = new FileStoreData
-                                        {
-                                            Data = fileStoreDto.Data,
-                                            FileStoreId = fileStore.FileStoreId
-                                        };
+			    // File name is the file name plus id plus extension
+			    fileStore.Name = $"{fileName}_{fileStore.FileStoreId}{extension}";
+			    var fileStoreData = new FileStoreData
+			                        {
+				                        Data = fileStoreDto.Data,
+				                        FileStoreId = fileStore.FileStoreId
+			                        };
 
-                    _dbContext.FileStoreDatas.Add(entity:fileStoreData);
-                    _dbContext.SaveChanges();
-                    _dbContext.Commit();
-                    _logger.Info(message:"End: FileStoreService.CreateFileStore.");
+			    _dbContext.FileStoreDatas.Add(entity:fileStoreData);
+			    _dbContext.SaveChanges();
+			    _logger.Info(message:"End: FileStoreService.CreateFileStore.");
 
-                    return fileStore.FileStoreId;
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
+			    return fileStore.FileStoreId;
+		    }
+	    }
 
-        public FileStoreDto GetFileStoreById(int fileStoreId, bool includingFileData = false)
+	    public FileStoreDto GetFileStoreById(int fileStoreId, bool includingFileData = false)
         {
             _logger.Info(message:$"Start: FileStoreService.GetFileStoreById. attachmentFileId={fileStoreId}.");
 

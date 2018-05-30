@@ -365,16 +365,16 @@
                             <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
                                 @Model.SampleImportDto.Rows.Count sample result(s) imported. <br/> <br/>
 
-                                @if (Model.SampleDtos != null)
-                                {
-                                    var newSampleAddCount = Model.SampleDtos.Count(x => !x.SampleId.HasValue);
+                                @if (Model.SampleImportDto.SampleDtos != null)
+								{
+									var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
 
-                                    if (newSampleAddCount > 0)
-                                    {
+									if (newSampleAddCount > 0)
+									{
                                         <span>@newSampleAddCount new draft sample(s) created. <br /></span>
                                     }
 
-                                    var existingSampleUpdateCount = Model.SampleDtos.Count(x => x.SampleId.HasValue);
+                                    var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
 
                                     if (existingSampleUpdateCount > 0)
                                     {

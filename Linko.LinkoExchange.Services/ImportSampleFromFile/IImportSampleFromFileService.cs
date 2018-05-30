@@ -69,13 +69,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <returns></returns>
         List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sampleImportDto"></param>
-        /// <param name="sampleDtos"></param>
-        /// <returns></returns>
-        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto, out List<SampleDto> sampleDtos);
+	    /// <summary>
+	    /// 
+	    /// </summary>
+	    /// <param name="sampleImportDto"></param>
+	    /// <returns></returns>
+	    ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
 
         FileVersionDto GetFileVersion();
 

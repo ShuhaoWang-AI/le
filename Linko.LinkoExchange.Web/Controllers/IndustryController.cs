@@ -10,7 +10,6 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
-using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
@@ -1870,12 +1869,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                         case SampleImportViewModel.SampleImportStep.DataValidation: 
                             //TODO: do proper action
-                            List<SampleDto> sampleDtos;
-                            var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto, sampleDtos:out sampleDtos);
+                            var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto);
 
                             if (dataValidationResultDto.Success)
                             {
-                                model.SampleDtos = sampleDtos;
                                 ModelState.Remove(key: "CurrentSampleImportStep");
                                 model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
                                 goto case SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
