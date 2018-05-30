@@ -393,7 +393,6 @@
 
     <script>
         function dataSourceManipulatingErrorHandler(e) {
-            console.log('dataSourceManipulatingErrorHandler called', this);
             if (e.errors) {
                 var errorMessages = [];
                 $.each(e.errors, function(key, value) {
@@ -406,7 +405,6 @@
 
 
                 var validationSummary = $(this.errorDivId);
-                console.log('validationSummary: ', validationSummary);
                 validationSummary.removeClass("validation-summary-valid");
                 validationSummary.addClass("validation-summary-errors");
 

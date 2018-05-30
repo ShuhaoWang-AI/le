@@ -24,6 +24,20 @@
         </ol>
     </section>
 
+    if (!ViewData.ModelState.IsValid)
+    {
+        var modelStateErrors = ViewData.ModelState.Values.SelectMany(m => m.Errors);
+
+        <div class="alert alert-danger validation-summary-valid" id="validationSummaryMonitoringPoint">
+            <ul>
+                @foreach (var modelStateError in modelStateErrors)
+                {
+                    <li>@modelStateError)</li>
+                }
+            </ul>
+        </div>
+    }
+
     @Html.HiddenFor(model => model.CurrentSampleImportStep)
 
     // SampleImportStep.SelectDataSource
@@ -37,7 +51,7 @@
             </div>
         </div>
         <div class="box-body form-horizontal">
-            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            @if (ViewData.ModelState.IsValid && Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
             {
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                                 {

@@ -1716,37 +1716,55 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/Import")]
         public ActionResult SampleImport()
         {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-
-            var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
+            var currentOrganizationRegulatoryProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
             var viewModel = new SampleImportViewModel
                             {
                                 CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource
                             };
-
-            if (dataSources.Count == 1 && dataSources[index:0].DataSourceId.HasValue)
+            try
             {
-                viewModel.SelectedDataSourceId = (int) dataSources[index:0].DataSourceId;
-                viewModel.SelectedDataSourceName = dataSources[index:0].Name;
-                viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+                var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
+
+                var selectedDataSourceId = GetQueryParameterValueAsInt(parameterName:"DataSourceId");
+                if (selectedDataSourceId.HasValue)
+                {
+                    var selectedDataSource = dataSources.Find(x => x.DataSourceId == selectedDataSourceId);
+                    if (selectedDataSource == null)
+                    {
+                        throw new BadRequest(message: $"The Data Source {selectedDataSourceId} does not exist");
+                    }
+                    viewModel.SelectedDataSourceId = (int) selectedDataSourceId;
+                    viewModel.SelectedDataSourceName = selectedDataSource.Name;
+                    viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+                }
+                else if (dataSources.Count == 1 && dataSources[index:0].DataSourceId.HasValue)
+                {
+                    viewModel.SelectedDataSourceId = (int) dataSources[index:0].DataSourceId;
+                    viewModel.SelectedDataSourceName = dataSources[index:0].Name;
+                    viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+                }
+
+                if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+                {
+                    viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
+                                                     {
+                                                         AvailableDataSources = dataSources.Select(x => new SelectListItem
+                                                                                                        {
+                                                                                                            Text = x.Name,
+                                                                                                            Value = x.DataSourceId.ToString(),
+                                                                                                            Selected =
+                                                                                                                x.DataSourceId.ToString()
+                                                                                                                 .Equals(value:viewModel
+                                                                                                                             .SelectedDataSourceId
+                                                                                                                             .ToString())
+                                                                                                        }).ToList()
+                                                     };
+                    viewModel.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
+                }
             }
-
-            if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            catch (RuleViolationException rve)
             {
-                viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
-                                                 {
-                                                     AvailableDataSources = dataSources.Select(x => new SelectListItem
-                                                                                                    {
-                                                                                                        Text = x.Name,
-                                                                                                        Value = x.DataSourceId.ToString(),
-                                                                                                        Selected =
-                                                                                                            x.DataSourceId.ToString()
-                                                                                                             .Equals(value:viewModel
-                                                                                                                         .SelectedDataSourceId
-                                                                                                                         .ToString())
-                                                                                                    }).ToList()
-                                                 };
-                viewModel.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
             }
 
             return View(model:viewModel);

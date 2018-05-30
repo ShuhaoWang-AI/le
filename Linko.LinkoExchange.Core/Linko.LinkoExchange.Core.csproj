@@ -214,6 +214,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Validation\RuleViolation.cs" />
+    <Compile Include="Validation\BadRequest.cs" />
     <Compile Include="Validation\RuleViolationException.cs" />
   </ItemGroup>
   <ItemGroup />

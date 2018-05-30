@@ -217,11 +217,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult DataSourceDetails_ImportSamples(DataSourceViewModel model)
         {
-            return RedirectToAction(actionName:"SampleImport", controllerName:"Industry",
-                                    routeValues:new
-                                                {
-                                                    id = model.Id
-                                                });
+            return RedirectToAction(actionName:"SampleImport", controllerName:"Industry", routeValues:new
+                                                                                                      {
+                                                                                                          DataSourceId = model.Id
+                                                                                                      });
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]

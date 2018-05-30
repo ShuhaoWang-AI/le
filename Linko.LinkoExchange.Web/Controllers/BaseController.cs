@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Report;
@@ -17,14 +18,15 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly IReportPackageService _reportPackageService;
         private readonly ISampleService _sampleService;
-        private readonly IUserService _userService;
         private readonly IUnitService _unitService;
+        private readonly IUserService _userService;
 
         #endregion
 
         #region constructors and destructor
 
-        public BaseController(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService, IUnitService unitService)
+        public BaseController(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService,
+                              IUnitService unitService)
         {
             _httpContextService = httpContextService;
             _userService = userService;
@@ -34,6 +36,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
+
+        #region interface implementations
 
         #region default action
 
@@ -56,7 +60,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var reportPackageStatusCounts = _reportPackageService.GetReportPackageStatusCounts();
                     filterContext.Controller.ViewBag.ReportPackageCount_Draft = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.Draft)?.Count;
                     filterContext.Controller.ViewBag.ReportPackageCount_ReadyToSubmit = reportPackageStatusCounts
-                        .SingleOrDefault(c => c.Status == ReportStatusName.ReadyToSubmit)?.Count;
+                                                                                        .SingleOrDefault(c => c.Status == ReportStatusName.ReadyToSubmit)?.Count;
                     filterContext.Controller.ViewBag.ReportPackageCount_SubmittedPendingReview =
                         reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.SubmittedPendingReview)?.Count;
                     filterContext.Controller.ViewBag.ReportPackageCount_RepudiatedPendingReview =
@@ -81,9 +85,36 @@ namespace Linko.LinkoExchange.Web.Controllers
                 filterContext.Controller.ViewBag.UserName = "";
                 filterContext.Controller.ViewBag.UserRole = "";
             }
+
             base.OnResultExecuting(filterContext:filterContext);
         }
 
         #endregion
+
+        #endregion
+
+        protected string GetQueryParameterValue(string parameterName)
+        {
+            return Request.QueryString.Get(name: parameterName);
+        }
+
+        protected int? GetQueryParameterValueAsInt(string parameterName)
+        {
+            var parameterValue = GetQueryParameterValue(parameterName:parameterName);
+            if (string.IsNullOrEmpty(value:parameterValue))
+            {
+                return null;
+            }
+
+            int intValue;
+            if (int.TryParse(s:parameterValue, result:out intValue))
+            {
+                return intValue;
+            }
+            else
+            {
+                throw new BadRequest(message:$"The value of Query Parameter {parameterName} should be a integer");
+            }
+        }
     }
 }
