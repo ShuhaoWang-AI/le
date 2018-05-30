@@ -379,11 +379,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.MonitoringPoint:
                     doesExist = dataSourceTranslation.Id.HasValue
                                     ? _dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
-                                                                                       && x.DataSourceId == dataSourceTranslation.DataSourceId)
-                                      > 0
-                                    : _dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                        && x.DataSourceId == dataSourceTranslation.DataSourceId
                                                                                        && x.DataSourceMonitoringPointId != dataSourceTranslation.Id)
+                                      > 0
+                                    : _dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
+                                                                                       && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
                     if (doesExist)
                     {
@@ -395,11 +395,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.SampleType:
                     doesExist = dataSourceTranslation.Id.HasValue
                                     ? _dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
-                                                                                    && x.DataSourceId == dataSourceTranslation.DataSourceId)
-                                      > 0
-                                    : _dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                     && x.DataSourceId == dataSourceTranslation.DataSourceId
                                                                                     && x.DataSourceCtsEventTypeId != dataSourceTranslation.Id)
+                                      > 0
+                                    : _dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
+                                                                                    && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
                     if (doesExist)
                     {
@@ -411,11 +411,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.CollectionMethod:
                     doesExist = dataSourceTranslation.Id.HasValue
                                     ? _dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
-                                                                                        && x.DataSourceId == dataSourceTranslation.DataSourceId)
-                                      > 0
-                                    : _dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                         && x.DataSourceId == dataSourceTranslation.DataSourceId
                                                                                         && x.DataSourceCollectionMethodId != dataSourceTranslation.Id)
+                                      > 0
+                                    : _dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
+                                                                                        && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
                     if (doesExist)
                     {
@@ -427,11 +427,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.Parameter:
                     doesExist = dataSourceTranslation.Id.HasValue
                                     ? _dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
-                                                                                 && x.DataSourceId == dataSourceTranslation.DataSourceId)
-                                      > 0
-                                    : _dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                  && x.DataSourceId == dataSourceTranslation.DataSourceId
                                                                                  && x.DataSourceParameterId != dataSourceTranslation.Id)
+                                      > 0
+                                    : _dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
+                                                                                 && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
                     if (doesExist)
                     {
@@ -443,11 +443,11 @@ namespace Linko.LinkoExchange.Services.DataSource
                 case DataSourceTranslationType.Unit:
                     doesExist = dataSourceTranslation.Id.HasValue
                                     ? _dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
-                                                                            && x.DataSourceId == dataSourceTranslation.DataSourceId)
-                                      > 0
-                                    : _dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                             && x.DataSourceId == dataSourceTranslation.DataSourceId
                                                                             && x.DataSourceUnitId != dataSourceTranslation.Id)
+                                      > 0
+                                    : _dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
+                                                                            && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
                     if (doesExist)
                     {

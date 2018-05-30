@@ -87,6 +87,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                  .Where(x => x.OrganizationRegulatoryProgramId == industryOrganizationRegulatoryProgramId
                                                              && x.IsRemoved == false)
                                                  .Select(x => new {x.MonitoringPointId, x.Name})
+                                                 .OrderBy(x => x.Name)
                                                  .ToList();
 
                 return monitoringPoints.Select(x => new ListItemDto
@@ -109,6 +110,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                         && x.CtsEventCategoryName == "SAMPLE"
                                                         && x.IsRemoved == false)
                                             .Select(x => new {x.CtsEventTypeId, x.Name})
+                                            .OrderBy(x => x.Name)
                                             .ToList();
 
                 return sampleTypes.Select(x => new ListItemDto
@@ -130,6 +132,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                   .Where(x => x.OrganizationId == authrotyOrganizationId 
                                                               && x.IsRemoved == false)
                                                   .Select(x => new {x.CollectionMethodId, x.Name})
+                                                  .OrderBy(x => x.Name)
                                                   .ToList();
 
                 return collectionMethods.Select(x => new ListItemDto
@@ -151,6 +154,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                                            .Where(x => x.OrganizationRegulatoryProgramId == authorityOrganizationRegulatoryProgramId 
                                                        && x.IsRemoved == false)
                                            .Select(x => new {x.ParameterId, x.Name})
+                                           .OrderBy(x => x.Name)
                                            .ToList();
 
                 return parameters.Select(x => new ListItemDto
@@ -173,6 +177,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                   && x.IsRemoved == false 
                                                   && x.IsAvailableToRegulatee)
                                       .Select(x => new {x.UnitId, x.Name, x.Description})
+                                      .OrderBy(x => x.Name)
                                       .ToList();
 
                 return units.Select(x => new ListItemDto
