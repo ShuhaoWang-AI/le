@@ -1722,6 +1722,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                             };
             try
             {
+                ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
+
                 var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
 
                 var selectedDataSourceId = GetQueryParameterValueAsInt(parameterName:"DataSourceId");

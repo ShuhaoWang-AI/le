@@ -24,20 +24,6 @@
         </ol>
     </section>
 
-    if (!ViewData.ModelState.IsValid)
-    {
-        var modelStateErrors = ViewData.ModelState.Values.SelectMany(m => m.Errors);
-
-        <div class="alert alert-danger validation-summary-valid" id="validationSummaryMonitoringPoint">
-            <ul>
-                @foreach (var modelStateError in modelStateErrors)
-                {
-                    <li>@modelStateError)</li>
-                }
-            </ul>
-        </div>
-    }
-
     @Html.HiddenFor(model => model.CurrentSampleImportStep)
 
     // SampleImportStep.SelectDataSource
@@ -51,52 +37,55 @@
             </div>
         </div>
         <div class="box-body form-horizontal">
-            @if (ViewData.ModelState.IsValid && Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
             {
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                                 {
                                                                                                                                     @class = "alert alert-danger"
-                                                                                                                                })
-                if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                                                                                                            })
+                if (ViewData.ModelState.IsValid)
                 {
-                    <div class="alert alert-info">
-                        <h5>
-                            You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
-                        </h5>
+                    if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                    {
+                        <div class="alert alert-info">
+                            <h5>
+                                You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
+                            </h5>
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new
+                                                                                           {
+                                                                                               @class = "control-label col-md-2 required"
+                                                                                           })
+                        <div class="col-md-4">
+                            @Html.HiddenFor(model => model.SelectedDataSourceName)
+                            @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources, htmlAttributes:new
+                                                                                                                                                       {
+                                                                                                                                                           @class = "form-control"
+                                                                                                                                                       })
+                            @Html.ValidationMessageFor(model => model.SelectedDataSourceId, validationMessage:"", htmlAttributes:new
+                                                                                                                                 {
+                                                                                                                                     @class = "text-danger"
+                                                                                                                                 })
+                        </div>
+                        <div class="col-md-2">
+                            <input class="btn btn-primary btn-sm" type="button" value="Create New Data Source" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'" />
+                        </div>
                     </div>
+
+                    <script>
+                        $(document)
+                            .ready(function() {
+                                $("#LinkoExchangeForm")
+                                    .submit(function() {
+                                        $("#SelectedDataSourceName").val($("#SelectedDataSourceId option:selected").text());
+                                        return true;
+                                    });
+                            });
+                    </script>
                 }
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2 required"
-                                                                                       })
-                    <div class="col-md-4">
-                        @Html.HiddenFor(model => model.SelectedDataSourceName)
-                        @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources, htmlAttributes:new
-                                                                                                                                                   {
-                                                                                                                                                       @class = "form-control"
-                                                                                                                                                   })
-                        @Html.ValidationMessageFor(model => model.SelectedDataSourceId, validationMessage:"", htmlAttributes:new
-                                                                                                                             {
-                                                                                                                                 @class = "text-danger"
-                                                                                                                             })
-                    </div>
-                    <div class="col-md-2">
-                        <input class="btn btn-primary btn-sm" type="button" value="Create New Data Source" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'" />
-                    </div>
-                </div>
-
-                <script>
-                    $(document)
-                        .ready(function() {
-                            $("#LinkoExchangeForm")
-                                .submit(function() {
-                                    $("#SelectedDataSourceName").val($("#SelectedDataSourceId option:selected").text());
-                                    return true;
-                                });
-                        });
-                </script>
             }
             else
             {
@@ -121,7 +110,7 @@
             }
         </div>
 
-        @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+        @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource && ViewData.ModelState.IsValid)
         {
             <div class="box-footer">
                 <div class="form-group pull-right">
