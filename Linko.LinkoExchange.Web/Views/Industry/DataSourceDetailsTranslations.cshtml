@@ -3,7 +3,7 @@
 @using Linko.LinkoExchange.Web.ViewModels.Shared
 @model DataSourceViewModel
 @{
-    ViewBag.Title = "Data Source Details Translations";
+    ViewBag.Title = "Translations";
 }
 
 
@@ -247,6 +247,78 @@
         </section>
     </div>
 
+    <!-- gridDataSourceUnitTranslation -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Units</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryUnit">
+                <ul></ul>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<DataSourceUnitTranslationViewModel>()
+                          .Name(componentName: "gridDataSourceUnitTranslation")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.DataSourceTerm)
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-3" });
+                              columns.Bound(c => c.Unit)
+                                     .ClientTemplate(value: "#= (Unit==null)? '' : Unit.DisplayName #")
+                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
+                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
+                              columns.Command(command =>
+                              {
+                                  command.Edit();
+                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                              });
+                          })
+                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
+                          .Editable(editable => editable.Mode(mode: GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                          .Pageable(pager => pager.Enabled(value: false))
+                          .Scrollable(s => s.Enabled(value: false))
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .NoRecords(text: "No Unit Translation exists.")
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled: false)
+                                                        .Batch(enabled: false)
+                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                        .Create(create => create.Action(actionName: "CreateDataSourceUnitTranslation", controllerName: "Industry"))
+                                                        .Read(read => read.Action(actionName: "DataSourceDetailsTranslations_Read", controllerName: "Industry", routeValues: new
+                                                        {
+                                                            dataSourceId = Model.Id,
+                                                            translationType = DataSourceTranslationType.Unit
+                                                        }))
+                                                        .Update(update => update.Action(actionName: "UpdateDataSourceUnitTranslation", controllerName: "Industry"))
+                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourcUnitTranslation", controllerName: "Industry"))
+                                                        .PageSize(pageSize: 100)
+                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceUnitTranslation', errorDivId: '#validationSummaryUnit'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.Id);
+                                                            model.Field(p => p.Id).Editable(enabled: false);
+                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
+                                                            model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.Unit);
+                                                            model.Field(p => p.DataSourceTerm);
+                                                            model.Field(p => p.Unit).DefaultValue(ViewData[key: "defaultAuthorityUnit"] as DropdownOptionViewModel);
+                                                        })
+                          ))
+                </div>
+            </div>
+        </section>
+    </div>
+
     <!-- gridDataSourceParameterTranslation -->
     <div class="box box-primary">
         <div class="box-header with-border">
@@ -312,78 +384,6 @@
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.Parameter);
                                                             model.Field(p => p.DataSourceTerm);
                                                             model.Field(p => p.Parameter).DefaultValue(ViewData[key: "defaultAuthorityParameter"] as DropdownOptionViewModel);
-                                                        })
-                          ))
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- gridDataSourceUnitTranslation -->
-    <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">Units</h3>
-            <div class="box-tools pull-right">
-                <button class="btn btn-box-tool" data-widget="collapse">
-                    <i class="fa fa-minus"></i>
-                </button>
-            </div>
-        </div>
-
-        <section class="box-body form-horizontal">
-            <div class="alert alert-danger validation-summary-valid" id="validationSummaryUnit">
-                <ul></ul>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    @* grid name should be start with grid for centralized error handling *@
-                    @(Html.Kendo().Grid<DataSourceUnitTranslationViewModel>()
-                          .Name(componentName:"gridDataSourceUnitTranslation")
-                          .Columns(columns =>
-                          {
-                              columns.Bound(c => c.DataSourceTerm)
-                                     .HtmlAttributes(attributes:new {@class = "col-sm-3"})
-                                     .HeaderHtmlAttributes(attributes:new {@class = "col-sm-3"});
-                              columns.Bound(c => c.Unit)
-                                     .ClientTemplate(value: "#= (Unit==null)? '' : Unit.DisplayName #")
-                                     .HtmlAttributes(attributes: new { @class = "col-sm-6" })
-                                     .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
-                              columns.Command(command =>
-                                              {
-                                                  command.Edit();
-                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
-                                              });
-                          })
-                          .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
-                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine).DisplayDeleteConfirmation(false))
-                          .Pageable(pager => pager.Enabled(value: false))
-                          .Scrollable(s => s.Enabled(value: false))
-                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                          .Resizable(resizable => resizable.Columns(value:true))
-                          .NoRecords(text: "No Unit Translation exists.")
-                          .DataSource(dataSource => dataSource
-                                                        .Ajax()
-                                                        .ServerOperation(enabled:false)
-                                                        .Batch(enabled:false)
-                                                        .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                        .Create(create => create.Action(actionName: "CreateDataSourceUnitTranslation", controllerName: "Industry"))
-                                                        .Read(read => read.Action(actionName:"DataSourceDetailsTranslations_Read", controllerName:"Industry", routeValues:new
-                                                        {
-                                                            dataSourceId = Model.Id,
-                                                            translationType = DataSourceTranslationType.Unit
-                                                        }))
-                                                        .Update(update => update.Action(actionName: "UpdateDataSourceUnitTranslation", controllerName:"Industry"))
-                                                        .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourcUnitTranslation", controllerName:"Industry"))
-                                                        .PageSize(pageSize:100)
-                                                        .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceUnitTranslation', errorDivId: '#validationSummaryUnit'})"))
-                                                        .Model(model =>
-                                                        {
-                                                            model.Id(p => p.Id);
-                                                            model.Field(p => p.Id).Editable(enabled:false);
-                                                            model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
-                                                            model.Field(p => p.TranslationType).Editable(enabled:false).DefaultValue(DataSourceTranslationType.Unit);
-                                                            model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.Unit).DefaultValue(ViewData[key: "defaultAuthorityUnit"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
