@@ -76,24 +76,24 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				var parameterId = importingSampleResult.ColumnMap[key:SampleImportColumnName.ParameterName].TranslatedValueId;
 				var unitId = importingSampleResult.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId;
 
-				if (monitoringPointId <= 0 )
+				if (monitoringPointId <= 0)
 				{
 					var errorMessage = "Invalid Monitoring point translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber);
+					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
 
 				}
 
 				if (parameterId <= 0)
 				{
 					var errorMessage = "Invalid parameter translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber);
+					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
 
 				}
 
 				if (unitId <= 0)
 				{
 					var errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber); 
+					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
 				}
 
 				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
@@ -101,18 +101,22 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				importingSampleResult.EffectiveUnit = GetEffectiveUnit(monitoringPointId:monitoringPointId, parameterId:parameterId, start:start, end:end);
 
 				var fromUnit = _authorityUnitDict[key:unitId];
+				var targetUnit = importingSampleResult.EffectiveUnit;
 
-				try
+				if (fromUnit.UnitId != targetUnit.UnitId)
 				{
-					importingSampleResult.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result:result, currentAuthorityUnit:fromUnit,
-					                                                                                   targetAuthorityUnit:importingSampleResult.EffectiveUnit);
+					try
+					{
+						importingSampleResult.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result:result, currentAuthorityUnit:fromUnit,
+						                                                                                   targetAuthorityUnit:targetUnit);
+					}
+					catch (RuleViolationException ex)
+					{
+						_logger.Warn(message:ex.GetFirstErrorMessage());
+						const string errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
+						AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
+					}
 				}
-				catch (RuleViolationException ex)
-				{
-					_logger.Warn(message:ex.GetFirstErrorMessage());
-					const string errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult: validationResult, errorMessage: errorMessage, rowNumber: importingSampleResult.RowNumber);
-                }
 			}
 		}
 
