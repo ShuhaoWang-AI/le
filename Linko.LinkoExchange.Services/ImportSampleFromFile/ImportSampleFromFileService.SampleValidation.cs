@@ -233,13 +233,18 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var sampleDtos = new List<SampleDto>();
 
 			var min = importingSamples.Min(i => i.Sample.StartDateTimeLocal);
-			var max = importingSamples.Max(i => i.Sample.EndDateTimeLocal); 
+			var max = importingSamples.Max(i => i.Sample.EndDateTimeLocal);
+
+			var massLoadingUnit = _unitService.GetUnitForMassLoadingCalculations();
 
 			// Get existing draft samples for that user;
 			var draftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
 
 			foreach (var importingSample in importingSamples)
 			{
+				var massloadingConversionFactor = importingSample.Sample.MassLoadingConversionFactorPounds;
+				var decimalPlaces = importingSample.Sample.MassLoadingCalculationDecimalPlaces ?? 0;
+
 				// Sample results are in a draft sample, then update that draft
 				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:draftSamples, searchFor:importingSample.Sample);
 				if (drftSamplesToUpdate.Any())
@@ -250,11 +255,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					foreach (var draftSample in drftSamplesToUpdate)
 					{
 						// remove sample results that exists in draft and importing samples
-						var newSampleResults = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value: i.ParameterId)).ToList();
+						var newSampleResults = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
 
 						// update sample results that are in draft
-						newSampleResults.AddRange(collection: importingSample.Sample.SampleResults);
-						draftSample.SampleResults = newSampleResults; 
+						newSampleResults.AddRange(collection:importingSample.Sample.SampleResults);
+						draftSample.SampleResults = newSampleResults;
 
 						// re-calculate all mass loadings 
 						if (importingSample.FlowRow != null || draftSample.FlowValue.HasValue)
@@ -272,10 +277,20 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 								continue;
 							}
 
+							draftSample.FlowUnitId = flowRow.FlowUnitId;
+							draftSample.FlowValue = flowRow.FlowValue;
+							draftSample.FlowUnitName = flowRow.FlowUnitName;
+							draftSample.FlowEnteredValue = flowRow.FlowValue.ToString(CultureInfo.InvariantCulture);
+
 							// re-calculate mass loadings for all sample results
 							foreach (var sampleResult in draftSample.SampleResults)
 							{
-								CreateMassLoadingSampleResult(importFlowRow:flowRow, sampleResultDto:sampleResult);
+								CreateMassLoadingSampleResult(importFlowRow:flowRow,
+								                              sampleResultDto:sampleResult,
+								                              massloadingConversionFactorPounds:massloadingConversionFactor,
+								                              decimalPlaces:decimalPlaces, massLoadingUnitDto:massLoadingUnit,
+								                              useLessThanSignForMassLoading:draftSample.IsMassLoadingResultToUseLessThanSign
+								                             );
 							}
 						}
 					}
@@ -285,6 +300,29 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				else // this sample is a new sample
 				{
 					sampleDtos.Add(item:importingSample.Sample);
+
+					// re-calculate all mass loadings 
+					if (importingSample.FlowRow != null)
+					{
+						// validationResult
+						var flowRow = importingSample.FlowRow;
+						if (flowRow.FlowUnitId < 1)
+						{
+							continue;
+						}
+
+						// re-calculate mass loadings for all sample results
+						foreach (var sampleResult in importingSample.Sample.SampleResults)
+						{
+							CreateMassLoadingSampleResult(
+							                              importFlowRow:flowRow,
+							                              sampleResultDto:sampleResult,
+							                              massloadingConversionFactorPounds:massloadingConversionFactor,
+							                              decimalPlaces:decimalPlaces,
+							                              massLoadingUnitDto:massLoadingUnit,
+							                              useLessThanSignForMassLoading:importingSample.Sample.IsMassLoadingResultToUseLessThanSign);
+						}
+					}
 				}
 			}
 
@@ -345,29 +383,35 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			return sampleResultDto;
 		}
 
-		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto)
+		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto, double? massloadingConversionFactorPounds, int decimalPlaces, UnitDto massLoadingUnitDto, bool useLessThanSignForMassLoading)
 		{
 			if (importFlowRow == null)
 			{
 				return;
 			}
 
-			var massLoadingBaseUnit = "gpd";
+			var massLoadingBaseUnit = "mgd";
 			var resultBaseUnit = "mg/l";
 
-			var flowUnitName = importFlowRow.FlowUnitName;
 			var flowResult = importFlowRow.FlowValue;
-			var massloadingUnitId = importFlowRow.FlowUnitId;
 
-			var massLoadingMultiplier = flowUnitName.Equals(value: massLoadingBaseUnit, comparisonType:StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
-			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(value:resultBaseUnit, comparisonType:StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
-			var massLoadingValue = flowResult * sampleResultDto.Value * massLoadingMultiplier * resultUnitConversionFactor;
-
+			var massLoadingQualifier = "";
+			if (sampleResultDto.Qualifier == "<" && useLessThanSignForMassLoading)
+			{
+				massLoadingQualifier = "<";
+			}
+			 
+			var massLoadingMultiplier = massloadingConversionFactorPounds ?? 0.0f; 
+			var flowUnitConversionFactor = sampleResultDto.UnitName.Equals(value: massLoadingBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
+			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(value: resultBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
+			
+			var massLoadingValue = flowResult * sampleResultDto.Value * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor;
+			massLoadingValue = Math.Round(massLoadingValue?? 0.0f, decimalPlaces, MidpointRounding.AwayFromZero);
 			sampleResultDto.MassLoadingValue = massLoadingValue.ToString();
-			sampleResultDto.MassLoadingQualifier = sampleResultDto.Qualifier;
+			sampleResultDto.MassLoadingQualifier = massLoadingQualifier;
 
-			sampleResultDto.MassLoadingUnitId = massloadingUnitId;
-			sampleResultDto.MassLoadingUnitName = flowUnitName;
+			sampleResultDto.MassLoadingUnitId = massLoadingUnitDto.UnitId;
+			sampleResultDto.MassLoadingUnitName = massLoadingUnitDto.Name;
 		}
 
 		private ImportSampleFromFileValidationResultDto GetValidImportingSamples(SampleImportDto sampleImportDto, out List<ImportSampleWrapper> groupedSampleWrappers)
