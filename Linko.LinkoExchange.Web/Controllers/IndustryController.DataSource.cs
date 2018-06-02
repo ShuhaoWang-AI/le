@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var id = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var industry = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:id);
-            ViewBag.Title = string.Format(format:"{0} Data Sources", arg0:industry.OrganizationDto.OrganizationName);
+            ViewBag.Title = string.Format(format:"{0} Data Providers", arg0:industry.OrganizationDto.OrganizationName);
 
             return View();
         }
@@ -79,8 +79,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:new
                                  {
                                      redirect = false,
-                                     message = "Please select an Data Source."
-                                 });
+                                     message = "Please select an Data Provider."
+                });
             }
             catch (RuleViolationException rve)
             {
@@ -122,7 +122,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              Description = model.Description
                                                                          });
                 ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = "Data Source created successfully!";
+                ViewBag.SuccessMessage = "Data Provider created successfully!";
                 ModelState.Clear();
                 return RedirectToAction(actionName:"DataSourceDetails", controllerName:"Industry", routeValues:new {id});
             }
@@ -161,7 +161,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                     Description = model.Description
                                                                 });
                 ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = "Data Source updated successfully!";
+                ViewBag.SuccessMessage = "Data Provider updated successfully!";
                 ModelState.Clear();
                 model = PrepareDataSourcesDetails(id:id);
             }
@@ -194,7 +194,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var rve = new RuleViolationException(
                                                      "Validation errors",
-                                                     new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:"Remove Data Source failed."));
+                                                     new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage: "Remove Data Provider failed."));
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 model = PrepareDataSourcesDetails(id:id);
                 return View(viewName:"DataSourceDetails", model:model);

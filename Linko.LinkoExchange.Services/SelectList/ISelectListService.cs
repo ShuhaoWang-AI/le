@@ -5,10 +5,10 @@ namespace Linko.LinkoExchange.Services.SelectList
 {
     public interface ISelectListService
     {
-        IEnumerable<ListItemDto> GetIndustryMonitoringPointSelectList();
-        IEnumerable<ListItemDto> GetAuthoritySampleTypeSelectList();
-        IEnumerable<ListItemDto> GetAuthorityCollectionMethodSelectList();
-        IEnumerable<ListItemDto> GetAuthorityParameterSelectList();
-        IEnumerable<ListItemDto> GetAuthorityUnitSelectList();
+        List<ListItemDto> GetIndustryMonitoringPointSelectList(bool withEmptyItem = false);
+        List<ListItemDto> GetAuthoritySampleTypeSelectList(bool withEmptyItem = false);
+        List<ListItemDto> GetAuthorityCollectionMethodSelectList(bool withEmptyItem = false);
+        List<ListItemDto> GetAuthorityParameterSelectList(bool withEmptyItem = false);
+        List<ListItemDto> GetAuthorityUnitSelectList(bool withEmptyItem = false);
     }
 }

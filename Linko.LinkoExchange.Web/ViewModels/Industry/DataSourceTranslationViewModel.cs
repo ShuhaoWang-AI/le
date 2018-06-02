@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public int DataSourceId { get; set; }
 
-        [Display(Name = "This was in the file")]
+        [Display(Name = "Import file term")]
         public string DataSourceTerm { get; set; }
 
         public DataSourceTranslationType TranslationType { get; set; }
@@ -42,7 +42,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #region public properties
 
         [UIHint(uiHint:"AuthorityMonitoringPointEditor")]
-        [Display(Name = "Choose which Monitoring Point this is")]
+        [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel MonitoringPoint { get; set; }
 
         public override DropdownOptionViewModel TranslatedItem
@@ -59,7 +59,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #region public properties
 
         [UIHint(uiHint:"AuthoritySampleTypeEditor")]
-        [Display(Name = "Choose which Sample Type this is")]
+        [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel SampleType { get; set; }
 
         public override DropdownOptionViewModel TranslatedItem
@@ -76,7 +76,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #region public properties
 
         [UIHint(uiHint:"AuthorityCollectionMethodEditor")]
-        [Display(Name = "Choose which Collection Method this is")]
+        [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel CollectionMethod { get; set; }
 
         public override DropdownOptionViewModel TranslatedItem
@@ -93,7 +93,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #region public properties
 
         [UIHint(uiHint:"AuthorityParameterEditor")]
-        [Display(Name = "Choose which Parameter this is")]
+        [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel Parameter { get; set; }
 
         public override DropdownOptionViewModel TranslatedItem
@@ -110,7 +110,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         #region public properties
 
         [UIHint(uiHint:"AuthorityUnitEditor")]
-        [Display(Name = "Choose which Unit this is")]
+        [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel Unit { get; set; }
 
         public override DropdownOptionViewModel TranslatedItem

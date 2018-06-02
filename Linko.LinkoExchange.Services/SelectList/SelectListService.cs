@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Services.SelectList
         #region Implementation of ISelectListService
 
         /// <inheritdoc />
-        public IEnumerable<ListItemDto> GetIndustryMonitoringPointSelectList()
+        public List<ListItemDto> GetIndustryMonitoringPointSelectList(bool withEmptyItem = false)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
@@ -90,16 +90,21 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                  .OrderBy(x => x.Name)
                                                  .ToList();
 
-                return monitoringPoints.Select(x => new ListItemDto
+                var list = monitoringPoints.Select(x => new ListItemDto
                 {
-                                                        Id = x.MonitoringPointId,
-                                                        DisplayValue = x.Name
-                                                    });
+                    Id = x.MonitoringPointId,
+                    DisplayValue = x.Name
+                }).ToList();
+                if (withEmptyItem)
+                {
+                    list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Monitoring Point" });
+                }
+                return list;
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<ListItemDto> GetAuthoritySampleTypeSelectList()
+        public List<ListItemDto> GetAuthoritySampleTypeSelectList(bool withEmptyItem = false)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
@@ -113,16 +118,21 @@ namespace Linko.LinkoExchange.Services.SelectList
                                             .OrderBy(x => x.Name)
                                             .ToList();
 
-                return sampleTypes.Select(x => new ListItemDto
+                var list = sampleTypes.Select(x => new ListItemDto
                 {
-                                                   Id = x.CtsEventTypeId,
-                                                   DisplayValue = x.Name
-                                               });
+                    Id = x.CtsEventTypeId,
+                    DisplayValue = x.Name
+                }).ToList();
+                if (withEmptyItem)
+                {
+                    list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Sample Type" });
+                }
+                return list;
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<ListItemDto> GetAuthorityCollectionMethodSelectList()
+        public List<ListItemDto> GetAuthorityCollectionMethodSelectList(bool withEmptyItem = false)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
@@ -135,16 +145,21 @@ namespace Linko.LinkoExchange.Services.SelectList
                                                   .OrderBy(x => x.Name)
                                                   .ToList();
 
-                return collectionMethods.Select(x => new ListItemDto
+                var list = collectionMethods.Select(x => new ListItemDto
                 {
-                                                         Id = x.CollectionMethodId,
-                                                         DisplayValue = x.Name
-                                                     });
+                    Id = x.CollectionMethodId,
+                    DisplayValue = x.Name
+                }).ToList();
+                if (withEmptyItem)
+                {
+                    list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Collection Method" });
+                }
+                return list;
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<ListItemDto> GetAuthorityParameterSelectList()
+        public List<ListItemDto> GetAuthorityParameterSelectList(bool withEmptyItem = false)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
@@ -157,16 +172,21 @@ namespace Linko.LinkoExchange.Services.SelectList
                                            .OrderBy(x => x.Name)
                                            .ToList();
 
-                return parameters.Select(x => new ListItemDto
+                var list = parameters.Select(x => new ListItemDto
                 {
-                                                  Id = x.ParameterId,
-                                                  DisplayValue = x.Name
-                                              });
+                    Id = x.ParameterId,
+                    DisplayValue = x.Name
+                }).ToList();
+                if (withEmptyItem)
+                {
+                    list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Parameter" });
+                }
+                return list;
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<ListItemDto> GetAuthorityUnitSelectList()
+        public List<ListItemDto> GetAuthorityUnitSelectList(bool withEmptyItem = false)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
@@ -180,12 +200,17 @@ namespace Linko.LinkoExchange.Services.SelectList
                                       .OrderBy(x => x.Name)
                                       .ToList();
 
-                return units.Select(x => new ListItemDto
+                var list = units.Select(x => new ListItemDto
                 {
                     Id = x.UnitId,
                     DisplayValue = x.Name,
                     Description = x.Description
-                });
+                }).ToList();
+                if (withEmptyItem)
+                {
+                    list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Unit" });
+                }
+                return list;
             }
         }
 

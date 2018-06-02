@@ -5,17 +5,13 @@
         <li>
             <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Home")'"><i class=""></i> Home </a>
         </li>
-        <li class="active">DataSources</li>
+        <li class="active">Data Providers</li>
     </ol>
 </section>
 <div class="box box-primary">
     <div class="box-header with-border">
         <div>
-            <span class="box-title">Data Sources</span>
-            <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" type="button"
-                    title="Data Sources identify who is providing you the sample data you are importing. A lab for example">
-                <i class="fa fa-info-circle fa-lg"></i>
-            </button>
+            <span class="box-title">Data Providers</span>
         </div>
         
         <div class="box-tools pull-right">
@@ -32,7 +28,7 @@
             var vm = new ConfirmationMessageViewModal
             {
                 ShowMessage = TempData[key: "DeleteDataSourceSucceed"] != null,
-                Messaage = "Data Source deleted successfully."
+                Messaage = "Data Provider deleted successfully."
             };
 
             @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
@@ -43,7 +39,7 @@
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<DataSourceViewModel>()
-                      .Name(componentName: "gridDataSource")
+                      .Name(componentName: "gridDataProvider")
                       .Columns(columns =>
                       {
                           columns.Bound(c => c.Name)
@@ -81,7 +77,7 @@
                                                     }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName: "DataSources_Read", controllerName: "Industry"))
                                                     .PageSize(pageSize: 10)
-                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridDataSource'})"))
+                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridDataProvider'})"))
                       )
                 )
             </div>
@@ -93,10 +89,10 @@
     <script type="text/javascript">
         gotoNextPage = function()
         {
-            var grid = $("#gridDataSource").data("kendoGrid");
+            var grid = $("#gridDataProvider").data("kendoGrid");
             var postUrl = "@Url.Action(actionName: "DataSources_Select", controllerName:"Industry")";
 
-            doAjaxAction(grid, postUrl, "", "Select an Data Source");
+            doAjaxAction(grid, postUrl, "", "Select an Data Provider");
         };
 
     </script>
