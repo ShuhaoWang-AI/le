@@ -1,0 +1,199 @@
+﻿@using Linko.LinkoExchange.Core.Enum
+@model Linko.LinkoExchange.Web.ViewModels.Shared.FileVersionViewModel.FileVersionFieldViewModel
+
+@Styles.Render(paths:"~/bundles/icheck")
+@Scripts.Render(paths:"~/bundles/jquery")
+
+<style>
+    .form-control[disabled]
+    {
+        cursor: text;
+    }
+</style>
+
+<section class="form-horizontal" style="width: 97%;">
+
+    @Html.HiddenFor(model => model.FileVersionFieldId)
+
+    <div class="col-md-12">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.FileVersionFieldName, htmlAttributes:new
+                                                                               {
+                                                                                   @class = "control-label col-md-3"
+                                                                               })
+
+            <div class="col-md-7">
+                @Html.EditorFor(model => model.FileVersionFieldName, additionalViewData:new
+                                                                                        {
+                                                                                            htmlAttributes = new
+                                                                                                             {
+                                                                                                                 @class = "form-control",
+                                                                                                                 maxlength = 50
+                                                                                                             }
+                                                                                        })
+                @Html.ValidationMessageFor(model => model.FileVersionFieldName)
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.SystemFieldName, htmlAttributes:new
+                                                                          {
+                                                                              @class = "control-label col-md-3"
+                                                                          })
+
+            <div class="col-md-7">
+                @Html.TextBoxFor(model => model.SystemFieldNameDisplayText, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "form-control",
+                                                                                             disabled = "disabled"
+                                                                                         })
+                @Html.ValidationMessageFor(model => model.SystemFieldName)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes:new
+                                                                      {
+                                                                          @class = "control-label col-md-3"
+                                                                      })
+
+            <div class="col-md-7">
+                @Html.TextAreaFor(model => model.Description, htmlAttributes:new
+                                                                             {
+                                                                                 @class = "form-control",
+                                                                                 rows = 5,
+                                                                                 maxlength = 500
+                                                                             })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.IsIncluded, htmlAttributes:new
+                                                                     {
+                                                                         @class = "control-label col-md-3"
+                                                                     })
+
+            <div class="col-md-7">
+                @Html.CheckBoxFor(model => model.IsIncluded)
+                @Html.ValidationMessageFor(model => model.IsIncluded)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.DataOptionalityName, htmlAttributes:new
+                                                                              {
+                                                                                  @class = "control-label col-md-3"
+                                                                              })
+            <div class="col-md-7">
+
+                @Html.DropDownListFor(model => model.DataOptionalityName,
+                    selectList:Model.AvailableResultQualifierValidValues,
+                    htmlAttributes:new
+                                   {
+                                       @class = "form-control"
+                                   })
+                @Html.ValidationMessageFor(model => model.DataOptionalityName)
+
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-3"
+                                                                           })
+
+            <div class="col-md-7">
+                @Html.CheckBoxFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                                  {
+                                                                                      disabled = "disabled"
+                                                                                  })
+                @Html.ValidationMessageFor(model => model.IsSystemRequired)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.DataFormatName, htmlAttributes:new
+                                                                         {
+                                                                             @class = "control-label col-md-3"
+                                                                         })
+
+            <div class="col-md-7">
+                @Html.TextBoxFor(model => model.DataFormatDescription, htmlAttributes:new
+                                                                                      {
+                                                                                          @class = "form-control",
+                                                                                          disabled = "disabled"
+                                                                                      })
+                @Html.ValidationMessageFor(model => model.DataFormatName)
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.Size, htmlAttributes:new
+                                                               {
+                                                                   @class = "control-label col-md-3"
+                                                               })
+
+            <div class="col-md-7">
+                @Html.TextBoxFor(model => model.Size, htmlAttributes:new
+                                                                     {
+                                                                         @class = "form-control",
+                                                                         @readonly = "readonly"
+                                                                     })
+                @Html.ValidationMessageFor(model => model.Size)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.ExampleData, htmlAttributes:new
+                                                                      {
+                                                                          @class = "control-label col-md-3"
+                                                                      })
+
+            <div class="col-md-7">
+                @Html.TextAreaFor(model => model.ExampleData, htmlAttributes:new
+                                                                             {
+                                                                                 @class = "form-control",
+                                                                                 rows = 5,
+                                                                                 maxlength = 500
+                                                                             })
+                @Html.ValidationMessageFor(model => model.ExampleData)
+            </div>
+        </div>
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.AdditionalComments, htmlAttributes:new
+                                                                             {
+                                                                                 @class = "control-label col-md-3"
+                                                                             })
+
+            <div class="col-md-7">
+                @Html.TextAreaFor(model => model.AdditionalComments, htmlAttributes:new
+                                                                                    {
+                                                                                        @class = "form-control",
+                                                                                        rows = 5,
+                                                                                        maxlength = 500
+                                                                                    })
+                @Html.ValidationMessageFor(model => model.AdditionalComments)
+            </div>
+        </div>
+    </div>
+</section>
+
+@Scripts.Render(paths:"~/Bundles/js_icheck")
+
+<script>
+    $(function() {
+        $('input[type="checkbox"]').iCheck({ checkboxClass: "icheckbox_minimal-blue" });
+    });
+
+
+    $(function() {
+        if ($("#IsSystemRequired").is(':checked')) {
+            $("option[value='@((int) DataOptionalityName.Optional)']").remove();
+        } else {
+            $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
+            }
+    });
+
+</script>

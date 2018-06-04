@@ -79,5 +79,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         FileVersionDto GetFileVersion();
 
         void ImportSampleAndCreateAttachment(SampleImportDto sampleImportDto);
+        
+        FileVersionDto GetFileVersionForAuthorityConfiguration(FileVersionTemplateName fileVersionTemplateName);
     }
 }

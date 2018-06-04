@@ -515,6 +515,55 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
+        public FileVersionDto GetFileVersionForAuthorityConfiguration(FileVersionTemplateName fileVersionTemplateName)
+        {
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
+            {
+                var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                var authority = _organizationService.GetAuthority(orgRegProgramId:currentRegulatoryProgramId);
+
+                var fileVersionTemplate = _dbContext.FileVersionTemplates.FirstOrDefault(i => i.Name == fileVersionTemplateName.ToString());
+
+                if (fileVersionTemplate == null)
+                {
+                    throw new ArgumentException(message:$"File version template {fileVersionTemplateName} not found!");
+                }
+
+                var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                
+                var fileVersionDto = _mapHelper.ToDto(fromDomainObject:fileVersion);
+
+                fileVersionDto = _mapHelper.MargeToFileVersionDto(fileVersionDto:fileVersionDto, fileVersionTemplate:fileVersionTemplate);
+
+                if (fileVersion == null)
+                {
+                    fileVersionDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
+                    fileVersionDto.OrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(currentRegulatoryProgramId);
+                }
+
+                if (fileVersion?.LastModificationDateTimeUtc != null)
+                {
+                    var lastModificationDateTimeUtc = (DateTime) fileVersion?.LastModificationDateTimeUtc?.UtcDateTime;
+                    fileVersionDto.LastModificationDateTimeLocal =
+                        _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(utcDateTime:lastModificationDateTimeUtc, orgRegProgramId:currentRegulatoryProgramId);
+                }
+
+                if (fileVersionDto.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == fileVersionDto.LastModifierUserId.Value);
+                    fileVersionDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    fileVersionDto.LastModifierFullName = "N/A";
+                }
+
+                return fileVersionDto;
+                
+            }
+        }
+
+        /// <inheritdoc />
         public void RemoveImportTempFile(int importTempFileId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"importTempFileId={importTempFileId}"))
@@ -752,7 +801,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                                 case DataOptionalityName.Optional: break;
                                 case DataOptionalityName.Recommended:
-                                    //TODO: User Story 8199, could reserve cell optinality state to speed up missing default values look up
+                                    //TODO: User Story 8199, could reserve cell optionality state to speed up missing default values look up
                                     break;
                                 default: throw new NotImplementedException();
                             }

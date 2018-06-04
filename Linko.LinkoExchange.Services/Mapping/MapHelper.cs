@@ -1738,21 +1738,70 @@ namespace Linko.LinkoExchange.Services.Mapping
 			return new FileVersionFieldDto
 			       {
 				       FileVersionFieldId = fromDomainObject.FileVersionFieldId,
-				       FileVersionId = fromDomainObject.FileVersionId,
 					   SystemFieldName = (SampleImportColumnName)fromDomainObject.SystemFieldId,
 				       FileVersionFieldName = fromDomainObject.Name,
 					   DataFormatName = (DataFormatName)fromDomainObject.SystemField.DataFormatId,
+					   DataFormatDescription = fromDomainObject.SystemField.DataFormat.Description,
 				       Description = fromDomainObject.Description,
 				       DataOptionalityName = (DataOptionalityName)fromDomainObject.DataOptionalityId,
 				       IsSystemRequired =fromDomainObject.SystemField.IsRequired,
 				       Size = fromDomainObject.Size,
 				       ExampleData = fromDomainObject.ExampleData,
-				       AdditionalComments = fromDomainObject.AdditionalComments
+				       AdditionalComments = fromDomainObject.AdditionalComments,
+					   IsIncluded = true
+			       };
+		}
+
+
+		/// <inheritdoc />
+		public FileVersionDto MargeToFileVersionDto(FileVersionDto fileVersionDto, FileVersionTemplate fileVersionTemplate)
+		{
+			var dto = new FileVersionDto
+			                        {
+				                        Name = fileVersionTemplate.Name,
+				                        Description = fileVersionTemplate.Description,
+				                        FileVersionFields = fileVersionTemplate.FileVersionTemplateFields.Select(ToFileVersionFieldDto).ToList()
+			                        };
+
+			if (fileVersionDto != null)
+			{
+				fileVersionDto.FileVersionFields.ForEach(x => x.IsIncluded = true);
+
+				dto.FileVersionId = fileVersionDto.FileVersionId;
+				dto.Name = fileVersionDto.Name;
+				dto.LastModifierUserId = fileVersionDto.LastModifierUserId;
+				dto.Description = fileVersionDto.Description;
+				dto.FileVersionFields.RemoveAll(x => fileVersionDto.FileVersionFields.Exists(y => y.SystemFieldName == x.SystemFieldName));
+				dto.FileVersionFields.AddRange(collection:fileVersionDto.FileVersionFields);
+				dto.OrganizationRegulatoryProgramId = fileVersionDto.OrganizationRegulatoryProgramId;
+				dto.OrganizationRegulatoryProgram = fileVersionDto.OrganizationRegulatoryProgram;
+
+				//dto.LastModificationDateTimeLocal = service will populate later,
+			}
+
+			return dto;
+		}
+
+		private FileVersionFieldDto ToFileVersionFieldDto(FileVersionTemplateField fromDomainObject)
+		{
+			return new FileVersionFieldDto
+			       {
+				       SystemFieldName = (SampleImportColumnName) fromDomainObject.SystemFieldId,
+				       FileVersionFieldName = fromDomainObject.SystemField.Name,
+				       DataFormatName = (DataFormatName) fromDomainObject.SystemField.DataFormatId,
+					   DataFormatDescription = fromDomainObject.SystemField.DataFormat.Description,
+				       Description = fromDomainObject.SystemField.Description,
+				       DataOptionalityName = fromDomainObject.SystemField.IsRequired ? DataOptionalityName.Required : DataOptionalityName.Optional,
+				       IsSystemRequired = fromDomainObject.SystemField.IsRequired,
+				       Size = fromDomainObject.SystemField.Size,
+				       ExampleData = fromDomainObject.SystemField.ExampleData,
+				       AdditionalComments = fromDomainObject.SystemField.AdditionalComments,
+				       IsIncluded = false
 			       };
 		}
 
 		#endregion
-		public List<MonitoringPointParameterDto> GetMonitoringPointParameterDtoFromMonitoringPointParameter(ICollection<MonitoringPointParameter> monitoringPointParameters)
+		private List<MonitoringPointParameterDto> GetMonitoringPointParameterDtoFromMonitoringPointParameter(ICollection<MonitoringPointParameter> monitoringPointParameters)
 		{
 			return monitoringPointParameters?.Select(i => new MonitoringPointParameterDto
 			                                             {

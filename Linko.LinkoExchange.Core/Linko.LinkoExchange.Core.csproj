@@ -184,6 +184,7 @@
     <Compile Include="Enum\ReportStatusName.cs" />
     <Compile Include="Enum\ResultComplianceType.cs" />
     <Compile Include="Enum\SampleNameCreationRuleOption.cs" />
+    <Compile Include="Enum\FileVersionTemplateName.cs" />
     <Compile Include="Enum\SampleStatusName.cs" />
     <Compile Include="Enum\SettingType.cs" />
     <Compile Include="Enum\DataOptionalityName.cs" />

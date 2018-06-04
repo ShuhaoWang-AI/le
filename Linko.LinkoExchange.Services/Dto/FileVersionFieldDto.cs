@@ -7,7 +7,7 @@ namespace Linko.LinkoExchange.Services.Dto
         #region public properties
 
         public int? FileVersionFieldId { get; set; }
-        public int FileVersionId { get; set; }
+
         /// <summary>
         /// System column name
         /// </summary>
@@ -17,12 +17,18 @@ namespace Linko.LinkoExchange.Services.Dto
         /// </summary>
         public string FileVersionFieldName { get; set; }
         public DataFormatName DataFormatName { get; set; }
+        public string DataFormatDescription { get; set; }
         public string Description { get; set; }
         public DataOptionalityName DataOptionalityName { get; set; }
         public bool IsSystemRequired { get; set; }
         public int? Size { get; set; }
         public string ExampleData { get; set; }
         public string AdditionalComments { get; set; }
+
+        /// <summary>
+        /// Used in authority portal to select the system field in the File Version 
+        /// </summary>
+        public bool IsIncluded { get; set; } 
 
         #endregion
     }

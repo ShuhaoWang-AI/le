@@ -1,0 +1,182 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+@{
+    ViewBag.Title = "Sample Import Template";
+}
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
+{
+    @Html.AntiForgeryToken()
+
+    <section class="">
+        <ol class="breadcrumb">
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li class="active">Sample Import Template</li>
+        </ol>
+    </section>
+
+    <style>
+
+/*
+    Increase the width of the edit form.
+    The default one is 400px.
+*/
+
+        .k-edit-form-container
+        {
+            width: 75vw;
+        }
+
+        @@media (max-width: 767px) {
+            .k-edit-form-container
+            {
+                width: 90vw;
+            }
+                                   }
+    </style>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Sample Import Template Customization</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <section class="box-body form-horizontal">
+            <div class="alert alert-danger validation-summary-valid" id="validationSummaryImportFileTemplate">
+                <h5>
+                    @Message.ValidationSummaryHeaderText
+                </h5>
+                <ul></ul>
+            </div>
+
+            <div class="alert alert-info">
+                <h5>
+                    Customize the Sample Import Template here. Modify the default "Column Header", "Column Description", "Example Data",
+                    "Additional Comments" as like you want. Check the "Is Included" Checkbox to include the column into the template. All System
+                    requied field needs to be included.
+                    You can make "System Required" field as "Recommended". Then if it is not included in the file, the LinkoExchange user will be
+                    prompted to choose this data during the import process. Currently only "MonitoringPoint", "SampleType" and "CollectionMethod"
+                    support this feature.
+                    You can make "System Non-required" field as "Required" if you want to force industry user to must include that column value in
+                    the imported file.
+
+                </h5>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<FileVersionViewModel.FileVersionFieldViewModel>()
+                          .Name(componentName:"gridAuthorityImportFileTemplate")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.SystemFieldName);
+                              columns.Bound(c => c.FileVersionFieldName);
+
+                              //columns.Bound(c => c.IsSystemRequired).ClientTemplate(value: "#= IsSystemRequired ? 'Yes' : 'No' #").Width(pixelWidth: 75);
+                              columns.Bound(c => c.DataOptionalityName);
+                              columns.Bound(c => c.Size);
+                              columns.Bound(c => c.DataFormatName);
+
+                              //columns.Bound(c => c.Description);
+                              //columns.Bound(c => c.ExampleData);
+                              //columns.Bound(c => c.AdditionalComments);
+
+                              columns.Bound(c => c.IsIncluded)
+                                     .ClientTemplate(value:"#= IsIncluded ? 'Yes' : 'No' #")
+                                     .ClientGroupHeaderTemplate(value:"#= value ? 'Included in Template': 'Not Included in Template'#")
+                                     .Hidden(value:true)
+                                     .Width(pixelWidth:75);
+                              columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
+                          })
+                          .ClientDetailTemplateId(id:"detailTemplate")
+                          .Editable(editable => editable.Mode(mode:GridEditMode.PopUp).TemplateName(templateName:"FileVersionFieldEditor"))
+                          .Pageable(pageable => pageable.Enabled(value:false))
+                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+
+                          //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                          .Resizable(resizable => resizable.Columns(value:true))
+                          .Scrollable(s => s.Height(value:"auto"))
+                          .NoRecords(text:"No system field exists.")
+                          .Events(events => events.DataBound(handler:"dataBound"))
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled:false)
+                                                        .Batch(enabled:false)
+                                                        .Sort(sort => { sort.Add(memberName: "SystemFieldNameDisplayText").Ascending(); }) // <-- initial sort expression
+                                                        .Read(read => read.Action(actionName:"ImportFileTemplate_Read", controllerName:"Authority"))
+                                                        .Update(update => update.Action(actionName:"ImportFileTemplate_Update", controllerName:"Authority"))
+                                                        .Events(events => events.Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(p => p.FileVersionFieldId);
+                                                            model.Field(p => p.FileVersionFieldId).Editable(enabled:false);
+                                                            model.Field(p => p.SystemFieldName).Editable(enabled:false);
+                                                            model.Field(p => p.FileVersionFieldName);
+                                                            model.Field(p => p.IsSystemRequired).Editable(enabled:false);
+                                                            model.Field(p => p.DataOptionalityName);
+                                                            model.Field(p => p.Size).Editable(enabled:false);
+                                                            model.Field(p => p.DataFormatName).Editable(enabled:false);
+                                                            model.Field(p => p.Description);
+                                                            model.Field(p => p.ExampleData);
+                                                            model.Field(p => p.AdditionalComments);
+                                                            model.Field(p => p.IsIncluded);
+                                                        })
+                                                        .Group(g => g.AddDescending(c => c.IsIncluded))
+                          )
+                          )
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        function error_handler_ImportFileTemplate(e) {
+            if (e.errors) {
+                var errorMessages = [];
+                $.each(e.errors, function(key, value) {
+                    if ("errors" in value) {
+                        $.each(value.errors, function() {
+                            errorMessages.push("<li>" + this + "</li>");
+                        });
+                    }
+                });
+
+                var validationSummary = $("#validationSummaryImportFileTemplate");
+
+                validationSummary.removeClass("validation-summary-valid");
+                validationSummary.addClass("validation-summary-errors");
+
+                validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+
+                validationSummary.find("ul").append(errorMessages);
+
+                // Cancel the changes.
+                var grid = $(this.gridId).data("kendoGrid");
+                grid.one("dataBinding", function(e) {
+                    e.preventDefault(); // cancel grid rebind if error occurs
+                });
+
+                $(".k-button")
+                    .click(function() {
+                        var validationSummary = $("#validationSummaryImportFileTemplate");
+
+                        validationSummary.addClass("validation-summary-valid");
+                        validationSummary.removeClass("validation-summary-errors");
+                        validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                    });
+            }
+        }
+
+        function dataBound() {
+            this.expandRow(this.tbody.find("tr.k-master-row").first());
+        }
+    </script>
+
+    <script id="detailTemplate" type="text/kendo-tmpl">
+         <div class="row"><strong class = "col-md-2 text-right">Description:</strong> #: Description # </div>
+         <div class="row"><strong class = "col-md-2 text-right">Example Data:</strong>#: ExampleData #  </div>
+         <div class="row"><strong class = "col-md-2 text-right">Additional Comments:</strong>#: AdditionalComments #  </div> 
+    </script>
+}

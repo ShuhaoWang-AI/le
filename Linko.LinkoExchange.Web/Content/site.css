@@ -201,6 +201,11 @@ input[type="search"]::-webkit-search-cancel-button
     -webkit-appearance: searchfield-cancel-button;
 }
 
+.form-control[disabled]
+{
+    cursor: text;
+}
+
 
 /* Start: Custom notification template*/
 
