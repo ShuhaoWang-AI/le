@@ -151,7 +151,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 				                       Border = tableBorder,
 				                       DefaultCellBorder = tableBorder,
 				                       DefaultCellPadding = new MarginInfo(left:5, bottom:2, right:2, top:2),
-				                       Margin = {Top = 20},
+				                       Margin = {Top = 22},
 				                       IsBroken = true,
 				                       RepeatingRowsCount = 2
 			                       };
@@ -199,7 +199,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 			row.DefaultCellTextState = leftTextBoldSize9;
 			row.BackgroundColor = Color.LightGray;
 			row.Border = tableBorder;
-			var cell = row.Cells.Add(text:$"Monitoring Point:{monitoringPointName}");
+			var cell = row.Cells.Add(text:$"Monitoring Point: {monitoringPointName}");
 			cell.ColSpan = 10;
 			cell.Margin = new MarginInfo(bottom:10.0, left:5.0, right:5.0, top:5.0);
 

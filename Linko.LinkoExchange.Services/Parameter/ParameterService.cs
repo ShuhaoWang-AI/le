@@ -659,7 +659,6 @@ namespace Linko.LinkoExchange.Services.Parameter
 			                                                    i.LimitType.Name.Equals(LimitTypeName.Monthly.ToString(), StringComparison.OrdinalIgnoreCase)) &&
 			                                                   (i.LimitBasis.Name.Equals(LimitBasisName.Concentration.ToString(), StringComparison.OrdinalIgnoreCase) ||
 			                                                    i.LimitBasis.Name.Equals(LimitBasisName.MassLoading.ToString(), StringComparison.OrdinalIgnoreCase)))
-			                                       .OrderBy(i => i.MonitoringPointParameter.MonitoringPoint.Name)
 			                                       .GroupBy(j => j.MonitoringPointParameter.MonitoringPoint, (key, group) => new
 			                                                                                                                 {
 				                                                                                                                 MonitoringPoint = key,
@@ -668,8 +667,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 				                                                                                                                      .ThenBy(l => l.MonitoringPointParameter.EffectiveDateTime)
 				                                                                                                                      .ThenBy(m => m.MonitoringPointParameter.RetirementDateTime)
 				                                                                                                                      .ToList()
-			                                                                                                                 });
-
+			                                                                                                                 })
+												   .OrderBy(i => i.MonitoringPoint.Name);
+			
 			var parameterLimitsByMonitoringPoints = new List<ParameterLimitsByMonitoringPoint>();
 			foreach (var mp in monitoringPointsLimits)
 			{
