@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Parameter;
@@ -43,6 +44,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private readonly ICromerrAuditLogService _cromerrLogService;
         private readonly IHttpContextService _httpContextService;
+        private readonly IImportSampleFromFileService _importSampleFromFileService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
 
@@ -77,7 +79,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             IReportTemplateService reportTemplateService,
             IUnitService unitService,
             IReportPackageService reportPackageService,
-            ISampleService sampleService)
+            ISampleService sampleService,
+            IImportSampleFromFileService importSampleFromFileService)
             : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService, unitService:unitService)
         {
             _organizationService = organizationService;
@@ -94,6 +97,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _reportElementService = reportElementService;
             _reportTemplateService = reportTemplateService;
             _unitService = unitService;
+            _importSampleFromFileService = importSampleFromFileService;
         }
 
         #endregion
@@ -2621,12 +2625,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     Name = vm.Name,
                                                     SystemUnit = new SystemUnitViewModel {Id = vm.SystemUnitId, Name = vm.SystemUnit?.Name ?? ""},
                                                     IsAvailableToRegulatee = vm.IsAvailableToRegulatee,
-                                                    IsReviewed = vm.IsReviewed
+                                                    ShowInBadgeCount = !vm.IsReviewed
                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request);
 
-            return Json(data:result);
+            return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -2654,9 +2658,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
                 unitDto.IsAvailableToRegulatee = viewModel.IsAvailableToRegulatee;
-                unitDto.IsReviewed = viewModel.IsReviewed;
+                if (viewModel.IsAvailableToRegulatee)
+                {
+                    viewModel.ShowInBadgeCount = false;
+                }
+
+                unitDto.IsReviewed = !viewModel.ShowInBadgeCount;
 
                 _unitService.UpdateAuthorityUnit(unitDto:unitDto);
+
+                viewModel.BadgeCount = _unitService.GetMissingAuthorityUnitToSystemUnitTranslationCount();
             }
 
             return Json(data:new[] {viewModel}.ToDataSourceResult(request:request, modelState:ModelState));
@@ -2673,9 +2684,61 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                     UnitDimensionId = vm.UnitDimensionId,
                                                                     UnitDimensionName = vm.UnitDimension.Name
                                                                 }).OrderBy(x => x.UnitDimensionName).ThenBy(x => x.Name).ToList();
-            availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel {Name = @"Select System Unit", Description = "", Id = null, UnitDimensionId = null, UnitDimensionName = ""});
+            availableSystemUnits.Insert(index:0, item:new SystemUnitViewModel
+                                                      {
+                                                          Name = @"Select System Unit",
+                                                          Description = "",
+                                                          Id = null,
+                                                          UnitDimensionId = null,
+                                                          UnitDimensionName = ""
+                                                      });
             ViewData[key:"availableSystemUnits"] = availableSystemUnits;
             ViewData[key:"defaultSystemUnit"] = availableSystemUnits.First();
+        }
+
+        #endregion
+
+        #region Sample Import File template
+
+        public ActionResult ImportFileTemplate()
+        {
+            return View();
+        }
+
+        public ActionResult ImportFileTemplate_Read([CustomDataSourceRequest] DataSourceRequest request)
+        {
+            var dto = _importSampleFromFileService.GetFileVersionForAuthorityConfiguration(fileVersionTemplateName:FileVersionTemplateName.SampleImport);
+            var viewModels = dto.FileVersionFields
+                                .Select(x => new FileVersionViewModel.FileVersionFieldViewModel
+                                             {
+                                                 FileVersionFieldId = x.FileVersionFieldId,
+                                                 SystemFieldName = x.SystemFieldName,
+                                                 FileVersionFieldName = x.FileVersionFieldName,
+                                                 IsSystemRequired = x.IsSystemRequired,
+                                                 DataOptionalityName = x.DataOptionalityName,
+                                                 DataFormatName = x.DataFormatName,
+                                                 DataFormatDescription = x.DataFormatDescription,
+                                                 Size = x.Size,
+                                                 Description = x.Description,
+                                                 ExampleData = x.ExampleData,
+                                                 AdditionalComments = x.AdditionalComments,
+                                                 IsIncluded = x.IsIncluded
+                                             });
+
+            var result = viewModels.OrderBy(x => (int) x.SystemFieldName).ToDataSourceResult(request:request);
+
+            return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ImportFileTemplate_Update([DataSourceRequest] DataSourceRequest request, FileVersionViewModel.FileVersionFieldViewModel viewModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult ImportFileTemplate([DataSourceRequest] DataSourceRequest request, FileVersionViewModel.FileVersionFieldViewModel viewModel)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

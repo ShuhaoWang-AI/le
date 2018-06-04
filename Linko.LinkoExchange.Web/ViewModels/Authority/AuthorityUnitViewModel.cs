@@ -23,7 +23,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         public bool IsAvailableToRegulatee { get; set; }
 
         [Display(Name = "Show in Badge Count")]
-        public bool IsReviewed { get; set; }
+        public bool ShowInBadgeCount { get; set; }
+
+        /// <summary>
+        /// used for batch update
+        /// </summary>
+        public int BadgeCount { get; set; } 
 
         #endregion
     }

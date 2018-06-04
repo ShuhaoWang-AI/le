@@ -52,7 +52,7 @@
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
                                        columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.IsReviewed).ClientTemplate(value:"#= IsReviewed ? 'Yes' : 'No' #")
+                                       columns.Bound(c => c.ShowInBadgeCount).ClientTemplate(value:"#= ShowInBadgeCount ? 'Yes' : 'No' #")
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
                                        columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
                                    })
@@ -75,9 +75,10 @@
                                                         .Batch(enabled:false)
                                                         .Sort(sort => { sort.Add(memberName:"Name").Ascending(); }) // <-- initial sort expression
                                                         .Read(read => read.Action(actionName:"UnitTranslations_Read", controllerName:"Authority"))
-                                                        .Update(update => update.Action(actionName:"UnitTranslations_Update", controllerName:"Authority"))
+                                                        .Update(update => update.Action(actionName:"UnitTranslations_Update", controllerName:"Authority")
+                                                        )
                                                         .PageSize(pageSize:25)
-                                                        .Events(events => events.Error(handler:"error_handler_AuthorityUnitTranslation.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                        .Events(events => events.RequestEnd(handler:"UpdateBadgeCount").Error(handler:"error_handler_AuthorityUnitTranslation.bind({gridId: '#gridAuthorityUnitTranslation'})"))
                                                         .Model(model =>
                                                                {
                                                                    model.Id(p => p.Id);
@@ -85,7 +86,7 @@
                                                                    model.Field(p => p.Name).Editable(enabled:false);
                                                                    model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
                                                                    model.Field(p => p.IsAvailableToRegulatee);
-                                                                   model.Field(p => p.IsReviewed);
+                                                                   model.Field(p => p.ShowInBadgeCount);
                                                                })
                           )
                           )
@@ -94,6 +95,16 @@
         </section>
     </div>
     <script>
+        function UpdateBadgeCount(e) {
+            console.log(e);
+            if (e.type === "update" && e.response.Errors == null) {
+                var responseData = e.response.Data[0];
+                if (responseData.BadgeCount != null) {
+                    $("#sidebar_PendingUnitTranslationsCount").html(responseData.BadgeCount);
+                }
+            }
+        }
+
         function error_handler_AuthorityUnitTranslation(e) {
             if (e.errors) {
                 var errorMessages = [];
@@ -120,13 +131,14 @@
                     e.preventDefault(); // cancel grid rebind if error occurs                             
                 });
 
-                $(".k-button").click(function() {
-                    var validationSummary = $("#validationSummaryUnitTranslation");
+                $(".k-button")
+                    .click(function() {
+                        var validationSummary = $("#validationSummaryUnitTranslation");
 
-                    validationSummary.addClass("validation-summary-valid");
-                    validationSummary.removeClass("validation-summary-errors");
-                    validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
-                });
+                        validationSummary.addClass("validation-summary-valid");
+                        validationSummary.removeClass("validation-summary-errors");
+                        validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                    });
             }
         }
     </script>

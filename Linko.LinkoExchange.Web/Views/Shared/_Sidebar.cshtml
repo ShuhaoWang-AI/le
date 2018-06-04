@@ -108,7 +108,7 @@
                     </ul>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings,UnitTranslations", controllers:"Authority")">
+                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings,UnitTranslations,ImportFileTemplate", controllers:"Authority")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Authority Account</span>
@@ -132,6 +132,12 @@
                                 <span>Settings</span>
                             </a>
                         </li>
+                        <li class="@Html.IsActive(actions:"ImportFileTemplate", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ImportFileTemplate", controllerName:"Authority")'">
+                                <i class="fa fa-cloud-upload fa-fw"></i>
+                                <span>Sample Import Template</span>
+                            </a>
+                        </li>
                         <li class="@Html.IsActive(actions:"UnitTranslations", controllers:"Authority")">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"UnitTranslations", controllerName:"Authority")'">
                                 <i class="fa fa-cogs fa-fw"></i>
@@ -139,7 +145,7 @@
                                 @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
                                 {
                                     <span class="pull-right-container">
-                                        <span class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                        <span id="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
                                     </span>
                                 }
                             </a>
