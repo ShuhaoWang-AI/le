@@ -159,7 +159,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="treeview @Html.IsActive(actions:"Samples,SampleDetails,NewSampleDetailsStep2", controllers:"Industry")">
+                <li class="treeview @Html.IsActive(actions:"Samples,SampleDetails,NewSampleDetailsStep2,SampleImport", controllers:"Industry")">
                     <a href="#">
                         <i class="fa fa-fw fa-th-list"></i>
                         <span>Samples</span>
@@ -175,7 +175,11 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Draft)">
+                        @{
+                            var sampleDraftActiveClass = Html.DoesLocationMatch(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Draft) ||
+                                                      Html.DoesLocationMatch(actions:"SampleImport", controllers:"Industry") ? "active" : string.Empty;
+                        }
+                        <li class="@sampleDraftActiveClass">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Draft</span>
