@@ -214,6 +214,15 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
 			}
 
+			if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.ResultQualifier].OriginalValueString) ||
+			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.MethodDetectionLimit].OriginalValueString) ||
+			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisMethod].OriginalValueString) ||
+			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisDateTime].OriginalValueString))
+			{
+				var errorMessage = "Invalid flow column(s).";
+				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
+			}
+
 			var orgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
 			var validFlowUnits = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.FlowUnitValidValues).Split(',')
 			                                    .Select(s => s.ToLower()).ToList();
