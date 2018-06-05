@@ -10,6 +10,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public SampleImportColumnName SampleImportColumnName { get; set; }
         public List<ListItemDto> Options { get; set; }
         public List<string> MissingTranslations { get; set; }
+        public string Title { get; set; }
 
         #endregion
     }
