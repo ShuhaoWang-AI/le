@@ -259,6 +259,11 @@ input[type="search"]::-webkit-search-cancel-button
     min-width: 76px;
 }
 
+.alert-light 
+{
+    color: gray;
+}
+
 .stepwizard-step p 
 {
     margin-top: 10px;

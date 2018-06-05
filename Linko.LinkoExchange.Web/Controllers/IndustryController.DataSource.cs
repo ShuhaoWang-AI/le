@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Domain;
@@ -16,7 +17,7 @@ using DataSource = Kendo.Mvc.UI.DataSource;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public partial class IndustryController : BaseController
+    public partial class IndustryController
     {
         #region dataSources list view
 
@@ -217,10 +218,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult DataSourceDetails_ImportSamples(DataSourceViewModel model)
         {
-            return RedirectToAction(actionName:"SampleImport", controllerName:"Industry", routeValues:new
-                                                                                                      {
-                                                                                                          DataSourceId = model.Id
-                                                                                                      });
+            return RedirectToAction(actionName: "SampleImport", routeValues: new RouteValueDictionary {
+                { QueryParameters.DataProviderId, model.Id}
+            });
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -559,5 +559,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
+
+        private class QueryParameters
+        {
+            internal const string DataProviderId = "DataProviderId";
+        }
     }
 }

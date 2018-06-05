@@ -214,6 +214,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Validation\InternalServerError.cs" />
     <Compile Include="Validation\RuleViolation.cs" />
     <Compile Include="Validation\BadRequest.cs" />
     <Compile Include="Validation\RuleViolationException.cs" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +20,7 @@ using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.SelectList;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Unit;
@@ -45,10 +45,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
         private readonly IOrganizationService _organizationService;
+        private readonly IParameterService _parameterService;
         private readonly IReportElementService _reportElementService;
         private readonly IReportTemplateService _reportTemplateService;
-        private readonly IParameterService _parameterService;
         private readonly ISampleService _sampleService;
+        private readonly ISelectListService _selectListService;
         private readonly ISettingService _settingService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IUnitService _unitService;
@@ -67,6 +68,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             ITimeZoneService timeZoneService,
             ISampleService sampleService,
             IProgramService programService,
+            ISelectListService selectListService,
             ISettingService settingService,
             IUnitService unitService,
             IReportElementService reportElementService,
@@ -119,6 +121,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 throw new ArgumentNullException(paramName:nameof(programService));
             }
 
+            if (selectListService == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(selectListService));
+            }
+
             if (settingService == null)
             {
                 throw new ArgumentNullException(paramName:nameof(settingService));
@@ -131,8 +138,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
             if (parameterService == null)
             {
-                throw new ArgumentNullException(paramName: nameof(parameterService));
+                throw new ArgumentNullException(paramName:nameof(parameterService));
             }
+
             if (reportTemplateService == null)
             {
                 throw new ArgumentNullException(paramName:nameof(reportElementService));
@@ -159,6 +167,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             _parameterService = parameterService;
             _reportElementService = reportElementService;
             _reportTemplateService = reportTemplateService;
+            _selectListService = selectListService;
             _settingService = settingService;
             _sampleService = sampleService;
             _dataSourceService = dataSourceService;
@@ -252,7 +261,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
                 int importTempFileIdToReturn;
-                using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
+                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var importTempFile = _mapHelper
                         .ToDomainObject(fromDto:importTempFileDto,
@@ -262,7 +271,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                  UploadDateTimeUtc = DateTimeOffset.Now,
                                                                  UploaderUserId = currentUserProfileId,
                                                                  FileTypeId = validFileTypes
-                                                                     .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
+                                                                              .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
                                                              });
 
                     _dbContext.ImportTempFiles.Add(entity:importTempFile);
@@ -388,42 +397,69 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     if (ruleViolationException.ValidationIssues.Count > 0)
                     {
                         result.Errors.AddRange(collection:ruleViolationException
-                                                   .ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""})
-                                                   .ToList());
+                                                          .ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""})
+                                                          .ToList());
                     }
                 }
-				
+
                 return result;
             }
         }
 
         /// <inheritdoc />
-        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto)
+        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, 
+                                                                     ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType)
         {
-            throw new NotImplementedException();
+            var requiredDataDefaults = new List<RequiredDataDefaultsDto>();
+
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
+                                                            columnName:SampleImportColumnName.MonitoringPoint, selectedValue:defaultMonitoringPoint);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
+                                                            columnName:SampleImportColumnName.CollectionMethod, selectedValue: defaultCollectionMethod);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
+                                                            columnName:SampleImportColumnName.SampleType, selectedValue: defaultSampleType);
+
+            return requiredDataDefaults;
         }
 
         /// <inheritdoc />
         public SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
         {
-            var validationIssues = new List<RuleViolation>();
-            foreach (var translationType in Enum.GetValues(enumType:typeof(DataSourceTranslationType)).Cast<DataSourceTranslationType>())
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
+                                    descripition:sampleImportDto.ImportJobId))
             {
-                PopulateExistingTranslationData(sampleImportDto:sampleImportDto, translationType:translationType, validationIssues:validationIssues);
-            }
+                var validationIssues = new List<RuleViolation>();
+                foreach (var translationType in Enum.GetValues(enumType:typeof(DataSourceTranslationType)).Cast<DataSourceTranslationType>())
+                {
+                    PopulateExistingTranslationData(sampleImportDto:sampleImportDto, translationType:translationType, validationIssues:validationIssues);
+                }
 
-            if (validationIssues.Count > 0)
-            {
-                throw new RuleViolationException(message:"Population Data Source Translation failed", validationIssues:validationIssues);
-            }
+                if (validationIssues.Count > 0)
+                {
+                    throw new BadRequest(message:"Population Data Source Translation failed", validationIssues:validationIssues);
+                }
 
-            return sampleImportDto;
+                return sampleImportDto;
+            }
         }
 
         /// <inheritdoc />
         public List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto)
         {
-            throw new NotImplementedException();
+            var missingTranslations = new List<MissingTranslationDto>();
+
+            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
+                                            columnName:SampleImportColumnName.MonitoringPoint);
+            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
+                                            columnName:SampleImportColumnName.CollectionMethod);
+            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
+                                            columnName:SampleImportColumnName.SampleType);
+            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
+                                            columnName:SampleImportColumnName.ParameterName);
+            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
+                                            columnName:SampleImportColumnName.ResultUnit);
+
+            return missingTranslations;
         }
 
         /// <inheritdoc />
@@ -464,18 +500,18 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-                using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))  
+                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
                     // Add or update samples
-					foreach (var sampleDto in sampleImportDto.SampleDtos)
-					{
-						_sampleService.SaveSample(sampleDto);
-					}
+                    foreach (var sampleDto in sampleImportDto.SampleDtos)
+                    {
+                        _sampleService.SaveSample(sample:sampleDto);
+                    }
 
-					// Create new attachment
-					var tempFile = sampleImportDto.TempFile;
+                    // Create new attachment
+                    var tempFile = sampleImportDto.TempFile;
                     var reportElementTypeIdForIndustryFileUpload =
                         _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:currentRegulatoryProgramId, settingType:SettingType.ReportElementTypeIdForIndustryFileUpload);
 
@@ -485,7 +521,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     }
                     else
                     {
-                        var reportElementTypeId = Convert.ToInt32(reportElementTypeIdForIndustryFileUpload);
+                        var reportElementTypeId = Convert.ToInt32(value:reportElementTypeIdForIndustryFileUpload);
                         var reportElementType = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
                                                                      .First(c => c.ReportElementTypeId == reportElementTypeId);
 
@@ -587,6 +623,80 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         #endregion
 
+        private void AddRequiredDataDefaultDtoOrPopulateDefaultValue(SampleImportDto sampleImportDto, 
+                                                                     List<RequiredDataDefaultsDto> requiredDataDefaults, 
+                                                                     SampleImportColumnName columnName, 
+                                                                     ListItemDto selectedValue)
+        {
+            var emptyValueCells = GetEmptyValueCells(sampleImportDto:sampleImportDto, columnName:columnName);
+            if (!emptyValueCells.Any())
+            {
+                return;
+            }
+
+            var isDefaultValueValid = selectedValue != null && selectedValue.Id > 0;
+            if (isDefaultValueValid)
+            {
+                _logger.Debug(message: "{0} populated empty {1} cells with requires default value", argument1: sampleImportDto.ImportJobId, argument2: columnName);
+                foreach (var cell in emptyValueCells)
+                {
+                    cell.TranslatedValueId = selectedValue.Id;
+                    cell.TranslatedValue = selectedValue.DisplayValue;
+                }
+            }
+            else
+            {
+                _logger.Debug(message: "{0} found empty {1} cells which requires default value", argument1: sampleImportDto.ImportJobId, argument2: columnName);
+                requiredDataDefaults.Add(item: new RequiredDataDefaultsDto
+                                               {
+                                                   SampleImportColumnName = columnName,
+                                                   Options = GetSelectListBySampleImportColumn(columnName: columnName)
+                                               });
+            }
+        }
+
+        private static List<ImportCellObject> GetEmptyValueCells(SampleImportDto sampleImportDto, SampleImportColumnName columnName)
+        {
+            return sampleImportDto.Rows.Select(row => row.Cells.First(cell => cell.SampleImportColumnName == columnName))
+                                  .Where(cell => string.IsNullOrEmpty(value:cell.OriginalValueString))
+                                  .ToList();
+        }
+
+        private void AddMissingTranslationDtoIfExist(SampleImportDto sampleImportDto,
+                                                     List<MissingTranslationDto> missingTranslationDtos,
+                                                     SampleImportColumnName columnName)
+        {
+            var missingTranslationTerms = sampleImportDto.Rows.Select(row => row.Cells.First(cell => cell.SampleImportColumnName == columnName))
+                                                         .Where(cell => !string.IsNullOrEmpty(value:cell.OriginalValueString) && cell.TranslatedValueId > 0)
+                                                         .Select(cell => cell.OriginalValueString).ToList();
+            if (!missingTranslationTerms.Any())
+            {
+                return;
+            }
+
+            _logger.Info(message:"Column {0} missing translations at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportJobId,
+                         argument3:string.Join(separator:",", values:missingTranslationTerms));
+            missingTranslationDtos.Add(item:new MissingTranslationDto
+                                            {
+                                                SampleImportColumnName = columnName,
+                                                MissingTranslations = missingTranslationTerms,
+                                                Options = GetSelectListBySampleImportColumn(columnName:columnName)
+                                            });
+        }
+
+        private List<ListItemDto> GetSelectListBySampleImportColumn(SampleImportColumnName columnName)
+        {
+            switch (columnName)
+            {
+                case SampleImportColumnName.MonitoringPoint: return _selectListService.GetIndustryMonitoringPointSelectList(withEmptyItem:true);
+                case SampleImportColumnName.SampleType: return _selectListService.GetAuthoritySampleTypeSelectList(withEmptyItem: true);
+                case SampleImportColumnName.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList(withEmptyItem: true);
+                case SampleImportColumnName.ParameterName: return _selectListService.GetAuthorityParameterSelectList(withEmptyItem: true);
+                case SampleImportColumnName.ResultUnit: return _selectListService.GetAuthorityUnitSelectList(withEmptyItem: true);
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+
         private List<ImportRowObject> GetImportRowObjects(Workbook importFileWorkbook, SampleImportDto sampleImportDto, ref ImportSampleFromFileValidationResultDto result)
         {
             var validationIssues = new List<ErrorWithRowNumberDto>();
@@ -602,7 +712,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 // first populate the resultQualifierValidValues from Authority's settings
                 var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId:_settingService
-                                                                                 .GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId);
+                                                                                             .GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId);
 
                 var resultQualifierValidValues = programSettings.Settings
                                                                 .Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues))
@@ -665,7 +775,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                         else
                         {
                             FileVersionFieldDto templateColumn;
-                            if (!fileColumnDictionary.TryGetValue(columnIndex, out templateColumn))
+                            if (!fileColumnDictionary.TryGetValue(key:columnIndex, value:out templateColumn))
                             {
                                 // column is not in the Authority template. So no need to process
                                 continue;
@@ -692,7 +802,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                       RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
                                     }
-                                    
+
                                     importCellObject.OriginalValue = importCellObject.OriginalValueString;
                                     break;
 
@@ -712,6 +822,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                   });
                                         importCellObject.OriginalValue = default(double?);
                                     }
+
                                     break;
 
                                 case DataFormatName.DateTime:
@@ -732,6 +843,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                   });
                                         importCellObject.OriginalValue = default(DateTime?);
                                     }
+
                                     break;
 
                                 case DataFormatName.Bit:
@@ -749,6 +861,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                   });
                                         importCellObject.OriginalValue = default(bool?);
                                     }
+
                                     break;
                                 default: throw new NotImplementedException();
                             }
@@ -771,6 +884,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 case SampleImportColumnName.CollectionMethod:
                                 case SampleImportColumnName.ParameterName:
                                 case SampleImportColumnName.ResultUnit:
+
                                     // will be populate later 
                                     break;
                                 default: throw new NotImplementedException();
@@ -801,7 +915,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                                 case DataOptionalityName.Optional: break;
                                 case DataOptionalityName.Recommended:
-                                    //TODO: User Story 8199, could reserve cell optionality state to speed up missing default values look up
+
+                                    //TODO: User Story 8199, could reserve cell optinality state to speed up missing default values look up
                                     break;
                                 default: throw new NotImplementedException();
                             }
@@ -899,7 +1014,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             var rawValueAsNumber = string.IsNullOrWhiteSpace(value:cellValue.RawValue) ? default(double?) : Convert.ToDouble(value:cellValue.RawValue);
             return rawValueAsNumber;
         }
-
+        
         private SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto, DataSourceTranslationType translationType,
                                                                 ICollection<RuleViolation> validationIssues)
         {
@@ -913,34 +1028,22 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             var translationDict = _dataSourceService.GetDataSourceTranslationDict(dataSourceId:sampleImportDto.DataSource.DataSourceId.Value,
                                                                                   translationType:translationType);
             var sampleImportColumnName = ToSampleImportColumnName(fromTranslationType:translationType);
-            foreach (var row in sampleImportDto.Rows)
+
+            var cellsToPopulate = sampleImportDto.Rows.Select(row => row.Cells.Find(cell => cell.SampleImportColumnName == sampleImportColumnName))
+                                                 .Where(cell => !string.IsNullOrEmpty(value:cell.OriginalValue))
+                                                 .ToList();
+
+            foreach (var cell in cellsToPopulate)
             {
-                foreach (var cell in row.Cells)
+                DataSourceTranslationItemDto translationItem;
+                if (!translationDict.TryGetValue(key:cell.OriginalValueString, value:out translationItem))
                 {
-                    if (cell.SampleImportColumnName != sampleImportColumnName)
-                    {
-                        continue;
-                    }
-
-                    if (string.IsNullOrEmpty(value:cell.OriginalValue))
-                    {
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
-                                                                    errorMessage:$"Value at row {row.RowNumber} and column {sampleImportColumnName} is required"));
-                        continue;
-                    }
-
-                    DataSourceTranslationItemDto translationItem;
-                    if (translationDict.TryGetValue(key:cell.OriginalValue, value:out translationItem))
-                    {
-                        cell.TranslatedValueId = translationItem.TranslationId;
-                        cell.TranslatedValue = translationItem.TranslationName;
-                    }
-                    else
-                    {
-                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null,
-                                                                    errorMessage:$"Cannot translate '{cell.OriginalValue}' to an existing {translationType}"));
-                    }
+                    _logger.Info(message: "{0} translation should set missing translation to term '{1}'", argument1:translationType, argument2:cell.OriginalValueString);
+                    continue;
                 }
+
+                cell.TranslatedValueId = translationItem.TranslationId;
+                cell.TranslatedValue = translationItem.TranslationName;
             }
 
             return sampleImportDto;
@@ -963,6 +1066,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             //Also handles scenarios where ImportTempFileId does not exist
             return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
-        } 
+        }
     }
 }

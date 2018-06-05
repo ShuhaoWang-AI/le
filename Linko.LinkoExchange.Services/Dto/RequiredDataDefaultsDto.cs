@@ -6,6 +6,5 @@ namespace Linko.LinkoExchange.Services.Dto {
     {
         public SampleImportColumnName SampleImportColumnName { get; set; }
         public List<ListItemDto> Options { get; set; }
-        
     }
 }

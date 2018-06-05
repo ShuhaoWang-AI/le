@@ -52,28 +52,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// If missing then return list of RequiredDataDefaultsDto
         /// </summary>
         /// <param name="sampleImportDto"> </param>
+        /// <param name="defaultMonitoringPoint"> </param>
+        /// <param name="defaultCollectionMethod"> </param>
+        /// <param name="defaultSampleType"> </param>
         /// <returns> </returns>
-        List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto);
+        List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, 
+                                                              ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sampleImportDto"> </param>
-        /// <returns> </returns>
         SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sampleImportDto"></param>
-        /// <returns></returns>
         List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto);
 
-	    /// <summary>
-	    /// 
-	    /// </summary>
-	    /// <param name="sampleImportDto"></param>
-	    /// <returns></returns>
 	    ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
 
         FileVersionDto GetFileVersion();

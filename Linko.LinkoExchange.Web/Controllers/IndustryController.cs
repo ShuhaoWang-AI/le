@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -1218,6 +1217,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var objJavascript = new JavaScriptSerializer();
 
                 model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+                // ReSharper disable once AssignNullToNotNullAttribute
                 model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
 
                 // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
@@ -1322,6 +1322,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var objJavascript = new JavaScriptSerializer();
 
                     model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
 
                     if (isReadyToReport)
@@ -1364,6 +1365,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var objJavascript = new JavaScriptSerializer();
 
             model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+            // ReSharper disable once AssignNullToNotNullAttribute
             model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
 
             // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
@@ -1706,297 +1708,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                         MassLoadingMaxValue = c.MassLoadingMaxValue,
                                                                         MassLoadingMinValue = c.MassLoadingMinValue
                                                                     }).OrderBy(c => c.Name).ToList();
-        }
-
-        #endregion
-
-        #region import samples from file
-
-        [Route(template:"Sample/Import")]
-        public ActionResult SampleImport()
-        {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var viewModel = new SampleImportViewModel
-                            {
-                                CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource
-                            };
-            try
-            {
-                ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
-
-                var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
-
-                var selectedDataSourceId = GetQueryParameterValueAsInt(parameterName:"DataSourceId");
-                if (selectedDataSourceId.HasValue)
-                {
-                    var selectedDataSource = dataSources.Find(x => x.DataSourceId == selectedDataSourceId);
-                    if (selectedDataSource == null)
-                    {
-                        throw new BadRequest(message: $"The Data Source {selectedDataSourceId} does not exist");
-                    }
-                    viewModel.SelectedDataSourceId = (int) selectedDataSourceId;
-                    viewModel.SelectedDataSourceName = selectedDataSource.Name;
-                    viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
-                }
-                else if (dataSources.Count == 1 && dataSources[index:0].DataSourceId.HasValue)
-                {
-                    viewModel.SelectedDataSourceId = (int) dataSources[index:0].DataSourceId;
-                    viewModel.SelectedDataSourceName = dataSources[index:0].Name;
-                    viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
-                }
-
-                if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
-                {
-                    viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
-                                                     {
-                                                         AvailableDataSources = dataSources.Select(x => new SelectListItem
-                                                                                                        {
-                                                                                                            Text = x.Name,
-                                                                                                            Value = x.DataSourceId.ToString(),
-                                                                                                            Selected =
-                                                                                                                x.DataSourceId.ToString()
-                                                                                                                 .Equals(value:viewModel
-                                                                                                                             .SelectedDataSourceId
-                                                                                                                             .ToString())
-                                                                                                        }).ToList()
-                                                     };
-                    viewModel.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
-                }
-            }
-            catch (RuleViolationException rve)
-            {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
-            }
-
-            return View(model:viewModel);
-        }
-
-        [AcceptVerbs(verbs:HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
-        [Route(template:"Sample/Import")]
-        public ActionResult SampleImport(SampleImportViewModel model)
-        {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    switch (model.CurrentSampleImportStep)
-                    {
-                        case SampleImportViewModel.SampleImportStep.SelectDataSource:
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
-                            ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
-                            break;
-
-                        case SampleImportViewModel.SampleImportStep.SelectFile:
-                            if (model.ImportTempFileId.HasValue)
-                            {
-                                ModelState.Remove(key:"CurrentSampleImportStep");
-                                model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.FileValidation;
-                                goto case SampleImportViewModel.SampleImportStep.FileValidation;
-                            }
-                            break;
-
-                        case SampleImportViewModel.SampleImportStep.FileValidation:
-                            if (model.ImportTempFileId.HasValue)
-                            {
-                                var importTempFileDto = _importSampleFromFileService.GetImportTempFileById(importTempFileId:model.ImportTempFileId.Value);
-                                SampleImportDto sampleImportDto;
-                                var fileValidationResultDto =
-                                    _importSampleFromFileService.DoFileValidation(dataSourceId:model.SelectedDataSourceId, importTempFileDto:importTempFileDto,
-                                                                                  sampleImportDto:out sampleImportDto);
-
-                                if (fileValidationResultDto.Success)
-                                {
-                                    model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto:sampleImportDto);
-                                    ModelState.Remove(key:"CurrentSampleImportStep");
-                                    model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
-                                    goto case SampleImportViewModel.SampleImportStep.SelectDataDefault;
-                                }
-                                else
-                                {
-                                    model.StepFileValidation = new StepFileValidationViewModel
-                                                               {
-                                                                   Errors = fileValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
-                                                                                                                       {
-                                                                                                                           ErrorMessage = x.ErrorMessage,
-                                                                                                                           RowNumbers = x.RowNumbers
-                                                                                                                       })
-                                                               };
-                                }
-                            }
-                            else
-                            {
-                                //throw error ??
-                            }
-                            break;
-
-                        case SampleImportViewModel.SampleImportStep.SelectDataDefault:
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint;
-                            goto case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint:
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod;
-                            goto case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: 
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationSampleType;
-                            goto case SampleImportViewModel.SampleImportStep.DataTranslationSampleType;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: 
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationParameter;
-                            goto case SampleImportViewModel.SampleImportStep.DataTranslationParameter;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationParameter: 
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslationUnit;
-                            goto case SampleImportViewModel.SampleImportStep.DataTranslationUnit;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataTranslationUnit: 
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataValidation;
-                            goto case SampleImportViewModel.SampleImportStep.DataValidation;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.DataValidation: 
-                            //TODO: do proper action
-                            var dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto);
-
-                            if (dataValidationResultDto.Success)
-                            {
-                                ModelState.Remove(key: "CurrentSampleImportStep");
-                                model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
-                                goto case SampleImportViewModel.SampleImportStep.ShowPreImportOutput;
-                            }
-                            else
-                            {
-                                model.StepDataValidation = new StepDataValidationViewModel
-                                {
-                                    Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
-                                    {
-                                        ErrorMessage = x.ErrorMessage,
-                                        RowNumbers = x.RowNumbers
-                                    })
-                                };
-                            }
-                            break;
-                        case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: 
-                            //TODO: do proper action
-                            ModelState.Remove(key:"CurrentSampleImportStep");
-                            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.ShowImportOutput;
-                            goto case SampleImportViewModel.SampleImportStep.ShowImportOutput;
-                            break;
-                        case SampleImportViewModel.SampleImportStep.ShowImportOutput:
-                            _importSampleFromFileService.ImportSampleAndCreateAttachment(sampleImportDto:model.SampleImportDto);
-                            break;
-                        default: return RedirectToAction(actionName:"SampleImport");
-                    }
-                }
-                catch (RuleViolationException rve)
-                {
-                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                }
-            }
-            else
-            {
-                if (ModelState[key:"."] != null)
-                {
-                    foreach (var issue in ModelState[key:"."].Errors)
-                    {
-                        ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
-                    }
-                }
-
-                switch (model.CurrentSampleImportStep)
-                {
-                    case SampleImportViewModel.SampleImportStep.SelectDataSource:
-                        var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
-
-                        model.StepSelectDataSource = new StepSelectDataSourceViewModel
-                                                     {
-                                                         AvailableDataSources =
-                                                             dataSources.Select(x => new SelectListItem
-                                                                                     {
-                                                                                         Text = x.Name,
-                                                                                         Value = x.DataSourceId.ToString(),
-                                                                                         Selected =
-                                                                                             x.DataSourceId.ToString()
-                                                                                              .Equals(value:model.SelectedDataSourceId
-                                                                                                                 .ToString())
-                                                                                     }).ToList()
-                                                     };
-                        model.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Source", Value = "0", Disabled = true});
-
-                        break;
-                    case SampleImportViewModel.SampleImportStep.SelectFile: break;
-                    case SampleImportViewModel.SampleImportStep.FileValidation: break;
-                    case SampleImportViewModel.SampleImportStep.SelectDataDefault: break;
-                    case SampleImportViewModel.SampleImportStep.DataTranslationMonitoringPoint: break;
-                    case SampleImportViewModel.SampleImportStep.DataTranslationCollectionMethod: break;
-                    case SampleImportViewModel.SampleImportStep.DataTranslationSampleType: break;
-                    case SampleImportViewModel.SampleImportStep.DataTranslationParameter: break;
-                    case SampleImportViewModel.SampleImportStep.DataTranslationUnit: break;
-                    case SampleImportViewModel.SampleImportStep.DataValidation: break;
-                    case SampleImportViewModel.SampleImportStep.ShowPreImportOutput: break;
-                    case SampleImportViewModel.SampleImportStep.ShowImportOutput: break;
-                    default: return RedirectToAction(actionName:"SampleImport");
-                }
-            }
-
-            return View(model:model);
-        }
-
-        public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
-        {
-            try
-            {
-                int id;
-
-                if (upload != null && upload.ContentLength > 0)
-                {
-                    using (var reader = new BinaryReader(input:upload.InputStream))
-                    {
-                        var content = reader.ReadBytes(count:upload.ContentLength);
-
-                        var importTempFileDto = new ImportTempFileDto
-                                                {
-                                                    OriginalFileName = upload.FileName,
-                                                    RawFile = content,
-                                                    MediaType = upload.ContentType
-                                                };
-
-                        id = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
-                    }
-                }
-                else
-                {
-                    var validationIssues = new List<RuleViolation>();
-                    var message = "No file was selected.";
-                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-                }
-
-                model.ImportTempFileId = id;
-                model.SelectedFileName = upload.FileName;
-
-                return Json(data:model, behavior:JsonRequestBehavior.AllowGet);
-            }
-            catch (RuleViolationException rve)
-            {
-                Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                return Json(data:MvcValidationExtensions.GetViolationErrors(ruleViolationException:rve), behavior:JsonRequestBehavior.AllowGet);
-            }
         }
 
         #endregion
