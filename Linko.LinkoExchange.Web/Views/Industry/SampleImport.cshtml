@@ -1,5 +1,8 @@
-﻿@using Linko.LinkoExchange.Core.Enum
+﻿@using Linko.LinkoExchange.Core.Domain
+@using Linko.LinkoExchange.Core.Enum
+@using Linko.LinkoExchange.Services.Dto
 @using Linko.LinkoExchange.Web.ViewModels.Industry
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 @model Linko.LinkoExchange.Web.ViewModels.Industry.SampleImportViewModel
 
 @{
@@ -48,22 +51,22 @@
             </div>
             <div class="stepwizard-step col-xs-2">
                 <span class="btn @( isStepSelectDataDefault? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                   @( isStepSelectDataDefault ? "" : "disabled=\"disabled\"" )>3</span>
+                      @( isStepSelectDataDefault ? "" : "disabled=\"disabled\"" )>3</span>
                 <p><small>Select Data Default</small></p>
             </div>
             <div class="stepwizard-step col-xs-2">
                 <span class="btn @( isStepDataTranslations? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                   @( isStepDataTranslations ? "" : "disabled=\"disabled\"" )>4</span>
+                      @( isStepDataTranslations ? "" : "disabled=\"disabled\"" )>4</span>
                 <p><small>Data Translation</small></p>
             </div>
             <div class="stepwizard-step col-xs-2">
                 <span class="btn @( isStepPreview? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                   @( isStepPreview ? "" : "disabled=\"disabled\"" )>5</span>
+                      @( isStepPreview ? "" : "disabled=\"disabled\"" )>5</span>
                 <p><small>Preview</small></p>
             </div>
             <div class="stepwizard-step col-xs-2">
                 <span class="btn @( isStepImport? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                   @( isStepImport ? "" : "disabled=\"disabled\"" )>6</span>
+                      @( isStepImport ? "" : "disabled=\"disabled\"" )>6</span>
                 <p><small>Import</small></p>
             </div>
         </div>
@@ -168,7 +171,7 @@
 
                     <div class="alert alert-info">
                         <h5>
-                            Select a .xlsx file to upload. You can drag and drop to upload.
+                            Select an .xlsx file to upload or drag and drop the file into the area below.
                         </h5>
                     </div>
                     <div class="form-group">
@@ -299,10 +302,9 @@
                                   .Columns(columns =>
                                            {
                                                columns.Bound(c => c.ErrorMessage).Title(text:"Error");
-                                               columns.Bound(c => c.RowNumbers).Title(text:"Row Number");
+                                               columns.Bound(c => c.RowNumbers).Title(text:"Row Number(s)");
                                            })
                                   .Scrollable(s => s.Height(value:"auto")))
-                        }
                         </div>
                     </div>
                 }
@@ -368,13 +370,13 @@
                     if (requiredDefaultSampleType != null)
                     {
                         <div class="form-group">
-                                @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-4">
-                                    @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
-                                    @Html.DropDownList(name: "SelectedDefaultSampleTypeId",
-                                        selectList: new SelectList(items: requiredDefaultSampleType.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
-                                        htmlAttributes: new { @class = "form-control" })
-                                </div>
+                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
+                                @Html.DropDownList(name: "SelectedDefaultSampleTypeId",
+                                    selectList: new SelectList(items: requiredDefaultSampleType.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
+                                    htmlAttributes: new { @class = "form-control" })
+                            </div>
                         </div>
                     }
                     else
@@ -388,12 +390,18 @@
                             .ready(function() {
                                 $("#LinkoExchangeForm")
                                     .submit(function() {
-                                        console.log($("#LinkoExchangeForm"));
-                                        console.log($("#SelectedDefaultCollectionMethodId"));
-                                        console.log($("#SelectedDefaultCollectionMethodId option:selected"));
-                                        $("#SelectedDefaultMonitoringPointName").val($("#SelectedDefaultMonitoringPointId option:selected").text());
-                                        $("#SelectedDefaultCollectionMethodName").val($("#SelectedDefaultCollectionMethodId option:selected").text());
-                                        $("#SelectedDefaultSampleTypeName").val($("#SelectedDefaultSampleTypeId option:selected").text());
+                                        var defaultMonitoringPoitnNameFromDropdown = $("#SelectedDefaultMonitoringPointId option:selected").text();
+                                        if (defaultMonitoringPoitnNameFromDropdown) {
+                                            $("#SelectedDefaultMonitoringPointName").val(defaultMonitoringPoitnNameFromDropdown);
+                                        }
+                                        var defaultCollectionMethodNameFromDropdown = $("#SelectedDefaultCollectionMethodId option:selected").text();
+                                        if (defaultCollectionMethodNameFromDropdown) {
+                                            $("#SelectedDefaultCollectionMethodName").val(defaultCollectionMethodNameFromDropdown);
+                                        }
+                                        var defaultCollectionSampleTypeFromDropdown = $("#SelectedDefaultSampleTypeId option:selected").text();
+                                        if (defaultCollectionSampleTypeFromDropdown) {
+                                            $("#SelectedDefaultSampleTypeName").val(defaultCollectionSampleTypeFromDropdown);
+                                        }
                                         return true;
                                     });
                             });
@@ -416,12 +424,12 @@
                     if (Model.SelectedDefaultMonitoringPointId > 0)
                     {
                         <div class="form-group">
-                                @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-4">
-                                    @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
-                                    @Html.EditorFor(model => model.SelectedDefaultMonitoringPointName, 
-                                        additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                                </div>
+                            @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
+                                @Html.EditorFor(model => model.SelectedDefaultMonitoringPointName, 
+                                    additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                            </div>
                         </div>
                     }
                     else
@@ -432,12 +440,12 @@
                     if (Model.SelectedDefaultCollectionMethodId > 0)
                     {
                         <div class="form-group">
-                                @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-4">
-                                    @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
-                                    @Html.EditorFor(model => model.SelectedDefaultCollectionMethodName, 
-                                        additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                                </div>
+                            @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
+                                @Html.EditorFor(model => model.SelectedDefaultCollectionMethodName, 
+                                    additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                            </div>
                         </div>
                     }
                     else
@@ -448,13 +456,11 @@
                     if (Model.SelectedDefaultSampleTypeId > 0)
                     {
                         <div class="form-group">
-                            <div class="col-md-12">
-                                @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-4">
-                                    @Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
-                                    @Html.EditorFor(model => model.SelectedDefaultSampleTypeName,
-                                        additionalViewData: new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                                </div>
+                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                @Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
+                                @Html.EditorFor(model => model.SelectedDefaultSampleTypeName,
+                                    additionalViewData: new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                             </div>
                         </div>
                     }
@@ -484,7 +490,8 @@
                 @if (isStepDataTranslations)
                 {
                     @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
-                        htmlAttributes:new {@class = "alert alert-danger"})
+                        htmlAttributes:new {@class = "alert alert-danger", @id= "validationSummaryDataTranslations" })
+
                 }
                 else
                 {
@@ -496,9 +503,9 @@
         </section>
     }
 
+    // SampleImportStep.DataValidation
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation)
     {
-        // SampleImportStep.DataValidation
         <section class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Data Validation</h3>
@@ -527,6 +534,79 @@
                                   })
                                   .Scrollable(s => s.Height(value: "auto")))
                         }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    // SampleImportStep.ShowPreImportOutput
+    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput)
+    {
+        var rowCount = Model.SampleImportDto.Rows.Count;
+        <section class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Preview Import</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                <div class="alert alert-info">
+                    <h5>
+                        Sample file is ready to import
+                    </h5>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="box box-group box-solid" style="padding: 0 0 0 10px;">
+                            <div class="box-header">
+                                <button class="btn btn-box-tool" data-widget="collapse">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                &nbsp;
+                                <h3 class="box-title">Preview Summary </h3>
+                            </div>
+                            <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
+                                @(rowCount) sample result(s) are ready to import. <br /> <br />
+
+                                @if (Model.SampleImportDto.SampleDtos != null)
+                                {
+                                    var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
+
+                                    if (newSampleAddCount > 0)
+                                    {
+                                        <span>@newSampleAddCount new draft sample(s) are ready to create. <br /></span>
+                                    }
+
+                                    var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
+
+                                    if (existingSampleUpdateCount > 0)
+                                    {
+                                        <span>@existingSampleUpdateCount existing draft sample(s) are ready to update. <br /></span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <script>
+                    $(document)
+                        .ready(function() {
+                            $("#LinkoExchangeForm")
+                                .submit(function() {
+                                    $("#CurrentSampleImportStep").val(@((int)SampleImportViewModel.SampleImportStep.ShowImportOutput));
+                                    return true;
+                                });
+                        });
+                </script>
+                <div class="box-footer">
+                    <div class="form-group pull-right">
+                        
+                        <input class="btn btn-primary btn-sm" type="submit" value="Import" />
                     </div>
                 </div>
             </div>

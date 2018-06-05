@@ -725,7 +725,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                      SampleImportColumnName columnName)
         {
             var missingTranslationTerms = sampleImportDto.Rows.Select(row => row.Cells.First(cell => cell.SampleImportColumnName == columnName))
-                                                         .Where(cell => !string.IsNullOrEmpty(value:cell.OriginalValueString) && cell.TranslatedValueId > 0)
+                                                         .Where(cell => !string.IsNullOrEmpty(value:cell.OriginalValueString) && cell.TranslatedValueId == 0)
                                                          .Select(cell => cell.OriginalValueString).ToList();
             if (!missingTranslationTerms.Any())
             {
@@ -738,8 +738,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                             {
                                                 SampleImportColumnName = columnName,
                                                 MissingTranslations = missingTranslationTerms,
-                                                Options = GetSelectListBySampleImportColumn(columnName:columnName)
-                                            });
+                                                Options = GetSelectListBySampleImportColumn(columnName:columnName),
+                                                Title = GetSampleImportColumnTitle(columnName:columnName)
+            });
         }
 
         private List<ListItemDto> GetSelectListBySampleImportColumn(SampleImportColumnName columnName)
@@ -751,6 +752,19 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 case SampleImportColumnName.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList(withEmptyItem: true);
                 case SampleImportColumnName.ParameterName: return _selectListService.GetAuthorityParameterSelectList(withEmptyItem: true);
                 case SampleImportColumnName.ResultUnit: return _selectListService.GetAuthorityUnitSelectList(withEmptyItem: true);
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private string GetSampleImportColumnTitle(SampleImportColumnName columnName)
+        {
+            switch (columnName)
+            {
+                case SampleImportColumnName.MonitoringPoint: return "Monitoring Points";
+                case SampleImportColumnName.SampleType: return "Sample Types";
+                case SampleImportColumnName.CollectionMethod: return "Collection Methods";
+                case SampleImportColumnName.ParameterName: return "Parameters";
+                case SampleImportColumnName.ResultUnit: return "Units";
                 default: throw new ArgumentOutOfRangeException();
             }
         }

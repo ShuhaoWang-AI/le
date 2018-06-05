@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 
@@ -65,6 +66,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public string SelectedDefaultSampleTypeName { get; set; }
 
+        public MissingTranslationViewModel MissingTranslation { get; set; }
+
         #endregion
     }
 
@@ -96,6 +99,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public List<ErrorWithRowNumberViewModel> Errors { get; set; }
 
         #endregion
+    }
+
+    public class MissingTranslationViewModel
+    {
+        public List<DataSourceTranslationViewModel> MisstingTranslations { get; set; }
+        public string Title { get; set; }
+        public DataSourceTranslationType TranslationType { get; set; }
     }
 
     public class ErrorWithRowNumberViewModel

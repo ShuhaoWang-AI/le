@@ -165,23 +165,18 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult DoImportFileValidation(SampleImportViewModel model)
         {
-            var fileValidationErrorView = LoadSampleImportDtoAndReturnFileValidationErrorViewOrNull(model:model);
+            var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model:model);
             if (fileValidationErrorView != null)
             {
                 return fileValidationErrorView;
             }
 
-            if (model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
-            {
-                MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.SelectDataDefault);
-                return SampleImport(model:model);
-            }
-
-            throw new InternalServerError(message:"Programming error.");
+            MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.SelectDataDefault);
+            return SampleImport(model:model);
         }
 
 
-        private ActionResult LoadSampleImportDtoAndReturnFileValidationErrorViewOrNull(SampleImportViewModel model)
+        private ActionResult LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(SampleImportViewModel model)
         {
             if (!model.ImportTempFileId.HasValue)
             {
@@ -219,46 +214,29 @@ namespace Linko.LinkoExchange.Web.Controllers
             return null;
         }
 
-        private ActionResult DoImportDataValidation(SampleImportViewModel model)
-        {
-            ImportSampleFromFileValidationResultDto dataValidationResultDto = null;
-            if (model.SampleImportDto.SampleDtos == null)
-            {
-                dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto:model.SampleImportDto);
-            }
-
-            if (dataValidationResultDto != null && !dataValidationResultDto.Success)
-            {
-                model.StepDataValidation = new StepDataValidationViewModel
-                                           {
-                                               Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
-                                                                                                   {
-                                                                                                       ErrorMessage = x.ErrorMessage,
-                                                                                                       RowNumbers = x.RowNumbers
-                                                                                                   }).ToList()
-                };
-
-                _logger.Debug(message: "Sample/Import has {0} errors at step Data Validation", argument: model.StepDataValidation.Errors.Count);
-
-                MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataValidation);
-                return View(model:model);
-            }
-
-            MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.ShowPreImportOutput);
-            return SampleImport(model:model);
-        }
-
         private ActionResult DoImportSelectDataDefault(SampleImportViewModel model)
         {
-            var fileValidationErrorView = LoadSampleImportDtoAndReturnFileValidationErrorViewOrNull(model: model);
+            var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model: model);
             if (fileValidationErrorView != null)
             {
                 return fileValidationErrorView;
             }
 
-            var selectedDefaultMonitoringPoint = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultMonitoringPointId, 
+            var requireUserSelectDefaultValueView = GetSelectDefaultValuesViewOrNullToContinue(model:model);
+            if (requireUserSelectDefaultValueView != null)
+            {
+                return requireUserSelectDefaultValueView;
+            }
+
+            MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataTranslations);
+            return SampleImport(model:model);
+        }
+
+        private ActionResult GetSelectDefaultValuesViewOrNullToContinue(SampleImportViewModel model)
+        {
+            var selectedDefaultMonitoringPoint = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultMonitoringPointId,
                                                                              columnText: model.SelectedDefaultMonitoringPointName,
-                                                                             columnName: SampleImportColumnName.MonitoringPoint, 
+                                                                             columnName: SampleImportColumnName.MonitoringPoint,
                                                                              sampleImportDto: model.SampleImportDto);
             var selectedDefaultCollectionMethod = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultCollectionMethodId,
                                                                              columnText: model.SelectedDefaultCollectionMethodName,
@@ -269,56 +247,123 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              columnName: SampleImportColumnName.SampleType,
                                                                              sampleImportDto: model.SampleImportDto);
 
-            var requiredDefaultValues = _importSampleFromFileService.GetRequiredDataDefaults(sampleImportDto:model.SampleImportDto,
-                                                                                             defaultMonitoringPoint:selectedDefaultMonitoringPoint,
-                                                                                             defaultCollectionMethod:selectedDefaultCollectionMethod,
-                                                                                             defaultSampleType:selectedDefaultSampleType);
-            
+            var requiredDefaultValues = _importSampleFromFileService.GetRequiredDataDefaults(sampleImportDto: model.SampleImportDto,
+                                                                                             defaultMonitoringPoint: selectedDefaultMonitoringPoint,
+                                                                                             defaultCollectionMethod: selectedDefaultCollectionMethod,
+                                                                                             defaultSampleType: selectedDefaultSampleType);
+
             if (requiredDefaultValues.Count > 0)
             {
                 model.SampleImportDto.RequiredDefaultValues = requiredDefaultValues;
                 MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.SelectDataDefault);
-                return View(model:model);
+                return View(model: model);
             }
 
-
-            MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataTranslations);
-            return SampleImport(model:model);
+            return null;
         }
 
         private ActionResult DoImportDataTranslations(SampleImportViewModel model)
         {
-            model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto:model.SampleImportDto);
-            model.SampleImportDto.MissingTranslations = _importSampleFromFileService.GetMissingTranslationSet(sampleImportDto:model.SampleImportDto);
-
-            if (DoesTranslationsMissing(sampleImportDto:model.SampleImportDto, columnName:SampleImportColumnName.MonitoringPoint)
-                || DoesTranslationsMissing(sampleImportDto:model.SampleImportDto, columnName:SampleImportColumnName.CollectionMethod)
-                || DoesTranslationsMissing(sampleImportDto:model.SampleImportDto, columnName:SampleImportColumnName.SampleType)
-                || DoesTranslationsMissing(sampleImportDto:model.SampleImportDto, columnName:SampleImportColumnName.ParameterName)
-                || DoesTranslationsMissing(sampleImportDto:model.SampleImportDto, columnName:SampleImportColumnName.ResultUnit))
+            var dataTranslationView = GetDataTranslationViewOrNullToContinue(model);
+            if (dataTranslationView != null)
             {
-                return View(model:model);
+                return dataTranslationView;
             }
 
-            var dataValidationResult = DoImportDataValidation(model:model);
-            if (dataValidationResult != null)
+            return DoImportDataValidation(model:model);
+        }
+
+        private ActionResult GetDataTranslationViewOrNullToContinue(SampleImportViewModel model)
+        {
+            model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto: model.SampleImportDto);
+            model.SampleImportDto.MissingTranslations = _importSampleFromFileService.GetMissingTranslationSet(sampleImportDto: model.SampleImportDto);
+
+            if (DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.MonitoringPoint)
+                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.CollectionMethod)
+                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.SampleType)
+                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.ParameterName)
+                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.ResultUnit))
             {
-                return dataValidationResult;
+                //TODO: should prepare the viewmodel missing translation presentation values and return `View(model:model)`
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: new BadRequest(message: "Missing translations"),
+                                                                       modelState: ViewData.ModelState);
+                return View(model: model);
+            }
+
+            return null;
+        }
+
+        private ActionResult DoImportDataValidation(SampleImportViewModel model)
+        {
+            var dataValidationErrorView = GetDataValidationErrorViewOrNullToContinue(model);
+            if (dataValidationErrorView != null)
+            {
+                return dataValidationErrorView;
             }
 
             MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.ShowPreImportOutput);
-            return SampleImport(model:model);
+            return SampleImport(model: model);
+        }
+
+        private ActionResult GetDataValidationErrorViewOrNullToContinue(SampleImportViewModel model)
+        {
+            ImportSampleFromFileValidationResultDto dataValidationResultDto = null;
+            if (model.SampleImportDto.SampleDtos == null)
+            {
+                dataValidationResultDto = _importSampleFromFileService.DoDataValidation(sampleImportDto: model.SampleImportDto);
+            }
+
+            if (dataValidationResultDto != null && !dataValidationResultDto.Success)
+            {
+                model.StepDataValidation = new StepDataValidationViewModel
+                {
+                    Errors = dataValidationResultDto.Errors.Select(x => new ErrorWithRowNumberViewModel
+                    {
+                        ErrorMessage = x.ErrorMessage,
+                        RowNumbers = x.RowNumbers
+                    }).ToList()
+                };
+
+                _logger.Debug(message: "Sample/Import has {0} errors at step Data Validation", argument: model.StepDataValidation.Errors.Count);
+
+                MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataValidation);
+                return View(model: model);
+            }
+
+            return null;
         }
 
         private ActionResult DoImportPreview(SampleImportViewModel model)
         {
-            MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.ShowImportOutput);
-
-            return SampleImport(model:model);
+            return View(model: model);
         }
 
         private ActionResult DoImportFinalSave(SampleImportViewModel model)
         {
+            var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model: model);
+            if (fileValidationErrorView != null)
+            {
+                return fileValidationErrorView;
+            }
+
+            var requireUserSelectDefaultValueView = GetSelectDefaultValuesViewOrNullToContinue(model: model);
+            if (requireUserSelectDefaultValueView != null)
+            {
+                return requireUserSelectDefaultValueView;
+            }
+
+            var dataTranslationView = GetDataTranslationViewOrNullToContinue(model);
+            if (dataTranslationView != null)
+            {
+                return dataTranslationView;
+            }
+
+            var dataValidationErrorView = GetDataValidationErrorViewOrNullToContinue(model: model);
+            if (dataValidationErrorView != null)
+            {
+                return dataValidationErrorView;
+            }
+
             _importSampleFromFileService.ImportSampleAndCreateAttachment(sampleImportDto: model.SampleImportDto);
             return View(model:model);
         }
@@ -386,7 +431,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return false;
             }
 
-            return sampleImportDto.MissingTranslations.Find(x => x.SampleImportColumnName == columnName) == null;
+            return sampleImportDto.MissingTranslations.Find(x => x.SampleImportColumnName == columnName) != null;
         }
 
         #endregion
