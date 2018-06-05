@@ -565,17 +565,29 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     throw new ArgumentException(message:$"File version template {fileVersionTemplateName} not found!");
                 }
 
+                //TODO: when there will be multiple FileVersions for same authority need to update following condition
                 var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
-                
-                var fileVersionDto = _mapHelper.ToDto(fromDomainObject:fileVersion);
-
-                fileVersionDto = _mapHelper.MargeToFileVersionDto(fileVersionDto:fileVersionDto, fileVersionTemplate:fileVersionTemplate);
 
                 if (fileVersion == null)
                 {
-                    fileVersionDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
-                    fileVersionDto.OrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(currentRegulatoryProgramId);
+                    using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                    {
+                        fileVersion = new FileVersion
+                                      {
+                                          Name = fileVersionTemplate.Name,
+                                          Description = fileVersionTemplate.Description,
+                                          OrganizationRegulatoryProgramId = currentRegulatoryProgramId,
+                                          CreationDateTimeUtc = DateTimeOffset.Now
+                                      };
+
+                        _dbContext.FileVersions.Add(entity:fileVersion);
+                        _dbContext.SaveChanges();
+                    }
                 }
+
+                var fileVersionDto = _mapHelper.ToDto(fromDomainObject:fileVersion);
+
+                fileVersionDto = _mapHelper.MargeToFileVersionDto(fileVersionDto:fileVersionDto, fileVersionTemplate:fileVersionTemplate);
 
                 if (fileVersion?.LastModificationDateTimeUtc != null)
                 {
@@ -596,6 +608,52 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 return fileVersionDto;
                 
+            }
+        }
+
+        /// <inheritdoc />
+        public int? AddOrUpdateFileVersionFieldForAuthorityConfiguration(int fileVersionId, FileVersionFieldDto dto)
+        {
+            using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+            {
+                FileVersionField domainObject = null;
+
+                if (dto.FileVersionFieldId.HasValue)
+                {
+                    domainObject = _dbContext.FileVersionFields.FirstOrDefault(i => i.FileVersionFieldId == dto.FileVersionFieldId);
+                }
+
+
+                if (domainObject == null)
+                {
+                    domainObject = new FileVersionField();
+                }
+
+                if (!dto.IsIncluded)
+                {
+                    _dbContext.FileVersionFields.Remove(domainObject);
+                    _dbContext.SaveChanges();
+                    return null;
+                }
+
+                domainObject.Name = dto.FileVersionFieldName;
+                domainObject.Description = dto.Description;
+                domainObject.FileVersionId = fileVersionId;
+                domainObject.SystemFieldId = (int) dto.SystemFieldName;
+                domainObject.DataOptionalityId = (int) dto.DataOptionalityName;
+                domainObject.Description = dto.Description;
+                domainObject.Size = dto.Size;
+                domainObject.ExampleData = dto.ExampleData;
+                domainObject.AdditionalComments = dto.AdditionalComments;
+
+                if (!dto.FileVersionFieldId.HasValue)
+                {
+                    _dbContext.FileVersionFields.Add(domainObject);
+                }
+
+                _dbContext.SaveChanges();
+
+                return domainObject.FileVersionFieldId;
             }
         }
 

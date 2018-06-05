@@ -1,5 +1,5 @@
 ﻿@using Linko.LinkoExchange.Core.Enum
-@model Linko.LinkoExchange.Web.ViewModels.Shared.FileVersionViewModel.FileVersionFieldViewModel
+@model Linko.LinkoExchange.Web.ViewModels.Shared.FileVersionFieldViewModel
 
 @Styles.Render(paths:"~/bundles/icheck")
 @Scripts.Render(paths:"~/bundles/jquery")
@@ -42,10 +42,10 @@
 
             <div class="col-md-7">
                 @Html.TextBoxFor(model => model.SystemFieldNameDisplayText, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "form-control",
-                                                                                             disabled = "disabled"
-                                                                                         })
+                                                                                           {
+                                                                                               @class = "form-control",
+                                                                                               disabled = "disabled"
+                                                                                           })
                 @Html.ValidationMessageFor(model => model.SystemFieldName)
             </div>
         </div>
@@ -191,9 +191,11 @@
     $(function() {
         if ($("#IsSystemRequired").is(':checked')) {
             $("option[value='@((int) DataOptionalityName.Optional)']").remove();
+            $("#IsIncluded").iCheck('disable');
+            $("#IsIncluded").iCheck('check');
         } else {
             $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
-            }
+        }
     });
 
 </script>

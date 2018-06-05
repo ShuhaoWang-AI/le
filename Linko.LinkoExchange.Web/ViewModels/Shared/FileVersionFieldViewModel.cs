@@ -5,32 +5,12 @@ using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    public class FileVersionViewModel
-    {
-        #region public properties
-
-        [ScaffoldColumn(scaffold:false)]
-        public int? FileVersionId { get; set; }
-
-        [Display(Name = "Name")]
-        public string Name { get; set; }
-
-        [Display(Name = "Description")]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Authority OrganizationRegulatoryProgramId
-        /// </summary>
-        [ScaffoldColumn(scaffold:false)]
-        public int OrganizationRegulatoryProgramId { get; set; }
-
-        public List<FileVersionFieldViewModel> FileVersionFields { get; set; }
-
-        #endregion
-
         public class FileVersionFieldViewModel
         {
             #region public properties
+
+            [ScaffoldColumn(scaffold:false)]
+            public int FileVersionId { get; set; }
 
             [ScaffoldColumn(scaffold:false)]
             public int? FileVersionFieldId { get; set; }
@@ -122,6 +102,5 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
             public bool IsIncluded { get; set; }
 
             #endregion
-        }
     }
 }

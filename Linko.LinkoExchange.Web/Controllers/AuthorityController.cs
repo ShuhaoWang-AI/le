@@ -2709,8 +2709,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var dto = _importSampleFromFileService.GetFileVersionForAuthorityConfiguration(fileVersionTemplateName:FileVersionTemplateName.SampleImport);
             var viewModels = dto.FileVersionFields
-                                .Select(x => new FileVersionViewModel.FileVersionFieldViewModel
+                                .Select(x => new FileVersionFieldViewModel
                                              {
+                                                 FileVersionId = dto.FileVersionId ?? 0,
                                                  FileVersionFieldId = x.FileVersionFieldId,
                                                  SystemFieldName = x.SystemFieldName,
                                                  FileVersionFieldName = x.FileVersionFieldName,
@@ -2729,16 +2730,26 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
         }
-
-        public ActionResult ImportFileTemplate_Update([DataSourceRequest] DataSourceRequest request, FileVersionViewModel.FileVersionFieldViewModel viewModel)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult ImportFileTemplate([DataSourceRequest] DataSourceRequest request, FileVersionViewModel.FileVersionFieldViewModel viewModel)
+        public ActionResult ImportFileTemplate_Update([DataSourceRequest] DataSourceRequest request, FileVersionFieldViewModel viewModel)
         {
-            throw new NotImplementedException();
+            if (ModelState.IsValid)
+            {
+                var dto = _importSampleFromFileService.GetFileVersionForAuthorityConfiguration(fileVersionTemplateName:FileVersionTemplateName.SampleImport);
+                var fileVersionFieldDto = dto.FileVersionFields.First(x => x.SystemFieldName == viewModel.SystemFieldName);
+
+                fileVersionFieldDto.FileVersionFieldName = viewModel.FileVersionFieldName;
+                fileVersionFieldDto.Description = viewModel.Description;
+                fileVersionFieldDto.IsIncluded = viewModel.IsIncluded;
+                fileVersionFieldDto.DataOptionalityName = viewModel.DataOptionalityName;
+                fileVersionFieldDto.ExampleData = viewModel.ExampleData;
+                fileVersionFieldDto.AdditionalComments = viewModel.AdditionalComments;
+
+                viewModel.FileVersionFieldId = _importSampleFromFileService.AddOrUpdateFileVersionFieldForAuthorityConfiguration(viewModel.FileVersionId, fileVersionFieldDto);
+            }
+
+            return Json(data:new[] {viewModel}.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
         #endregion
