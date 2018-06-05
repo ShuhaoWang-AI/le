@@ -117,6 +117,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 						AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
 					}
 				}
+				else
+				{
+					importingSampleResult.EffectiveUnitResult = result;
+				}
 			}
 		}
 
@@ -418,9 +422,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var flowUnitConversionFactor = sampleResultDto.UnitName.Equals(value: massLoadingBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
 			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(value: resultBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
 			
-			var massLoadingValue = flowResult * sampleResultDto.Value * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor;
-			massLoadingValue = Math.Round(massLoadingValue?? 0.0f, decimalPlaces, MidpointRounding.AwayFromZero);
-			sampleResultDto.MassLoadingValue = massLoadingValue.ToString();
+			var numbers = new[] {flowResult, sampleResultDto.Value ?? 0, massLoadingMultiplier, flowUnitConversionFactor , resultUnitConversionFactor}; 
+			var massloading = _sampleService.CalculateFlowNumbersProduct(numbers, decimalPlaces);
+			sampleResultDto.MassLoadingValue = massloading.ProductStr; 
 			sampleResultDto.MassLoadingQualifier = massLoadingQualifier;
 
 			sampleResultDto.MassLoadingUnitId = massLoadingUnitDto.UnitId;

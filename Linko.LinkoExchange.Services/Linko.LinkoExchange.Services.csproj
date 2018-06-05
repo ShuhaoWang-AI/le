@@ -140,6 +140,7 @@
     <Compile Include="Config\ConfigSettingService.cs" />
     <Compile Include="DataSource\IDataSourceService.cs" />
     <Compile Include="DataSource\DataSourceService.cs" />
+    <Compile Include="Dto\FloatNumbersProductDto.cs" />
     <Compile Include="Dto\ListItemDto.cs" />
     <Compile Include="Dto\ErrorWithRowNumberDto.cs" />
     <Compile Include="Dto\FileVersionDto.cs" />

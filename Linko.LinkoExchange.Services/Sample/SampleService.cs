@@ -980,14 +980,51 @@ namespace Linko.LinkoExchange.Services.Sample
             return sampleRequirementDtos;
         }
 
-        #endregion
 
-        /// <summary>
-        ///     Maps Sample Dto to Sample and saves to database. No validation.
-        /// </summary>
-        /// <param name="sampleDto"> Sample Dto to map and save </param>
-        /// <returns> Existing Id or newly created Id of Sample row in tSample table </returns>
-        private int SimplePersist(SampleDto sampleDto)
+	    public FloatNumbersProductDto CalculateFlowNumbersProduct(double[] numbers, int decimals)
+	    {
+		    var result = new FloatNumbersProductDto();
+		    if (numbers == null || !numbers.Any())
+		    {
+			    return result;
+		    }
+
+		    var product = 0.0;
+		    for (var i = 0; i < numbers.Length; i++)
+		    {
+			    if (i == 0)
+			    {
+				    product = numbers[i];
+			    }
+
+			    else
+			    {
+				    product *= numbers[i];
+			    }
+		    }
+
+		    var formatStr = "0.";
+		    for (var j = 0; j < decimals; j++)
+		    {
+			    formatStr += "0";
+		    }
+
+		    var value = Math.Round(value:product, digits:decimals, mode:MidpointRounding.AwayFromZero); 
+
+		    result.Product = value;
+			result.ProductStr = value.ToString(format:formatStr);
+
+		    return result;
+	    }
+
+	    #endregion
+
+		/// <summary>
+		///     Maps Sample Dto to Sample and saves to database. No validation.
+		/// </summary>
+		/// <param name="sampleDto"> Sample Dto to map and save </param>
+		/// <returns> Existing Id or newly created Id of Sample row in tSample table </returns>
+		private int SimplePersist(SampleDto sampleDto)
         {
             var sampleIdString = sampleDto.SampleId?.ToString() ?? "null";
 

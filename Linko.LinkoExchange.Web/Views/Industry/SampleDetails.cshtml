@@ -582,1010 +582,1012 @@
     </div>
 
 @section Scripts {
-    <script>
-        $(document)
-            .ready(function() {
-                //Prevent "enter key" press from doing anything on the page, i.e. collapsing boxes, submitting form, etc...
-                $('#LinkoExchangeForm')
-                    .bind('keydown', function(e) {
-                        if (e.keyCode == 13) {
-                            e.preventDefault();
-                        }
-                    });
-
-                $('#ParameterGroupTable')
-                    .DataTable(
-                        {
-                            "columnDefs": [
-                                {
-                                    "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' name='btnAddParamsFromGroup' type='button'><i class='fa fa-lg fa-plus'></i></button>",
-                                    "targets": 4
-                                }
-                            ],
-                            "searching": false,
-                            "ordering": false,
-                            "order": [[1, 'asc']],
-                            "paging": false,
-                            "info": false,
-                            "responsive": true,
-                            "autoWidth": false,
-                            "processing": true,
-                            "stateSave": false
-                        }
-                    );
-
-                $('#ParameterTable')
-                    .DataTable(
-                        {
-                            "columnDefs": [
-                                {
-                                    "defaultContent":
-                                        '<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>',
-                                    "targets": 10
-                                }
-                            ],
-                            "searching": false,
-                            "ordering": true,
-                            "order": [[1, 'asc']],
-                            "paging": false,
-                            "info": false,
-                            "responsive": true,
-                            "autoWidth": false,
-                            "processing": true,
-                            "stateSave": false,
-                            language: {
-                                search: "",
-                                searchPlaceholder: "Search Parameter..."
-                            }
-                        }
-                    );
-
-                var clickedButtonId = "";
-
-                $("input[type='submit'],button[type='submit']")
-                    .click(function() {
-                        clickedButtonId = $(this).attr('id');
-                    });
-
-                $("#LinkoExchangeForm")
-                    .submit(function(event) {
-                        //clear potentially existing success message box from previous action result
-                        $("#div-success-message").remove();
-
-                        var isFormValid = true;
-
-                        try {
-                            isFormValid = $(this).valid();
-                        } catch (e) {}
-
-                        try {
-                            var validationSummary = $('.validation-summary-errors');
-
-                            if (validationSummary.length === 0) {
-                                // Form is still valid 
-                                validationSummary = $('.validation-summary-valid');
-                            }
-
-                            // add Results to hidden field
-                            var sampleResults = [];
-                            var isValid = true;
-
-                            var parameterTable = $('#ParameterTable').DataTable();
-                            parameterTable
-                                .rows()
-                                .every(function() {
-                                    var d = this.data();
-                                    var sampleResult = {};
-                                    //console.debug(d);
-                                    var cell = d[0];
-                                    var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
-
-                                    sampleResult.Id = $('input', cell)['prevObject'][0].value;
-                                    sampleResult.ParameterId = paramId;
-                                    sampleResult.ParameterName = d[1];
-                                    var qualifier = $("#Qualifier_" + paramId).val();
-                                    sampleResult.Qualifier = ((qualifier === "NUMERIC") ? "" : qualifier);
-                                    var result = parseFloat($("#Result_" + paramId).val());
-                                    sampleResult.Value = $("#Result_" + paramId).val();
-                                    sampleResult.UnitId = $("#UnitId_" + paramId).val();
-                                    sampleResult.UnitName = $("#UnitName_" + paramId).html();
-                                    sampleResult
-                                        .IsCalcMassLoading = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
-                                    sampleResult.AnalysisDateTimeLocal = $("#AnalysisDateTime_" + paramId).val();
-                                    sampleResult.AnalysisMethod = $("#AnalysisMethod_" + paramId).val();
-                                    sampleResult.EnteredMethodDetectionLimit = $("#MDL_" + paramId).val();
-
-                                    var massLoadingResult = $("#MassResult_" + paramId).html().split(' ');
-                                    if (massLoadingResult.length === 3) {
-                                        sampleResult.MassLoadingSampleResultId = $("#MassResultId_" + paramId).val();
-                                        var massLoadingQualifier = massLoadingResult[0];
-                                        sampleResult.MassLoadingQualifier = massLoadingQualifier;
-                                        sampleResult.MassLoadingValue = massLoadingResult[1];
-                                        sampleResult.MassLoadingUnitId = $("#MassLoadingMassLoadingUnitId").val();
-                                        sampleResult.MassLoadingUnitName = $("#MassLoadingMassLoadingUnitName").val();
-                                    }
-
-                                    sampleResults.push(sampleResult);
-
-                                    if (clickedButtonId === "btnReadyToReport" && isFormValid) {
-                                        var isSampleResultValid =
-                                            !((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
-                                                && isNaN(result));
-
-                                        isValid = isValid & isSampleResultValid;
-
-                                        if (!isSampleResultValid) {
-                                            $(this.node()).addClass('text-red');
-                                        } else {
-                                            $(this.node()).removeClass('text-red');
-                                        }
-                                    }
-                                });
-
-                            if (!isValid && isFormValid) {
-                                event.preventDefault();
-                                $("input[type='submit']").prop('disabled', false);
-                                $("input[type='button']").prop("disabled", false);
-
-                                validationSummary.removeClass("validation-summary-valid");
-                                validationSummary.find("ul")
-                                    .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
-                                validationSummary.find("ul").append("<li>Result is required for row(s) marked as red.</li>");
-                                $("#CollectionMethodId").focus(); // to scroll to top validation summary
-                            } else {
-                                $("#SampleResults").val(JSON.stringify(sampleResults));
-
-                                $("#CtsEventTypeName").val($("#CtsEventTypeId option:selected").text());
-                                $("#CollectionMethodName").val($("#CollectionMethodId option:selected").text());
-                                $("#FlowUnitName").val($("#FlowUnitId option:selected").text());
-                            }
-
-                            return isValid;
-                        } catch (err) {
-                            alert(err);
-                            return false;
-                        }
-                    });
-            });
-    </script>
-
-    @if (ViewBag.Readonly)
-    {
-        <script>
-            $(document)
-                .ready(function() {
-                    $("input[type='text']").prop('readonly', true);
-
-                    $("input[id^='CalcLoading_']").prop('disabled', true);
-
-                    //Need to reinitialize these checkboxes for some reason!
-                    $("input[id^='CalcLoading_']")
-                        .iCheck({
-                            checkboxClass: "icheckbox_minimal-blue"
-                        });
-            
-                    $("select").prop('disabled', true);
-                    $("[name='btnAddParamsFromGroup']").prop('disabled', true);
-                    $("[name='btnDeleteParam']").prop('disabled', true);
-                });
-        </script>
-    }
-    else
-    {
-        @Scripts.Render("~/bundles/jqueryval")
-        @Scripts.Render("~/bundles/inputmask")
-
-        <script>
-            $(document)
-                .ready(function() {
-                    updateResultTextBoxState();
-
-                    $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
-                    $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
-                    $("#FlowValue").inputmask('decimal', { digits: '16', rightAlign: true });
-                    $("#StartDateTimeLocal")
-                        .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm',
-                            mask: "1/2/y [h:s t\\m]",
-                            placeholder: "mm/dd/yyyy 00:00 am",
-                            greedy: false,
-                            clearMaskOnLostFocus: false,
-                            clearIncomplete: true
-                        });
-
-                    $("#EndDateTimeLocal")
-                        .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm',
-                            mask: "1/2/y [h:s t\\m]",
-                            placeholder: "mm/dd/yyyy 00:00 am",
-                            greedy: false,
-                            clearMaskOnLostFocus: false,
-                            clearIncomplete: true
-                        });
-
-                    $("input[id^='AnalysisDateTime_']")
-                        .inputmask({
-                            alias: 'mm/dd/yyyy hh:mm xm',
-                            mask: "1/2/y [h:s t\\m]",
-                            placeholder: "mm/dd/yyyy 00:00 am",
-                            greedy: false,
-                            clearMaskOnLostFocus: false,
-                            clearIncomplete: true
-                        });
-
-                    if ($("input[id^='CalcLoading_']").length > 0 && $("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
-                        $("input[id='CalcLoading']").iCheck('check');
-                    }
-                });
-
-            $(document)
-                .on('change', "input[id^='AnalysisDateTime_']", function() {
-                    var value = $(this).val().toLowerCase().replace("12:00 am", "");
-                    $(this).val(value);
-                });
-
-            updateResultTextBoxState = function() {
-                var parameterTable = $('#ParameterTable').DataTable();
-                parameterTable
-                    .rows()
-                    .every(function() {
-                        var d = this.data();
-                        var cell = d[0];
-                        var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
-                        var qualifier = $("#Qualifier_" + paramId).val();
-
-                        if (qualifier === "ND" || qualifier === "NF") {
-                            $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                        } else {
-                            $("#Result_" + paramId).removeAttr("readonly");
-                        }
-                    });
-            };
-
-            function displayMassLoading(paramId) {
-                var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
-
-                if (clChecked) {
-                    var qualifier = $("#Qualifier_" + paramId).val();
-                    var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
-                    var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
-                    var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
-                    var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
-
-                    if (qualifier === "ND" || qualifier === "NF") {
-                        $("#MassResult_" + paramId).html("");
-                    } else if (qualifier === "NUMERIC" || qualifier === ">") {
-                        var result = parseFloat($("#Result_" + paramId).val());
-                        var sampleFlowResult = parseFloat($("#FlowValue").val());
-
-                        if (isNaN(result)
-                            || isNaN(sampleFlowResult)
-                            || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
-                            || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l"))) {
-                            $("#MassResult_" + paramId).html("");
-                        } else {
-                            var massLoadingValue = getMassLoadingValue(paramId);
-
-                            $("#MassResult_" + paramId)
-                                .html(" "
-                                    + massLoadingValue
-                                    + " "
-                                    + massLoadingUnit);
-                            //.css('color', 'green');
-                        }
-                    } else if (qualifier === "<") {
-                        var result = parseFloat($("#Result_" + paramId).val());
-                        var sampleFlowResult = parseFloat($("#FlowValue").val());
-
-                        if (isNaN(result)
-                            || isNaN(sampleFlowResult)
-                            || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
-                            || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l"))) {
-                            $("#MassResult_" + paramId).html("");
-                        } else {
-                            var massLoadingValue = getMassLoadingValue(paramId);
-
-                            $("#MassResult_" + paramId)
-                                .html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
-                                    + " "
-                                    + massLoadingValue
-                                    + " "
-                                    + massLoadingUnit);
-                            //.css('color', 'green');
-                        }
-                    }
-                } else {
-                    $("#MassResult_" + paramId).html("");
-                }
-
-                displayMassLoadingCompliance(paramId);
-            }
-
-            $("#FlowValue")
-                .blur(function() {
-                    $("input[id^='CalcLoading_']:checkbox:checked")
-                        .each(function() {
-                            var paramId = this.id.replace('CalcLoading_', '');
-                            displayMassLoading(paramId);
-                        });
-
-                    $("input[id^='Result_']")
-                        .each(function() {
-                            var paramId = this.id.replace('Result_', '');
-                            displayConcentrationCompliance(paramId);
-                        });
-                });
-
-            $("select[name='FlowUnitId']")
-                .change(function() {
-                    $("input[id^='CalcLoading_']:checkbox:checked")
-                        .each(function() {
-                            var paramId = this.id.replace('CalcLoading_', '');
-                            displayMassLoading(paramId);
-                        });
-
-                    $("input[id^='Result_']")
-                        .each(function() {
-                            var paramId = this.id.replace('Result_', '');
-                            displayConcentrationCompliance(paramId);
-                        });
-                });
-
-            $(document)
-                .on('change', "select[id^='Qualifier_']", function() {
-                    var paramId = this.id.replace('Qualifier_', '');
-                    var qualifier = $("#Qualifier_" + paramId).val();
-
-                    if (qualifier === "ND" || qualifier === "NF") {
-                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                    } else {
-                        $("#Result_" + paramId).removeAttr("readonly");
-                    }
-
-                    displayMassLoading(paramId);
-                    displayConcentrationCompliance(paramId);
-                });
-
-            $(document)
-                .on('blur', "input[id^='Result_']", function() {
-                    var paramId = this.id.replace('Result_', '');
-                    displayConcentrationCompliance(paramId);
-                    displayMassLoading(paramId);
-                });
-
-            $(document)
-                .on('ifChecked', "input[id='CalcLoading']", function(event) {
-                    $("input[id^='CalcLoading_']").iCheck('check');
-                });
-
-            $(document)
-                .on('ifUnchecked', "input[id='CalcLoading']", function(event) {
-                    $("input[id^='CalcLoading_']").iCheck('uncheck');
-                });
-
-            $(document)
-                .on('ifChecked', "input[id^='CalcLoading_']", function(event) {
-                    if ($("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
-                        $("input[id='CalcLoading']").iCheck('check');
-                    }
-                    var paramId = this.id.replace('CalcLoading_', '');
-                    displayMassLoading(paramId);
-                });
-
-            $(document)
-                .on('ifUnchecked', "input[id^='CalcLoading_']", function(event) {
-                    if ($("input[id^='CalcLoading_']:checked").length !== $("input[id^='CalcLoading_']").length) {
-                        $("input[id='CalcLoading']").iCheck('indeterminate');
-                    }
-                    var paramId = this.id.replace('CalcLoading_', '');
-                    displayMassLoading(paramId);
-                });
-
-            $(document)
-                .on('click', "button[name='btnDeleteParam']", function() {
-                    var table = $('#ParameterTable').DataTable();
-                    table
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
-
-            $("#btnDeleteEmptyParameters")
-                .click(function() {
-                    var table = $('#ParameterTable').DataTable();
-                    table
-                        .rows()
-                        .every(function() {
-                            var d = this.data();
-                            var cell = d[0];
-                            var paramId = $('input', cell)['prevObject'][0].id
-                                .replace('sampleResultId_', '');
-                            var qualifier = $("#Qualifier_" + paramId).val();
-                            var result = parseFloat($("#Result_" + paramId).val());
-
-                            //console.debug($('input', cell)['prevObject'][0].id + ' : ' + paramId + ' : ' + qualifier + ' : ' + result);
-
-                            if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
-                                && isNaN(result)
-                            ) {
-                                this.nodes().to$().addClass('selected');
-                            }
-                        });
-
-                    table.rows('.selected')
-                        .remove()
-                        .draw();
-
-                    //console.debug($('#ParameterTable >tbody >tr').length);
-                });
-
-            $("#btnAddParameter")
-                .click(function() {
-                    var allParameters = $.parseJSON($("#AllParameters").val());
-
-                    var alreadyAddedParameterIds = [];
-
-                    $('#ParameterTable')
-                        .DataTable()
-                        .rows()
-                        .every(function() {
-                            var d = this.data();
-                            var cell = d[0];
-                            var paramId = $('input', cell)['prevObject'][0].id
-                                .replace('sampleResultId_', '');
-                            alreadyAddedParameterIds.push(parseInt(paramId));
-                        });
-
-                    //console.debug(alreadyAddedParameterIds);
-
-                    var availableParameters = $.grep(allParameters, function(obj) {
-                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
-                    });
-
-                    //console.debug(allParameters);
-                    //console.debug(availableParameters);
-
-                    $("#AddParameterDropdown")
-                        .kendoDropDownList({
-                            filter: "contains",
-                            dataSource: availableParameters,
-                            dataTextField: "Name",
-                            dataValueField: "Id",
-                            autoWidth: true,
-                            noDataTemplate: 'No Parameter Available!',
-                            popup: {
-                                appendTo: $("#AddParameterModal")
-                            }
-                        });
-
-                    $('#AddParameterModal').modal('show');
-                });
-
-            $(document)
-                .on('click', "button[id='btnAddParameterInsideModal']", function() {
-                    var allParameters = $.parseJSON($("#AllParameters").val());
-
-                    var availableParameters = $.grep(allParameters, function(obj) {
-                        return (obj.Id === parseInt($("#AddParameterDropdown").val()));
-                    });
-
-                    $('#AddParameterModal').modal('hide');
-                    //console.debug(availableParameters);
-                    AddParamtersToParameterTable(availableParameters);
-                });
-
-            $(document)
-                .on('click', "button[name='btnAddParamsFromGroup']", function() {
-                    var alreadyAddedParameterIds = [];
-
-                    $('#ParameterTable')
-                        .DataTable()
-                        .rows()
-                        .every(function() {
-                            var d = this.data();
-                            //console.debug(d);
-                            var cell = d[0];
-                            var paramId = $('input', cell)['prevObject'][0].id
-                                .replace('sampleResultId_', '');
-                            alreadyAddedParameterIds.push(parseInt(paramId));
-                        });
-
-                    //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
-
-                    var strGroupParameterIds = $('#ParameterGroupTable')
-                        .DataTable()
-                        .row($(this).parents('tr'))
-                        .data();
-                    var groupParameterIds = [];
-
-                    $.each(strGroupParameterIds[3].split(','), function(index, value) {
-                        groupParameterIds.push(parseInt(value));
-                    });
-
-                    //console.debug(groupParameterIds);
-                    var allParameters = $.parseJSON($("#AllParameters").val());
-
-                    var availableParameters = $.grep(allParameters, function(obj) {
-                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
-                            && ($.inArray(obj.Id, groupParameterIds) !== -1);
-                    });
-
-                    //console.debug("allParameters :" + allParameters);
-                    //console.debug("availableParameters :" + availableParameters);
-
-                    AddParamtersToParameterTable(availableParameters);
-                });
-
-            AddParamtersToParameterTable = function(availableParameters) {
-                var parameterTable = $('#ParameterTable').DataTable();
-
-                $.each(availableParameters, function(index, value) {
-                    //console.debug(value.Id + " : " + value.Name);
-                    var data = {};
-                    data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''  autocomplete='false' >";
-                    data[1] = value.Name;
-
-                    var availableResultQualifierValidValues =
-                        @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
-
-                    var qualifierCtrl =
-                        '<select class="form-control input-sm no-margin no-padding onchange-calc-compliance" id="Qualifier_'
-                            + value.Id
-                            + '" style="width: 100%">';
-
-                    $.each(availableResultQualifierValidValues, function(i, v) {
-                        if (v.Value === "NUMERIC") {
-                            qualifierCtrl += '<option value="'
-                                + v.Value
-                                + '" selected="">'
-                                + v.Text
-                                + '</option>';
-                        } else {
-                            qualifierCtrl +=
-                                '<option value="' + v.Value + '">' + v.Text + '</option>';
-                        }
-                    });
-                    qualifierCtrl += '</select>';
-
-                    data[2] = qualifierCtrl;
-
-                    data[3] = $("#unitsAndResultComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
-                        .html()
-                        .replace(/{{parameterId}}/g, value.Id)
-                        .replace(/{{unitId}}/g, value.DefaultUnitId)
-                        .replace(/{{unitName}}/g, value.DefaultUnitName)
-                        .replace(/{{complianceIconAndMessage}}/g, "");
-
-                    data[4] = '<input class="form-control input-sm" id="MDL_'
-                        + value.Id
-                        + '" type="text" style="width: 80px" value="" autocomplete="false">';
-                    data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
-                        + value.Id
-                        + '" type="text" value="" autocomplete="false">';
-                    data[6] = '<input id="AnalysisDateTime_'
-                        + value.Id
-                        + '" style="width: 100%; font-size: 12px;"'
-                        + 'autocomplete="false" />';
-
-                    if (value.IsCalcMassLoading) {
-                        data[7] =
-                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                            + value.Id
-                            + '" checked />';
-                    } else {
-                        data[7] =
-                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                            + value.Id
-                            + '"/>';
-                    }
-                    data[8] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="" />';
-                    data[9] = $("#massResultAndComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
-                        .html()
-                        .replace(/{{parameterId}}/g, value.Id);
-                    data[10] = null;
-
-                    //console.debug("data : " + data);
-
-                    var rowNode = parameterTable
-                        .row.add(data)
-                        .draw()
-                        .node();
-
-                    $(rowNode).css('color', 'green');
-
-                    displayConcentrationCompliance(value.Id);
-                    displayMassLoadingCompliance(value.Id);
-                });
-
-                // need to reinitialize iCheck otherwise newly added checkbox doesn't work
-                
-                $("input[id^='CalcLoading_']")
-                    .iCheck({
-                        checkboxClass: "icheckbox_minimal-blue"
-                    });
-
-                $("input[id^='AnalysisDateTime_']")
-                    .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm tt", max: new Date($.now()) });
-
-                $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
-                $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
-                $("input[id^='AnalysisDateTime_']")
-                    .inputmask({
-                        alias: 'mm/dd/yyyy hh:mm xm',
-                        mask: "1/2/y [h:s t\\m]",
-                        placeholder: "mm/dd/yyyy 00:00 am",
-                        greedy: false,
-                        clearMaskOnLostFocus: false,
-                        clearIncomplete: true
-                    });
-            };
-
-            $("#StartDateTimeLocal")
-                .on("blur", function() {
-                    $("#StartDateTimeLocal").trigger('change');
-                });
-
-            $("#StartDateTimeLocal")
-                .on("change", function() 
-                {
-                    ReloadParameterGroups();
-                });
-
-            $("#EndDateTimeLocal")
-                .on("blur", function() {
-                    $("#EndDateTimeLocal").trigger('change');
-                });
-
-            $("#EndDateTimeLocal")
-                .on("change", function()
-                {
-                    ReloadParameterGroups();
-                });
-
-            $("#CollectionMethodId")
-                .on("change", function()
-                {
-                    ReloadParameterGroups();
-                });
-
-            function ReloadParameterGroups()
-            {
-                //Start date
-                $("#StartDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
-                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
-
-                //End date
-                $("#EndDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
-                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
-
-                if ($('#StartDateTimeLocal').val() === "" || $('#EndDateTimeLocal').val() === "" || $('#CollectionMethodId').val() < 1)
-                {
-                    return;
-                }
-
-                var viewModel = {};
-                viewModel.monitoringPointId = $('#MonitoringPointId').val();
-                viewModel.startDateTime = $('#StartDateTimeLocal').val();
-                viewModel.endDateTime = $('#EndDateTimeLocal').val();
-                viewModel.collectionMethodId = $('#CollectionMethodId').val();
-
-                var postUrl ="@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
-
-                $.ajax({
-                        type: "POST",
-                        url: postUrl,
-                        data: viewModel
-                    })
-                    .done(function(response) {
-                        if (response.hasError != null && response.hasError) {
-                            alert(response.message);
-                        } else {
-                            $("#AllParameters").val(JSON.stringify(response.allParameters));
-                            var parameterGroups = response.parameterGroups;
-
-                            var table = $('#ParameterGroupTable').DataTable();
-
-                            table
-                                .clear()
-                                .draw();
-
-                            $.each(parameterGroups, function(index, value) {
-                                var data = {};
-                                data[0] = value.Id;
-                                data[1] = value.Name;
-                                data[2] = value.Description;
-                                data[3] = value.ParameterIds;
-                                data[4] = null;
-
-                                //console.debug("data : " + data);
-
-                                var rowNode = table
-                                    .row.add(data)
-                                    .draw()
-                                    .node();
-
-                                $(rowNode).css('color', 'green');
-                            });
-
-                            $("input[id^='Result_']")
-                                .each(function() {
-                                    var paramId = this.id.replace('Result_', '');
-                                    displayConcentrationCompliance(paramId);
-                                    displayMassLoadingCompliance(paramId);
-                                });
-                        }
-                    });
-
-            }
-        </script>
-    }
-
-    <script>
-        $(document)
-            .ready(function() {
-                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
-                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
-
-                $("input[id^='AnalysisDateTime_']")
-                    .each(function() {
-                        var value = $(this).val().toLowerCase().replace("12:00 am", "");
-                        $(this).val(value);
-                    });
-
-                //display compliance information for already saved results
-                $("input[id^='Result_']")
-                    .each(function() {
-                        var paramId = this.id.replace('Result_', '');
-                        displayConcentrationCompliance(paramId);
-                        displayMassLoadingCompliance(paramId);
-                    });
-
-                disableAutoComplete();
-            });
-    </script>
-
-    <script>
-
-        function displayConcentrationCompliance(parameterId) {
-            var qualifier = $("#Qualifier_" + parameterId).val();
-            var result = $("#Result_" + parameterId).val();
-
-            var concentrationMaxValue = null;
-            var concentrationMinValue = null;
-
-            //find limit from global parameter JSON blob
-            var allParameters = $.parseJSON($("#AllParameters").val());
-            var foundParameters = $.grep(allParameters, function(e) {
-                return e.Id == parameterId;
-            });
-            if (foundParameters.length == 0) {
-                // parameter with that Id not found
-                alert('ERROR: could not find parameter with Id = ' + parameterId);
-            } else if (foundParameters.length == 1) {
-                concentrationMaxValue = foundParameters[0].ConcentrationMaxValue;
-                concentrationMinValue = foundParameters[0].ConcentrationMinValue;
-            } else {
-                // multiple matching parameters found
-                alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + parameterId);
-            }
-
-            var complianceIconAndMessage = "";
-            var complianceTemplateToDisplay;
-            //If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
-            if (concentrationMaxValue != null) {
-                if (concentrationMinValue != null) {
-                    //range limit
-                    if (qualifier != "ND" && qualifier != "NF" && !isEmptyOrSpaces(result) 
-                            && ((qualifier == "<" && (result > concentrationMaxValue || result <= concentrationMinValue))
-                                || (qualifier == ">" && (result >= concentrationMaxValue || result < concentrationMinValue)) 
-                                || (result > concentrationMaxValue || result < concentrationMinValue))) //blank qualifier/exact value
-                    {
-
-                        complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
-
-                    } else {
-                        
-                        //If there's no result don't show compliance badge at all
-                        if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
-                        {
-                            complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
-                        }
-                        else
-                        {
-                            complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
-                        }
-
-                    }
-                } else {
-                    //max limit only
-                    if (qualifier != "ND" && qualifier != "NF" && !isEmptyOrSpaces(result)
-                        && ((qualifier == ">" && result >= concentrationMaxValue) || result > concentrationMaxValue)) {
-                        complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
-                    } else {
-                        
-                        //If there's no result don't show compliance badge at all
-                        if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF")
-                        {
-                            complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
-                        }
-                        else
-                        {
-                            complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
-                        }
-                    }
-                }
-            } else {
-                //no limits
-
-                //Don't show compliance icon at all if there isn't a valid result
-                if (qualifier !== "ND" && qualifier !== "NF" && isEmptyOrSpaces(result))
-                {
-                    complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
-                }
-                else
-                {
-                    complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
-                }
-            }
-
-            if (qualifier == "ND" || qualifier == "NF")
-            {
-                result = qualifier; //for display purposes only
-            }
-            else
-            {
-                if (qualifier == ">" || qualifier == "<")
-                {
-                    result = qualifier + " " + result;
-                }
-            }
-
-            complianceIconAndMessage = $(complianceTemplateToDisplay)
-                .html()
-                .replace("{{parameterName}}", foundParameters[0].Name)
-                .replace("{{resultValue}}", result)
-                .replace("{{minLimit}}", concentrationMinValue)
-                .replace("{{maxLimit}}", concentrationMaxValue);
-
-            $("#ResultCompliance_" + parameterId).html(complianceIconAndMessage);
-
-            //alert('Calculate compliance using qualifier = ' + qualifier + ' and result = ' + result + ' and max value = ' + concentrationMaxValue + '!');
-        }
-
-        function displayMassLoadingCompliance(paramId) {
-            if (!isMassLoadingValueComplianceIconRequired(paramId))
-            {
-                $("#MassResultCompliance_" + paramId).html("");
-                return;
-            }
-
-            var massLoadingValue = getMassLoadingValue(paramId);
-            var qualifier = $("#Qualifier_" + paramId).val();
-            var massLoadingMaxValue = null;
-            var massLoadingMinValue = null;
-            var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
-
-            //find limit from global parameter JSON blob
-            var allParameters = $.parseJSON($("#AllParameters").val());
-            var foundParameters = $.grep(allParameters, function(e) {
-                return e.Id == paramId;
-            });
-            if (foundParameters.length == 0) {
-                // parameter with that Id not found
-                alert('ERROR: could not find parameter with Id = ' + paramId);
-            } else if (foundParameters.length == 1) {
-                massLoadingMaxValue = foundParameters[0].MassLoadingMaxValue;
-                massLoadingMinValue = foundParameters[0].MassLoadingMinValue;
-            } else {
-                // multiple matching parameters found
-                alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + paramId);
-            }
-
-            var complianceIconAndMessage = "";
-            var complianceTemplateToDisplay;
-            //If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
-            if (massLoadingMaxValue != null) {
-                if (massLoadingMinValue != null) {
-                    //range limit
-                    if (qualifier != "ND" && qualifier != "NF"
-                        && ((isMassLoadingResultToUseLessThanSign && qualifier == "<" && massLoadingValue <= massLoadingMinValue) 
-                            || massLoadingValue > massLoadingMaxValue || massLoadingValue < massLoadingMinValue)) {
-                        complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
-                    } else {
-                        complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
-                    }
-                } else {
-                    //max limit only
-                    if (qualifier != "ND" && qualifier != "NF"
-                        && massLoadingValue > massLoadingMaxValue) {
-                        complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
-                    } else {
-                        complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
-                    }
-                }
-            } else {
-                //no limits
-                complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
-            }
-
-            
-            //Update mass loading value for display purposes only
-            if (qualifier == "ND" || qualifier == "NF")
-            {
-                massLoadingValue = qualifier; 
-            }
-            else
-            {
-                if (qualifier == "<" && isMassLoadingResultToUseLessThanSign)
-                {
-                    massLoadingValue = qualifier + " " + massLoadingValue;
-                }
-            }
-
-            complianceIconAndMessage = $(complianceTemplateToDisplay)
-                .html()
-                .replace("{{parameterName}}", foundParameters[0].Name)
-                .replace("{{resultValue}}", massLoadingValue)
-                .replace("{{minLimit}}", massLoadingMinValue)
-                .replace("{{maxLimit}}", massLoadingMaxValue);
-
-            $("#MassResultCompliance_" + paramId).html(complianceIconAndMessage);
-
-            //alert("Comparing mass loading value = '" + massLoadingValue + "' to min ='" + massLoadingMinValue + "' and max = '"  + massLoadingMaxValue + "'");
-        }
-
-        function isMassLoadingValueComplianceIconRequired(paramId)
-        {
-            var qualifier = $("#Qualifier_" + paramId).val();
-            var result = parseFloat($("#Result_" + paramId).val());
-            var sampleFlowResult = parseFloat($("#FlowValue").val());
-            var flowUnitId = $("#FlowUnitId option:selected").val();
-            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
-            var massResult = $("#MassResult_" + paramId).html();
-
-            //if no valid result OR not calc mass loading OR valid flow value/unit
-            if (massResult == "" ||
-                isNaN(result) || //no valid result
-                !clChecked || //haven't checked isCalcMassLoading
-                (isNaN(sampleFlowResult) || flowUnitId < 1)) //no flow result value or unit
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        function getMassLoadingValue(paramId) {
-            var result = parseFloat($("#Result_" + paramId).val());
-            var sampleFlowResult = parseFloat($("#FlowValue").val());
-            var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
-            var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
-            var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
-            var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
-            var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
-
-            var massLoadingValue = result
-                * sampleFlowResult
-                * massLoadingMultiplier
-                * flowUnitConversionFactor
-                * resultUnitConversionFactor;
-
-            var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
-            massLoadingValue = massLoadingValue.toFixed(massLoadingCalculationDecimalPlaces);
-
-            return massLoadingValue;
-        }
-
-    </script>
-
-    <!-- html templates -->
-
-    <script id="unitsAndResultComplianceTemplate" type="text/template">
+	<script>
+		$(document)
+			.ready(function() {
+				//Prevent "enter key" press from doing anything on the page, i.e. collapsing boxes, submitting form, etc...
+				$('#LinkoExchangeForm')
+					.bind('keydown', function(e) {
+						if (e.keyCode == 13) {
+							e.preventDefault();
+						}
+					});
+
+				$('#ParameterGroupTable')
+					.DataTable(
+						{
+							"columnDefs": [
+								{
+									"defaultContent":
+										"<button class='btn btn-primary btn-sm' name='btnAddParamsFromGroup' type='button'><i class='fa fa-lg fa-plus'></i></button>",
+									"targets": 4
+								}
+							],
+							"searching": false,
+							"ordering": false,
+							"order": [[1, 'asc']],
+							"paging": false,
+							"info": false,
+							"responsive": true,
+							"autoWidth": false,
+							"processing": true,
+							"stateSave": false
+						}
+					);
+
+				$('#ParameterTable')
+					.DataTable(
+						{
+							"columnDefs": [
+								{
+									"defaultContent":
+										'<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>',
+									"targets": 10
+								}
+							],
+							"searching": false,
+							"ordering": true,
+							"order": [[1, 'asc']],
+							"paging": false,
+							"info": false,
+							"responsive": true,
+							"autoWidth": false,
+							"processing": true,
+							"stateSave": false,
+							language: {
+								search: "",
+								searchPlaceholder: "Search Parameter..."
+							}
+						}
+					);
+
+				var clickedButtonId = "";
+
+				$("input[type='submit'],button[type='submit']")
+					.click(function() {
+						clickedButtonId = $(this).attr('id');
+					});
+
+				$("#LinkoExchangeForm")
+					.submit(function(event) {
+						//clear potentially existing success message box from previous action result
+						$("#div-success-message").remove();
+
+						var isFormValid = true;
+
+						try {
+							isFormValid = $(this).valid();
+						} catch (e) {}
+
+						try {
+							var validationSummary = $('.validation-summary-errors');
+
+							if (validationSummary.length === 0) {
+								// Form is still valid 
+								validationSummary = $('.validation-summary-valid');
+							}
+
+							// add Results to hidden field
+							var sampleResults = [];
+							var isValid = true;
+
+							var parameterTable = $('#ParameterTable').DataTable();
+							parameterTable
+								.rows()
+								.every(function() {
+									var d = this.data();
+									var sampleResult = {};
+									//console.debug(d);
+									var cell = d[0];
+									var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+
+									sampleResult.Id = $('input', cell)['prevObject'][0].value;
+									sampleResult.ParameterId = paramId;
+									sampleResult.ParameterName = d[1];
+									var qualifier = $("#Qualifier_" + paramId).val();
+									sampleResult.Qualifier = ((qualifier === "NUMERIC") ? "" : qualifier);
+									var result = parseFloat($("#Result_" + paramId).val());
+									sampleResult.Value = $("#Result_" + paramId).val();
+									sampleResult.UnitId = $("#UnitId_" + paramId).val();
+									sampleResult.UnitName = $("#UnitName_" + paramId).html();
+									sampleResult
+										.IsCalcMassLoading = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+									sampleResult.AnalysisDateTimeLocal = $("#AnalysisDateTime_" + paramId).val();
+									sampleResult.AnalysisMethod = $("#AnalysisMethod_" + paramId).val();
+									sampleResult.EnteredMethodDetectionLimit = $("#MDL_" + paramId).val();
+
+									var massLoadingResult = $("#MassResult_" + paramId).html().split(' ');
+									if (massLoadingResult.length === 3) {
+										sampleResult.MassLoadingSampleResultId = $("#MassResultId_" + paramId).val();
+										var massLoadingQualifier = massLoadingResult[0];
+										sampleResult.MassLoadingQualifier = massLoadingQualifier;
+										sampleResult.MassLoadingValue = massLoadingResult[1];
+										sampleResult.MassLoadingUnitId = $("#MassLoadingMassLoadingUnitId").val();
+										sampleResult.MassLoadingUnitName = $("#MassLoadingMassLoadingUnitName").val();
+									}
+
+									sampleResults.push(sampleResult);
+
+									if (clickedButtonId === "btnReadyToReport" && isFormValid) {
+										var isSampleResultValid =
+											!((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
+												&& isNaN(result));
+
+										isValid = isValid & isSampleResultValid;
+
+										if (!isSampleResultValid) {
+											$(this.node()).addClass('text-red');
+										} else {
+											$(this.node()).removeClass('text-red');
+										}
+									}
+								});
+
+							if (!isValid && isFormValid) {
+								event.preventDefault();
+								$("input[type='submit']").prop('disabled', false);
+								$("input[type='button']").prop("disabled", false);
+
+								validationSummary.removeClass("validation-summary-valid");
+								validationSummary.find("ul")
+									.empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+								validationSummary.find("ul").append("<li>Result is required for row(s) marked as red.</li>");
+								$("#CollectionMethodId").focus(); // to scroll to top validation summary
+							} else {
+								$("#SampleResults").val(JSON.stringify(sampleResults));
+
+								$("#CtsEventTypeName").val($("#CtsEventTypeId option:selected").text());
+								$("#CollectionMethodName").val($("#CollectionMethodId option:selected").text());
+								$("#FlowUnitName").val($("#FlowUnitId option:selected").text());
+							}
+
+							return isValid;
+						} catch (err) {
+							alert(err);
+							return false;
+						}
+					});
+			});
+	</script>
+
+	@if (ViewBag.Readonly)
+	{
+		<script>
+			$(document)
+				.ready(function() {
+					$("input[type='text']").prop('readonly', true);
+
+					$("input[id^='CalcLoading_']").prop('disabled', true);
+
+					//Need to reinitialize these checkboxes for some reason!
+					$("input[id^='CalcLoading_']")
+						.iCheck({
+							checkboxClass: "icheckbox_minimal-blue"
+						});
+
+					$("select").prop('disabled', true);
+					$("[name='btnAddParamsFromGroup']").prop('disabled', true);
+					$("[name='btnDeleteParam']").prop('disabled', true);
+				});
+		</script>
+	}
+	else
+	{
+		@Scripts.Render("~/bundles/jqueryval")
+		@Scripts.Render("~/bundles/inputmask")
+
+		<script>
+			$(document)
+				.ready(function() {
+					updateResultTextBoxState();
+
+					$("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
+					$("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
+					$("#FlowValue").inputmask('decimal', { digits: '16', rightAlign: true });
+					$("#StartDateTimeLocal")
+						.inputmask({
+							alias: 'mm/dd/yyyy hh:mm xm',
+							mask: "1/2/y [h:s t\\m]",
+							placeholder: "mm/dd/yyyy 00:00 am",
+							greedy: false,
+							clearMaskOnLostFocus: false,
+							clearIncomplete: true
+						});
+
+					$("#EndDateTimeLocal")
+						.inputmask({
+							alias: 'mm/dd/yyyy hh:mm xm',
+							mask: "1/2/y [h:s t\\m]",
+							placeholder: "mm/dd/yyyy 00:00 am",
+							greedy: false,
+							clearMaskOnLostFocus: false,
+							clearIncomplete: true
+						});
+
+					$("input[id^='AnalysisDateTime_']")
+						.inputmask({
+							alias: 'mm/dd/yyyy hh:mm xm',
+							mask: "1/2/y [h:s t\\m]",
+							placeholder: "mm/dd/yyyy 00:00 am",
+							greedy: false,
+							clearMaskOnLostFocus: false,
+							clearIncomplete: true
+						});
+
+					if ($("input[id^='CalcLoading_']").length > 0 && $("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
+						$("input[id='CalcLoading']").iCheck('check');
+					}
+				});
+
+			$(document)
+				.on('change', "input[id^='AnalysisDateTime_']", function() {
+					var value = $(this).val().toLowerCase().replace("12:00 am", "");
+					$(this).val(value);
+				});
+
+			updateResultTextBoxState = function() {
+				var parameterTable = $('#ParameterTable').DataTable();
+				parameterTable
+					.rows()
+					.every(function() {
+						var d = this.data();
+						var cell = d[0];
+						var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+						var qualifier = $("#Qualifier_" + paramId).val();
+
+						if (qualifier === "ND" || qualifier === "NF") {
+							$("#Result_" + paramId).val("").attr("readonly", "readonly");
+						} else {
+							$("#Result_" + paramId).removeAttr("readonly");
+						}
+					});
+			};
+
+			function displayMassLoading(paramId) {
+				var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+
+				if (clChecked) {
+					var qualifier = $("#Qualifier_" + paramId).val();
+					var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
+					var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
+					var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
+					var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
+
+					if (qualifier === "ND" || qualifier === "NF") {
+						$("#MassResult_" + paramId).html("");
+					} else if (qualifier === "NUMERIC" || qualifier === ">") {
+						var result = parseFloat($("#Result_" + paramId).val());
+						var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+						if (isNaN(result)
+							|| isNaN(sampleFlowResult)
+							|| ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
+							|| ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l"))) {
+							$("#MassResult_" + paramId).html("");
+						} else {
+
+							getMassLoadingValueAsync(paramId)
+								.then(function(massloading) {
+									$("#MassResult_" + paramId)
+										.html(" "
+											+ massloading.valueStr
+											+ " "
+											+ massLoadingUnit);
+								});
+						}
+					} else if (qualifier === "<") {
+						var result = parseFloat($("#Result_" + paramId).val());
+						var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+						if (isNaN(result)
+							|| isNaN(sampleFlowResult)
+							|| ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
+							|| ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l"))) {
+							$("#MassResult_" + paramId).html("");
+						} else {
+							getMassLoadingValueAsync(paramId)
+								.then(function(massLoadingValue) {
+									$("#MassResult_" + paramId)
+										.html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
+											+ " "
+											+ massLoadingValue.valueStr
+											+ " "
+											+ massLoadingUnit);
+									//.css('color', 'green');
+								});
+						}
+					}
+				} else {
+					$("#MassResult_" + paramId).html("");
+				}
+
+				displayMassLoadingCompliance(paramId);
+			}
+
+			$("#FlowValue")
+				.blur(function() {
+					$("input[id^='CalcLoading_']:checkbox:checked")
+						.each(function() {
+							var paramId = this.id.replace('CalcLoading_', '');
+							displayMassLoading(paramId);
+						});
+
+					$("input[id^='Result_']")
+						.each(function() {
+							var paramId = this.id.replace('Result_', '');
+							displayConcentrationCompliance(paramId);
+						});
+				});
+
+			$("select[name='FlowUnitId']")
+				.change(function() {
+					$("input[id^='CalcLoading_']:checkbox:checked")
+						.each(function() {
+							var paramId = this.id.replace('CalcLoading_', '');
+							displayMassLoading(paramId);
+						});
+
+					$("input[id^='Result_']")
+						.each(function() {
+							var paramId = this.id.replace('Result_', '');
+							displayConcentrationCompliance(paramId);
+						});
+				});
+
+			$(document)
+				.on('change', "select[id^='Qualifier_']", function() {
+					var paramId = this.id.replace('Qualifier_', '');
+					var qualifier = $("#Qualifier_" + paramId).val();
+
+					if (qualifier === "ND" || qualifier === "NF") {
+						$("#Result_" + paramId).val("").attr("readonly", "readonly");
+					} else {
+						$("#Result_" + paramId).removeAttr("readonly");
+					}
+
+					displayMassLoading(paramId);
+					displayConcentrationCompliance(paramId);
+				});
+
+			$(document)
+				.on('blur', "input[id^='Result_']", function() {
+					var paramId = this.id.replace('Result_', '');
+					displayConcentrationCompliance(paramId);
+					displayMassLoading(paramId);
+				});
+
+			$(document)
+				.on('ifChecked', "input[id='CalcLoading']", function(event) {
+					$("input[id^='CalcLoading_']").iCheck('check');
+				});
+
+			$(document)
+				.on('ifUnchecked', "input[id='CalcLoading']", function(event) {
+					$("input[id^='CalcLoading_']").iCheck('uncheck');
+				});
+
+			$(document)
+				.on('ifChecked', "input[id^='CalcLoading_']", function(event) {
+					if ($("input[id^='CalcLoading_']:checked").length === $("input[id^='CalcLoading_']").length) {
+						$("input[id='CalcLoading']").iCheck('check');
+					}
+					var paramId = this.id.replace('CalcLoading_', '');
+					displayMassLoading(paramId);
+				});
+
+			$(document)
+				.on('ifUnchecked', "input[id^='CalcLoading_']", function(event) {
+					if ($("input[id^='CalcLoading_']:checked").length !== $("input[id^='CalcLoading_']").length) {
+						$("input[id='CalcLoading']").iCheck('indeterminate');
+					}
+					var paramId = this.id.replace('CalcLoading_', '');
+					displayMassLoading(paramId);
+				});
+
+			$(document)
+				.on('click', "button[name='btnDeleteParam']", function() {
+					var table = $('#ParameterTable').DataTable();
+					table
+						.row($(this).parents('tr'))
+						.remove()
+						.draw();
+				});
+
+			$("#btnDeleteEmptyParameters")
+				.click(function() {
+					var table = $('#ParameterTable').DataTable();
+					table
+						.rows()
+						.every(function() {
+							var d = this.data();
+							var cell = d[0];
+							var paramId = $('input', cell)['prevObject'][0].id
+								.replace('sampleResultId_', '');
+							var qualifier = $("#Qualifier_" + paramId).val();
+							var result = parseFloat($("#Result_" + paramId).val());
+
+							//console.debug($('input', cell)['prevObject'][0].id + ' : ' + paramId + ' : ' + qualifier + ' : ' + result);
+
+							if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
+								&& isNaN(result)
+							) {
+								this.nodes().to$().addClass('selected');
+							}
+						});
+
+					table.rows('.selected')
+						.remove()
+						.draw();
+
+					//console.debug($('#ParameterTable >tbody >tr').length);
+				});
+
+			$("#btnAddParameter")
+				.click(function() {
+					var allParameters = $.parseJSON($("#AllParameters").val());
+
+					var alreadyAddedParameterIds = [];
+
+					$('#ParameterTable')
+						.DataTable()
+						.rows()
+						.every(function() {
+							var d = this.data();
+							var cell = d[0];
+							var paramId = $('input', cell)['prevObject'][0].id
+								.replace('sampleResultId_', '');
+							alreadyAddedParameterIds.push(parseInt(paramId));
+						});
+
+					//console.debug(alreadyAddedParameterIds);
+
+					var availableParameters = $.grep(allParameters, function(obj) {
+						//The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+						return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
+					});
+
+					//console.debug(allParameters);
+					//console.debug(availableParameters);
+
+					$("#AddParameterDropdown")
+						.kendoDropDownList({
+							filter: "contains",
+							dataSource: availableParameters,
+							dataTextField: "Name",
+							dataValueField: "Id",
+							autoWidth: true,
+							noDataTemplate: 'No Parameter Available!',
+							popup: {
+								appendTo: $("#AddParameterModal")
+							}
+						});
+
+					$('#AddParameterModal').modal('show');
+				});
+
+			$(document)
+				.on('click', "button[id='btnAddParameterInsideModal']", function() {
+					var allParameters = $.parseJSON($("#AllParameters").val());
+
+					var availableParameters = $.grep(allParameters, function(obj) {
+						return (obj.Id === parseInt($("#AddParameterDropdown").val()));
+					});
+
+					$('#AddParameterModal').modal('hide');
+					//console.debug(availableParameters);
+					AddParamtersToParameterTable(availableParameters);
+				});
+
+			$(document)
+				.on('click', "button[name='btnAddParamsFromGroup']", function() {
+					var alreadyAddedParameterIds = [];
+
+					$('#ParameterTable')
+						.DataTable()
+						.rows()
+						.every(function() {
+							var d = this.data();
+							//console.debug(d);
+							var cell = d[0];
+							var paramId = $('input', cell)['prevObject'][0].id
+								.replace('sampleResultId_', '');
+							alreadyAddedParameterIds.push(parseInt(paramId));
+						});
+
+					//console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
+
+					var strGroupParameterIds = $('#ParameterGroupTable')
+						.DataTable()
+						.row($(this).parents('tr'))
+						.data();
+					var groupParameterIds = [];
+
+					$.each(strGroupParameterIds[3].split(','), function(index, value) {
+						groupParameterIds.push(parseInt(value));
+					});
+
+					//console.debug(groupParameterIds);
+					var allParameters = $.parseJSON($("#AllParameters").val());
+
+					var availableParameters = $.grep(allParameters, function(obj) {
+						//The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+						return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
+							&& ($.inArray(obj.Id, groupParameterIds) !== -1);
+					});
+
+					//console.debug("allParameters :" + allParameters);
+					//console.debug("availableParameters :" + availableParameters);
+
+					AddParamtersToParameterTable(availableParameters);
+				});
+
+			AddParamtersToParameterTable = function(availableParameters) {
+				var parameterTable = $('#ParameterTable').DataTable();
+
+				$.each(availableParameters, function(index, value) {
+					//console.debug(value.Id + " : " + value.Name);
+					var data = {};
+					data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''  autocomplete='false' >";
+					data[1] = value.Name;
+
+					var availableResultQualifierValidValues =
+						@Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
+
+					var qualifierCtrl =
+						'<select class="form-control input-sm no-margin no-padding onchange-calc-compliance" id="Qualifier_'
+							+ value.Id
+							+ '" style="width: 100%">';
+
+					$.each(availableResultQualifierValidValues, function(i, v) {
+						if (v.Value === "NUMERIC") {
+							qualifierCtrl += '<option value="'
+								+ v.Value
+								+ '" selected="">'
+								+ v.Text
+								+ '</option>';
+						} else {
+							qualifierCtrl +=
+								'<option value="' + v.Value + '">' + v.Text + '</option>';
+						}
+					});
+					qualifierCtrl += '</select>';
+
+					data[2] = qualifierCtrl;
+
+					data[3] = $("#unitsAndResultComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
+						.html()
+						.replace(/{{parameterId}}/g, value.Id)
+						.replace(/{{unitId}}/g, value.DefaultUnitId)
+						.replace(/{{unitName}}/g, value.DefaultUnitName)
+						.replace(/{{complianceIconAndMessage}}/g, "");
+
+					data[4] = '<input class="form-control input-sm" id="MDL_'
+						+ value.Id
+						+ '" type="text" style="width: 80px" value="" autocomplete="false">';
+					data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
+						+ value.Id
+						+ '" type="text" value="" autocomplete="false">';
+					data[6] = '<input id="AnalysisDateTime_'
+						+ value.Id
+						+ '" style="width: 100%; font-size: 12px;"'
+						+ 'autocomplete="false" />';
+
+					if (value.IsCalcMassLoading) {
+						data[7] =
+							'<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+							+ value.Id
+							+ '" checked />';
+					} else {
+						data[7] =
+							'<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+							+ value.Id
+							+ '"/>';
+					}
+					data[8] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="" />';
+					data[9] = $("#massResultAndComplianceTemplate") //using regex replace to get ALL occurances within a string (hence the "/g")
+						.html()
+						.replace(/{{parameterId}}/g, value.Id);
+					data[10] = null;
+
+					//console.debug("data : " + data);
+
+					var rowNode = parameterTable
+						.row.add(data)
+						.draw()
+						.node();
+
+					$(rowNode).css('color', 'green');
+
+					displayConcentrationCompliance(value.Id);
+					displayMassLoadingCompliance(value.Id);
+				});
+
+				// need to reinitialize iCheck otherwise newly added checkbox doesn't work
+
+				$("input[id^='CalcLoading_']")
+					.iCheck({
+						checkboxClass: "icheckbox_minimal-blue"
+					});
+
+				$("input[id^='AnalysisDateTime_']")
+					.kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm tt", max: new Date($.now()) });
+
+				$("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
+				$("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
+				$("input[id^='AnalysisDateTime_']")
+					.inputmask({
+						alias: 'mm/dd/yyyy hh:mm xm',
+						mask: "1/2/y [h:s t\\m]",
+						placeholder: "mm/dd/yyyy 00:00 am",
+						greedy: false,
+						clearMaskOnLostFocus: false,
+						clearIncomplete: true
+					});
+			};
+
+			$("#StartDateTimeLocal")
+				.on("blur", function() {
+					$("#StartDateTimeLocal").trigger('change');
+				});
+
+			$("#StartDateTimeLocal")
+				.on("change", function() {
+					ReloadParameterGroups();
+				});
+
+			$("#EndDateTimeLocal")
+				.on("blur", function() {
+					$("#EndDateTimeLocal").trigger('change');
+				});
+
+			$("#EndDateTimeLocal")
+				.on("change", function() {
+					ReloadParameterGroups();
+				});
+
+			$("#CollectionMethodId")
+				.on("change", function() {
+					ReloadParameterGroups();
+				});
+
+			function ReloadParameterGroups() {
+				//Start date
+				$("#StartDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
+				$("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+
+				//End date
+				$("#EndDateTimeLocal").data("kendoDateTimePicker").value(window.kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
+				$("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+
+				if ($('#StartDateTimeLocal').val() === "" || $('#EndDateTimeLocal').val() === "" || $('#CollectionMethodId').val() < 1) {
+					return;
+				}
+
+				var viewModel = {};
+				viewModel.monitoringPointId = $('#MonitoringPointId').val();
+				viewModel.startDateTime = $('#StartDateTimeLocal').val();
+				viewModel.endDateTime = $('#EndDateTimeLocal').val();
+				viewModel.collectionMethodId = $('#CollectionMethodId').val();
+
+				var postUrl = "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
+
+				$.ajax({
+						type: "POST",
+						url: postUrl,
+						data: viewModel
+					})
+					.done(function(response) {
+						if (response.hasError != null && response.hasError) {
+							alert(response.message);
+						} else {
+							$("#AllParameters").val(JSON.stringify(response.allParameters));
+							var parameterGroups = response.parameterGroups;
+
+							var table = $('#ParameterGroupTable').DataTable();
+
+							table
+								.clear()
+								.draw();
+
+							$.each(parameterGroups, function(index, value) {
+								var data = {};
+								data[0] = value.Id;
+								data[1] = value.Name;
+								data[2] = value.Description;
+								data[3] = value.ParameterIds;
+								data[4] = null;
+
+								//console.debug("data : " + data);
+
+								var rowNode = table
+									.row.add(data)
+									.draw()
+									.node();
+
+								$(rowNode).css('color', 'green');
+							});
+
+							$("input[id^='Result_']")
+								.each(function() {
+									var paramId = this.id.replace('Result_', '');
+									displayConcentrationCompliance(paramId);
+									displayMassLoadingCompliance(paramId);
+								});
+						}
+					});
+
+			}
+		</script>
+	}
+
+	<script>
+		$(document)
+			.ready(function() {
+				$("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+				$("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+
+				$("input[id^='AnalysisDateTime_']")
+					.each(function() {
+						var value = $(this).val().toLowerCase().replace("12:00 am", "");
+						$(this).val(value);
+					});
+
+				//display compliance information for already saved results
+				$("input[id^='Result_']")
+					.each(function() {
+						var paramId = this.id.replace('Result_', '');
+						displayConcentrationCompliance(paramId);
+						displayMassLoadingCompliance(paramId);
+					});
+
+				disableAutoComplete();
+			});
+	</script>
+
+	<script>
+
+		function displayConcentrationCompliance(parameterId) {
+			var qualifier = $("#Qualifier_" + parameterId).val();
+			var result = $("#Result_" + parameterId).val();
+
+			var concentrationMaxValue = null;
+			var concentrationMinValue = null;
+
+			//find limit from global parameter JSON blob
+			var allParameters = $.parseJSON($("#AllParameters").val());
+			var foundParameters = $.grep(allParameters, function(e) {
+				return e.Id == parameterId;
+			});
+			if (foundParameters.length == 0) {
+				// parameter with that Id not found
+				alert('ERROR: could not find parameter with Id = ' + parameterId);
+			} else if (foundParameters.length == 1) {
+				concentrationMaxValue = foundParameters[0].ConcentrationMaxValue;
+				concentrationMinValue = foundParameters[0].ConcentrationMinValue;
+			} else {
+				// multiple matching parameters found
+				alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + parameterId);
+			}
+
+			var complianceIconAndMessage = "";
+			var complianceTemplateToDisplay;
+			//If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
+			if (concentrationMaxValue != null) {
+				if (concentrationMinValue != null) {
+					//range limit
+					if (qualifier != "ND"
+						&& qualifier != "NF"
+						&& !isEmptyOrSpaces(result)
+						&& ((qualifier == "<" && (result > concentrationMaxValue || result <= concentrationMinValue))
+							|| (qualifier == ">" && (result >= concentrationMaxValue || result < concentrationMinValue))
+							|| (result > concentrationMaxValue || result < concentrationMinValue))) //blank qualifier/exact value
+					{
+
+						complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
+
+					} else {
+
+						//If there's no result don't show compliance badge at all
+						if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF") {
+							complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
+						} else {
+							complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+						}
+
+					}
+				} else {
+					//max limit only
+					if (qualifier != "ND"
+						&& qualifier != "NF"
+						&& !isEmptyOrSpaces(result)
+						&& ((qualifier == ">" && result >= concentrationMaxValue) || result > concentrationMaxValue)) {
+						complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
+					} else {
+
+						//If there's no result don't show compliance badge at all
+						if (!isEmptyOrSpaces(result) || qualifier == "ND" || qualifier == "NF") {
+							complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
+						} else {
+							complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+						}
+					}
+				}
+			} else {
+				//no limits
+
+				//Don't show compliance icon at all if there isn't a valid result
+				if (qualifier !== "ND" && qualifier !== "NF" && isEmptyOrSpaces(result)) {
+					complianceTemplateToDisplay = "#blankComplianceIconAndMessage";
+				} else {
+					complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+				}
+			}
+
+			if (qualifier == "ND" || qualifier == "NF") {
+				result = qualifier; //for display purposes only
+			} else {
+				if (qualifier == ">" || qualifier == "<") {
+					result = qualifier + " " + result;
+				}
+			}
+
+			complianceIconAndMessage = $(complianceTemplateToDisplay)
+				.html()
+				.replace("{{parameterName}}", foundParameters[0].Name)
+				.replace("{{resultValue}}", result)
+				.replace("{{minLimit}}", concentrationMinValue)
+				.replace("{{maxLimit}}", concentrationMaxValue);
+
+			$("#ResultCompliance_" + parameterId).html(complianceIconAndMessage);
+
+			//alert('Calculate compliance using qualifier = ' + qualifier + ' and result = ' + result + ' and max value = ' + concentrationMaxValue + '!');
+		}
+
+		function displayMassLoadingCompliance(paramId) {
+			if (!isMassLoadingValueComplianceIconRequired(paramId)) {
+				$("#MassResultCompliance_" + paramId).html("");
+				return;
+			}
+
+			var qualifier = $("#Qualifier_" + paramId).val();
+			var massLoadingMaxValue = null;
+			var massLoadingMinValue = null;
+			var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
+
+			//find limit from global parameter JSON blob
+			var allParameters = $.parseJSON($("#AllParameters").val());
+			var foundParameters = $.grep(allParameters, function(e) {
+				return e.Id == paramId;
+			});
+			if (foundParameters.length == 0) {
+				// parameter with that Id not found
+				alert('ERROR: could not find parameter with Id = ' + paramId);
+			} else if (foundParameters.length == 1) {
+				massLoadingMaxValue = foundParameters[0].MassLoadingMaxValue;
+				massLoadingMinValue = foundParameters[0].MassLoadingMinValue;
+			} else {
+				// multiple matching parameters found
+				alert('ERROR: found ' + foundParameters.length + ' parameters with Id = ' + paramId);
+			}
+
+			var complianceIconAndMessage = "";
+			var complianceTemplateToDisplay;
+			//If a limit exists at all, there will always be a max value. Optionally a min value could exist as well.
+			getMassLoadingValueAsync(paramId)
+				.then(function(massloading) {
+					var massLoadingValue = massloading.value;
+
+					if (massLoadingMaxValue != null) {
+						if (massLoadingMinValue != null) {
+							//range limit
+							if (qualifier != "ND"
+								&& qualifier != "NF"
+								&& ((isMassLoadingResultToUseLessThanSign && qualifier == "<" && massLoadingValue <= massLoadingMinValue)
+									|| massLoadingValue > massLoadingMaxValue
+									|| massLoadingValue < massLoadingMinValue)) {
+								complianceTemplateToDisplay = "#bad-outsideRangeComplianceIconAndMessage";
+							} else {
+								complianceTemplateToDisplay = "#goodComplianceRangeIconAndMessage";
+							}
+						} else {
+							//max limit only
+							if (qualifier != "ND"
+								&& qualifier != "NF"
+								&& massLoadingValue > massLoadingMaxValue) {
+								complianceTemplateToDisplay = "#bad-aboveMaxComplianceIconAndMessage";
+							} else {
+								complianceTemplateToDisplay = "#goodComplianceMaxIconAndMessage";
+							}
+						}
+					} else {
+						//no limits
+						complianceTemplateToDisplay = "#unknownComplianceIconAndMessage";
+					}
+
+
+					//Update mass loading value for display purposes only
+					if (qualifier == "ND" || qualifier == "NF") {
+						massLoadingValue = qualifier;
+					} else {
+						if (qualifier == "<" && isMassLoadingResultToUseLessThanSign) {
+							massLoadingValue = qualifier + " " + massLoadingValue;
+						}
+					}
+
+					complianceIconAndMessage = $(complianceTemplateToDisplay)
+						.html()
+						.replace("{{parameterName}}", foundParameters[0].Name)
+						.replace("{{resultValue}}", massLoadingValue)
+						.replace("{{minLimit}}", massLoadingMinValue)
+						.replace("{{maxLimit}}", massLoadingMaxValue);
+
+					$("#MassResultCompliance_" + paramId).html(complianceIconAndMessage);
+				});
+
+			//alert("Comparing mass loading value = '" + massLoadingValue + "' to min ='" + massLoadingMinValue + "' and max = '"  + massLoadingMaxValue + "'");
+		}
+
+		function isMassLoadingValueComplianceIconRequired(paramId) {
+			var qualifier = $("#Qualifier_" + paramId).val();
+			var result = parseFloat($("#Result_" + paramId).val());
+			var sampleFlowResult = parseFloat($("#FlowValue").val());
+			var flowUnitId = $("#FlowUnitId option:selected").val();
+			var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+			var massResult = $("#MassResult_" + paramId).html();
+
+			//if no valid result OR not calc mass loading OR valid flow value/unit
+			if (massResult == ""
+				|| isNaN(result)
+				|| //no valid result
+				!clChecked
+				|| //haven't checked isCalcMassLoading
+				(isNaN(sampleFlowResult) || flowUnitId < 1)) //no flow result value or unit
+			{
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+		function getMassLoadingValueAsync(paramId) {
+			var result = parseFloat($("#Result_" + paramId).val());
+			var sampleFlowResult = parseFloat($("#FlowValue").val());
+			var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
+			var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
+			var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
+			var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
+			var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
+			var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+
+			var dataToCalcu = {
+				numbers: [
+					result,
+					sampleFlowResult,
+					massLoadingMultiplier,
+					flowUnitConversionFactor,
+					resultUnitConversionFactor
+				],
+				decimals: massLoadingCalculationDecimalPlaces
+			};
+
+			var defer = $.Deferred();
+			$.post("/Industry/Sample/FloatNumbersProduct", dataToCalcu)
+				.done(function(data) {
+					console.log(data);
+					return defer.resolve(data);
+				})
+			    .catch(function(err) {
+			    	return defer.reject();
+				});
+
+			return defer.promise();
+		}
+
+	</script>
+
+	<!-- html templates -->
+
+	<script id="unitsAndResultComplianceTemplate" type="text/template">
         <span class="input-group input-group-sm" style="min-width:125px">
             <input class="form-control input-sm onchange-calc-compliance" id="Result_{{parameterId}}" type="text" value="" style="text-align: right;" autocomplete="false" />
             <input id="UnitId_{{parameterId}}" type="hidden" value="{{unitId}}" />
@@ -1596,31 +1598,31 @@
         </span>
     </script>
 
-    <script id="blankComplianceIconAndMessage" type="text/template">
+	<script id="blankComplianceIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-check-circle" style="visibility: hidden" aria-hidden="true" data-placement="top" data-toggle="tooltip"></i>
     </script>
 
-    <script id="goodComplianceMaxIconAndMessage" type="text/template">
+	<script id="goodComplianceMaxIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is in compliance with limit of {{maxLimit}}."></i>
     </script>
 
-    <script id="goodComplianceRangeIconAndMessage" type="text/template">
+	<script id="goodComplianceRangeIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-check-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} is in compliance with limit of {{minLimit}}-{{maxLimit}}."></i>
     </script>
 
-    <script id="unknownComplianceIconAndMessage" type="text/template">
+	<script id="unknownComplianceIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-circle" style="color: green" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="No limit found for {{parameterName}}."></i>
     </script>
 
-    <script id="bad-aboveMaxComplianceIconAndMessage" type="text/template">
+	<script id="bad-aboveMaxComplianceIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} violates limit of {{maxLimit}}."></i>
     </script>
 
-    <script id="bad-outsideRangeComplianceIconAndMessage" type="text/template">
+	<script id="bad-outsideRangeComplianceIconAndMessage" type="text/template">
         <i class="fa fa-lg fa-exclamation-circle" style="color: red" aria-hidden="true" data-placement="top" data-toggle="tooltip" title="" data-original-title="{{parameterName}} result of {{resultValue}} violates limit of {{minLimit}}-{{maxLimit}}."></i>
     </script>
 
-    <script id="massResultAndComplianceTemplate" type="text/template">
+	<script id="massResultAndComplianceTemplate" type="text/template">
         <span style="float: right; white-space: nowrap;">
             <span>
                 <strong id="MassResult_{{parameterId}}"></strong>

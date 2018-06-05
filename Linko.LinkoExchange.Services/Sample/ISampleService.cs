@@ -100,5 +100,13 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="orgRegProgramId"></param>
         /// <returns></returns>
         IEnumerable<SampleRequirementDto> GetSampleRequirements(DateTime startDate, DateTime endDate, int orgRegProgramId);
+
+		/// <summary>
+		/// Calculate the product of array of double numbers, with specified decimals. 
+		/// </summary>
+		/// <param name="numbers">The array of numbers to calculate</param>
+		/// <param name="decimals">The decimals</param>
+		/// <returns></returns>
+	    FloatNumbersProductDto CalculateFlowNumbersProduct(double[] numbers, int decimals);
     }
 }

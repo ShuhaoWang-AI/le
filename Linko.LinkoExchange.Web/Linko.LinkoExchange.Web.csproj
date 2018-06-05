@@ -550,6 +550,7 @@
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\DataSourceTranslationViewModel.cs" />
     <Compile Include="ViewModels\Industry\DataSourceViewModel.cs" />
+    <Compile Include="ViewModels\Industry\FloatProductViewModel.cs" />
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
     <Compile Include="ViewModels\Industry\SampleImportViewModel.cs" />
     <Compile Include="ViewModels\Shared\DropdownOptionViewModel.cs" />

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -1726,6 +1727,31 @@ namespace Linko.LinkoExchange.Web.Controllers
             return File(fileContents:data, contentType:contentType, fileDownloadName:fileDownloadName);
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region float numbers calcuation 
+
+		[AllowAnonymous]
+		[AcceptVerbs(verbs: HttpVerbs.Post)]
+		[Route(template: "Sample/FloatNumbersProduct")]
+		public ActionResult FloatNumbersProduct(FloatProductViewModel model)
+		{
+			if (model?.Numbers == null || !model.Numbers.Any())
+			{
+				Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid numbers");
+			}
+
+			var result = _sampleService.CalculateFlowNumbersProduct(model.Numbers, model.Decimals);
+			var ret = new
+			          {
+				          value = result.Product,
+				          valueStr = result.ProductStr
+			          }; 
+
+			return Json(data: ret, behavior: JsonRequestBehavior.AllowGet);
+		}
+
+		#endregion
+	}
 }
