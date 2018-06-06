@@ -2734,8 +2734,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult ImportFileTemplate_Update([DataSourceRequest] DataSourceRequest request, FileVersionFieldViewModel viewModel)
         {
+            if (string.IsNullOrWhiteSpace(viewModel.FileVersionFieldName))
+            {
+                ModelState.AddModelError(key:"FileVersionFieldName", errorMessage:@"Column Header is required.");
+            }
+
             if (ModelState.IsValid)
             {
+
                 var dto = _importSampleFromFileService.GetFileVersionForAuthorityConfiguration(fileVersionTemplateName:FileVersionTemplateName.SampleImport);
                 var fileVersionFieldDto = dto.FileVersionFields.First(x => x.SystemFieldName == viewModel.SystemFieldName);
 

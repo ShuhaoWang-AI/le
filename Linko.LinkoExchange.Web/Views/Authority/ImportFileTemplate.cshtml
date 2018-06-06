@@ -105,7 +105,7 @@
                                                         .Sort(sort => { sort.Add(memberName:"SystemFieldNameDisplayText").Ascending(); }) // <-- initial sort expression
                                                         .Read(read => read.Action(actionName:"ImportFileTemplate_Read", controllerName:"Authority"))
                                                         .Update(update => update.Action(actionName:"ImportFileTemplate_Update", controllerName:"Authority"))
-                                                        .Events(events => events.RequestEnd(handler:"OnUpdateSuccess").Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
+                                                        .Events(events => events.Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
                                                         .Model(model =>
                                                                {
                                                                    model.Id(p => p.SystemFieldName); // Need to use SystemFieldName as this is unique and multiple FileVersionFieldId is null
@@ -132,6 +132,28 @@
         </section>
     </div>
     <script>
+        //register custom validation rules
+        (function ($, kendo) {
+            $.extend(true, kendo.ui.validator, {
+                rules: { // custom rules
+                    fileVersionFieldNameValidation: function (input, params) {
+                        if (input.is("[name='FileVersionFieldName']") && input.val() === "") {
+                            input.attr("data-fileVersionFieldNameValidation-msg", "Column Header is requiered");
+                            return false;
+                        }
+
+                        return true;
+                    }
+                },
+                messages: { //custom rules messages
+                    fileVersionFieldNameValidation: function (input) {
+                        // return the message text
+                        return input.attr("data-val-fileVersionFieldNameValidation");
+                    }
+                }
+            });
+        })(jQuery, kendo);
+
         function error_handler_ImportFileTemplate(e) {
             if (e.errors) {
                 var errorMessages = [];
