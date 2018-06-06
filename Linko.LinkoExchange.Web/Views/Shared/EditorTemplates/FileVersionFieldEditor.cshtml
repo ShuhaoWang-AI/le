@@ -179,14 +179,26 @@
     </div>
 </section>
 
+@Scripts.Render("~/bundles/jqueryval")
+
 <script>
     $(document)
         .ready(function() {
-        if ($("#IsSystemRequired").is( ":checked" )) {
-            $("option[value='@((int) DataOptionalityName.Optional)']").remove();
-            $("#IsIncluded").prop("disabled", true);
-        } else {
-            $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
-        }
-    });
+            if ($("#IsSystemRequired").is(":checked")) {
+                $("option[value='@((int) DataOptionalityName.Optional)']").remove();
+                $("#IsIncluded").prop("disabled", true);
+            } else {
+                $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
+            }
+
+            $('#FileVersionFieldName')
+                .on('change', function(evt) {
+                    try {
+                        $('#FileVersionFieldName').closest("form").valid();
+                        
+                    } catch (e) {}
+                });
+
+            
+        });
 </script>

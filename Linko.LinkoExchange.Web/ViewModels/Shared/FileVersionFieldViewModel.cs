@@ -1,106 +1,123 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using FluentValidation;
+using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-        public class FileVersionFieldViewModel
+    [Validator(validatorType:typeof(FileVersionFieldViewModelValidator))]
+    public class FileVersionFieldViewModel
+    {
+        #region public properties
+
+        [ScaffoldColumn(scaffold:false)]
+        public int FileVersionId { get; set; }
+
+        [ScaffoldColumn(scaffold:false)]
+        public int? FileVersionFieldId { get; set; }
+
+        /// <summary>
+        /// System column name
+        /// </summary>
+        [Display(Name = "System Field Name")]
+        [Editable(allowEdit:false)]
+        public SampleImportColumnName SystemFieldName { get; set; }
+
+        /// <summary>
+        /// System column name
+        /// </summary>
+        [Display(Name = "System Field Name")]
+        [Editable(allowEdit:false)]
+        public string SystemFieldNameDisplayText => SystemFieldName.ToString();
+
+        /// <summary>
+        /// Authority's column name
+        /// </summary>
+        [Display(Name = "Column Header")]
+        public string FileVersionFieldName { get; set; }
+
+        [Display(Name = "Is System Required")]
+        [Editable(allowEdit:false)]
+        public bool IsSystemRequired { get; set; }
+
+        [Display(Name = "Data Optionality")]
+        public DataOptionalityName DataOptionalityName { get; set; }
+
+        public IEnumerable<SelectListItem> AvailableResultQualifierValidValues
         {
-            #region public properties
-
-            [ScaffoldColumn(scaffold:false)]
-            public int FileVersionId { get; set; }
-
-            [ScaffoldColumn(scaffold:false)]
-            public int? FileVersionFieldId { get; set; }
-
-            /// <summary>
-            /// System column name
-            /// </summary>
-            [Display(Name = "System Field Name")]
-            [Editable(allowEdit:false)]
-            public SampleImportColumnName SystemFieldName { get; set; }
-            /// <summary>
-            /// System column name
-            /// </summary>
-            [Display(Name = "System Field Name")]
-            [Editable(allowEdit:false)]
-            public string SystemFieldNameDisplayText => SystemFieldName.ToString();
-
-            /// <summary>
-            /// Authority's column name
-            /// </summary>
-            [Display(Name = "Column Header")]
-            public string FileVersionFieldName { get; set; }
-
-            [Display(Name = "Is System Required")]
-            [Editable(allowEdit:false)]
-            public bool IsSystemRequired { get; set; }
-
-            [Display(Name = "Data Optionality")]
-            public DataOptionalityName DataOptionalityName { get; set; }
-
-            public IEnumerable<SelectListItem> AvailableResultQualifierValidValues
+            get
             {
-                get
-                {
-                    var options = new List<SelectListItem>
-                                   {
-                                       new SelectListItem
-                                       {
-                                           Text = DataOptionalityName.Required.ToString(),
-                                           Value = ((int) DataOptionalityName.Required).ToString(),
-                                           Selected = DataOptionalityName == DataOptionalityName.Required
-                                       },
-                                       new SelectListItem
-                                       {
-                                           Text = DataOptionalityName.Recommended.ToString(),
-                                           Value = ((int) DataOptionalityName.Recommended).ToString(),
-                                           Selected = DataOptionalityName == DataOptionalityName.Recommended
-                                       },
-                                       new SelectListItem
-                                       {
-                                           Text = DataOptionalityName.Optional.ToString(),
-                                           Value = ((int) DataOptionalityName.Optional).ToString(),
-                                           Selected = DataOptionalityName == DataOptionalityName.Optional
-                                       }
-                                   };
+                var options = new List<SelectListItem>
+                              {
+                                  new SelectListItem
+                                  {
+                                      Text = DataOptionalityName.Required.ToString(),
+                                      Value = ((int) DataOptionalityName.Required).ToString(),
+                                      Selected = DataOptionalityName == DataOptionalityName.Required
+                                  },
+                                  new SelectListItem
+                                  {
+                                      Text = DataOptionalityName.Recommended.ToString(),
+                                      Value = ((int) DataOptionalityName.Recommended).ToString(),
+                                      Selected = DataOptionalityName == DataOptionalityName.Recommended
+                                  },
+                                  new SelectListItem
+                                  {
+                                      Text = DataOptionalityName.Optional.ToString(),
+                                      Value = ((int) DataOptionalityName.Optional).ToString(),
+                                      Selected = DataOptionalityName == DataOptionalityName.Optional
+                                  }
+                              };
 
-                    return options;
-                }
+                return options;
             }
+        }
 
-            [Display(Name = "Field Size")]
-            [Editable(allowEdit:false)]
-            public int? Size { get; set; }
+        [Display(Name = "Field Size")]
+        [Editable(allowEdit:false)]
+        public int? Size { get; set; }
 
-            [Display(Name = "Data Format")]
-            [Editable(allowEdit:false)]
-            public DataFormatName DataFormatName { get; set; }
-            
-            [Display(Name = "Data Format")]
-            [Editable(allowEdit:false)]
-            public string DataFormatDescription { get; set; }
+        [Display(Name = "Data Format")]
+        [Editable(allowEdit:false)]
+        public DataFormatName DataFormatName { get; set; }
 
-            [Display(Name = "Column Description")]
-            [DataType(dataType:DataType.MultilineText)]
-            public string Description { get; set; }
+        [Display(Name = "Data Format")]
+        [Editable(allowEdit:false)]
+        public string DataFormatDescription { get; set; }
 
-            [Display(Name = "Example Data")]
-            [DataType(dataType:DataType.MultilineText)]
-            public string ExampleData { get; set; }
+        [Display(Name = "Column Description")]
+        [DataType(dataType:DataType.MultilineText)]
+        public string Description { get; set; }
 
-            [Display(Name = "Additional Comments")]
-            [DataType(dataType:DataType.MultilineText)]
-            public string AdditionalComments { get; set; }
+        [Display(Name = "Example Data")]
+        [DataType(dataType:DataType.MultilineText)]
+        public string ExampleData { get; set; }
 
-            /// <summary>
-            /// Used in authority portal to select the system field in the File Version
-            /// </summary>
-            [Display(Name = "Is Included")]
-            public bool IsIncluded { get; set; }
+        [Display(Name = "Additional Comments")]
+        [DataType(dataType:DataType.MultilineText)]
+        public string AdditionalComments { get; set; }
 
-            #endregion
+        /// <summary>
+        /// Used in authority portal to select the system field in the File Version
+        /// </summary>
+        [Display(Name = "Is Included")]
+        public bool IsIncluded { get; set; }
+
+        #endregion
+    }
+
+    public class FileVersionFieldViewModelValidator : AbstractValidator<FileVersionFieldViewModel>
+    {
+        #region constructors and destructor
+
+        public FileVersionFieldViewModelValidator()
+        {
+            //ReportElementTypeId
+            RuleFor(x => x.FileVersionFieldName).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+        }
+
+        #endregion
     }
 }
