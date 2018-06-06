@@ -1,11 +1,10 @@
 ﻿@using Linko.LinkoExchange.Core.Enum
 @model Linko.LinkoExchange.Web.ViewModels.Shared.FileVersionFieldViewModel
 
-@Styles.Render(paths:"~/bundles/icheck")
 @Scripts.Render(paths:"~/bundles/jquery")
 
 <style>
-    .form-control[disabled]
+    .form-control[disabled], input[type='checkbox'][disabled]
     {
         cursor: text;
     }
@@ -180,22 +179,14 @@
     </div>
 </section>
 
-@Scripts.Render(paths:"~/Bundles/js_icheck")
-
 <script>
-    $(function() {
-        $('input[type="checkbox"]').iCheck({ checkboxClass: "icheckbox_minimal-blue" });
-    });
-
-
-    $(function() {
-        if ($("#IsSystemRequired").is(':checked')) {
+    $(document)
+        .ready(function() {
+        if ($("#IsSystemRequired").is( ":checked" )) {
             $("option[value='@((int) DataOptionalityName.Optional)']").remove();
-            $("#IsIncluded").iCheck('disable');
-            $("#IsIncluded").iCheck('check');
+            $("#IsIncluded").prop("disabled", true);
         } else {
             $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
         }
     });
-
 </script>

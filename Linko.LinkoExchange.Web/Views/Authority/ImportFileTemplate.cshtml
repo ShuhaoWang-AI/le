@@ -1,5 +1,4 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
-
 @{
     ViewBag.Title = "Sample Import Template";
 }
@@ -28,12 +27,13 @@
             width: 75vw;
         }
 
-        @@media (max-width: 767px) {
+        @@media (max-width: 767px)
+        {
             .k-edit-form-container
             {
                 width: 90vw;
             }
-                                   }
+        }
     </style>
 
     <div class="box box-primary">
@@ -47,12 +47,12 @@
         </div>
         <section class="box-body form-horizontal">
 
-            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText,
-                htmlAttributes: new
-                {
-                    @class = "alert alert-danger",
-                    id = "validationSummaryImportFileTemplate"
-                })
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText,
+                htmlAttributes:new
+                               {
+                                   @class = "alert alert-danger",
+                                   id = "validationSummaryImportFileTemplate"
+                               })
 
             <div class="alert alert-info">
                 <h5>
@@ -73,21 +73,21 @@
                     @(Html.Kendo().Grid<FileVersionFieldViewModel>()
                           .Name(componentName:"gridAuthorityImportFileTemplate")
                           .Columns(columns =>
-                          {
-                              columns.Bound(c => c.SystemFieldNameDisplayText);
-                              columns.Bound(c => c.FileVersionFieldName);
+                                   {
+                                       columns.Bound(c => c.SystemFieldNameDisplayText);
+                                       columns.Bound(c => c.FileVersionFieldName);
 
-                              columns.Bound(c => c.DataOptionalityName);
-                              columns.Bound(c => c.Size);
-                              columns.Bound(c => c.DataFormatName);
+                                       columns.Bound(c => c.DataOptionalityName);
+                                       columns.Bound(c => c.Size);
+                                       columns.Bound(c => c.DataFormatName);
 
-                              columns.Bound(c => c.IsIncluded)
-                                     .ClientTemplate(value:"#= IsIncluded ? 'Yes' : 'No' #")
-                                     .ClientGroupHeaderTemplate(value:"#= value ? 'Included in Template': 'Not Included in Template'#")
-                                     .Hidden(value:true)
-                                     .Width(pixelWidth:75);
-                              columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
-                          })
+                                       columns.Bound(c => c.IsIncluded)
+                                              .ClientTemplate(value:"#= IsIncluded ? 'Yes' : 'No' #")
+                                              .ClientGroupHeaderTemplate(value:"#= value ? 'Included in Template': 'Not Included in Template'#")
+                                              .Hidden(value:true)
+                                              .Width(pixelWidth:75);
+                                       columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
+                                   })
                           .ClientDetailTemplateId(id:"detailTemplate")
                           .Editable(editable => editable.Mode(mode:GridEditMode.PopUp).TemplateName(templateName:"FileVersionFieldEditor"))
                           .Pageable(pageable => pageable.Enabled(value:false))
@@ -102,28 +102,28 @@
                                                         .Ajax()
                                                         .ServerOperation(enabled:false)
                                                         .Batch(enabled:false)
-                                                        .Sort(sort => { sort.Add(memberName: "SystemFieldNameDisplayText").Ascending(); }) // <-- initial sort expression
+                                                        .Sort(sort => { sort.Add(memberName:"SystemFieldNameDisplayText").Ascending(); }) // <-- initial sort expression
                                                         .Read(read => read.Action(actionName:"ImportFileTemplate_Read", controllerName:"Authority"))
-                                                        .Update(update => update.Action(actionName: "ImportFileTemplate_Update", controllerName:"Authority"))
-                                                        .Events(events => events.RequestEnd(handler: "OnUpdateSuccess").Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
+                                                        .Update(update => update.Action(actionName:"ImportFileTemplate_Update", controllerName:"Authority"))
+                                                        .Events(events => events.RequestEnd(handler:"OnUpdateSuccess").Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
                                                         .Model(model =>
-                                                        {
-                                                            model.Id(p => p.SystemFieldName); // Need to use SystemFieldName as this is unique and multiple FileVersionFieldId is null
-                                                            model.Field(p => p.FileVersionFieldId).Editable(enabled:false);
-                                                            model.Field(p => p.FileVersionId).Editable(enabled: false);
-                                                            model.Field(p => p.SystemFieldName).Editable(enabled:false);
-                                                            model.Field(p => p.SystemFieldNameDisplayText).Editable(enabled: false);
-                                                            model.Field(p => p.FileVersionFieldName);
-                                                            model.Field(p => p.IsSystemRequired).Editable(enabled:false);
-                                                            model.Field(p => p.DataOptionalityName);
-                                                            model.Field(p => p.DataFormatDescription);
-                                                            model.Field(p => p.Size).Editable(enabled:false);
-                                                            model.Field(p => p.DataFormatName).Editable(enabled:false);
-                                                            model.Field(p => p.Description);
-                                                            model.Field(p => p.ExampleData);
-                                                            model.Field(p => p.AdditionalComments);
-                                                            model.Field(p => p.IsIncluded);
-                                                        })
+                                                               {
+                                                                   model.Id(p => p.SystemFieldName); // Need to use SystemFieldName as this is unique and multiple FileVersionFieldId is null
+                                                                   model.Field(p => p.FileVersionFieldId).Editable(enabled:false);
+                                                                   model.Field(p => p.FileVersionId).Editable(enabled:false);
+                                                                   model.Field(p => p.SystemFieldName).Editable(enabled:false);
+                                                                   model.Field(p => p.SystemFieldNameDisplayText).Editable(enabled:false);
+                                                                   model.Field(p => p.FileVersionFieldName);
+                                                                   model.Field(p => p.IsSystemRequired).Editable(enabled:false);
+                                                                   model.Field(p => p.DataOptionalityName);
+                                                                   model.Field(p => p.DataFormatDescription);
+                                                                   model.Field(p => p.Size).Editable(enabled:false);
+                                                                   model.Field(p => p.DataFormatName).Editable(enabled:false);
+                                                                   model.Field(p => p.Description);
+                                                                   model.Field(p => p.ExampleData);
+                                                                   model.Field(p => p.AdditionalComments);
+                                                                   model.Field(p => p.IsIncluded);
+                                                               })
                                                         .Group(g => g.AddDescending(c => c.IsIncluded))
                           )
                           )
@@ -132,12 +132,6 @@
         </section>
     </div>
     <script>
-        function OnUpdateSuccess(e) {
-            console.log(e);
-            if (e.type === "update" && e.response.Errors == null) {
-               // e.sender.dataSource.read();
-            }
-        }
         function error_handler_ImportFileTemplate(e) {
             if (e.errors) {
                 var errorMessages = [];
