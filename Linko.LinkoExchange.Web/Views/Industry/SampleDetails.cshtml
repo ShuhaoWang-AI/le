@@ -1576,7 +1576,7 @@
 					console.log(data);
 					return defer.resolve(data);
 				})
-			    .catch(function(err) {
+			    .error(function(err) {
 			    	return defer.reject();
 				});
 
