@@ -95,7 +95,7 @@ namespace Linko.LinkoExchange.Data
 		public DbSet<ReportElementCategory> ReportElementCategories { get; set; }
 
 		public DbSet<ReportPackageTemplateAssignment> ReportPackageTemplateAssignments { get; set; }
-		public DbSet<ReportPackageTemplate> ReportPackageTempates { get; set; }
+		public DbSet<ReportPackageTemplate> ReportPackageTemplates { get; set; }
 		public DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
 		public DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
 
@@ -171,18 +171,12 @@ namespace Linko.LinkoExchange.Data
 			}
 		}
 
-		[Obsolete]
-		public virtual CustomTransactionScope CreateAutoCommitScope()
+		public virtual CustomTransactionScope BeginTransactionScope(MethodBase from)
 		{
-			return BeginTranactionScope("Obsoleted");
+			return BeginTransactionScope(from.DeclaringType?.Name + "." + from.Name);
 		}
 
-		public virtual CustomTransactionScope BeginTranactionScope(MethodBase from)
-		{
-			return BeginTranactionScope(from.DeclaringType?.Name + "." + from.Name);
-		}
-
-		private CustomTransactionScope BeginTranactionScope(string from)
+		private CustomTransactionScope BeginTransactionScope(string from)
 		{
 			if (CustomTransaction == null)
 			{

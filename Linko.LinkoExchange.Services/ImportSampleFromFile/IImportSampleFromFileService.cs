@@ -65,7 +65,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 	    ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
 
-        FileVersionDto GetFileVersion();
+        FileVersionDto GetFileVersion(string fileVersionName);
 
         void ImportSampleAndCreateAttachment(SampleImportDto sampleImportDto);
         

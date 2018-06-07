@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
 		    var sampleId = -1;
 		    
-			using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
+			using (_dbContext.BeginTransactionScope(MethodBase.GetCurrentMethod()))
 			{
 				//Cannot save if included in a report
 				//      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  

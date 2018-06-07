@@ -237,7 +237,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
 		    }
 
-		    using (_dbContext.BeginTranactionScope(MethodBase.GetCurrentMethod()))
+		    using (_dbContext.BeginTransactionScope(MethodBase.GetCurrentMethod()))
 		    {
 			    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 			    var currentRegulatoryProgramId =
@@ -336,7 +336,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 			    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
 		    }
 
-		    using (_dbContext.CreateAutoCommitScope())
+		    using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
 		    {
 			    var currentUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 			    fileStoreToUpdate.LastModifierUserId = currentUserId;
@@ -368,7 +368,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
             }
 
-	        using (_dbContext.CreateAutoCommitScope())
+	        using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
 	        {
 
 		        var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);

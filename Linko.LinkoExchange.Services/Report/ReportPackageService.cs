@@ -163,7 +163,7 @@ namespace Linko.LinkoExchange.Services.Report
                         }
 
                         //Check if user signatory rights are required and current user "is signatory".
-                        var rpTemplate = _dbContext.ReportPackageTempates
+                        var rpTemplate = _dbContext.ReportPackageTemplates
                                                    .SingleOrDefault(rpt => rpt.ReportPackageTemplateId == reportPackage.ReportPackageTemplateId);
 
                         if (rpTemplate == null || (rpTemplate.IsSubmissionBySignatoryRequired && !orgRegProgramUser.IsSignatory))
@@ -737,7 +737,7 @@ namespace Linko.LinkoExchange.Services.Report
                     //Step 1 - copy fields from template to new Report Package instance (tReportPackage)
 
                     //Get template
-                    var reportPackageTemplate = _dbContext.ReportPackageTempates
+                    var reportPackageTemplate = _dbContext.ReportPackageTemplates
                                                           .Include(rpt => rpt.CtsEventType)
                                                           .Include(rpt => rpt.OrganizationRegulatoryProgram)
                                                           .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization)

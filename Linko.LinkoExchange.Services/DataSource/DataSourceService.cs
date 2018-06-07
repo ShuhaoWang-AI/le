@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 }
 
                 int parameterGroupIdToReturn;
-                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var existingDataSource = GetExistingDataSource(organizationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
                     Core.Domain.DataSource dataSourceToPersist;
@@ -129,7 +129,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"dataSourceId={dataSourceId}"))
             {
-                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var foundDataSource = _dbContext.DataSources
                                                     .Include(ds => ds.DataSourceMonitoringPoints)
@@ -231,7 +231,7 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         public int SaveDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
-            using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+            using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
             {
                 ThrowRuleViolationErrroIfDataSourceTermIsAlreayExist(dataSourceTranslation:dataSourceTranslation, translationType:translationType);
                 switch (translationType)
@@ -297,7 +297,7 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         public void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
-            using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+            using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
             {
                 switch (translationType)
                 {

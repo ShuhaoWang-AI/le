@@ -261,7 +261,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
 
                 int importTempFileIdToReturn;
-                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var importTempFile = _mapHelper
                         .ToDomainObject(fromDto:importTempFileDto,
@@ -271,7 +271,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                                                  UploadDateTimeUtc = DateTimeOffset.Now,
                                                                  UploaderUserId = currentUserProfileId,
                                                                  FileTypeId = validFileTypes
-                                                                              .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
+                                                                     .Single(i => i.Extension.ToLower().Equals(value:extension)).FileTypeId
                                                              });
 
                     _dbContext.ImportTempFiles.Add(entity:importTempFile);
@@ -362,7 +362,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     }
 
                     //populate FileVersion in sampleImportDto
-                    sampleImportDto.FileVersion = GetFileVersion();
+                    sampleImportDto.FileVersion = GetFileVersion(fileVersionName:FileVersionTemplateName.SampleImport.ToString());
 
                     if (sampleImportDto.FileVersion?.FileVersionId == null)
                     {
@@ -397,8 +397,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     if (ruleViolationException.ValidationIssues.Count > 0)
                     {
                         result.Errors.AddRange(collection:ruleViolationException
-                                                          .ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""})
-                                                          .ToList());
+                                                   .ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""})
+                                                   .ToList());
                     }
                 }
 
@@ -407,17 +407,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, 
+        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint,
                                                                      ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType)
         {
             var requiredDataDefaults = new List<RequiredDataDefaultsDto>();
 
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
                                                             columnName:SampleImportColumnName.MonitoringPoint, selectedValue:defaultMonitoringPoint);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
-                                                            columnName:SampleImportColumnName.CollectionMethod, selectedValue: defaultCollectionMethod);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults, 
-                                                            columnName:SampleImportColumnName.SampleType, selectedValue: defaultSampleType);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
+                                                            columnName:SampleImportColumnName.CollectionMethod, selectedValue:defaultCollectionMethod);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
+                                                            columnName:SampleImportColumnName.SampleType, selectedValue:defaultSampleType);
 
             return requiredDataDefaults;
         }
@@ -463,14 +463,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public FileVersionDto GetFileVersion()
+        public FileVersionDto GetFileVersion(string fileVersionName)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
                 var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var authority = _organizationService.GetAuthority(orgRegProgramId:currentRegulatoryProgramId);
 
-                var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                                                                              // ReSharper disable once ArgumentsStyleOther
+                                                                              && i.Name.ToLower().Equals(fileVersionName.ToLower()));
 
                 var fileVersionDto = _mapHelper.ToDto(fromDomainObject:fileVersion);
 
@@ -500,7 +502,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod()))
             {
-                using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
@@ -566,22 +568,44 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
 
                 //TODO: when there will be multiple FileVersions for same authority need to update following condition
-                var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                                                                              && i.Name == fileVersionTemplateName.ToString());
 
                 if (fileVersion == null)
                 {
-                    using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+                    //TODO: when there will be multiple FileVersions then following code might not be needed
+                    using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                     {
                         fileVersion = new FileVersion
                                       {
                                           Name = fileVersionTemplate.Name,
                                           Description = fileVersionTemplate.Description,
-                                          OrganizationRegulatoryProgramId = currentRegulatoryProgramId,
+                                          OrganizationRegulatoryProgramId = authority.OrganizationRegulatoryProgramId,
                                           CreationDateTimeUtc = DateTimeOffset.Now
                                       };
 
                         _dbContext.FileVersions.Add(entity:fileVersion);
                         _dbContext.SaveChanges();
+
+                        foreach (var fileVersionTemplateField in fileVersionTemplate.FileVersionTemplateFields)
+                        {
+                            var fileVersionField = new FileVersionField
+                                                   {
+                                                       Name = fileVersionTemplateField.SystemField.Name,
+                                                       Description = fileVersionTemplateField.SystemField.Description,
+                                                       FileVersionId = fileVersion.FileVersionId,
+                                                       SystemFieldId = fileVersionTemplateField.SystemFieldId,
+                                                       DataOptionalityId = fileVersionTemplateField.SystemField.IsRequired
+                                                                               ? (int) DataOptionalityName.Required
+                                                                               : (int) DataOptionalityName.Optional,
+                                                       Size = fileVersionTemplateField.SystemField.Size,
+                                                       ExampleData = fileVersionTemplateField.SystemField.ExampleData,
+                                                       AdditionalComments = fileVersionTemplateField.SystemField.AdditionalComments
+                                                   };
+                            _dbContext.FileVersionFields.Add(entity:fileVersionField);
+                            _dbContext.SaveChanges();
+                            fileVersion.FileVersionFields.Add(item:fileVersionField);
+                        }
                     }
                 }
 
@@ -607,14 +631,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
 
                 return fileVersionDto;
-                
             }
         }
 
         /// <inheritdoc />
         public int? AddOrUpdateFileVersionFieldForAuthorityConfiguration(int fileVersionId, FileVersionFieldDto dto)
         {
-            using (_dbContext.BeginTranactionScope(from:MethodBase.GetCurrentMethod()))
+            using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
             {
                 FileVersionField domainObject = null;
 
@@ -623,7 +646,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     domainObject = _dbContext.FileVersionFields.FirstOrDefault(i => i.FileVersionFieldId == dto.FileVersionFieldId);
                 }
 
-
                 if (domainObject == null)
                 {
                     domainObject = new FileVersionField();
@@ -631,7 +653,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 if (!dto.IsIncluded)
                 {
-                    _dbContext.FileVersionFields.Remove(domainObject);
+                    _dbContext.FileVersionFields.Remove(entity:domainObject);
                     _dbContext.SaveChanges();
                     return null;
                 }
@@ -641,14 +663,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 domainObject.FileVersionId = fileVersionId;
                 domainObject.SystemFieldId = (int) dto.SystemFieldName;
                 domainObject.DataOptionalityId = (int) dto.DataOptionalityName;
-                domainObject.Description = dto.Description;
                 domainObject.Size = dto.Size;
                 domainObject.ExampleData = dto.ExampleData;
                 domainObject.AdditionalComments = dto.AdditionalComments;
 
                 if (!dto.FileVersionFieldId.HasValue)
                 {
-                    _dbContext.FileVersionFields.Add(domainObject);
+                    _dbContext.FileVersionFields.Add(entity:domainObject);
                 }
 
                 _dbContext.SaveChanges();
@@ -667,7 +688,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     throw new UnauthorizedAccessException();
                 }
 
-                using (_dbContext.CreateAutoCommitScope())
+                using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
                     var importTempFile = _dbContext.ImportTempFiles.Single(i => i.ImportTempFileId == importTempFileId);
                     if (importTempFile != null)
@@ -681,9 +702,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         #endregion
 
-        private void AddRequiredDataDefaultDtoOrPopulateDefaultValue(SampleImportDto sampleImportDto, 
-                                                                     List<RequiredDataDefaultsDto> requiredDataDefaults, 
-                                                                     SampleImportColumnName columnName, 
+        private void AddRequiredDataDefaultDtoOrPopulateDefaultValue(SampleImportDto sampleImportDto,
+                                                                     List<RequiredDataDefaultsDto> requiredDataDefaults,
+                                                                     SampleImportColumnName columnName,
                                                                      ListItemDto selectedValue)
         {
             var emptyValueCells = GetEmptyValueCells(sampleImportDto:sampleImportDto, columnName:columnName);
@@ -695,7 +716,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             var isDefaultValueValid = selectedValue != null && selectedValue.Id > 0;
             if (isDefaultValueValid)
             {
-                _logger.Debug(message: "{0} populated empty {1} cells with requires default value", argument1: sampleImportDto.ImportJobId, argument2: columnName);
+                _logger.Debug(message:"{0} populated empty {1} cells with requires default value", argument1:sampleImportDto.ImportJobId, argument2:columnName);
                 foreach (var cell in emptyValueCells)
                 {
                     cell.TranslatedValueId = selectedValue.Id;
@@ -704,12 +725,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
             else
             {
-                _logger.Debug(message: "{0} found empty {1} cells which requires default value", argument1: sampleImportDto.ImportJobId, argument2: columnName);
-                requiredDataDefaults.Add(item: new RequiredDataDefaultsDto
-                                               {
-                                                   SampleImportColumnName = columnName,
-                                                   Options = GetSelectListBySampleImportColumn(columnName: columnName)
-                                               });
+                _logger.Debug(message:"{0} found empty {1} cells which requires default value", argument1:sampleImportDto.ImportJobId, argument2:columnName);
+                requiredDataDefaults.Add(item:new RequiredDataDefaultsDto
+                                              {
+                                                  SampleImportColumnName = columnName,
+                                                  Options = GetSelectListBySampleImportColumn(columnName:columnName)
+                                              });
             }
         }
 
@@ -747,10 +768,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             switch (columnName)
             {
                 case SampleImportColumnName.MonitoringPoint: return _selectListService.GetIndustryMonitoringPointSelectList(withEmptyItem:true);
-                case SampleImportColumnName.SampleType: return _selectListService.GetAuthoritySampleTypeSelectList(withEmptyItem: true);
-                case SampleImportColumnName.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList(withEmptyItem: true);
-                case SampleImportColumnName.ParameterName: return _selectListService.GetAuthorityParameterSelectList(withEmptyItem: true);
-                case SampleImportColumnName.ResultUnit: return _selectListService.GetAuthorityUnitSelectList(withEmptyItem: true);
+                case SampleImportColumnName.SampleType: return _selectListService.GetAuthoritySampleTypeSelectList(withEmptyItem:true);
+                case SampleImportColumnName.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList(withEmptyItem:true);
+                case SampleImportColumnName.ParameterName: return _selectListService.GetAuthorityParameterSelectList(withEmptyItem:true);
+                case SampleImportColumnName.ResultUnit: return _selectListService.GetAuthorityUnitSelectList(withEmptyItem:true);
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -770,7 +791,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 // first populate the resultQualifierValidValues from Authority's settings
                 var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var programSettings = _settingService.GetProgramSettingsById(orgRegProgramId:_settingService
-                                                                                             .GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId);
+                                                                                 .GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationRegulatoryProgramId);
 
                 var resultQualifierValidValues = programSettings.Settings
                                                                 .Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues))
@@ -1072,7 +1093,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             var rawValueAsNumber = string.IsNullOrWhiteSpace(value:cellValue.RawValue) ? default(double?) : Convert.ToDouble(value:cellValue.RawValue);
             return rawValueAsNumber;
         }
-        
+
         private SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto, DataSourceTranslationType translationType,
                                                                 ICollection<RuleViolation> validationIssues)
         {
@@ -1096,7 +1117,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 DataSourceTranslationItemDto translationItem;
                 if (!translationDict.TryGetValue(key:cell.OriginalValueString, value:out translationItem))
                 {
-                    _logger.Info(message: "{0} translation should set missing translation to term '{1}'", argument1:translationType, argument2:cell.OriginalValueString);
+                    _logger.Info(message:"{0} translation should set missing translation to term '{1}'", argument1:translationType, argument2:cell.OriginalValueString);
                     continue;
                 }
 

@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Services.Report
                     if (currentPortalName.Equals(value:OrganizationTypeName.Authority.ToString(), comparisonType: StringComparison.OrdinalIgnoreCase))
                     {
                         //this will also handle scenarios where ReportPackageTemplateId doesn't even exist (regardless of ownership)
-                        var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTempates
+                        var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTemplates
                                                                         .Any(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId
                                                                                     && rpt.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
@@ -98,12 +98,12 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         /// <summary>
-        ///     Delete data from other tables before delete from  ReportPackageTempates
+        ///     Delete data from other tables before delete from  ReportPackageTemplates
         ///     1. Delete from tReportPackageTemplateAssignment
         ///     2. Delete from tReportPackageTemplateElementCategory
         ///     2.1  Delete from  tReportPackageTemplateElementType table
         ///     2.2  Delete from  tReportPackageTemplateElementCategory table
-        ///     3.  Delete from tReportPackageTempates
+        ///     3.  Delete from tReportPackageTemplates
         /// </summary>
         /// <param name="reportPackageTemplateId"> </param>
         public void DeleteReportPackageTemplate(int reportPackageTemplateId)
@@ -114,7 +114,7 @@ namespace Linko.LinkoExchange.Services.Report
                 try
                 {
                     var rpt =
-                        _dbContext.ReportPackageTempates.FirstOrDefault(
+                        _dbContext.ReportPackageTemplates.FirstOrDefault(
                                                                         i => i.ReportPackageTemplateId == reportPackageTemplateId);
                     if (rpt == null)
                     {
@@ -125,7 +125,7 @@ namespace Linko.LinkoExchange.Services.Report
                     DeleteReportPackageChildrenObjects(rpt:rpt);
 
                     // Step 3
-                    _dbContext.ReportPackageTempates.Remove(entity:rpt);
+                    _dbContext.ReportPackageTemplates.Remove(entity:rpt);
                     _dbContext.SaveChanges();
                     transaction.Commit();
 
@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             var rpt =
-                _dbContext.ReportPackageTempates.SingleOrDefault(
+                _dbContext.ReportPackageTemplates.SingleOrDefault(
                                                                  i => i.ReportPackageTemplateId == reportPackageTemplateId);
 
             _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
@@ -170,7 +170,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 
-            var rptsQuery = _dbContext.ReportPackageTempates
+            var rptsQuery = _dbContext.ReportPackageTemplates
                                       .Include(a => a.CtsEventType)
                                       .Include(a => a.OrganizationRegulatoryProgram)
                                       .Include(a => a.ReportPackageTemplateAssignments.Select(b => b.OrganizationRegulatoryProgram))
@@ -216,16 +216,16 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     This function provides update existing one, and create a new one functionalities
         ///     For update, after update tReportPackageTemplate table, do following steps
-        ///     1 Delete from tReprotPackageTemplateAssignment table,
+        ///     1 Delete from tReportPackageTemplateAssignment table,
         ///     2 Delete from tReportPackageTemplateElementType table,
         ///     3 Delete from tReportPackageTemplateElementCategory table,
-        ///     4 Create records in tReprotPackageTemplateAssignment table,
+        ///     4 Create records in tReportPackageTemplateAssignment table,
         ///     5 Create records in tReportPackageTemplateElementCategory table,
         ///     6 Create records in tReportPackageTemplateElementElementType table
         /// 
         ///     For new creation, do following steps
         ///     1. Create on record in tReportPackageTempate,
-        ///     2. Create one records in  tReprotPackageTemplateAssignment,
+        ///     2. Create one records in  tReportPackageTemplateAssignment,
         ///     3. For AttachmentType and CertificationTypes, do below:
         ///     2.1 Create one record in tReportPackageTemplateElementCategory
         ///     2.2 Create records in table tReportPackageTemplateElementType
@@ -275,7 +275,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //// Check if Name and EffectiveDateTimeUtc combination is unique or not 
-                    var testRpt = _dbContext.ReportPackageTempates
+                    var testRpt = _dbContext.ReportPackageTemplates
                                             .FirstOrDefault(i => i.EffectiveDateTimeUtc == effectiveDateTimeUtc
                                                                  && i.Name == rpt.Name
                                                                  && i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
@@ -300,9 +300,9 @@ namespace Linko.LinkoExchange.Services.Report
                     if (rpt.ReportPackageTemplateId.HasValue)
                     {
                         var currentReportPackageTempalte =
-                            _dbContext.ReportPackageTempates.Single(i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId.Value);
+                            _dbContext.ReportPackageTemplates.Single(i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId.Value);
 
-                        //// Update current reportPackageTampate 
+                        //// Update current reportPackageTemplate 
                         currentReportPackageTempalte.Name = rpt.Name;
                         currentReportPackageTempalte.Description = rpt.Description;
                         currentReportPackageTempalte.EffectiveDateTimeUtc = effectiveDateTimeUtc;
@@ -314,14 +314,14 @@ namespace Linko.LinkoExchange.Services.Report
                         currentReportPackageTempalte.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         currentReportPackageTempalte.LastModifierUserId = currentUserId;
 
-                        //  1 Delete from tReprotPackageTemplateAssignment table,
+                        //  1 Delete from tReportPackageTemplateAssignment table,
                         //  2 Delete from tReportPackageTemplateElementType table,
                         //  3 Delete from tReportPackageTemplateElementCategory table 
                         DeleteReportPackageChildrenObjects(rpt:currentReportPackageTempalte);
                     }
                     else
                     {
-                        // Create new in tReportPackageTempate table
+                        // Create new in tReportPackageTemplate table
                         reportPackageTemplate.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         reportPackageTemplate.IsActive = rpt.IsActive;
                         reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.Now;
@@ -329,7 +329,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageTemplate.LastModifierUserId = currentUserId;
 
                         // First time creation recorder DO NOT need to provide creation date time.
-                        reportPackageTemplate = _dbContext.ReportPackageTempates.Add(entity:reportPackageTemplate);
+                        reportPackageTemplate = _dbContext.ReportPackageTemplates.Add(entity:reportPackageTemplate);
                         _dbContext.SaveChanges();
                         rptId = reportPackageTemplate.ReportPackageTemplateId;
                     }
@@ -362,7 +362,7 @@ namespace Linko.LinkoExchange.Services.Report
                         if (rpt.SamplesAndResultsTypes != null && rpt.SamplesAndResultsTypes.Count > 0)
                         {
                             var samplesAndResultsTypes = rpt.SamplesAndResultsTypes.ToArray();
-                            CreateReportPackageElementCatergoryType(reportElementTypeDtos:samplesAndResultsTypes, reportPackageTemplate:reportPackageTemplate, setOrder:1);
+                            CreateReportPackageElementCategoryType(reportElementTypeDtos:samplesAndResultsTypes, reportPackageTemplate:reportPackageTemplate, setOrder:1);
                         }
                     }
 
@@ -370,14 +370,14 @@ namespace Linko.LinkoExchange.Services.Report
                     if (rpt.AttachmentTypes != null && rpt.AttachmentTypes.Count > 0)
                     {
                         var attachmentTypes = rpt.AttachmentTypes.ToArray();
-                        CreateReportPackageElementCatergoryType(reportElementTypeDtos:attachmentTypes, reportPackageTemplate:reportPackageTemplate, setOrder:1);
+                        CreateReportPackageElementCategoryType(reportElementTypeDtos:attachmentTypes, reportPackageTemplate:reportPackageTemplate, setOrder:1);
                     }
 
                     // CertificationType  
                     if (rpt.CertificationTypes != null && rpt.CertificationTypes.Count > 0)
                     {
                         var certificationTypes = rpt.CertificationTypes.ToArray();
-                        CreateReportPackageElementCatergoryType(reportElementTypeDtos:certificationTypes, reportPackageTemplate:reportPackageTemplate, setOrder:2);
+                        CreateReportPackageElementCategoryType(reportElementTypeDtos:certificationTypes, reportPackageTemplate:reportPackageTemplate, setOrder:2);
                     }
 
                     _dbContext.SaveChanges();
@@ -475,7 +475,7 @@ namespace Linko.LinkoExchange.Services.Report
             return reportElementTypeDtos;
         }
 
-        private void CreateReportPackageElementCatergoryType(ReportElementTypeDto[] reportElementTypeDtos,
+        private void CreateReportPackageElementCategoryType(ReportElementTypeDto[] reportElementTypeDtos,
                                                              ReportPackageTemplate reportPackageTemplate, int setOrder)
         {
             // Step 1, Save to tReportPackageTemplateElementCategory table
