@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public DataSourceTranslationType TranslationType { get; set; }
 
-        [UIHint(uiHint: "LinkoExchangeTermEditor")]
+        [UIHint(uiHint:"LinkoExchangeTermEditor")]
         [Display(Name = "LinkoExchange term")]
         public virtual DropdownOptionViewModel TranslatedItem { get; set; }
 

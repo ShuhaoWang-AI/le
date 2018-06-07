@@ -492,6 +492,56 @@
                     @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
                         htmlAttributes:new {@class = "alert alert-danger", @id= "validationSummaryDataTranslations" })
 
+                    <div class="alert alert-info">
+                        <h5>
+                            There is data in the file we don't recognize.  Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
+                        </h5>
+                        <h5>
+                            The following Import file term(s) must be translated to LinkoExchange term(s) before proceed to next step.
+                        </h5>
+                    </div>
+
+                    <h4>@(Model.MissingTranslation.Title)</h4>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                        @(Html.Kendo().Grid<DataSourceTranslationViewModel>(dataSource:Model.MissingTranslation.MisstingTranslations)
+                              .Name(componentName: "gridMissingTranslation")
+                              .Columns(columns =>
+                              {
+                                  columns.Bound(c => c.DataSourceTerm)
+                                         .HtmlAttributes(attributes: new { @class = "col-sm-2" })
+                                         .HeaderHtmlAttributes(attributes: new { @class = "col-sm-2" });
+                                  columns.Bound(c => c.TranslatedItem)
+                                         .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+                                         .HtmlAttributes(attributes: new { @class = "col-sm-4" })
+                                         .HeaderHtmlAttributes(attributes: new { @class = "col-sm-4" });
+                                  columns.Command(command => { command.Edit().UpdateText("Save"); });
+                              })
+                              .Editable(editable => editable.Mode(GridEditMode.InLine))
+                              .Pageable(pager => pager.Enabled(value:false))
+                              .Scrollable(s => s.Enabled(value: false))
+                              .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                              .Resizable(resizable => resizable.Columns(value: true))
+                              .NoRecords(text: "No translation requried.")
+                              .DataSource(dataSource =>
+                                          dataSource.Ajax()
+                                                    .ServerOperation(enabled: false)
+                                                    .Batch(enabled: false)
+                                                    .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+                                                    .PageSize(pageSize: 100)
+                                                    .Update(update => update.Action(actionName: "SampleImportAddMissingTranslation", controllerName: "Industry"))
+                                                    .Model(model =>
+                                                    {
+                                                        model.Id(p => p.DataSourceTerm);
+                                                        model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+                                                        model.Field(p => p.Id).Editable(enabled: false);
+                                                        model.Field(p => p.DataSourceId).Editable(enabled: false);
+                                                        model.Field(p => p.TranslationType).Editable(enabled: false);
+                                                        model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultLinkoExchangeTerm"] as DropdownOptionViewModel);
+                                                    })
+                            ))
+                        </div>
+                    </div>
                 }
                 else
                 {
@@ -500,6 +550,14 @@
                     </div>
                 }
             </div>
+            @if (isStepDataTranslations)
+            {
+                <div class="box-footer">
+                    <div class="form-group pull-right">
+                        <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                    </div>
+                </div>
+            }
         </section>
     }
 

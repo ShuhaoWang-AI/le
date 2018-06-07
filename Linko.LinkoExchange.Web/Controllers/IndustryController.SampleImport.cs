@@ -1,16 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
+using Kendo.Mvc.Extensions;
+using Kendo.Mvc.UI;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.Extensions;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -117,13 +123,43 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
+        public ActionResult SampleImportAddMissingTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceTranslationViewModel viewModel)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var dataSourceTranslationDto = new DataSourceTranslationDto
+                                                   {
+                                                       Id = viewModel.Id,
+                                                       DataSourceId = viewModel.DataSourceId,
+                                                       DataSourceTerm = viewModel.DataSourceTerm,
+                                                       TranslationItem = new DataSourceTranslationItemDto
+                                                                         {
+                                                                             // ReSharper disable once PossibleInvalidOperationException
+                                                                             TranslationId = viewModel.TranslatedItem.Id.Value,
+                                                                             TranslationName = viewModel.TranslatedItem.DisplayName
+                                                                         }
+                                                   };
+                    viewModel.Id = _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation: dataSourceTranslationDto, translationType: viewModel.TranslationType);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+
+            return Json(data: new[] { viewModel }.ToDataSourceResult(request: request, modelState: ModelState));
+        }
+
         private ActionResult DoImportSelectDataProvider(SampleImportViewModel model)
         {
             if (ModelState.IsValid)
             {
                 MoveToStep(model:model, nextStep:SampleImportViewModel.SampleImportStep.SelectFile);
                 ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
-                return SampleImport(model:model);
+                return DoImportSelectFile(model:model);
             }
 
             var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -172,9 +208,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.SelectDataDefault);
-            return SampleImport(model:model);
+            return DoImportSelectDataDefault(model:model);
         }
-
 
         private ActionResult LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(SampleImportViewModel model)
         {
@@ -229,23 +264,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataTranslations);
-            return SampleImport(model:model);
+            return DoImportDataTranslations(model:model);
         }
 
         private ActionResult GetSelectDefaultValuesViewOrNullToContinue(SampleImportViewModel model)
         {
             var selectedDefaultMonitoringPoint = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultMonitoringPointId,
-                                                                             columnText: model.SelectedDefaultMonitoringPointName,
-                                                                             columnName: SampleImportColumnName.MonitoringPoint,
-                                                                             sampleImportDto: model.SampleImportDto);
+                                                                             columnText: model.SelectedDefaultMonitoringPointName);
             var selectedDefaultCollectionMethod = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultCollectionMethodId,
-                                                                             columnText: model.SelectedDefaultCollectionMethodName,
-                                                                             columnName: SampleImportColumnName.CollectionMethod,
-                                                                             sampleImportDto: model.SampleImportDto);
+                                                                             columnText: model.SelectedDefaultCollectionMethodName);
             var selectedDefaultSampleType = GetUserSelectedDefaultValue(columnId: model.SelectedDefaultSampleTypeId,
-                                                                             columnText: model.SelectedDefaultSampleTypeName,
-                                                                             columnName: SampleImportColumnName.SampleType,
-                                                                             sampleImportDto: model.SampleImportDto);
+                                                                             columnText: model.SelectedDefaultSampleTypeName);
 
             var requiredDefaultValues = _importSampleFromFileService.GetRequiredDataDefaults(sampleImportDto: model.SampleImportDto,
                                                                                              defaultMonitoringPoint: selectedDefaultMonitoringPoint,
@@ -264,6 +293,18 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult DoImportDataTranslations(SampleImportViewModel model)
         {
+            var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model: model);
+            if (fileValidationErrorView != null)
+            {
+                return fileValidationErrorView;
+            }
+
+            var requireUserSelectDefaultValueView = GetSelectDefaultValuesViewOrNullToContinue(model: model);
+            if (requireUserSelectDefaultValueView != null)
+            {
+                return requireUserSelectDefaultValueView;
+            }
+
             var dataTranslationView = GetDataTranslationViewOrNullToContinue(model);
             if (dataTranslationView != null)
             {
@@ -278,19 +319,67 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto: model.SampleImportDto);
             model.SampleImportDto.MissingTranslations = _importSampleFromFileService.GetMissingTranslationSet(sampleImportDto: model.SampleImportDto);
 
-            if (DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.MonitoringPoint)
-                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.CollectionMethod)
-                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.SampleType)
-                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.ParameterName)
-                || DoesTranslationsMissing(sampleImportDto: model.SampleImportDto, columnName: SampleImportColumnName.ResultUnit))
+            if (!model.SampleImportDto.MissingTranslations.Any())
             {
-                //TODO: should prepare the viewmodel missing translation presentation values and return `View(model:model)`
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: new BadRequest(message: "Missing translations"),
-                                                                       modelState: ViewData.ModelState);
-                return View(model: model);
+                return null;
             }
 
-            return null;
+            var missingTranslationDto = model.SampleImportDto.MissingTranslations.First();
+
+            var availableLinkoExchangeTerms = missingTranslationDto.Options.Select(x => new DropdownOptionViewModel
+                                                                                        {
+                                                                                            Id = x.Id,
+                                                                                            DisplayName = x.DisplayValue,
+                                                                                            Description = x.Description
+                                                                                        })
+                                                                   .ToList();
+            var defaultLinkoExchangeTerm = availableLinkoExchangeTerms.First();
+
+            ViewData[key: "availableLinkoExchangeTerms"] = availableLinkoExchangeTerms;
+            ViewData[key: "defaultLinkoExchangeTerm"] = defaultLinkoExchangeTerm;
+
+            var translationType = ToTranslationType(columnName: missingTranslationDto.SampleImportColumnName);
+            var misstingTranslationViewModels = missingTranslationDto.MissingTranslations
+                                                                     .Select(term => new DataSourceTranslationViewModel
+                                                                     {
+                                                                         DataSourceId = model.SelectedDataSourceId,
+                                                                         DataSourceTerm = term,
+                                                                         TranslationType = translationType,
+                                                                         TranslatedItem = defaultLinkoExchangeTerm
+                                                                     }).ToList();
+            model.MissingTranslation = new MissingTranslationViewModel
+            {
+                Title = GetDataTranslationSubTitleFromColumnName(columnName: missingTranslationDto.SampleImportColumnName),
+                TranslationType = translationType,
+                MisstingTranslations = misstingTranslationViewModels
+            };
+            return View(model: model);
+        }
+
+        private DataSourceTranslationType ToTranslationType(SampleImportColumnName columnName)
+        {
+            switch (columnName)
+            {
+                case SampleImportColumnName.MonitoringPoint: return DataSourceTranslationType.MonitoringPoint;
+                case SampleImportColumnName.SampleType: return DataSourceTranslationType.SampleType;
+                case SampleImportColumnName.CollectionMethod: return DataSourceTranslationType.CollectionMethod;
+                case SampleImportColumnName.ParameterName: return DataSourceTranslationType.Parameter;
+                case SampleImportColumnName.ResultUnit: return DataSourceTranslationType.Unit;
+                default: throw new BadRequest(message:$"Cannot convert SampleImportColumnName {columnName} to DataSourceTranslationType.");
+            }
+        }
+
+        private string GetDataTranslationSubTitleFromColumnName(SampleImportColumnName columnName)
+        {
+            switch (columnName)
+            {
+                case SampleImportColumnName.MonitoringPoint: return "Monitoring Points";
+                case SampleImportColumnName.SampleType: return "Sample Types";
+                case SampleImportColumnName.CollectionMethod: return "Collection Methods";
+                case SampleImportColumnName.ParameterName: return "Parameters";
+                case SampleImportColumnName.ResultUnit: return "Units";
+                default: throw new ArgumentOutOfRangeException();
+            }
         }
 
         private ActionResult DoImportDataValidation(SampleImportViewModel model)
@@ -302,7 +391,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.ShowPreImportOutput);
-            return SampleImport(model: model);
+            return DoImportPreview(model: model);
         }
 
         private ActionResult GetDataValidationErrorViewOrNullToContinue(SampleImportViewModel model)
@@ -355,12 +444,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             var dataTranslationView = GetDataTranslationViewOrNullToContinue(model);
             if (dataTranslationView != null)
             {
+
                 return dataTranslationView;
             }
 
             var dataValidationErrorView = GetDataValidationErrorViewOrNullToContinue(model: model);
             if (dataValidationErrorView != null)
             {
+                MoveToStep(model: model, nextStep: SampleImportViewModel.SampleImportStep.DataValidation);
                 return dataValidationErrorView;
             }
 
@@ -410,7 +501,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-        private static ListItemDto GetUserSelectedDefaultValue(int columnId, string columnText, SampleImportColumnName columnName, SampleImportDto sampleImportDto)
+        private static ListItemDto GetUserSelectedDefaultValue(int columnId, string columnText)
         {
             if (columnId == 0 || string.IsNullOrEmpty(value:columnText))
             {
@@ -422,16 +513,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 Id = columnId,
                 DisplayValue = columnText
             };
-        }
-
-        private static bool DoesTranslationsMissing(SampleImportDto sampleImportDto, SampleImportColumnName columnName)
-        {
-            if (sampleImportDto.MissingTranslations == null || !sampleImportDto.MissingTranslations.Any())
-            {
-                return false;
-            }
-
-            return sampleImportDto.MissingTranslations.Find(x => x.SampleImportColumnName == columnName) != null;
         }
 
         #endregion

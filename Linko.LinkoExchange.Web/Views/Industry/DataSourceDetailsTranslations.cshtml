@@ -62,7 +62,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command =>
                                               {
-                                                  command.Edit();
+                                                  command.Edit().UpdateText("Save");
                                                   command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
                                               });
                           })
@@ -134,7 +134,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command =>
                                               {
-                                                  command.Edit();
+                                                  command.Edit().UpdateText("Save");
                                                   command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
                                               });
                           })
@@ -206,7 +206,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command =>
                                               {
-                                                  command.Edit();
+                                                  command.Edit().UpdateText("Save");
                                                   command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
                                               });
                           })
@@ -278,7 +278,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command =>
                               {
-                                  command.Edit();
+                                  command.Edit().UpdateText("Save");
                                   command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
                               });
                           })
@@ -350,7 +350,7 @@
                                      .HeaderHtmlAttributes(attributes: new { @class = "col-sm-6" });
                               columns.Command(command =>
                                               {
-                                                  command.Edit();
+                                                  command.Edit().UpdateText("Save");
                                                   command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
                                               });
                           })

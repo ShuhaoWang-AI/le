@@ -499,6 +499,7 @@
     <Content Include="Views\Shared\EditorTemplates\AuthorityMonitoringPointEditor.cshtml" />
     <Content Include="Views\Authority\ImportFileTemplate.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\FileVersionFieldEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\LinkoExchangeTermEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />

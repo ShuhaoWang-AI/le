@@ -737,9 +737,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             missingTranslationDtos.Add(item:new MissingTranslationDto
                                             {
                                                 SampleImportColumnName = columnName,
-                                                MissingTranslations = missingTranslationTerms,
-                                                Options = GetSelectListBySampleImportColumn(columnName:columnName),
-                                                Title = GetSampleImportColumnTitle(columnName:columnName)
+                                                MissingTranslations = missingTranslationTerms.Distinct(comparer:StringComparer.CurrentCultureIgnoreCase).ToList(),
+                                                Options = GetSelectListBySampleImportColumn(columnName:columnName)
             });
         }
 
@@ -752,19 +751,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 case SampleImportColumnName.CollectionMethod: return _selectListService.GetAuthorityCollectionMethodSelectList(withEmptyItem: true);
                 case SampleImportColumnName.ParameterName: return _selectListService.GetAuthorityParameterSelectList(withEmptyItem: true);
                 case SampleImportColumnName.ResultUnit: return _selectListService.GetAuthorityUnitSelectList(withEmptyItem: true);
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private string GetSampleImportColumnTitle(SampleImportColumnName columnName)
-        {
-            switch (columnName)
-            {
-                case SampleImportColumnName.MonitoringPoint: return "Monitoring Points";
-                case SampleImportColumnName.SampleType: return "Sample Types";
-                case SampleImportColumnName.CollectionMethod: return "Collection Methods";
-                case SampleImportColumnName.ParameterName: return "Parameters";
-                case SampleImportColumnName.ResultUnit: return "Units";
                 default: throw new ArgumentOutOfRangeException();
             }
         }
