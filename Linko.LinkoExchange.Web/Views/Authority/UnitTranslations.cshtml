@@ -100,7 +100,7 @@
             if (e.type === "update" && e.response.Errors == null) {
                 var responseData = e.response.Data[0];
                 if (responseData.BadgeCount != null) {
-                    $("#sidebar_PendingUnitTranslationsCount").html(responseData.BadgeCount);
+                    $("[name = 'sidebar_PendingUnitTranslationsCount']").html(responseData.BadgeCount);
                 }
             }
         }

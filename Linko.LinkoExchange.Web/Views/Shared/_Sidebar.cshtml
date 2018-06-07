@@ -115,7 +115,7 @@
                         @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
                         {
                             <span class="pull-right-container">
-                                <span class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                <span name="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
                             </span>
                         }
                     </a>
@@ -145,7 +145,7 @@
                                 @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
                                 {
                                     <span class="pull-right-container">
-                                        <span id="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                        <span name="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
                                     </span>
                                 }
                             </a>

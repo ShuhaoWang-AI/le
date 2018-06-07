@@ -2658,7 +2658,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
                 unitDto.IsAvailableToRegulatee = viewModel.IsAvailableToRegulatee;
-                if (viewModel.IsAvailableToRegulatee)
+
+                if (unitDto.SystemUnitId.HasValue)
                 {
                     viewModel.ShowInBadgeCount = false;
                 }
