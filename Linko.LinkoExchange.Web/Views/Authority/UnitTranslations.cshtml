@@ -54,7 +54,7 @@
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
                                        columns.Bound(c => c.ShowInBadgeCount).ClientTemplate(value:"#= ShowInBadgeCount ? 'Yes' : 'No' #")
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Command(command => { command.Edit(); }).Width(pixelWidth:170);
+                                       columns.Command(command => { command.Edit().UpdateText(text:"Save"); }).Width(pixelWidth:170);
                                    })
                           .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
                           .Pageable(pageable => pageable

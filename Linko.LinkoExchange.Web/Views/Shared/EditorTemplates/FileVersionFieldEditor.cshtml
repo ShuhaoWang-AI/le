@@ -4,13 +4,31 @@
 @Scripts.Render(paths:"~/bundles/jquery")
 
 <style>
+    .form-control
+    {
+        padding: 2px 8px;
+    }
+
+    .form-horizontal .control-label
+    {
+        padding-bottom: 6px;
+        padding-top: 10px;
+    }
+
+    input[type='checkbox']
+    {
+        height: 16px;
+        margin: 6px 0;
+        width: 16px;
+    }
+
     .form-control[disabled], input[type='checkbox'][disabled]
     {
         cursor: text;
     }
 </style>
 
-<section class="form-horizontal" style="width: 97%;">
+<section class="box-body form-horizontal" style="width: 97%;">
 
     @Html.HiddenFor(model => model.FileVersionFieldId)
 
@@ -185,9 +203,18 @@
     $(document)
         .ready(function() {
             if ($("#IsSystemRequired").is(":checked")) {
-                $("option[value='@((int) DataOptionalityName.Optional)']").remove();
                 $("#IsIncluded").prop("disabled", true);
-            } else {
+
+                $("option[value='@((int) DataOptionalityName.Optional)']").remove();
+            }
+
+            var columnNames = [
+                '@(SampleImportColumnName.MonitoringPoint.ToString())',
+                '@(SampleImportColumnName.SampleType.ToString())',
+                '@(SampleImportColumnName.CollectionMethod.ToString())'
+            ];
+
+            if ($.inArray($("#SystemFieldNameDisplayText").val(), columnNames) === -1) {
                 $("option[value='@((int) DataOptionalityName.Recommended)']").remove();
             }
 
@@ -195,10 +222,10 @@
                 .on('change', function(evt) {
                     try {
                         $('#FileVersionFieldName').closest("form").valid();
-                        
+
                     } catch (e) {}
                 });
 
-            
+
         });
 </script>
