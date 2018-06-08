@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using NLog;
 
 namespace Linko.LinkoExchange.Data
 {
@@ -8,15 +9,18 @@ namespace Linko.LinkoExchange.Data
 		#region fields
 
 		private readonly CustomTransactionWrapper _requestScopedTransaction;
+		private readonly ILogger _logger;
 
 		#endregion
 
 		#region constructors and destructor
 
-		public CustomTransactionScope(CustomTransactionWrapper requestScopedTransaction, string from)
+		public CustomTransactionScope(ILogger logger, CustomTransactionWrapper requestScopedTransaction, string from)
 		{
+			_logger = logger;
 			_requestScopedTransaction = requestScopedTransaction;
 			requestScopedTransaction.CallStacks.Push(item:from);
+
 		}
 
 		#endregion
@@ -33,15 +37,7 @@ namespace Linko.LinkoExchange.Data
 			_requestScopedTransaction.CallStacks.Pop();
 			if (_requestScopedTransaction.CallStacks.Count == 0)
 			{
-				try
-				{
-					_requestScopedTransaction.Transaction.Commit();
-				}
-				catch
-				{
-					_requestScopedTransaction.Transaction.Rollback();
-					throw;
-				}
+				_requestScopedTransaction.DbContext.Commit();
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Data
 	{
 		#region public properties
 
-		public DbContextTransaction Transaction { get; set; }
+		public LinkoExchangeContext DbContext { get; set; }
 		public Stack<string> CallStacks { get; set; }
 		#endregion
 	}

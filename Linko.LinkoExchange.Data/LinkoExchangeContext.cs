@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Linko.LinkoExchange.Core.Domain;
 using Microsoft.AspNet.Identity.EntityFramework;
+using NLog;
 using Module = Linko.LinkoExchange.Core.Domain.Module;
 using TimeZone = Linko.LinkoExchange.Core.Domain.TimeZone;
 
@@ -13,20 +14,23 @@ namespace Linko.LinkoExchange.Data
 {
 	public class LinkoExchangeContext : IdentityDbContext<UserProfile>
 	{
+		private readonly ILogger _logger;
 		#region constructors and destructor
 
-		public LinkoExchangeContext(string nameOrConnectionString)
+		public LinkoExchangeContext(string nameOrConnectionString, ILogger logger = null)
 			: base(nameOrConnectionString:nameOrConnectionString)
 		{
 			// Disable database initialization when the DB is not found
 			Database.SetInitializer<LinkoExchangeContext>(strategy:null);
+			_logger = logger;
+
 		}
 
 		#endregion
 
-		#region public properties
+        #region public properties
 
-		public DbContextTransaction Transaction { get; private set; }
+        public DbContextTransaction Transaction { get; private set; }
 
 		private CustomTransactionWrapper CustomTransaction { get; set; }
 
@@ -158,22 +162,37 @@ namespace Linko.LinkoExchange.Data
 		{
 			if (Transaction == null)
 			{
-				throw new ArgumentNullException(paramName:$"Transaction");
+				throw new ArgumentNullException(paramName: $"Transaction");
 			}
 
 			try
 			{
-				Transaction?.Commit();
+                Transaction.Commit();
 			}
-			finally
+			catch (Exception commitException)
 			{
-				Transaction.Dispose();
+				_logger?.Error(commitException, "Commit failed:");
+				try
+				{
+					Transaction.Rollback();
+				}
+				catch (Exception rollbackException)
+				{
+					_logger?.Error(rollbackException, "Rollback failed:");
+				}
+				throw;
+			}
+            finally
+			{
+                Transaction.Dispose();
+				CustomTransaction = null;
+                Transaction = null;
 			}
 		}
 
-		public virtual CustomTransactionScope BeginTransactionScope(MethodBase from)
+        public virtual CustomTransactionScope BeginTransactionScope(MethodBase from)
 		{
-			return BeginTransactionScope(from.DeclaringType?.Name + "." + from.Name);
+            return BeginTransactionScope(from.DeclaringType?.Name + "." + from.Name);
 		}
 
 		private CustomTransactionScope BeginTransactionScope(string from)
@@ -182,11 +201,12 @@ namespace Linko.LinkoExchange.Data
 			{
 				CustomTransaction = new CustomTransactionWrapper()
 				{
-					Transaction = BeginTransaction(),
+					DbContext = this,
 					CallStacks = new Stack<string>()
 				};
+				CustomTransaction.DbContext.BeginTransaction();
 			}
-			return new CustomTransactionScope(CustomTransaction, from);
+            return new CustomTransactionScope(_logger, CustomTransaction, from);
 		}
 
 		#endregion

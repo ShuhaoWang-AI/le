@@ -78,7 +78,7 @@ namespace Linko.LinkoExchange.Web
 
             // Data layer
             string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ToString();
-            container.RegisterType<LinkoExchangeContext>(new PerRequestLifetimeManager(), new InjectionConstructor(connectionString));
+            container.RegisterType<LinkoExchangeContext>(new PerRequestLifetimeManager(), new InjectionConstructor(connectionString, typeof(ILogger)));
 
             // Logger
             container.AddNewExtension<NLogExtension>();
