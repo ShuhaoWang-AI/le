@@ -59,11 +59,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, 
                                                               ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType);
 
-        SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto);
+        List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId);
 
-        List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto);
-
-	    ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
+        ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
 
         FileVersionDto GetFileVersion(string fileVersionName);
 

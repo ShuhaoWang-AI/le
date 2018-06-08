@@ -316,15 +316,14 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult GetDataTranslationViewOrNullToContinue(SampleImportViewModel model)
         {
-            model.SampleImportDto = _importSampleFromFileService.PopulateExistingTranslationData(sampleImportDto: model.SampleImportDto);
-            model.SampleImportDto.MissingTranslations = _importSampleFromFileService.GetMissingTranslationSet(sampleImportDto: model.SampleImportDto);
-
-            if (!model.SampleImportDto.MissingTranslations.Any())
+            var missingTranslations = _importSampleFromFileService.PopulateExistingTranslationDataAndReturnMissingTranslationSet(sampleImportDto:model.SampleImportDto, 
+                                                                                                                                 dataSourceId:model.SelectedDataSourceId);
+            if (!missingTranslations.Any())
             {
                 return null;
             }
 
-            var missingTranslationDto = model.SampleImportDto.MissingTranslations.First();
+            var missingTranslationDto = missingTranslations.First();
 
             var availableLinkoExchangeTerms = missingTranslationDto.Options.Select(x => new DropdownOptionViewModel
                                                                                         {

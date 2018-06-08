@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         DataSourceDto GetDataSource(int organizationRegulatoryProgramId, string name);
 
-        DataSourceDto GetDataSourceById(int dataSourceId);
+        DataSourceDto GetDataSourceById(int dataSourceId, bool withDataTranslations = false);
 
         List<DataSourceTranslationDto> GetDataSourceTranslations(int dataSourceId, DataSourceTranslationType translationType);
 
@@ -22,6 +22,10 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         int SaveDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType);
 
+        void SaveDataSourceTranslations(int dataSourceId, IEnumerable<DataSourceTranslationItemDto> dataSourceTranslations);
+
         void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType);
+
+        void DeleteInvalidDataSourceTranslations(int dataSourceId);
     }
 }

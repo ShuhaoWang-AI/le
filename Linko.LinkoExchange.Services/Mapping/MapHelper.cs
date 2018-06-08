@@ -1332,13 +1332,35 @@ namespace Linko.LinkoExchange.Services.Mapping
                 return null;
             }
 
-            return new DataSourceDto
+            var dataSourceDto = new DataSourceDto
             {
                 DataSourceId = dataSource.DataSourceId,
                 Name = dataSource.Name,
                 Description = dataSource.Description,
                 OrganizationRegulatoryProgramId = dataSource.OrganizationRegulatoryProgramId
             };
+
+	        if (dataSource.DataSourceMonitoringPoints != null)
+	        {
+		        dataSourceDto.DataSourceMonitoringPoints = dataSource.DataSourceMonitoringPoints.Select(selector:ToDataSourceMonitoringPointDto).ToList();
+	        }
+	        if (dataSource.DataSourceCollectionMethods != null)
+	        {
+		        dataSourceDto.DataSourceCollectionMethods = dataSource.DataSourceCollectionMethods.Select(selector:ToDataSourceCollectionMethodDto).ToList();
+	        }
+	        if (dataSource.DataSourceCtsEventTypes != null)
+	        {
+		        dataSourceDto.DataSourceSampleTypes = dataSource.DataSourceCtsEventTypes.Select(selector:ToDataSourceSampleTypeDto).ToList();
+	        }
+	        if (dataSource.DataSourceParameters != null)
+	        {
+		        dataSourceDto.DataSourceParameters = dataSource.DataSourceParameters.Select(selector:ToDataSourceParameterDto).ToList();
+	        }
+	        if (dataSource.DataSourceUnits != null)
+	        {
+		        dataSourceDto.DataSourceUnits = dataSource.DataSourceUnits.Select(selector:ToDataSourceUnitDto).ToList();
+	        }
+            return dataSourceDto;
         }
 
         public Core.Domain.DataSource GetDataSourceFromDataSourceDto(DataSourceDto dto, Core.Domain.DataSource existingDataSource)

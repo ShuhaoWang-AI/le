@@ -17,6 +17,12 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
 
+        public ICollection<DataSourceTranslationDto> DataSourceCollectionMethods { get; set; }
+        public ICollection<DataSourceTranslationDto> DataSourceMonitoringPoints { get; set; }
+        public ICollection<DataSourceTranslationDto> DataSourceSampleTypes { get; set; }
+        public ICollection<DataSourceTranslationDto> DataSourceParameters { get; set; }
+        public ICollection<DataSourceTranslationDto> DataSourceUnits { get; set; }
+
         #endregion
     }
 

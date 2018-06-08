@@ -380,13 +380,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			if (resultRow.ColumnMap.ContainsKey(key:SampleImportColumnName.MethodDetectionLimit))
 			{
-				sampleResultDto.EnteredMethodDetectionLimit = resultRow.ColumnMap[key:SampleImportColumnName.MethodDetectionLimit].TranslatedValue.ToString();
+				sampleResultDto.EnteredMethodDetectionLimit = resultRow.ColumnMap[key:SampleImportColumnName.MethodDetectionLimit].TranslatedValue?.ToString();
 				sampleResultDto.MethodDetectionLimit = resultRow.ColumnMap[key:SampleImportColumnName.MethodDetectionLimit].TranslatedValue;
 			}
 
 			if (resultRow.ColumnMap.ContainsKey(key:SampleImportColumnName.AnalysisMethod))
 			{
-				sampleResultDto.AnalysisMethod = resultRow.ColumnMap[key:SampleImportColumnName.AnalysisMethod].TranslatedValue.ToString();
+				sampleResultDto.AnalysisMethod = resultRow.ColumnMap[key:SampleImportColumnName.AnalysisMethod].TranslatedValue?.ToString();
 			}
 
 			if (resultRow.ColumnMap.ContainsKey(key:SampleImportColumnName.AnalysisDateTime))

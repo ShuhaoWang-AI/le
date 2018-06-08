@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
@@ -190,10 +191,24 @@ namespace Linko.LinkoExchange.Services.DataSource
             return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
         }
 
-        public DataSourceDto GetDataSourceById(int dataSourceId)
+        public DataSourceDto GetDataSourceById(int dataSourceId, bool withDataTranslations = false)
         {
-            var existingDataSource = _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId);
-            return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource:existingDataSource);
+            var existingDataSource = withDataTranslations
+                                         ? _dbContext.DataSources
+                                                     .Include(ds => ds.DataSourceMonitoringPoints)
+                                                     .Include(ds => ds.DataSourceMonitoringPoints.Select(x => x.MonitoringPoint))
+                                                     .Include(ds => ds.DataSourceCollectionMethods)
+                                                     .Include(ds => ds.DataSourceCollectionMethods.Select(x => x.CollectionMethod))
+                                                     .Include(ds => ds.DataSourceCtsEventTypes)
+                                                     .Include(ds => ds.DataSourceCtsEventTypes.Select(x => x.CtsEventType))
+                                                     .Include(ds => ds.DataSourceParameters)
+                                                     .Include(ds => ds.DataSourceParameters.Select(x => x.Parameter))
+                                                     .Include(ds => ds.DataSourceUnits)
+                                                     .Include(ds => ds.DataSourceUnits.Select(x => x.Unit))
+                                                     .FirstOrDefault(ds => ds.DataSourceId == dataSourceId)
+                                         : _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId);
+
+            return existingDataSource == null ? null : _mapHelper.GetDataSourceDtoFroDataSource(dataSource: existingDataSource);
         }
 
         public Dictionary<string, DataSourceTranslationItemDto> GetDataSourceTranslationDict(int dataSourceId, DataSourceTranslationType translationType)
@@ -295,6 +310,67 @@ namespace Linko.LinkoExchange.Services.DataSource
             }
         }
 
+        public void SaveDataSourceTranslations(int dataSourceId, IEnumerable<DataSourceTranslationItemDto> dataSourceTranslations)
+        {
+            using (_dbContext.BeginTransactionScope(from: MethodBase.GetCurrentMethod()))
+            {
+                foreach (var translationItem in dataSourceTranslations)
+                {
+                    switch (translationItem.TranslationType)
+                    {
+                        case DataSourceTranslationType.MonitoringPoint:
+                            var dataSourceMonitoringPoint = new DataSourceMonitoringPoint
+                                                            {
+                                                                DataSourceId = dataSourceId,
+                                                                DataSourceTerm = translationItem.TranslationName,
+                                                                MonitoringPointId = translationItem.TranslationId
+                                                            };
+                            _dbContext.DataSourceMonitoringPoints.Add(entity: dataSourceMonitoringPoint);
+                            break;
+                        case DataSourceTranslationType.SampleType:
+                            var dataSourceCtsEventType = new DataSourceCtsEventType
+                                                         {
+                                                             DataSourceId = dataSourceId,
+                                                             DataSourceTerm = translationItem.TranslationName,
+                                                             CtsEventTypeId = translationItem.TranslationId
+                                                         };
+                            _dbContext.DataSourceCtsEventTypes.Add(entity: dataSourceCtsEventType);
+                            break;
+                        case DataSourceTranslationType.CollectionMethod:
+                            var dataSourceCollectionMethod = new DataSourceCollectionMethod
+                                                             {
+                                                                 DataSourceId = dataSourceId,
+                                                                 DataSourceTerm = translationItem.TranslationName,
+                                                                 CollectionMethodId = translationItem.TranslationId
+                                                             };
+                            _dbContext.DataSourceCollectionMethods.Add(entity: dataSourceCollectionMethod);
+                            break;
+                        case DataSourceTranslationType.Parameter:
+                            var dataSourceParameter = new DataSourceParameter
+                                                      {
+                                                          DataSourceId = dataSourceId,
+                                                          DataSourceTerm = translationItem.TranslationName,
+                                                          ParameterId = translationItem.TranslationId
+                                                      };
+                            _dbContext.DataSourceParameters.Add(entity: dataSourceParameter);
+                            break;
+                        case DataSourceTranslationType.Unit:
+                            var dataSourceUnit = new DataSourceUnit
+                                                 {
+                                                     DataSourceId = dataSourceId,
+                                                     DataSourceTerm = translationItem.TranslationName,
+                                                     UnitId = translationItem.TranslationId
+                                                 };
+                            _dbContext.DataSourceUnits.Add(entity: dataSourceUnit);
+                            break;
+                        default: throw new InternalServerError(message:$"DataSourceTranslationType {translationItem.TranslationType} is unsupported");
+                    }
+                }
+
+                _dbContext.SaveChanges();
+            }
+        }
+
         public void DeleteDataSourceTranslation(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
             using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
@@ -321,13 +397,94 @@ namespace Linko.LinkoExchange.Services.DataSource
                         var dataSourceUnitToDelete = _dbContext.DataSourceUnits.Single(x => x.DataSourceUnitId == dataSourceTranslation.Id);
                         _dbContext.DataSourceUnits.Remove(entity:dataSourceUnitToDelete);
                         break;
-                    default: throw CreateRuleViolationExceptionForValidationError(errorMessage:$"DataSourceTranslationType {translationType} is unsupported");
+                    default: throw new InternalServerError(message: $"DataSourceTranslationType {translationType} is unsupported");
                 }
+                _dbContext.SaveChanges();
             }
-
-            _dbContext.SaveChanges();
         }
 
+        public void DeleteInvalidDataSourceTranslations(int dataSourceId)
+        {
+            var currentOrgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var authorityOrganization = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId);
+            var authorityOrganizationId = authorityOrganization.OrganizationId;
+            var authorityOrgRegProgramId = authorityOrganization.OrganizationRegulatoryProgramId;
+
+            var shouldSaveChanges = false;
+            using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
+            {
+                var invalidDataSourceMonitoringPoints = (from t in _dbContext.DataSourceMonitoringPoints
+                                                         join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
+                                                         join s in _dbContext.MonitoringPoints on t.MonitoringPointId equals s.MonitoringPointId
+                                                         where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                               && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
+                                                               && s.IsRemoved == true
+                                                         select t).ToList();
+                if (invalidDataSourceMonitoringPoints.Any())
+                {
+                    _dbContext.DataSourceMonitoringPoints.RemoveRange(entities:invalidDataSourceMonitoringPoints);
+                    shouldSaveChanges = true;
+                }
+
+                var invalidDataSourceCollectionMethods = (from t in _dbContext.DataSourceCollectionMethods
+                                                          join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
+                                                          join s in _dbContext.CollectionMethods on t.CollectionMethodId equals s.CollectionMethodId
+                                                          where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                                && s.OrganizationId == authorityOrganizationId
+                                                                && s.IsRemoved == true
+                                                          select t).ToList();
+                if (invalidDataSourceCollectionMethods.Any())
+                {
+                    _dbContext.DataSourceCollectionMethods.RemoveRange(entities:invalidDataSourceCollectionMethods);
+                    shouldSaveChanges = true;
+                }
+
+                var invalidDataSourceSampleTypes = (from t in _dbContext.DataSourceCtsEventTypes
+                                                    join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
+                                                    join s in _dbContext.CtsEventTypes on t.CtsEventTypeId equals s.CtsEventTypeId
+                                                    where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId 
+                                                          && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
+                                                          && s.CtsEventCategoryName == "SAMPLE"
+                                                          && s.IsRemoved == true
+                                                    select t).ToList();
+                if (invalidDataSourceSampleTypes.Any())
+                {
+                    _dbContext.DataSourceCtsEventTypes.RemoveRange(entities:invalidDataSourceSampleTypes);
+                    shouldSaveChanges = true;
+                }
+
+                var invalidDataSourceParameters = (from t in _dbContext.DataSourceParameters
+                                                   join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
+                                                   join s in _dbContext.Parameters on t.ParameterId equals s.ParameterId
+                                                   where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                          && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
+                                                          && s.IsRemoved == true
+                                                    select t).ToList();
+                if (invalidDataSourceParameters.Any())
+                {
+                    _dbContext.DataSourceParameters.RemoveRange(entities:invalidDataSourceParameters);
+                    shouldSaveChanges = true;
+                }
+
+                var invalidDataSourceUnits = (from t in _dbContext.DataSourceUnits
+                                              join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
+                                              join s in _dbContext.Units on t.UnitId equals s.UnitId
+                                              where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                    && s.OrganizationId == authorityOrganizationId
+                                                    && s.IsRemoved == true && s.IsAvailableToRegulatee == false
+                                              select t).ToList();
+                if (invalidDataSourceUnits.Any())
+                {
+                    _dbContext.DataSourceUnits.RemoveRange(entities:invalidDataSourceUnits);
+                    shouldSaveChanges = true;
+                }
+
+                if (shouldSaveChanges)
+                {
+                    _dbContext.SaveChanges();
+                }
+            }
+        }
         #endregion
 
         private List<DataSourceTranslationDto> GetDataSourceMonitoringPointTranslations(Core.Domain.DataSource dataSource)

@@ -29,6 +29,7 @@ using Telerik.Windows.Documents.Spreadsheet.FormatProviders;
 using Telerik.Windows.Documents.Spreadsheet.FormatProviders.OpenXml.Xlsx;
 using Telerik.Windows.Documents.Spreadsheet.Formatting;
 using Telerik.Windows.Documents.Spreadsheet.Model;
+using Telerik.Windows.Documents.Spreadsheet.Model.DataValidation;
 using Telerik.Windows.Documents.Spreadsheet.PropertySystem;
 
 namespace Linko.LinkoExchange.Services.ImportSampleFromFile
@@ -36,9 +37,15 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
     public partial class ImportSampleFromFileService : BaseService, IImportSampleFromFileService
     {
         #region fields
-
+        private static IEnumerable<SampleImportColumnName> _columnsNeedDataTranslation = new List<SampleImportColumnName>
+                                                                                        {
+                                                                                            SampleImportColumnName.MonitoringPoint,
+                                                                                            SampleImportColumnName.CollectionMethod,
+                                                                                            SampleImportColumnName.SampleType,
+                                                                                            SampleImportColumnName.ParameterName,
+                                                                                            SampleImportColumnName.ResultUnit
+                                                                                        };
         private readonly IDataSourceService _dataSourceService;
-
         private readonly LinkoExchangeContext _dbContext;
         private readonly IFileStoreService _fileStoreService;
         private readonly IHttpContextService _httpContextService;
@@ -423,43 +430,35 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
+        public List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
                                     descripition:sampleImportDto.ImportJobId))
             {
-                var validationIssues = new List<RuleViolation>();
-                foreach (var translationType in Enum.GetValues(enumType:typeof(DataSourceTranslationType)).Cast<DataSourceTranslationType>())
-                {
-                    PopulateExistingTranslationData(sampleImportDto:sampleImportDto, translationType:translationType, validationIssues:validationIssues);
-                }
+                //TODO: Should add audit log events to indicate system deleted they are no longer available data translations
+                _dataSourceService.DeleteInvalidDataSourceTranslations(dataSourceId:dataSourceId);
 
-                if (validationIssues.Count > 0)
-                {
-                    throw new BadRequest(message:"Population Data Source Translation failed", validationIssues:validationIssues);
-                }
+                sampleImportDto.DataSource = _dataSourceService.GetDataSourceById(dataSourceId: dataSourceId, withDataTranslations: true);
+                PopulateExistingTranslationData(sampleImportDto:sampleImportDto);
 
-                return sampleImportDto;
+                List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate;
+                var missingTranslations = GetMissingTranslationSet(sampleImportDto:sampleImportDto, translationItemsShouldAutoGenerate: out translationItemsShouldAutoGenerate);
+
+                if (translationItemsShouldAutoGenerate.Any())
+                {
+                    // ReSharper disable once PossibleInvalidOperationException
+                    _dataSourceService.SaveDataSourceTranslations(dataSourceId:dataSourceId, dataSourceTranslations:translationItemsShouldAutoGenerate);
+
+                    var shouldRepopulateTranslation = !missingTranslations.Any();
+                    if (shouldRepopulateTranslation)
+                    {
+                        sampleImportDto.DataSource = _dataSourceService.GetDataSourceById(dataSourceId: dataSourceId, withDataTranslations: true);
+                        PopulateExistingTranslationData(sampleImportDto: sampleImportDto);
+                    }
+                }
+                
+                return missingTranslations;
             }
-        }
-
-        /// <inheritdoc />
-        public List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto)
-        {
-            var missingTranslations = new List<MissingTranslationDto>();
-
-            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
-                                            columnName:SampleImportColumnName.MonitoringPoint);
-            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
-                                            columnName:SampleImportColumnName.CollectionMethod);
-            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
-                                            columnName:SampleImportColumnName.SampleType);
-            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
-                                            columnName:SampleImportColumnName.ParameterName);
-            AddMissingTranslationDtoIfExist(sampleImportDto:sampleImportDto, missingTranslationDtos:missingTranslations,
-                                            columnName:SampleImportColumnName.ResultUnit);
-
-            return missingTranslations;
         }
 
         /// <inheritdoc />
@@ -741,26 +740,128 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                   .ToList();
         }
 
-        private void AddMissingTranslationDtoIfExist(SampleImportDto sampleImportDto,
-                                                     List<MissingTranslationDto> missingTranslationDtos,
-                                                     SampleImportColumnName columnName)
+        private List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto, out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
         {
+            translationItemsShouldAutoGenerate = new List<DataSourceTranslationItemDto>();
+
+            var missingTranslations = new List<MissingTranslationDto>();
+            foreach (var columnName in _columnsNeedDataTranslation)
+            {
+                List<DataSourceTranslationItemDto> translationItemsNeedToAutoGenerate;
+                var missingTranslation = GetMissingTranslationOrNull(sampleImportDto:sampleImportDto,  columnName:columnName,
+                                                                     translationItemsShouldAutoGenerate:out translationItemsNeedToAutoGenerate);
+                if (missingTranslation != null)
+                {
+                    missingTranslations.Add(item:missingTranslation);
+                }
+
+                if (translationItemsNeedToAutoGenerate.Any())
+                {
+                    translationItemsShouldAutoGenerate.AddRange(collection:translationItemsNeedToAutoGenerate);
+                }
+            }
+            return missingTranslations;
+        }
+
+        private MissingTranslationDto GetMissingTranslationOrNull(SampleImportDto sampleImportDto, SampleImportColumnName columnName, 
+                                                                  out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
+        {
+            translationItemsShouldAutoGenerate = new List<DataSourceTranslationItemDto>();
             var missingTranslationTerms = sampleImportDto.Rows.Select(row => row.Cells.First(cell => cell.SampleImportColumnName == columnName))
-                                                         .Where(cell => !string.IsNullOrEmpty(value:cell.OriginalValueString) && cell.TranslatedValueId == 0)
-                                                         .Select(cell => cell.OriginalValueString).ToList();
+                                                         .Where(cell => !string.IsNullOrEmpty(value: cell.OriginalValueString) && cell.TranslatedValueId == 0)
+                                                         .Select(cell => cell.OriginalValueString)
+                                                         .Distinct(comparer: StringComparer.OrdinalIgnoreCase)
+                                                         .ToList();
             if (!missingTranslationTerms.Any())
             {
-                return;
+                return null;
             }
 
-            _logger.Info(message:"Column {0} missing translations at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportJobId,
+            translationItemsShouldAutoGenerate = DetectAutoGenerateTranslationItems(missingTranslationTerms: missingTranslationTerms, 
+                                                                                    translationType: ToTranslationType(columnName: columnName));
+            if (translationItemsShouldAutoGenerate.Any())
+            {
+                var generatedTranslationNames = translationItemsShouldAutoGenerate.Select(x => x.TranslationName);
+                _logger.Debug(message: "There are {0} {1} translation(s) should auto gererate: {2}", argument1: translationItemsShouldAutoGenerate.Count, 
+                              argument2: columnName, argument3: string.Join(separator: ",", values: translationItemsShouldAutoGenerate.Select(x => x.TranslationName)));
+
+                missingTranslationTerms = missingTranslationTerms.ExceptStringsCaseInsensitive(value:generatedTranslationNames).ToList();
+                if (!missingTranslationTerms.Any())
+                {
+                    return null;
+                }
+            }
+
+            _logger.Debug(message:"Column {0} missing translation(s) at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportJobId,
                          argument3:string.Join(separator:",", values:missingTranslationTerms));
-            missingTranslationDtos.Add(item:new MissingTranslationDto
-                                            {
-                                                SampleImportColumnName = columnName,
-                                                MissingTranslations = missingTranslationTerms.Distinct(comparer:StringComparer.CurrentCultureIgnoreCase).ToList(),
-                                                Options = GetSelectListBySampleImportColumn(columnName:columnName)
-            });
+            return new MissingTranslationDto
+                   {
+                       SampleImportColumnName = columnName,
+                       MissingTranslations = missingTranslationTerms,
+                       Options = GetSelectListBySampleImportColumn(columnName: columnName)
+                   };
+        }
+
+         private List<DataSourceTranslationItemDto> DetectAutoGenerateTranslationItems(IEnumerable<string> missingTranslationTerms, DataSourceTranslationType translationType)
+         {
+             Dictionary<string, DataSourceTranslationItemDto> translationItemsDict;
+             switch (translationType)
+             {
+                 case DataSourceTranslationType.MonitoringPoint:
+                     translationItemsDict = _selectListService.GetIndustryMonitoringPointSelectList()
+                                                              .ToCaseInsensitiveDictionary(x => x.DisplayValue, 
+                                                                                           x => new DataSourceTranslationItemDto
+                                                                                                {
+                                                                                                    TranslationId = x.Id,
+                                                                                                    TranslationName = x.DisplayValue,
+                                                                                                    TranslationType = translationType
+                                                                                                });
+                     break;
+                 case DataSourceTranslationType.SampleType:
+                     translationItemsDict = _selectListService.GetAuthoritySampleTypeSelectList()
+                                                              .ToCaseInsensitiveDictionary(x => x.DisplayValue,
+                                                                                           x => new DataSourceTranslationItemDto
+                                                                                                {
+                                                                                                    TranslationId = x.Id,
+                                                                                                    TranslationName = x.DisplayValue,
+                                                                                                    TranslationType = translationType
+                                                                                                });
+                    break;
+                 case DataSourceTranslationType.CollectionMethod:
+                     translationItemsDict = _selectListService.GetAuthorityCollectionMethodSelectList()
+                                                              .ToCaseInsensitiveDictionary(x => x.DisplayValue,
+                                                                                           x => new DataSourceTranslationItemDto
+                                                                                                {
+                                                                                                    TranslationId = x.Id,
+                                                                                                    TranslationName = x.DisplayValue,
+                                                                                                    TranslationType = translationType
+                                                                                           });
+                     break;
+                case DataSourceTranslationType.Parameter:
+                    translationItemsDict = _selectListService.GetAuthorityParameterSelectList()
+                                                             .ToCaseInsensitiveDictionary(x => x.DisplayValue,
+                                                                                          x => new DataSourceTranslationItemDto
+                                                                                               {
+                                                                                                   TranslationId = x.Id,
+                                                                                                   TranslationName = x.DisplayValue,
+                                                                                                   TranslationType = translationType
+                                                                                          });
+                    break;
+                 case DataSourceTranslationType.Unit:
+                    translationItemsDict = _selectListService.GetAuthorityUnitSelectList()
+                                                             .ToCaseInsensitiveDictionary(x => x.DisplayValue,
+                                                                                          x => new DataSourceTranslationItemDto
+                                                                                               {
+                                                                                                   TranslationId = x.Id,
+                                                                                                   TranslationName = x.DisplayValue,
+                                                                                                   TranslationType = translationType
+                                                                                          });
+                    break;
+                 default: throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
+             }
+
+             var matchedTermsForAutoGeneration = missingTranslationTerms.IntersectStringsCaseInsensitive(value: translationItemsDict.Keys).ToList();
+             return translationItemsDict.Where(x => matchedTermsForAutoGeneration.CaseInsensitiveContains(x.Key)).Select(x => x.Value).ToList();
         }
 
         private List<ListItemDto> GetSelectListBySampleImportColumn(SampleImportColumnName columnName)
@@ -1094,6 +1195,23 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             return rawValueAsNumber;
         }
 
+        private SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto)
+        {
+            var validationIssues = new List<RuleViolation>();
+
+            foreach (var translationType in Enum.GetValues(enumType: typeof(DataSourceTranslationType)).Cast<DataSourceTranslationType>())
+            {
+                PopulateExistingTranslationData(sampleImportDto: sampleImportDto, translationType: translationType, validationIssues: validationIssues);
+            }
+
+            if (validationIssues.Count > 0)
+            {
+                throw new BadRequest(message: "Population Data Source Translation failed", validationIssues: validationIssues);
+            }
+
+            return sampleImportDto;
+        }
+
         private SampleImportDto PopulateExistingTranslationData(SampleImportDto sampleImportDto, DataSourceTranslationType translationType,
                                                                 ICollection<RuleViolation> validationIssues)
         {
@@ -1104,8 +1222,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 return sampleImportDto;
             }
 
-            var translationDict = _dataSourceService.GetDataSourceTranslationDict(dataSourceId:sampleImportDto.DataSource.DataSourceId.Value,
-                                                                                  translationType:translationType);
+            var translationDict = GetDataSourceTranslationDict(dataSourceWithDataTranslations: sampleImportDto.DataSource, translationType:translationType);
             var sampleImportColumnName = ToSampleImportColumnName(fromTranslationType:translationType);
 
             var cellsToPopulate = sampleImportDto.Rows.Select(row => row.Cells.Find(cell => cell.SampleImportColumnName == sampleImportColumnName))
@@ -1128,6 +1245,28 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             return sampleImportDto;
         }
 
+        private Dictionary<string, DataSourceTranslationItemDto> GetDataSourceTranslationDict(DataSourceDto dataSourceWithDataTranslations, 
+                                                                                              DataSourceTranslationType translationType)
+        {
+            ICollection<DataSourceTranslationDto> dataSourceTranslations;
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint: dataSourceTranslations = dataSourceWithDataTranslations.DataSourceMonitoringPoints; break;
+                case DataSourceTranslationType.SampleType: dataSourceTranslations = dataSourceWithDataTranslations.DataSourceSampleTypes; break;
+                case DataSourceTranslationType.CollectionMethod: dataSourceTranslations = dataSourceWithDataTranslations.DataSourceCollectionMethods; break;
+                case DataSourceTranslationType.Parameter: dataSourceTranslations = dataSourceWithDataTranslations.DataSourceParameters; break;
+                case DataSourceTranslationType.Unit: dataSourceTranslations = dataSourceWithDataTranslations.DataSourceUnits; break;
+                default: throw new InternalServerError(message:$"DataSourceTranslationType {translationType} is unsupported");
+            }
+
+            var caseInsensitiveDictionary = new Dictionary<string, DataSourceTranslationItemDto>(comparer: StringComparer.OrdinalIgnoreCase);
+            foreach (var translation in dataSourceTranslations)
+            {
+                caseInsensitiveDictionary.Add(key: translation.DataSourceTerm, value: translation.TranslationItem);
+            }
+            return caseInsensitiveDictionary;
+        }
+
         private static SampleImportColumnName ToSampleImportColumnName(DataSourceTranslationType fromTranslationType)
         {
             switch (fromTranslationType)
@@ -1138,6 +1277,19 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 case DataSourceTranslationType.Parameter: return SampleImportColumnName.ParameterName;
                 case DataSourceTranslationType.Unit: return SampleImportColumnName.ResultUnit;
                 default: throw new NotSupportedException(message:$"DataSourceTranslationType {fromTranslationType} is unsupported");
+            }
+        }
+
+        private static DataSourceTranslationType ToTranslationType(SampleImportColumnName columnName)
+        {
+            switch (columnName)
+            {
+                case SampleImportColumnName.MonitoringPoint: return DataSourceTranslationType.MonitoringPoint;
+                case SampleImportColumnName.SampleType: return DataSourceTranslationType.SampleType;
+                case SampleImportColumnName.CollectionMethod: return DataSourceTranslationType.CollectionMethod;
+                case SampleImportColumnName.ParameterName: return DataSourceTranslationType.Parameter;
+                case SampleImportColumnName.ResultUnit: return DataSourceTranslationType.Unit;
+                default: throw new BadRequest(message:$"Cannot convert SampleImportColumnName {columnName} to DataSourceTranslationType.");
             }
         }
 
