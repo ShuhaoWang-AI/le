@@ -42,7 +42,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Editable(allowEdit:false)]
         public bool IsSystemRequired { get; set; }
 
-        [Display(Name = "Data Optionality")]
+        [Display(Name = "Authority Optionality")]
         public DataOptionalityName DataOptionalityName { get; set; }
 
         public IEnumerable<SelectListItem> AvailableResultQualifierValidValues

@@ -85,18 +85,19 @@
             </div>
         </div>
         <div class="col-md-6 form-group">
-            @Html.LabelFor(model => model.IsIncluded, htmlAttributes:new
-                                                                     {
-                                                                         @class = "control-label col-md-3"
-                                                                     })
+            @Html.LabelFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-3"
+                                                                           })
 
             <div class="col-md-7">
-                @Html.CheckBoxFor(model => model.IsIncluded)
-                @Html.ValidationMessageFor(model => model.IsIncluded)
+                @Html.CheckBoxFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                                  {
+                                                                                      disabled = "disabled"
+                                                                                  })
+                @Html.ValidationMessageFor(model => model.IsSystemRequired)
             </div>
         </div>
-    </div>
-    <div class="col-md-12">
         <div class="col-md-6 form-group">
             @Html.LabelFor(model => model.DataOptionalityName, htmlAttributes:new
                                                                               {
@@ -114,22 +115,26 @@
 
             </div>
         </div>
-        <div class="col-md-6 form-group">
-            @Html.LabelFor(model => model.IsSystemRequired, htmlAttributes:new
-                                                                           {
-                                                                               @class = "control-label col-md-3"
-                                                                           })
-
-            <div class="col-md-7">
-                @Html.CheckBoxFor(model => model.IsSystemRequired, htmlAttributes:new
-                                                                                  {
-                                                                                      disabled = "disabled"
-                                                                                  })
-                @Html.ValidationMessageFor(model => model.IsSystemRequired)
-            </div>
-        </div>
     </div>
     <div class="col-md-12">
+        @*<div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.IsIncluded, htmlAttributes:new
+                                                                     {
+                                                                         @class = "control-label col-md-3"
+                                                                     })
+
+            <div class="col-md-7">
+                @Html.CheckBoxFor(model => model.IsIncluded)
+                @Html.ValidationMessageFor(model => model.IsIncluded)
+            </div>
+        </div>*@
+    </div>
+</section>
+<section class="box-footer form-horizontal" style="width: 97%;">
+    <div>
+        <a id="linkShowAditionalConfiguration" href="#" onclick="showAditionalConfiguration()">Show Aditional Configuration</a>
+    </div>
+    <div class="col-md-12" name="sampleImportAditionalConfiguration">
         <div class="col-md-6 form-group">
             @Html.LabelFor(model => model.DataFormatName, htmlAttributes:new
                                                                          {
@@ -161,7 +166,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12" name="sampleImportAditionalConfiguration">
         <div class="col-md-6 form-group">
             @Html.LabelFor(model => model.ExampleData, htmlAttributes:new
                                                                       {
@@ -195,6 +200,7 @@
             </div>
         </div>
     </div>
+    
 </section>
 
 @Scripts.Render("~/bundles/jqueryval")
@@ -226,6 +232,11 @@
                     } catch (e) {}
                 });
 
-
+            $("[name='sampleImportAditionalConfiguration']").hide();
         });
+
+    function showAditionalConfiguration() {
+        $("[name='sampleImportAditionalConfiguration']").show();
+        $("#linkShowAditionalConfiguration").hide();
+    }
 </script>

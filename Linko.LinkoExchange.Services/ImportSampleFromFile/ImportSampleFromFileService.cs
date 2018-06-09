@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Web.Hosting;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -470,6 +471,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var authority = _organizationService.GetAuthority(orgRegProgramId:currentRegulatoryProgramId);
 
                 var fileVersion = _dbContext.FileVersions.FirstOrDefault(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+
                                                                               // ReSharper disable once ArgumentsStyleOther
                                                                               && i.Name.ToLower().Equals(fileVersionName.ToLower()));
 
@@ -675,6 +677,81 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 return domainObject.FileVersionFieldId;
             }
+        }
+
+        /// <inheritdoc />
+        public ExportFileDto DownloadSampleImportTemplate(string fileVersionName)
+        {
+            var workbook = new Workbook();
+            var fileVersion = GetFileVersion(fileVersionName:fileVersionName);
+
+            if (fileVersion == null)
+            {
+                throw CreateRuleViolationExceptionForValidationError(errorMessage:"There is no file");
+            }
+
+            workbook.SuspendLayoutUpdate();
+
+            var worksheet = workbook.Worksheets.Add();
+            worksheet.Name = "Data";
+            const int headerRowIndex = 0;
+            var colIndex = 0;
+
+            worksheet.Rows[fromIndex:headerRowIndex, toIndex:headerRowIndex].SetIsBold(value:true);
+
+            foreach (var fileVersionFileVersionField in fileVersion.FileVersionFields.OrderBy(x => (int) x.SystemFieldName))
+            {
+                worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.FileVersionFieldName);
+
+                var columnSelection = worksheet.Columns[index:colIndex];
+
+                AutoFitExcelColumnWidth(columnSelection:columnSelection, worksheet:worksheet, colIndex:colIndex);
+                colIndex++;
+            }
+
+            workbook.ResumeLayoutUpdate();
+
+            return GetExcelOutputFileDto(fileVersionName:fileVersionName, workbook:workbook);
+        }
+
+        /// <inheritdoc />
+        public ExportFileDto DownloadSampleImportTemplateInstruction(string fileVersionName)
+        {
+            var workbook = new Workbook();
+            var fileVersion = GetFileVersion(fileVersionName:fileVersionName);
+
+            if (fileVersion == null)
+            {
+                throw CreateRuleViolationExceptionForValidationError(errorMessage:"There is no file instruction");
+            }
+
+            var instructionFilePath = HostingEnvironment.MapPath(virtualPath:"~/Resources/SampleImportInstruction.xlsx");
+
+            Workbook instructionWorkbook = null;
+
+            if (instructionFilePath != null)
+            {
+                using (Stream stream = File.OpenRead(path:instructionFilePath))
+                {
+                    instructionWorkbook = new XlsxFormatProvider().Import(input:stream);
+                }
+            }
+
+            workbook.SuspendLayoutUpdate();
+
+            AddDataDescriptionSheetForSampleImportInstruction(workbook:workbook, fileVersion:fileVersion);
+
+            if (instructionWorkbook != null)
+            {
+                AddDataExampleSheetForSampleImportInstruction(workbook:workbook, fileVersion:fileVersion, instructionWorkbook:instructionWorkbook);
+                AddDataRulesSheetForSampleImportInstruction(workbook:workbook, fileVersion:fileVersion, instructionWorkbook:instructionWorkbook);
+                AddHowTheImportWorksSheetForSampleImportInstruction(workbook:workbook, fileVersion:fileVersion, instructionWorkbook:instructionWorkbook);
+                AddDataExampleWithMassLoadingsSheetForSampleImportInstruction(workbook:workbook, fileVersion:fileVersion, instructionWorkbook:instructionWorkbook);
+            }
+
+            workbook.ResumeLayoutUpdate();
+
+            return GetExcelOutputFileDto(fileVersionName:fileVersionName, workbook:workbook);
         }
 
         /// <inheritdoc />
@@ -1096,7 +1173,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 case DataOptionalityName.Optional: break;
                                 case DataOptionalityName.Recommended:
 
-                                    //TODO: User Story 8199, could reserve cell optinality state to speed up missing default values look up
+                                    //TODO: User Story 8199, could reserve cell optionality state to speed up missing default values look up
                                     break;
                                 default: throw new NotImplementedException();
                             }
@@ -1297,6 +1374,233 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             //Also handles scenarios where ImportTempFileId does not exist
             return _dbContext.ImportTempFiles.Any(fs => fs.ImportTempFileId == importTempFileId && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
+        }
+
+        private static void AutoFitExcelColumnWidth(ColumnSelection columnSelection, Worksheet worksheet, int colIndex)
+        {
+            columnSelection.AutoFitWidth();
+
+            //NOTE: workaround for incorrect autofit.
+            var newWidth = worksheet.Columns[index:colIndex].GetWidth().Value.Value + 15;
+            columnSelection.SetWidth(value:new ColumnWidth(value:newWidth, isCustom:false));
+        }
+
+        private static ExportFileDto GetExcelOutputFileDto(string fileVersionName, Workbook workbook)
+        {
+            var formatProvider = new XlsxFormatProvider();
+            byte[] renderedBytes;
+
+            using (var ms = new MemoryStream())
+            {
+                formatProvider.Export(workbook:workbook, output:ms);
+                renderedBytes = ms.ToArray();
+            }
+
+            var fileDto = new ExportFileDto
+                          {
+                              Name = fileVersionName + ".xlsx",
+                              ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                              Data = renderedBytes
+                          };
+            return fileDto;
+        }
+
+        private static void AddDataDescriptionSheetForSampleImportInstruction(Workbook workbook, FileVersionDto fileVersion)
+        {
+            var worksheet = workbook.Worksheets.Add();
+            worksheet.Name = "Data Descriptions";
+            var rowIndex = 1;
+            var colIndex = 0;
+
+            foreach (var fileVersionFileVersionField in fileVersion.FileVersionFields.OrderBy(x => (int) x.SystemFieldName))
+            {
+                foreach (var columnName in Enum.GetValues(enumType:typeof(DataDescriptionColumnName)).Cast<DataDescriptionColumnName>())
+                {
+                    colIndex = (int) columnName;
+
+                    switch (columnName)
+                    {
+                        case DataDescriptionColumnName.FileVersionFieldName:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.FileVersionFieldName);
+                            break;
+                        case DataDescriptionColumnName.DataOptionalityName:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.DataOptionalityName.ToString());
+                            break;
+                        case DataDescriptionColumnName.DataFormatName:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.DataFormatDescription);
+                            break;
+                        case DataDescriptionColumnName.FieldSize:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.Size.ToString());
+                            break;
+                        case DataDescriptionColumnName.Description:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.Description);
+                            break;
+                        case DataDescriptionColumnName.ExampleData:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.ExampleData);
+                            break;
+                        case DataDescriptionColumnName.AdditionalComments:
+                            worksheet.Cells[rowIndex:rowIndex, columnIndex:colIndex].SetValue(value:fileVersionFileVersionField.AdditionalComments);
+                            break;
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                rowIndex++;
+            }
+
+            const int headerRowIndex = 0;
+            const double maxColumnWidth = 400;
+            const double minColumnWidth = 85;
+
+            worksheet.Rows[fromIndex:0, toIndex:0].SetIsBold(value:true);
+            worksheet.Rows[fromIndex:0, toIndex:0].SetHorizontalAlignment(value:RadHorizontalAlignment.Center);
+            worksheet.Columns[fromIndex:0, toIndex:0].SetIsBold(value:true);
+
+            foreach (var columnName in Enum.GetValues(enumType:typeof(DataDescriptionColumnName)).Cast<DataDescriptionColumnName>())
+            {
+                colIndex = (int) columnName;
+                var columnSelection = worksheet.Columns[index:colIndex];
+                AutoFitExcelColumnWidth(columnSelection:columnSelection, worksheet:worksheet, colIndex:colIndex);
+
+                if (worksheet.Columns[index:colIndex].GetWidth().Value.Value > maxColumnWidth)
+                {
+                    columnSelection.SetWidth(value:new ColumnWidth(value:maxColumnWidth, isCustom:false));
+                }
+
+                if (worksheet.Columns[index:colIndex].GetWidth().Value.Value < minColumnWidth)
+                {
+                    columnSelection.SetWidth(value:new ColumnWidth(value:minColumnWidth, isCustom:false));
+                }
+
+                switch (columnName)
+                {
+                    case DataDescriptionColumnName.FileVersionFieldName:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Column Header");
+                        break;
+                    case DataDescriptionColumnName.DataOptionalityName:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Required?");
+                        break;
+                    case DataDescriptionColumnName.DataFormatName:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Data Format");
+                        break;
+                    case DataDescriptionColumnName.FieldSize:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Field Size");
+                        columnSelection.SetHorizontalAlignment(value:RadHorizontalAlignment.CenterContinuous);
+                        break;
+                    case DataDescriptionColumnName.Description:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Field Description");
+                        columnSelection.SetIsWrapped(value:true);
+                        break;
+                    case DataDescriptionColumnName.ExampleData:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Example Data");
+                        columnSelection.SetIsWrapped(value:true);
+                        columnSelection.SetIsBold(value:true);
+                        break;
+                    case DataDescriptionColumnName.AdditionalComments:
+                        worksheet.Cells[rowIndex:headerRowIndex, columnIndex:colIndex].SetValue(value:"Additional Comments");
+                        columnSelection.SetIsWrapped(value:true);
+                        break;
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private static void AddDataExampleSheetForSampleImportInstruction(Workbook workbook, FileVersionDto fileVersion, Workbook instructionWorkbook)
+        {
+            var instructionSheet = instructionWorkbook.Worksheets.GetByName(sheetName:"Data Example");
+
+            if (instructionSheet != null)
+            {
+                var worksheet = workbook.Worksheets.Add();
+                worksheet.CopyFrom(sourceWorksheet:instructionSheet);
+                worksheet.Name = "Data Example";
+
+                UpdateHeaderRowAndRemoveExtraColumns(fileVersion:fileVersion, worksheet:worksheet);
+            }
+        }
+
+        private static void AddDataRulesSheetForSampleImportInstruction(Workbook workbook, FileVersionDto fileVersion, Workbook instructionWorkbook)
+        {
+            var instructionSheet = instructionWorkbook.Worksheets.GetByName(sheetName:"Data Rules");
+            if (instructionSheet != null)
+            {
+                var worksheet = workbook.Worksheets.Add();
+                worksheet.CopyFrom(sourceWorksheet:instructionSheet);
+                worksheet.Name = "Data Rules";
+            }
+        }
+
+        private static void AddHowTheImportWorksSheetForSampleImportInstruction(Workbook workbook, FileVersionDto fileVersion, Workbook instructionWorkbook)
+        {
+            var instructionSheet = instructionWorkbook.Worksheets.GetByName(sheetName:"How the Import works");
+            if (instructionSheet != null)
+            {
+                var worksheet = workbook.Worksheets.Add();
+                worksheet.CopyFrom(sourceWorksheet:instructionSheet);
+                worksheet.Name = "How the Import works";
+            }
+        }
+
+        private static void AddDataExampleWithMassLoadingsSheetForSampleImportInstruction(Workbook workbook, FileVersionDto fileVersion, Workbook instructionWorkbook)
+        {
+            var instructionSheet = instructionWorkbook.Worksheets.GetByName(sheetName:"Data Example with Mass Loadings");
+
+            if (instructionSheet != null)
+            {
+                var worksheet = workbook.Worksheets.Add();
+                worksheet.CopyFrom(sourceWorksheet:instructionSheet);
+                worksheet.Name = "Data Example with Mass Loadings";
+
+                UpdateHeaderRowAndRemoveExtraColumns(fileVersion:fileVersion, worksheet:worksheet);
+            }
+        }
+
+        private static void UpdateHeaderRowAndRemoveExtraColumns(FileVersionDto fileVersion, Worksheet worksheet)
+        {
+            const int headerRowIndex = 0;
+
+            worksheet.Rows[fromIndex:headerRowIndex, toIndex:headerRowIndex].SetIsBold(value:true);
+
+            var usedCellRangeWithValues = worksheet.GetUsedCellRange(propertyDefinitions:new IPropertyDefinition[] {CellPropertyDefinitions.ValueProperty});
+            var templateColumnDictionary = fileVersion.FileVersionFields.ToDictionary(x => x.SystemFieldName.ToString().ToLower(), x => x);
+            var needToRemoveColumns = new List<int>();
+
+            for (var columnIndex = usedCellRangeWithValues.FromIndex.ColumnIndex; columnIndex <= usedCellRangeWithValues.ToIndex.ColumnIndex; columnIndex++)
+            {
+                var cellValue = worksheet.Cells[rowIndex:headerRowIndex, columnIndex:columnIndex].GetValue().Value;
+                var format = worksheet.Cells[rowIndex:headerRowIndex, columnIndex:columnIndex].GetFormat().Value;
+                var resultAsString = cellValue.GetValueAsString(format:format).Trim();
+
+                //Find column header from first row and map with FileVersionFieldDto
+                if (templateColumnDictionary.ContainsKey(key:resultAsString.ToLower()))
+                {
+                    var fileVersionFileVersionField = templateColumnDictionary[key:resultAsString.ToLower()];
+                    worksheet.Cells[rowIndex:headerRowIndex, columnIndex:columnIndex].SetValue(value:fileVersionFileVersionField.FileVersionFieldName);
+
+                    var columnSelection = worksheet.Columns[index:columnIndex];
+                    AutoFitExcelColumnWidth(columnSelection:columnSelection, worksheet:worksheet, colIndex:columnIndex);
+                }
+                else
+                {
+                    needToRemoveColumns.Add(item:columnIndex);
+                }
+            }
+
+            foreach (var columnIndex in needToRemoveColumns.OrderByDescending(x => x)) // need to be descending otherwise when remove changes the column index 
+            {
+                worksheet.Columns[index:columnIndex].Remove();
+            }
+        }
+
+        private enum DataDescriptionColumnName
+        {
+            FileVersionFieldName,
+            DataOptionalityName,
+            DataFormatName,
+            FieldSize,
+            Description,
+            ExampleData,
+            AdditionalComments
         }
     }
 }

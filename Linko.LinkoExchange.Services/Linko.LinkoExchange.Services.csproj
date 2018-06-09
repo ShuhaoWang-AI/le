@@ -141,6 +141,7 @@
     <Compile Include="Config\ConfigSettingService.cs" />
     <Compile Include="DataSource\IDataSourceService.cs" />
     <Compile Include="DataSource\DataSourceService.cs" />
+    <Compile Include="Dto\ExportFileDto.cs" />
     <Compile Include="Dto\FloatNumbersProductDto.cs" />
     <Compile Include="Dto\ListItemDto.cs" />
     <Compile Include="Dto\ErrorWithRowNumberDto.cs" />
@@ -316,6 +317,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ImportSampleFromFile\Resources\SampleImportInstruction.xlsx" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

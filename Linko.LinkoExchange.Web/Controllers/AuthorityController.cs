@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -2759,6 +2760,23 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(data:new[] {viewModel}.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
+        public ActionResult DownloadSampleImportTemplate()
+        {
+            var fileDto = _importSampleFromFileService.DownloadSampleImportTemplate(fileVersionName:FileVersionTemplateName.SampleImport.ToString());
+            var fileStream = new MemoryStream(buffer:fileDto.Data) {Position = 0};
+
+            return File(fileStream:fileStream, contentType:fileDto.ContentType, fileDownloadName:fileDto.Name);
+        }
+
+        public ActionResult DownloadSampleImportTemplateInstruction()
+        {
+            var fileDto = _importSampleFromFileService.DownloadSampleImportTemplateInstruction(fileVersionName:FileVersionTemplateName.SampleImport.ToString());
+            var fileStream = new MemoryStream(buffer:fileDto.Data) {Position = 0};
+
+            return File(fileStream:fileStream, contentType:fileDto.ContentType, fileDownloadName:fileDto.Name);
+        }
+
         #endregion
+
     }
 }

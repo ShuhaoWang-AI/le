@@ -15,6 +15,15 @@
         </div>
         
         <div class="box-tools pull-right">
+            @Html.ActionLink(linkText:"Download Instruction", actionName:"DownloadSampleImportTemplateInstruction", routeValues:null, htmlAttributes:new
+                                                                                                                                                     {
+                                                                                                                                                         @class = "btn btn-primary btn-sm"
+                                                                                                                                                     })
+            @Html.ActionLink(linkText:"Download Template", actionName:"DownloadSampleImportTemplate", routeValues:null, htmlAttributes:new
+                                                                                                                                       {
+                                                                                                                                           @class = "btn btn-primary btn-sm"
+                                                                                                                                       })
+            
             <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
                 Create New
             </button>

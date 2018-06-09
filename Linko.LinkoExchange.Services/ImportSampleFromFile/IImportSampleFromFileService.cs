@@ -69,5 +69,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         
         FileVersionDto GetFileVersionForAuthorityConfiguration(FileVersionTemplateName fileVersionTemplateName);
         int? AddOrUpdateFileVersionFieldForAuthorityConfiguration(int fileVersionId, FileVersionFieldDto dto);
+        ExportFileDto DownloadSampleImportTemplate(string fileVersionName);
+        ExportFileDto DownloadSampleImportTemplateInstruction(string fileVersionName);
     }
 }

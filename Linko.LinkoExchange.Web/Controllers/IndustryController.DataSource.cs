@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -92,7 +94,22 @@ namespace Linko.LinkoExchange.Web.Controllers
                                  });
             }
         }
+        
+        public ActionResult DownloadSampleImportTemplate()
+        {
+            var fileDto = _importSampleFromFileService.DownloadSampleImportTemplate(fileVersionName:FileVersionTemplateName.SampleImport.ToString());
+            var fileStream = new MemoryStream(buffer:fileDto.Data) {Position = 0};
 
+            return File(fileStream:fileStream, contentType:fileDto.ContentType, fileDownloadName:fileDto.Name);
+        }
+
+        public ActionResult DownloadSampleImportTemplateInstruction()
+        {
+            var fileDto = _importSampleFromFileService.DownloadSampleImportTemplateInstruction(fileVersionName:FileVersionTemplateName.SampleImport.ToString());
+            var fileStream = new MemoryStream(buffer:fileDto.Data) {Position = 0};
+
+            return File(fileStream:fileStream, contentType:fileDto.ContentType, fileDownloadName:fileDto.Name);
+        }
         #endregion
 
         #region dataSource details view
