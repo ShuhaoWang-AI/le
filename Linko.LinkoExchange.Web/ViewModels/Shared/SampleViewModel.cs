@@ -76,7 +76,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string FlowUnitName { get; set; }
         public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
 
-        public IList<SelectListItem> AvailableFlowUnits
+	    [Display(Name = "Flow")]
+	    public string FlowValueAndFlow => string.IsNullOrWhiteSpace(FlowValue) ? "" : $"{FlowValue} {FlowUnitName}";
+
+	    public string Status => Id.HasValue ? SampleStatus.Updated.ToString() : SampleStatus.New.ToString();
+
+	    public IList<SelectListItem> AvailableFlowUnits
         {
             get
             {
@@ -131,8 +136,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string SampleOverallCompliance { get; set; }
         public string SampleOverallComplianceComment { get; set; }
 
+		public string Identifier { get; set; }
         #endregion
     }
+	
+	public enum SampleStatus
+	{
+		New,
+		Updated
+	}
 
     public class SampleViewModelValidator : AbstractValidator<SampleViewModel>
     {

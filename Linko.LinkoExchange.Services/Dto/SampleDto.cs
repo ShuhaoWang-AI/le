@@ -27,8 +27,11 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime StartDateTimeLocal { get; set; }
         public DateTime EndDateTimeLocal { get; set; }
         public bool IsReadyToReport { get; set; }
-
-        public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
+		public double FlowMethodDetectionLimit { get; set; }
+		public string FlowAnalysisMethod { get; set; }
+		public DateTime? FlowAnalysisDateTime { get; set; }
+		
+		public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
         public string ResultQualifierValidValues { get; set; }
         public double? MassLoadingConversionFactorPounds { get; set; }
         public int? MassLoadingCalculationDecimalPlaces { get; set; }

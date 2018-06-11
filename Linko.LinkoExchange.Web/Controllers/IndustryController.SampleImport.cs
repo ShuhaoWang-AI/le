@@ -428,22 +428,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult DoImportPreview(SampleImportViewModel model)
         {
-            return View(model: model);
+			//TODO: to apply compliance check for sample results.
+			//TODO:  SampleOverallCompliance
+
+			model.Samples = model.SampleImportDto.SampleDtos.Select(_mapHelper.ToViewModel).ToList();
+
+			// to attach a identifier for each sample 
+	        foreach (var sample in model.Samples)
+			{
+				sample.Identifier = Guid.NewGuid().ToString();
+			}
+
+			return View(model: model);
         }
 
-        private ActionResult DoImportFinalSave(SampleImportViewModel model)
-        {
-            var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model: model);
-            if (fileValidationErrorView != null)
-            {
-                return fileValidationErrorView;
-            }
+	    private ActionResult DoImportFinalSave(SampleImportViewModel model)
+	    {
+		    var fileValidationErrorView = LoadSampleImportDtoAndGetFileValidationErrorViewOrNullToContinue(model:model);
+		    if (fileValidationErrorView != null)
+		    {
+			    return fileValidationErrorView;
+		    }
 
-            var requireUserSelectDefaultValueView = GetSelectDefaultValuesViewOrNullToContinue(model: model);
-            if (requireUserSelectDefaultValueView != null)
-            {
-                return requireUserSelectDefaultValueView;
-            }
+		    var requireUserSelectDefaultValueView = GetSelectDefaultValuesViewOrNullToContinue(model:model);
+		    if (requireUserSelectDefaultValueView != null)
+		    {
+			    return requireUserSelectDefaultValueView;
+		    }
 
             var dataTranslationView = GetDataTranslationViewOrNullToContinue(model);
             if (dataTranslationView != null)
@@ -459,11 +470,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return dataValidationErrorView;
             }
 
-            _importSampleFromFileService.ImportSampleAndCreateAttachment(sampleImportDto: model.SampleImportDto);
-            return View(model:model);
-        }
+			_importSampleFromFileService.ImportSampleAndCreateAttachment(sampleImportDto: model.SampleImportDto);
+			return View(model:model);
+	    }
 
-        public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
+	    public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
         {
             try
             {

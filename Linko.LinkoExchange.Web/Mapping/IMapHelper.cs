@@ -11,5 +11,8 @@ namespace Linko.LinkoExchange.Web.Mapping
         QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto, QuestionAnswerPairViewModel viewModel = null);
         QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto, QuestionViewModel viewModel = null);
         DropdownOptionViewModel ToDropdownOptionViewModel(ListItemDto fromDto);
+	    SampleViewModel ToViewModel(SampleDto sampleDto);
+	    SampleResultViewModel ToViewModel(SampleResultDto sampleResultDto);
+
     }
 }

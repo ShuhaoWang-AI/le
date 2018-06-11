@@ -6,210 +6,210 @@
 @model Linko.LinkoExchange.Web.ViewModels.Industry.SampleImportViewModel
 
 @{
-    ViewBag.Title = "Import Samples";
-    var isStepSelectDataProvider = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource;
-    var isStepSelectFile = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile||
-                           Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation;
-    var isStepSelectDataDefault = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataDefault;
-    var isStepDataTranslations = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataTranslations;
-    var isStepPreview = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput ||
-                        Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation;
-    var isStepImport = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowImportOutput;
+	ViewBag.Title = "Import Samples";
+	var isStepSelectDataProvider = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource;
+	var isStepSelectFile = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile||
+						   Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation;
+	var isStepSelectDataDefault = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataDefault;
+	var isStepDataTranslations = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataTranslations;
+	var isStepPreview = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput ||
+						Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation;
+	var isStepImport = Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowImportOutput;
 }
 
 @using (Html.BeginForm(actionName:"SampleImport", controllerName:"Industry", method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
 {
-    @Html.AntiForgeryToken()
+	@Html.AntiForgeryToken()
 
-    <section>
-        <ol class="breadcrumb">
-            <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
-            </li>
-            <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name:SampleStatusName.Draft.ToString())</a>
-            </li>
-            <li class="active">
-                Import Samples
-            </li>
-        </ol>
-    </section>
+	<section>
+		<ol class="breadcrumb">
+			<li>
+				<a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+			</li>
+			<li>
+				<a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name:SampleStatusName.Draft.ToString())</a>
+			</li>
+			<li class="active">
+				Import Samples
+			</li>
+		</ol>
+	</section>
 
-    @Html.HiddenFor(model => model.CurrentSampleImportStep)
+	@Html.HiddenFor(model => model.CurrentSampleImportStep)
 
-    <div class="stepwizard">
-        <div class="stepwizard-row">
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepSelectDataProvider? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepSelectDataProvider ? "" : "disabled=\"disabled\"" )>1</span>
-                <p><small>Select Data Provider</small></p>
-            </div>
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepSelectFile? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepSelectFile ? "" : "disabled=\"disabled\"" )>2</span>
-                <p><small>Select File</small></p>
-            </div>
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepSelectDataDefault? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepSelectDataDefault ? "" : "disabled=\"disabled\"" )>3</span>
-                <p><small>Select Data Default</small></p>
-            </div>
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepDataTranslations? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepDataTranslations ? "" : "disabled=\"disabled\"" )>4</span>
-                <p><small>Data Translation</small></p>
-            </div>
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepPreview? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepPreview ? "" : "disabled=\"disabled\"" )>5</span>
-                <p><small>Preview</small></p>
-            </div>
-            <div class="stepwizard-step col-xs-2">
-                <span class="btn @( isStepImport? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
-                      @( isStepImport ? "" : "disabled=\"disabled\"" )>6</span>
-                <p><small>Import</small></p>
-            </div>
-        </div>
-    </div>
+	<div class="stepwizard">
+		<div class="stepwizard-row">
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepSelectDataProvider? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepSelectDataProvider ? "" : "disabled=\"disabled\"" )>1</span>
+				<p><small>Select Data Provider</small></p>
+			</div>
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepSelectFile? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepSelectFile ? "" : "disabled=\"disabled\"" )>2</span>
+				<p><small>Select File</small></p>
+			</div>
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepSelectDataDefault? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepSelectDataDefault ? "" : "disabled=\"disabled\"" )>3</span>
+				<p><small>Select Data Default</small></p>
+			</div>
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepDataTranslations? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepDataTranslations ? "" : "disabled=\"disabled\"" )>4</span>
+				<p><small>Data Translation</small></p>
+			</div>
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepPreview? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepPreview ? "" : "disabled=\"disabled\"" )>5</span>
+				<p><small>Preview</small></p>
+			</div>
+			<div class="stepwizard-step col-xs-2">
+				<span class="btn @( isStepImport? "btn-primary" : "btn-default" ) stepwizard-btn-circle"
+					  @( isStepImport ? "" : "disabled=\"disabled\"" )>6</span>
+				<p><small>Import</small></p>
+			</div>
+		</div>
+	</div>
 
-    // SampleImportStep.SelectDataSource
-    <section class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">Select Data Provider</h3>
-            <div class="box-tools pull-right">
-                @if (isStepSelectDataProvider)
-                {
-                    <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
-                        Create New Data Provider
-                    </button>
-                }
-                <button class="btn btn-box-tool" data-widget="collapse">
-                    <i class="fa fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="box-body form-horizontal">
-            @if (isStepSelectDataProvider)
-            {
-                @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, 
-                    htmlAttributes:new { @class = "alert alert-danger" })
+	// SampleImportStep.SelectDataSource
+	<section class="box box-primary">
+		<div class="box-header with-border">
+			<h3 class="box-title">Select Data Provider</h3>
+			<div class="box-tools pull-right">
+				@if (isStepSelectDataProvider)
+				{
+					<button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
+						Create New Data Provider
+					</button>
+				}
+				<button class="btn btn-box-tool" data-widget="collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+		<div class="box-body form-horizontal">
+			@if (isStepSelectDataProvider)
+			{
+				@Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText,
+					htmlAttributes:new { @class = "alert alert-danger" })
 
-                if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
-                {
-                    <div class="alert alert-info">
-                        <h5>
-                            You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
-                        </h5>
-                    </div>
-                }
+				if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+				{
+					<div class="alert alert-info">
+						<h5>
+							You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
+						</h5>
+					</div>
+				}
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes: new { @class = "control-label col-md-2 required" })
-                    <div class="col-md-4">
-                        @Html.HiddenFor(model => model.SelectedDataSourceName)
-                        @Html.DropDownList(name: "SelectedDataSourceId", selectList: Model.StepSelectDataSource.AvailableDataSources,
-                            htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
+				<div class="form-group">
+					@Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes: new { @class = "control-label col-md-2 required" })
+					<div class="col-md-4">
+						@Html.HiddenFor(model => model.SelectedDataSourceName)
+						@Html.DropDownList(name: "SelectedDataSourceId", selectList: Model.StepSelectDataSource.AvailableDataSources,
+							htmlAttributes: new { @class = "form-control" })
+					</div>
+				</div>
 
-                <script>
-                    $(document)
+				<script>
+					$(document)
                         .ready(function() {
-                            $("#LinkoExchangeForm")
+                        	$("#LinkoExchangeForm")
                                 .submit(function() {
-                                    $("#SelectedDataSourceName").val($("#SelectedDataSourceId option:selected").text());
-                                    return true;
+                                	$("#SelectedDataSourceName").val($("#SelectedDataSourceId option:selected").text());
+                                	return true;
                                 });
                         });
-                </script>
+				</script>
 
-                <div class="box-footer">
-                    <div class="form-group pull-right">
-                        <input class="btn btn-primary btn-sm" type="submit" value="Next" />
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.HiddenFor(model => model.SelectedDataSourceId)
-                        @Html.EditorFor(model => model.SelectedDataSourceName, 
-                            additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
+				<div class="box-footer">
+					<div class="form-group pull-right">
+						<input class="btn btn-primary btn-sm" type="submit" value="Next" />
+					</div>
+				</div>
+			}
+			else
+			{
+				<div class="form-group">
+					@Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new { @class = "control-label col-md-2" })
+					<div class="col-md-4">
+						@Html.HiddenFor(model => model.SelectedDataSourceId)
+						@Html.EditorFor(model => model.SelectedDataSourceName,
+							additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+					</div>
+				</div>
+			}
+		</div>
+	</section>
 
-    // SampleImportStep.SelectFile
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataSource)
-    {
-        <section class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Select File</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
+	// SampleImportStep.SelectFile
+	if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataSource)
+	{
+		<section class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Select File</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+			</div>
 
-            <div class="box-body form-horizontal">
-                @Html.HiddenFor(model => model.ImportTempFileId)
-                @Html.HiddenFor(model => model.SelectedFileName)
+			<div class="box-body form-horizontal">
+				@Html.HiddenFor(model => model.ImportTempFileId)
+				@Html.HiddenFor(model => model.SelectedFileName)
 
-                @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
-                {
-                    <div class="alert alert-danger validation-summary-valid" id="validationSummarySelectFile">
-                        <h5>
-                            @Message.ValidationSummaryHeaderText
-                        </h5>
-                        <ul></ul>
-                    </div>
+				@if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+				{
+					<div class="alert alert-danger validation-summary-valid" id="validationSummarySelectFile">
+						<h5>
+							@Message.ValidationSummaryHeaderText
+						</h5>
+						<ul></ul>
+					</div>
 
-                    <div class="alert alert-info">
-                        <h5>
-                            Select an .xlsx file to upload or drag and drop the file into the area below.
-                        </h5>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2"
-                                                                                       })
-                        <div class="col-md-8">
-                            <input id="upload" name="upload" style="width: 100%;" type="file" />
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2"
-                                                                                       })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.SelectedFileName, additionalViewData:new
-                                                                                                {
-                                                                                                    htmlAttributes = new
-                                                                                                                     {
-                                                                                                                         @class = "form-control",
-                                                                                                                         @readonly = "readonly"
-                                                                                                                     }
-                                                                                                })
-                        </div>
-                    </div>
-                }
-            </div>
+					<div class="alert alert-info">
+						<h5>
+							Select an .xlsx file to upload or drag and drop the file into the area below.
+						</h5>
+					</div>
+					<div class="form-group">
+						@Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
+				   {
+					   @class = "control-label col-md-2"
+				   })
+						<div class="col-md-8">
+							<input id="upload" name="upload" style="width: 100%;" type="file" />
+						</div>
+					</div>
+				}
+				else
+				{
+					<div class="form-group">
+						@Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
+				   {
+					   @class = "control-label col-md-2"
+				   })
+						<div class="col-md-4">
+							@Html.EditorFor(model => model.SelectedFileName, additionalViewData:new
+					   {
+						   htmlAttributes = new
+						   {
+							   @class = "form-control",
+							   @readonly = "readonly"
+						   }
+					   })
+						</div>
+					</div>
+				}
+			</div>
 
-            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
-            {
-                @Scripts.Render(paths:"~/bundles/jqueryval")
+			@if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+			{
+				@Scripts.Render(paths:"~/bundles/jqueryval")
 
-                <script>
+				<script>
                     var allowedFileExtensions = [".xlsx"];
 
                     $("#upload")
@@ -267,10 +267,10 @@
                     function onFileUploadProgress(e) {
                         console.log("Upload progress :: " + e.percentComplete + "% :: ");
                     }
-                </script>
-            }
-        </section>
-    }
+				</script>
+			}
+		</section>
+	}
 
     // SampleImportStep.FileValidation
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
@@ -320,254 +320,254 @@
         </section>
     }
 
-    //SampleImportStep.SelectDataDefault
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.FileValidation)
-    {
-        <section class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Select Data Default</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="box-body form-horizontal">
-                @if (isStepSelectDataDefault)
-                {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText,
-                        htmlAttributes: new { @class = "alert alert-danger" })
+	//SampleImportStep.SelectDataDefault
+	if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.FileValidation)
+	{
+		<section class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Select Data Default</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="box-body form-horizontal">
+				@if (isStepSelectDataDefault)
+				{
+					@Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText,
+						htmlAttributes: new { @class = "alert alert-danger" })
 
-                    var requiredDefaultMonitoringPoint = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.MonitoringPoint);
-                    var requiredDefaultCollectionMethod = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.CollectionMethod);
-                    var requiredDefaultSampleType = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.SampleType);
-                    if (requiredDefaultMonitoringPoint != null)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
-                                @Html.DropDownList(name: "SelectedDefaultMonitoringPointId", 
-                                    selectList: new SelectList(items:requiredDefaultMonitoringPoint.Options, dataValueField:"Id", dataTextField:"DisplayValue"),
-                                    htmlAttributes: new { @class = "form-control" })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
-                        @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
-                    }
-                    if (requiredDefaultCollectionMethod != null)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
-                                @Html.DropDownList(name: "SelectedDefaultCollectionMethodId",
-                                    selectList: new SelectList(items:requiredDefaultCollectionMethod.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
-                                    htmlAttributes: new { @class = "form-control" })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
-                        @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
-                    }
-                    if (requiredDefaultSampleType != null)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
-                                @Html.DropDownList(name: "SelectedDefaultSampleTypeId",
-                                    selectList: new SelectList(items: requiredDefaultSampleType.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
-                                    htmlAttributes: new { @class = "form-control" })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
-                        @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
-                    }
+					var requiredDefaultMonitoringPoint = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.MonitoringPoint);
+					var requiredDefaultCollectionMethod = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.CollectionMethod);
+					var requiredDefaultSampleType = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.SampleType);
+					if (requiredDefaultMonitoringPoint != null)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
+								@Html.DropDownList(name: "SelectedDefaultMonitoringPointId",
+									selectList: new SelectList(items:requiredDefaultMonitoringPoint.Options, dataValueField:"Id", dataTextField:"DisplayValue"),
+									htmlAttributes: new { @class = "form-control" })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
+						@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
+					}
+					if (requiredDefaultCollectionMethod != null)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
+								@Html.DropDownList(name: "SelectedDefaultCollectionMethodId",
+									selectList: new SelectList(items:requiredDefaultCollectionMethod.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
+									htmlAttributes: new { @class = "form-control" })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
+						@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
+					}
+					if (requiredDefaultSampleType != null)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
+								@Html.DropDownList(name: "SelectedDefaultSampleTypeId",
+									selectList: new SelectList(items: requiredDefaultSampleType.Options, dataValueField: "Id", dataTextField: "DisplayValue"),
+									htmlAttributes: new { @class = "form-control" })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
+						@Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
+					}
 
-                    <script>
-                        $(document)
+					<script>
+						$(document)
                             .ready(function() {
-                                $("#LinkoExchangeForm")
+                            	$("#LinkoExchangeForm")
                                     .submit(function() {
-                                        var defaultMonitoringPoitnNameFromDropdown = $("#SelectedDefaultMonitoringPointId option:selected").text();
-                                        if (defaultMonitoringPoitnNameFromDropdown) {
-                                            $("#SelectedDefaultMonitoringPointName").val(defaultMonitoringPoitnNameFromDropdown);
-                                        }
-                                        var defaultCollectionMethodNameFromDropdown = $("#SelectedDefaultCollectionMethodId option:selected").text();
-                                        if (defaultCollectionMethodNameFromDropdown) {
-                                            $("#SelectedDefaultCollectionMethodName").val(defaultCollectionMethodNameFromDropdown);
-                                        }
-                                        var defaultCollectionSampleTypeFromDropdown = $("#SelectedDefaultSampleTypeId option:selected").text();
-                                        if (defaultCollectionSampleTypeFromDropdown) {
-                                            $("#SelectedDefaultSampleTypeName").val(defaultCollectionSampleTypeFromDropdown);
-                                        }
-                                        return true;
+                                    	var defaultMonitoringPoitnNameFromDropdown = $("#SelectedDefaultMonitoringPointId option:selected").text();
+                                    	if (defaultMonitoringPoitnNameFromDropdown) {
+                                    		$("#SelectedDefaultMonitoringPointName").val(defaultMonitoringPoitnNameFromDropdown);
+                                    	}
+                                    	var defaultCollectionMethodNameFromDropdown = $("#SelectedDefaultCollectionMethodId option:selected").text();
+                                    	if (defaultCollectionMethodNameFromDropdown) {
+                                    		$("#SelectedDefaultCollectionMethodName").val(defaultCollectionMethodNameFromDropdown);
+                                    	}
+                                    	var defaultCollectionSampleTypeFromDropdown = $("#SelectedDefaultSampleTypeId option:selected").text();
+                                    	if (defaultCollectionSampleTypeFromDropdown) {
+                                    		$("#SelectedDefaultSampleTypeName").val(defaultCollectionSampleTypeFromDropdown);
+                                    	}
+                                    	return true;
                                     });
                             });
-                    </script>
-                    <div class="box-footer">
-                        <div class="form-group pull-right">
-                            <input class="btn btn-primary btn-sm" type="submit" value="Next" />
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
-                    {
-                        <div class="alert-light" role="alert">
-                            Not Applicable. No empty recommended fields require Default Value from the import file.
-                        </div>
-                    }
+					</script>
+					<div class="box-footer">
+						<div class="form-group pull-right">
+							<input class="btn btn-primary btn-sm" type="submit" value="Next" />
+						</div>
+					</div>
+				}
+				else
+				{
+					if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
+					{
+						<div class="alert-light" role="alert">
+							Not Applicable. No empty recommended fields require Default Value from the import file.
+						</div>
+					}
 
-                    if (Model.SelectedDefaultMonitoringPointId > 0)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
-                                @Html.EditorFor(model => model.SelectedDefaultMonitoringPointName, 
-                                    additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
-                        @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
-                    }
-                    if (Model.SelectedDefaultCollectionMethodId > 0)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
-                                @Html.EditorFor(model => model.SelectedDefaultCollectionMethodName, 
-                                    additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
-                        @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
-                    }
-                    if (Model.SelectedDefaultSampleTypeId > 0)
-                    {
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
-                            <div class="col-md-4">
-                                @Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
-                                @Html.EditorFor(model => model.SelectedDefaultSampleTypeName,
-                                    additionalViewData: new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
-                        @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
-                    }
-                }
-            </div>
-        </section>
-    }
+					if (Model.SelectedDefaultMonitoringPointId > 0)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
+								@Html.EditorFor(model => model.SelectedDefaultMonitoringPointName,
+									additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointId)
+						@Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
+					}
+					if (Model.SelectedDefaultCollectionMethodId > 0)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
+								@Html.EditorFor(model => model.SelectedDefaultCollectionMethodName,
+									additionalViewData:new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodId)
+						@Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
+					}
+					if (Model.SelectedDefaultSampleTypeId > 0)
+					{
+						<div class="form-group">
+							@Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-4">
+								@Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
+								@Html.EditorFor(model => model.SelectedDefaultSampleTypeName,
+									additionalViewData: new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+							</div>
+						</div>
+					}
+					else
+					{
+						@Html.HiddenFor(model => model.SelectedDefaultSampleTypeId)
+						@Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
+					}
+				}
+			</div>
+		</section>
+	}
 
-    //SampleImportStep.DataTranslation
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataDefault)
-    {
-        <section class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Data Translation</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="box-body form-horizontal">
-                @if (isStepDataTranslations)
-                {
-                    @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
-                        htmlAttributes:new {@class = "alert alert-danger", @id= "validationSummaryDataTranslations" })
+	//SampleImportStep.DataTranslation
+	if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataDefault)
+	{
+		<section class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Data Translation</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="box-body form-horizontal">
+				@if (isStepDataTranslations)
+				{
+					@Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
+						htmlAttributes:new {@class = "alert alert-danger", @id= "validationSummaryDataTranslations" })
 
-                    <div class="alert alert-info">
-                        <h5>
-                            There is data in the file we don't recognize.  Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
-                        </h5>
-                        <h5>
-                            The following Import file term(s) must be translated to LinkoExchange term(s) before proceed to next step.
-                        </h5>
-                    </div>
+					<div class="alert alert-info">
+						<h5>
+							There is data in the file we don't recognize.  Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
+						</h5>
+						<h5>
+							The following Import file term(s) must be translated to LinkoExchange term(s) before proceed to next step.
+						</h5>
+					</div>
 
-                    <h4>@(Model.MissingTranslation.Title)</h4>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                        @(Html.Kendo().Grid<DataSourceTranslationViewModel>(dataSource:Model.MissingTranslation.MisstingTranslations)
-                              .Name(componentName: "gridMissingTranslation")
-                              .Columns(columns =>
-                              {
-                                  columns.Bound(c => c.DataSourceTerm)
-                                         .HtmlAttributes(attributes: new { @class = "col-sm-2" })
-                                         .HeaderHtmlAttributes(attributes: new { @class = "col-sm-2" });
-                                  columns.Bound(c => c.TranslatedItem)
-                                         .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
-                                         .HtmlAttributes(attributes: new { @class = "col-sm-4" })
-                                         .HeaderHtmlAttributes(attributes: new { @class = "col-sm-4" });
-                                  columns.Command(command => { command.Edit().UpdateText("Save"); });
-                              })
-                              .Editable(editable => editable.Mode(GridEditMode.InLine))
-                              .Pageable(pager => pager.Enabled(value:false))
-                              .Scrollable(s => s.Enabled(value: false))
-                              .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
-                              .Resizable(resizable => resizable.Columns(value: true))
-                              .NoRecords(text: "No translation requried.")
-                              .DataSource(dataSource =>
-                                          dataSource.Ajax()
-                                                    .ServerOperation(enabled: false)
-                                                    .Batch(enabled: false)
-                                                    .Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
-                                                    .PageSize(pageSize: 100)
-                                                    .Update(update => update.Action(actionName: "SampleImportAddMissingTranslation", controllerName: "Industry"))
-                                                    .Model(model =>
-                                                    {
-                                                        model.Id(p => p.DataSourceTerm);
-                                                        model.Field(p => p.DataSourceTerm).Editable(enabled: false);
-                                                        model.Field(p => p.Id).Editable(enabled: false);
-                                                        model.Field(p => p.DataSourceId).Editable(enabled: false);
-                                                        model.Field(p => p.TranslationType).Editable(enabled: false);
-                                                        model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultLinkoExchangeTerm"] as DropdownOptionViewModel);
-                                                    })
-                            ))
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert-light" role="alert">
-                        Not Applicable. No new Data Translation is not implemented yet
-                    </div>
-                }
-            </div>
-            @if (isStepDataTranslations)
-            {
-                <div class="box-footer">
-                    <div class="form-group pull-right">
-                        <input class="btn btn-primary btn-sm" type="submit" value="Next" />
-                    </div>
-                </div>
-            }
-        </section>
-    }
+					<h4>@(Model.MissingTranslation.Title)</h4>
+					<div class="form-group">
+						<div class="col-md-12">
+							@(Html.Kendo().Grid<DataSourceTranslationViewModel>(dataSource:Model.MissingTranslation.MisstingTranslations)
+							  .Name(componentName: "gridMissingTranslation")
+							  .Columns(columns =>
+							  {
+								  columns.Bound(c => c.DataSourceTerm)
+										 .HtmlAttributes(attributes: new { @class = "col-sm-2" })
+										 .HeaderHtmlAttributes(attributes: new { @class = "col-sm-2" });
+								  columns.Bound(c => c.TranslatedItem)
+										 .ClientTemplate(value: "#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
+										 .HtmlAttributes(attributes: new { @class = "col-sm-4" })
+										 .HeaderHtmlAttributes(attributes: new { @class = "col-sm-4" });
+								  columns.Command(command => { command.Edit().UpdateText("Save"); });
+							  })
+							  .Editable(editable => editable.Mode(GridEditMode.InLine))
+							  .Pageable(pager => pager.Enabled(value:false))
+							  .Scrollable(s => s.Enabled(value: false))
+							  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+							  .Resizable(resizable => resizable.Columns(value: true))
+							  .NoRecords(text: "No translation requried.")
+							  .DataSource(dataSource =>
+										  dataSource.Ajax()
+													.ServerOperation(enabled: false)
+													.Batch(enabled: false)
+													.Sort(sort => { sort.Add(memberName: "DataSourceTerm").Ascending(); })
+													.PageSize(pageSize: 100)
+													.Update(update => update.Action(actionName: "SampleImportAddMissingTranslation", controllerName: "Industry"))
+													.Model(model =>
+													{
+														model.Id(p => p.DataSourceTerm);
+														model.Field(p => p.DataSourceTerm).Editable(enabled: false);
+														model.Field(p => p.Id).Editable(enabled: false);
+														model.Field(p => p.DataSourceId).Editable(enabled: false);
+														model.Field(p => p.TranslationType).Editable(enabled: false);
+														model.Field(p => p.TranslatedItem).DefaultValue(ViewData[key: "defaultLinkoExchangeTerm"] as DropdownOptionViewModel);
+													})
+							))
+						</div>
+					</div>
+				}
+				else
+				{
+					<div class="alert-light" role="alert">
+						Not Applicable. No new Data Translation is not implemented yet
+					</div>
+				}
+			</div>
+			@if (isStepDataTranslations)
+			{
+				<div class="box-footer">
+					<div class="form-group pull-right">
+						<input class="btn btn-primary btn-sm" type="submit" value="Next" />
+					</div>
+				</div>
+			}
+		</section>
+	}
 
     // SampleImportStep.DataValidation
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation)
@@ -613,131 +613,274 @@
         </section>
     }
 
-    // SampleImportStep.ShowPreImportOutput
-    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput)
-    {
-        var rowCount = Model.SampleImportDto.Rows.Count;
-        <section class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Preview Import</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="box-body form-horizontal">
-                <div class="alert alert-info">
-                    <h5>
-                        Sample file is ready to import
-                    </h5>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="box box-group box-solid" style="padding: 0 0 0 10px;">
-                            <div class="box-header">
-                                <button class="btn btn-box-tool" data-widget="collapse">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                                &nbsp;
-                                <h3 class="box-title">Preview Summary </h3>
-                            </div>
-                            <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
-                                @(rowCount) sample result(s) are ready to import. <br /> <br />
+	// SampleImportStep.ShowPreImportOutput
+	if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput)
+	{
+		var rowCount = Model.SampleImportDto.Rows.Count;
+		<section class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Preview Import</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="box-body form-horizontal">
+				<div class="alert alert-info">
+					<h5>
+						Sample file is ready to import
+					</h5>
+				</div>
+				<div class="form-group">
+					<div class="col-md-12">
+						<div class="box box-group box-solid" style="padding: 0 0 0 10px;">
+							&nbsp;
+							<h3 class="box-title">Preview Summary </h3>
+							<div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
+								@(rowCount) sample result(s) are ready to import. <br /> <br />
 
-                                @if (Model.SampleImportDto.SampleDtos != null)
-                                {
-                                    var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
+								@if (Model.SampleImportDto.SampleDtos != null)
+								{
+									var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
 
-                                    if (newSampleAddCount > 0)
-                                    {
-                                        <span>@newSampleAddCount new draft sample(s) are ready to create. <br /></span>
-                                    }
+									if (newSampleAddCount > 0)
+									{
+										<span>@newSampleAddCount new draft sample(s) are ready to create. <br /></span>
+									}
 
-                                    var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
+									var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
 
-                                    if (existingSampleUpdateCount > 0)
-                                    {
-                                        <span>@existingSampleUpdateCount existing draft sample(s) are ready to update. <br /></span>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <script>
-                    $(document)
+									if (existingSampleUpdateCount > 0)
+									{
+										<span>@existingSampleUpdateCount existing draft sample(s) are ready to update. <br /></span>
+									}
+
+									<!-- sample results preview -->
+									<br />
+									<h4 class="box-title">Import Sample Preview </h4>
+									@(Html.Kendo().Grid(dataSource:Model.Samples)
+										  .Name(componentName: "gridImportSamplesPreview")
+										  .Columns(columns =>
+										  {
+											  columns.Bound(c => c.SampleOverallCompliance)
+													 .ClientTemplate(
+																	 value: "# if (SampleOverallCompliance == 'Bad') { #" +
+																		   "<i class='fa fa-lg fa-exclamation-circle' style='color:red' " +
+																		   "# } else { #" +
+																		   "<i class='fa fa-lg fa-check-circle' style='color:green' " +
+																		   "# } #" +
+																		   "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
+												  )
+													 .HtmlAttributes(attributes: new
+													 {
+														 align = "center"
+													 })
+													 .Filterable(f => f.Enabled(value: false))
+													 .Width(pixelWidth: 40);
+											  columns.Bound(c => c.MonitoringPointName)
+													 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+																							 .SuggestionOperator(filterType: FilterType.Contains)));
+											  columns.Bound(c => c.CtsEventTypeName)
+													 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+																							 .SuggestionOperator(filterType: FilterType.Contains)));
+											  columns.Bound(c => c.CollectionMethodName)
+													 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+																							 .SuggestionOperator(filterType: FilterType.Contains)));
+											  columns.Bound(c => c.StartDateTimeLocal)
+													 .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+													 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+											  columns.Bound(c => c.EndDateTimeLocal)
+													 .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+													 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+											  columns.Bound(c => c.LabSampleIdentifier)
+													 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+																							 .SuggestionOperator(filterType: FilterType.Contains)));
+
+											  columns.Bound(c => c.FlowValueAndFlow)
+													 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+																							 .SuggestionOperator(filterType: FilterType.Contains)));
+										  })
+										  .Pageable(pageable => pageable
+																	.PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
+																	.Refresh(enabled: true)
+																	.Input(enabled: true)
+																	.Numeric(enabled: false)
+										  )
+										  .ClientDetailTemplateId(id: "template")
+										  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+
+										  // .Filterable(filterable => { filterable.Enabled(value: true).Mode(value: GridFilterMode.Row); })
+										  .Resizable(resizable => resizable.Columns(value: true))
+										  .Scrollable(s => s.Height(value: "auto"))
+										  .NoRecords(text: "No sample exists.")
+										  .Events(e =>
+										  {
+											  e.DetailInit("detailInit");
+										  })
+										  .DataSource(dataSource => dataSource
+																		.Ajax()
+																		.PageSize(pageSize: 15)
+																		.Sort(sort =>
+																		{
+																			sort.Add(memberName: "StartDateTimeLocal").Ascending();
+																			sort.Add(memberName: "MonitoringPointName").Ascending();
+																			sort.Add(memberName: "CollectionMethodName").Ascending();
+																		})
+																		.Group(g => g.Add(c => c.Status))
+																		.ServerOperation(enabled: false)
+										  ))
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<script>
+
+					function detailInit(e) {
+
+						var sampleIdentifier = e.data.Identifier;
+						console.log(sampleIdentifier); 
+						var gridId = "gridSampleResult" + sampleIdentifier;
+						$("#gridSampleResult").attr("id", gridId);
+					
+						var sampleResult = e.data.SampleResults.map(function(item) {
+							item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
+							return item;
+						});
+						var sampleResultGrid = $("#" + gridId).data("kendoGrid");
+					
+						sampleResultGrid.dataSource.data(sampleResult); 
+					  }
+
+					$(document)
                         .ready(function() {
-                            $("#LinkoExchangeForm")
+                        	$("#LinkoExchangeForm")
                                 .submit(function() {
-                                    $("#CurrentSampleImportStep").val(@((int)SampleImportViewModel.SampleImportStep.ShowImportOutput));
-                                    return true;
+                                	$("#CurrentSampleImportStep").val(@((int)SampleImportViewModel.SampleImportStep.ShowImportOutput));
+                                	return true;
                                 });
                         });
-                </script>
-                <div class="box-footer">
-                    <div class="form-group pull-right">
-                        
-                        <input class="btn btn-primary btn-sm" type="submit" value="Import" />
-                    </div>
-                </div>
-            </div>
-        </section>
-    }
+				</script>
+				<div class="box-footer">
+					<div class="form-group pull-right">
 
-    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowImportOutput)
-    {
-        // SampleImportStep.ShowImportOutput
-        <section class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Data Imported</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="box-body form-horizontal">
-                <div class="alert alert-success">
-                    <h5>
-                        Samples imported successfully!
-                    </h5>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="box box-group box-solid" style="padding: 0 0 0 10px;">
-                            <div class="box-header">
-                                <button class="btn btn-box-tool" data-widget="collapse">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                                &nbsp;
-                                <h3 class="box-title">Import Summary </h3>
-                            </div>
-                            <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
-                                @Model.SampleImportDto.Rows.Count sample result(s) imported. <br /> <br />
+						<input class="btn btn-primary btn-sm" type="submit" value="Import" />
+					</div>
+				</div>
+			</div>
+		</section>
+	}
 
-                                @if (Model.SampleImportDto.SampleDtos != null)
-                                {
-                                    var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
+	if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowImportOutput)
+	{
+		// SampleImportStep.ShowImportOutput
+		<section class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title">Data Imported</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="box-body form-horizontal">
+				<div class="alert alert-success">
+					<h5>
+						Samples imported successfully!
+					</h5>
+				</div>
+				<div class="form-group">
+					<div class="col-md-12">
+						<div class="box box-group box-solid" style="padding: 0 0 0 10px;">
+							<div class="box-header">
+								<button class="btn btn-box-tool" data-widget="collapse">
+									<i class="fa fa-minus"></i>
+								</button>
+								&nbsp;
+								<h3 class="box-title">Import Summary </h3>
+							</div>
+							<div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
+								@Model.SampleImportDto.Rows.Count sample result(s) imported. <br /> <br />
 
-                                    if (newSampleAddCount > 0)
-                                    {
-                                        <span>@newSampleAddCount new draft sample(s) created. <br /></span>
-                                    }
+								@if (Model.SampleImportDto.SampleDtos != null)
+								{
+									var newSampleAddCount = Model.SampleImportDto.SampleDtos.Count(x => !x.SampleId.HasValue);
 
-                                    var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
+									if (newSampleAddCount > 0)
+									{
+										<span>@newSampleAddCount new draft sample(s) created. <br /></span>
+									}
 
-                                    if (existingSampleUpdateCount > 0)
-                                    {
-                                        <span>@existingSampleUpdateCount existing draft sample(s) updated. <br /></span>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    }
+									var existingSampleUpdateCount = Model.SampleImportDto.SampleDtos.Count(x => x.SampleId.HasValue);
+
+									if (existingSampleUpdateCount > 0)
+									{
+										<span>@existingSampleUpdateCount existing draft sample(s) updated. <br /></span>
+									}
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	}
 }
+
+<script id="template" type="text/kendo-tmpl">
+
+	@(Html.Kendo().Grid<SampleResultViewModel>()
+		  .Name(componentName: "gridSampleResult")
+		  .Columns(columns =>
+		  {
+			  columns.Bound(c => c.ParameterName);
+			  columns.Bound(c => c.Value)
+					 .HtmlAttributes(attributes: new { align = "right" })
+					 .ClientTemplate(value: "\\#=Value\\#&nbsp;&nbsp;<i "
+										   + "\\#if(ConcentrationResultCompliance==\"Good\") { \\#"
+										   + "class='fa fa-lg fa-check-circle' style='color:green' "
+										   + "\\# } else if(ConcentrationResultCompliance==\"Unknown\") { \\#"
+										   + "class='fa fa-lg fa-circle' style='color:green' "
+										   + "\\# } else if(ConcentrationResultCompliance==\"Bad\") { \\#"
+										   + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
+										   + "\\# } \\#"
+										   + "aria-hidden='true' data-placement='top' "
+										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
+
+			  columns.Bound(c => c.MassLoadingValue)
+					 .HtmlAttributes(attributes: new { align = "right" })
+					 .ClientTemplate(value:
+						 "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
+						 + "\\# } else { \\#"
+						 + "\\#=MassLoadingValue\\#&nbsp;&nbsp;<i "
+						 + "\\#if(MassResultCompliance==\"Good\") { \\#"
+						 + "class='fa fa-lg fa-check-circle' style='color:green' "
+						 + "\\# } else if(MassResultCompliance==\"Unknown\") { \\#"
+						 + "class='fa fa-lg fa-circle' style='color:green' "
+						 + "\\# } else if(MassResultCompliance==\"Bad\") { \\#"
+						 + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
+						 + "\\# } \\#"
+						 + "aria-hidden='true' data-placement='top' "
+						 + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
+						 + "\\# } \\#");
+
+			  columns.Bound(c => c.AnalysisMethod);
+			  columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes: new { align = "right" });
+			  columns.Bound(c => c.AnalysisDateTimeLocal)
+					 .ClientTemplate(value: "\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.parseDate(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
+		  })
+		  .Pageable()
+		  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+		  .Scrollable(s => s.Height(value: "auto"))
+		  .NoRecords(text: "No sample result exists.")
+
+		  .DataSource(dataSource => dataSource
+			  .Ajax()
+		   .ServerOperation(enabled: false)
+		  )
+		  .ToClientTemplate()
+	)
+
+</script>
