@@ -147,33 +147,31 @@ namespace Linko.LinkoExchange.Web.Mapping
 	    {
 		    if (sampleResultDto == null)
 		    {
-			    return null; 
+			    return null;
 		    }
 
 		    var sampleResult = new SampleResultViewModel
 		                       {
-			                      ParameterId = sampleResultDto.ParameterId,
-								  ParameterName = sampleResultDto.ParameterName, 
-								  Qualifier = sampleResultDto.Qualifier,
-								  Value = sampleResultDto.EnteredValue,
-								  UnitId = sampleResultDto.UnitId,
-								  UnitName = sampleResultDto.UnitName,
-								  EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
-								  AnalysisMethod = sampleResultDto.AnalysisMethod,
-								  AnalysisDateTimeLocal = sampleResultDto.AnalysisDateTimeLocal, 
-								  ConcentrationResultCompliance = sampleResultDto.ConcentrationResultCompliance.ToString(),
-								  ConcentrationResultComplianceComment = sampleResultDto.ConcentrationResultComplianceComment,
+			                       Id = sampleResultDto.SampleResultId,
+			                       ParameterId = sampleResultDto.ParameterId,
+			                       ParameterName = sampleResultDto.ParameterName,
+			                       Qualifier = sampleResultDto.Qualifier,
+			                       Value = sampleResultDto.EnteredValue,
+			                       UnitId = sampleResultDto.UnitId,
+			                       UnitName = sampleResultDto.UnitName,
+			                       EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
+			                       AnalysisMethod = sampleResultDto.AnalysisMethod,
+			                       AnalysisDateTimeLocal = sampleResultDto.AnalysisDateTimeLocal,
+			                       ConcentrationResultCompliance = sampleResultDto.ConcentrationResultCompliance.ToString(),
+			                       ConcentrationResultComplianceComment = sampleResultDto.ConcentrationResultComplianceComment,
 
-								  MassLoadingQualifier = sampleResultDto.MassLoadingQualifier, 
-								  MassLoadingUnitId = sampleResultDto.MassLoadingUnitId, 
-								  MassLoadingValue = sampleResultDto.MassLoadingValue, 
-								  MassLoadingUnitName = sampleResultDto.MassLoadingUnitName,
-								  MassLoadingSampleResultId = sampleResultDto.MassLoadingSampleResultId,
-								  MassResultCompliance = sampleResultDto.MassResultCompliance.ToString(),
-								  MassResultComplianceComment = sampleResultDto.MassResultComplianceComment,
-								  
-
-
+			                       MassLoadingQualifier = sampleResultDto.MassLoadingQualifier,
+			                       MassLoadingUnitId = sampleResultDto.MassLoadingUnitId,
+			                       MassLoadingValue = sampleResultDto.MassLoadingValue,
+			                       MassLoadingUnitName = sampleResultDto.MassLoadingUnitName,
+			                       MassLoadingSampleResultId = sampleResultDto.MassLoadingSampleResultId,
+			                       MassResultCompliance = sampleResultDto.MassResultCompliance.ToString(),
+			                       MassResultComplianceComment = sampleResultDto.MassResultComplianceComment,
 		                       };
 		    return sampleResult;
 	    }

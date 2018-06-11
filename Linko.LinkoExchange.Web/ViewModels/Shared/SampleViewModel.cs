@@ -79,7 +79,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 	    [Display(Name = "Flow")]
 	    public string FlowValueAndFlow => string.IsNullOrWhiteSpace(FlowValue) ? "" : $"{FlowValue} {FlowUnitName}";
 
-	    public string Status => Id.HasValue ? SampleStatus.Updated.ToString() : SampleStatus.New.ToString();
+		[Display(Name = "Import Status")]
+		public string Status => Id.HasValue ? ImportStatus.Updated.ToString() : ImportStatus.New.ToString();
 
 	    public IList<SelectListItem> AvailableFlowUnits
         {
@@ -139,8 +140,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 		public string Identifier { get; set; }
         #endregion
     }
-	
-	public enum SampleStatus
+
+
+	public enum ImportStatus
 	{
 		New,
 		Updated

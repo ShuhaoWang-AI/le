@@ -60,9 +60,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string ConcentrationResultComplianceComment { get; set; }
         public string MassResultCompliance { get; set; }
         public string MassResultComplianceComment { get; set; }
-
-        #endregion
-    }
+		
+		public string Status => Id.HasValue ? ImportStatus.Updated.ToString() : ImportStatus.New.ToString();
+		#endregion
+	}
 
     public class SampleResultViewModelValidator : AbstractValidator<SampleResultViewModel> { }
 }

@@ -737,8 +737,7 @@
 
 					function detailInit(e) {
 
-						var sampleIdentifier = e.data.Identifier;
-						console.log(sampleIdentifier); 
+						var sampleIdentifier = e.data.Identifier; 
 						var gridId = "gridSampleResult" + sampleIdentifier;
 						$("#gridSampleResult").attr("id", gridId);
 					
@@ -746,6 +745,11 @@
 							item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
 							return item;
 						});
+
+						sampleResult = sampleResult.sort(function(a, b) {
+							return a.Status > b.Status;
+						});
+						
 						var sampleResultGrid = $("#" + gridId).data("kendoGrid");
 					
 						sampleResultGrid.dataSource.data(sampleResult); 
@@ -833,6 +837,7 @@
 		  .Columns(columns =>
 		  {
 			  columns.Bound(c => c.ParameterName);
+			  columns.Bound(c => c.Status);
 			  columns.Bound(c => c.Value)
 					 .HtmlAttributes(attributes: new { align = "right" })
 					 .ClientTemplate(value: "\\#=Value\\#&nbsp;&nbsp;<i "
