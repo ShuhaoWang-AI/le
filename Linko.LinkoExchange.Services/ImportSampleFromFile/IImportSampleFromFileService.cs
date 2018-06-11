@@ -28,14 +28,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         void RemoveImportTempFile(int importTempFileId);
 
         /// <summary>
-        /// Get Telerik.Windows.Documents.Spreadsheet.Model.Workbook from importTempFileDto
-        /// </summary>
-        /// <param name="importTempFileDto"> </param>
-        /// <param name="isAuthorizationRequired"> If need to check user have access to the file or not then pass true, otherwise default value is false </param>
-        /// <returns> </returns>
-        Workbook GetWorkbook(ImportTempFileDto importTempFileDto, bool isAuthorizationRequired = false);
-
-        /// <summary>
         /// Checks file is valid to import or not
         /// </summary>
         /// <param name="dataSourceId"> </param>

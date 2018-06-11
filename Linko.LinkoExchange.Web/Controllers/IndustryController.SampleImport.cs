@@ -11,6 +11,7 @@ using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.Extensions;
@@ -27,59 +28,33 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/Import")]
         public ActionResult SampleImport()
         {
-            var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var viewModel = new SampleImportViewModel
                             {
                                 CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource
                             };
             try
             {
-                ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
-
-                var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId:currentOrganizationRegulatoryProgramId);
-
+                var dataSources = GetDataSourcesAndUpdateStepSelectDataSourceAvailableDataSources(viewModel:viewModel);
                 var selectedDataSourceId = GetQueryParameterValueAsInt(parameterName:QueryParameters.DataProviderId);
                 if (selectedDataSourceId.HasValue)
                 {
                     var selectedDataSource = dataSources.Find(x => x.DataSourceId == selectedDataSourceId);
                     if (selectedDataSource == null)
                     {
-                        throw new BadRequest(message:$"The Data Source {selectedDataSourceId} does not exist");
+                        throw new BadRequest(message:ErrorConstants.SampleImport.DataProviderDoesNotExist);
                     }
 
                     viewModel.SelectedDataSourceId = (int) selectedDataSourceId;
                     viewModel.SelectedDataSourceName = selectedDataSource.Name;
+                    ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
                     viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
                 }
                 else if (dataSources.Count == 1 && dataSources[index:0].DataSourceId.HasValue)
                 {
                     viewModel.SelectedDataSourceId = (int) dataSources[index:0].DataSourceId;
                     viewModel.SelectedDataSourceName = dataSources[index:0].Name;
+                    ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
                     viewModel.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
-                }
-
-                if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
-                {
-                    viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
-                                                     {
-                                                         AvailableDataSources = dataSources.Select(x => new SelectListItem
-                                                                                                        {
-                                                                                                            Text = x.Name,
-                                                                                                            Value = x.DataSourceId.ToString(),
-                                                                                                            Selected =
-                                                                                                                x.DataSourceId.ToString()
-                                                                                                                 .Equals(value:viewModel
-                                                                                                                               .SelectedDataSourceId
-                                                                                                                               .ToString())
-                                                                                                        }).ToList(),
-                                                         AvailableDataProviders = dataSources.Select(x => new ListItemDto
-                                                                                                          {
-                                                                                                              DisplayValue = x.Name,
-                                                                                                              // ReSharper disable once PossibleInvalidOperationException
-                                                                                                              Id = (int) x.DataSourceId
-                                                                                                          }).ToList()
-                                                     };
-                    viewModel.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Provider", Value = "0", Disabled = true});
                 }
             }
             catch (RuleViolationException rve)
@@ -88,6 +63,36 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return View(model:viewModel);
+        }
+
+        private List<DataSourceDto> GetDataSourcesAndUpdateStepSelectDataSourceAvailableDataSources(SampleImportViewModel viewModel)
+        {
+            var currentOrganizationRegulatoryProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var dataSources = _dataSourceService.GetDataSources(organizationRegulatoryProgramId: currentOrganizationRegulatoryProgramId);
+            if (viewModel.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataSource)
+            {
+                viewModel.StepSelectDataSource = new StepSelectDataSourceViewModel
+                                                 {
+                                                     AvailableDataSources = dataSources.Select(x => new SelectListItem
+                                                                                                    {
+                                                                                                        Text = x.Name,
+                                                                                                        Value = x.DataSourceId.ToString(),
+                                                                                                        Selected =
+                                                                                                            x.DataSourceId.ToString()
+                                                                                                             .Equals(value: viewModel
+                                                                                                                            .SelectedDataSourceId
+                                                                                                                            .ToString())
+                                                                                                    }).ToList(),
+                                                     AvailableDataProviders = dataSources.Select(x => new ListItemDto
+                                                                                                      {
+                                                                                                          DisplayValue = x.Name,
+                                                                                                          // ReSharper disable once PossibleInvalidOperationException
+                                                                                                          Id = (int)x.DataSourceId
+                                                                                                      }).ToList()
+                                                 };
+                viewModel.StepSelectDataSource.AvailableDataSources.Insert(index: 0, item: new SelectListItem { Text = @"Select Data Provider", Value = "0", Disabled = true });
+            }
+            return dataSources;
         }
 
         private static string ToJson(dynamic value)
@@ -215,7 +220,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!model.ImportTempFileId.HasValue)
             {
-                throw new BadRequest(message:SampleImportViewModelValidator.CannotFileImportFile);
+                throw new BadRequest(message:ErrorConstants.SampleImport.CannotFindImportFile);
             }
             if (model.SampleImportDto == null)
             {

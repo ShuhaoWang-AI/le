@@ -1,0 +1,69 @@
+﻿// ReSharper disable ClassNeverInstantiated.Global
+
+namespace Linko.LinkoExchange.Services.Base
+{
+    public static class ErrorConstants
+    {
+        public class Validator
+        {
+            #region static fields and constants
+
+            public const string PropertyNameIsRequred = "{PropertyName} is required.";
+
+            #endregion
+        }
+
+        public class SampleImport
+        {
+            #region static fields and constants
+
+            public const string CannotFindImportFile = "Cannot find import file.";
+            public const string DataProviderDoesNotExist = "The Data Provider does not exist.";
+            public const string DefaultCollectionMethodIsRequired = "Default Monitoring Point is required.";
+            public const string DefaultMonitoringPointIsRequired = "Default Monitoring Point is required.";
+            public const string DefaultSampleTypeIsRequired = "Default Sample Type is required.";
+            public const string ImportTemplateDoesNotExist = "No file format has been defined. Contact your Authority for assistance.";
+
+            #endregion
+
+            public class FileValidation
+            {
+                #region static fields and constants
+
+                public const string FieldValueExceedMaxmimumSize = "The length of {0} exceeds the maximum of size of {1}";
+                public const string FieldValueIsNotBoolean = "{0} is not boolean";
+                public const string FieldValueIsNotDate = "{0} is not a valid date";
+                public const string FieldValueIsNotNumeric = "{0} is not numeric";
+                public const string FieldValueIsRequired = "{0} is required and is missing";
+                public const string FileTypeIsUnsupported = "The file type selected is not supported.";
+
+                public const string ImportFileExceedSizeLimitation = "The file size exceeds the maximum supported size of {0} MB.  Try splitting the data into 2 files.";
+                public const string ImportFileIsCorrupted = "The uploaded file is corrupted, please import with the XLSX file again.";
+                public const string ImportFileIsEmpty = "The file is empty.";
+                public const string ImportFileMissingRequiredFields = "The file does not contain the required column(s) {0}";
+                public const string ResultIsRequired = "Result is required.";
+                public const string ResultQualifierIsInvalid = "Result Qualifier<{0}> is not valid";
+                public const string ResultQualifierNdNfShoudNotHaveAValue = "Result Qualifier ND/NF cannot be followed by a value in the Result field";
+
+                #endregion
+            }
+
+            public class DataValication
+            {
+                #region static fields and constants
+
+                public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample";
+                public const string FlowResultShouldNotContainsResultQualifier = "Invalid flow column(s).";
+                public const string FlowUnitIsInvalidOnMassLoadingCalculation = "Invalid Flow unit for Mass Loadings calculations.Chosen unit must be gpd or mgd.";
+                public const string FlowUnitIsUnSpecified = "Missing flow value.";
+                public const string FlowValueIsInvalid = "Missing flow value.";
+                public const string ParameterUnitIsUnspecified = "Parameter Unit is unspecified, Contact your Authority for assistance.";
+
+                public const string TranslatedUnitDoesNotSupportUnitConversion =
+                    "Translated LinkoExchagne Unit does not support unit conversion. Contact your Authority for assistance.";
+
+                #endregion
+            }
+        }
+    }
+}

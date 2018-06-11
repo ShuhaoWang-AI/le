@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseService.cs" />
+    <Compile Include="Base\ErrorConstants.cs" />
     <Compile Include="Base\MethodLogger.cs" />
     <Compile Include="Base\LinqExtensions.cs" />
     <Compile Include="Cache\ApplicationCache.cs" />

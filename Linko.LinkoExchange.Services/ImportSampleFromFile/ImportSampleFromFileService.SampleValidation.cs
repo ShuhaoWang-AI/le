@@ -78,22 +78,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 				if (monitoringPointId <= 0)
 				{
-					var errorMessage = "Invalid Monitoring point translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
-
+					AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DefaultMonitoringPointIsRequired, rowNumber:importingSampleResult.RowNumber);
 				}
 
 				if (parameterId <= 0)
 				{
-					var errorMessage = "Invalid parameter translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
-
+					AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DefaultCollectionMethodIsRequired, rowNumber:importingSampleResult.RowNumber);
 				}
 
 				if (unitId <= 0)
 				{
-					var errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
-					AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
+					AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DefaultSampleTypeIsRequired, rowNumber:importingSampleResult.RowNumber);
 				}
 
 				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
@@ -113,8 +108,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					catch (RuleViolationException ex)
 					{
 						_logger.Warn(message:ex.GetFirstErrorMessage());
-						const string errorMessage = "Invalid System unit translation defined by the Authority. Contact your Authority.";
-						AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:importingSampleResult.RowNumber);
+						AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.TranslatedUnitDoesNotSupportUnitConversion, rowNumber:importingSampleResult.RowNumber);
 					}
 				}
 				else
@@ -183,7 +177,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				}
 				else
 				{
-					throw CreateRuleViolationExceptionForValidationError(errorMessage:"Effective unit for parameter not found.");
+					throw CreateRuleViolationExceptionForValidationError(errorMessage:ErrorConstants.SampleImport.DataValication.ParameterUnitIsUnspecified);
 				}
 			}
 		}
@@ -208,14 +202,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			if (flowValue <= 0.0)
 			{
-				var errorMessage = "Missing flow value.";
-				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowValueIsInvalid, rowNumber:flow.RowNumber);
 			}
 
 			if (flowUnitId <= 0)
 			{
-				var errorMessage = "Missing flow unit.";
-				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage: ErrorConstants.SampleImport.DataValication.FlowUnitIsUnSpecified, rowNumber:flow.RowNumber);
 			}
 
 			if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.ResultQualifier].OriginalValueString) ||
@@ -223,8 +215,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisMethod].OriginalValueString) ||
 			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisDateTime].OriginalValueString))
 			{
-				var errorMessage = "Invalid flow column(s).";
-				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowResultShouldNotContainsResultQualifier, rowNumber:flow.RowNumber);
 			}
 
 			var orgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
@@ -232,8 +223,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			                                    .Select(s => s.ToLower()).ToList();
 			if (!validFlowUnits.Contains(flowUnitName.ToLower()))
 			{
-				var errorMessage = "Invalid Flow unit for Mass Loadings calculations. Chosen unit must be gpd or mgd.";
-				AddValidationError(validationResult:validationResult, errorMessage:errorMessage, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowUnitIsInvalidOnMassLoadingCalculation, rowNumber:flow.RowNumber);
 			}
 
 			importSampleWrapper.SampleResults.Remove(item:flow);
@@ -465,7 +455,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				// Check if sample has duplicate parameters 
 				if (parameterGroup.Count() > 1)
 				{
-					var errorMessage = "Duplicate parameters exist";
+					var errorMessage = ErrorConstants.SampleImport.DataValication.DuplicateParametersInSameSample;
 					if (validationResult.Errors.Any(i => i.ErrorMessage.Equals(value:errorMessage)))
 					{
 						var error = validationResult.Errors.Single(i => i.ErrorMessage == errorMessage);
