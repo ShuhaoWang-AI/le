@@ -635,9 +635,8 @@
 				<div class="form-group">
 					<div class="col-md-12">
 						<div class="box box-group box-solid" style="padding: 0 0 0 10px;">
-							&nbsp;
 							<h3 class="box-title">Preview Summary </h3>
-							<div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 60px;">
+							<div style="padding: 0 5px;">
 								@(rowCount) sample result(s) are ready to import. <br /> <br />
 
 								@if (Model.SampleImportDto.SampleDtos != null)
@@ -709,8 +708,6 @@
 										  )
 										  .ClientDetailTemplateId(id: "template")
 										  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
-
-										  // .Filterable(filterable => { filterable.Enabled(value: true).Mode(value: GridFilterMode.Row); })
 										  .Resizable(resizable => resizable.Columns(value: true))
 										  .Scrollable(s => s.Height(value: "auto"))
 										  .NoRecords(text: "No sample exists.")
@@ -871,7 +868,6 @@
 			  columns.Bound(c => c.AnalysisDateTimeLocal)
 					 .ClientTemplate(value: "\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.parseDate(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
 		  })
-		  .Pageable()
 		  .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
 		  .Scrollable(s => s.Height(value: "auto"))
 		  .NoRecords(text: "No sample result exists.")
