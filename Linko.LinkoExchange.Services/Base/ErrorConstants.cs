@@ -48,17 +48,16 @@ namespace Linko.LinkoExchange.Services.Base
                 #endregion
             }
 
-            public class DataValication
+            public class DataValidation
             {
                 #region static fields and constants
 
                 public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample";
-                public const string FlowResultShouldNotContainsResultQualifier = "Invalid flow column(s).";
                 public const string FlowUnitIsInvalidOnMassLoadingCalculation = "Invalid Flow unit for Mass Loadings calculations.Chosen unit must be gpd or mgd.";
                 public const string FlowUnitIsUnSpecified = "Missing flow units for Mass Loading calculations.";
                 public const string FlowValueIsInvalid = "Missing flow value for Mass Loading calculations.";
                 public const string ParameterUnitIsUnspecified = "Parameter Unit is unspecified, Contact your Authority for assistance.";
-                public const string ResultQualifierMustBeEmpty = "Result Qualifier must be empty.";
+                public const string FlowResultQualifierMustBeEmpty = "Result Qualifier must be empty.";
 
                 public const string TranslatedUnitDoesNotSupportUnitConversion =
                     "Invalid unit translation. Cannot convert {0} to {1}.  Check the unit translation selected or contact your Authority.";

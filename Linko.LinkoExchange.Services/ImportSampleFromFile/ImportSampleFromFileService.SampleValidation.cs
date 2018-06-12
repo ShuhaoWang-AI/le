@@ -109,7 +109,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					{
 						_logger.Warn(message:ex.GetFirstErrorMessage());
 						AddValidationError(validationResult:validationResult, 
-						                   errorMessage:string.Format(format:ErrorConstants.SampleImport.DataValication.TranslatedUnitDoesNotSupportUnitConversion, 
+						                   errorMessage:string.Format(format:ErrorConstants.SampleImport.DataValidation.TranslatedUnitDoesNotSupportUnitConversion, 
 						                                              arg0:fromUnit.Name, arg1:targetUnit.Name), 
 						                   rowNumber:importingSampleResult.RowNumber);
 					}
@@ -180,7 +180,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				}
 				else
 				{
-					throw CreateRuleViolationExceptionForValidationError(errorMessage:ErrorConstants.SampleImport.DataValication.ParameterUnitIsUnspecified);
+					throw CreateRuleViolationExceptionForValidationError(errorMessage:ErrorConstants.SampleImport.DataValidation.ParameterUnitIsUnspecified);
 				}
 			}
 		}
@@ -190,9 +190,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			if (_massLoadingFlowParameter == null)
 			{
 				_massLoadingFlowParameter = _parameterService.GetFlowParameter();
-			} 
-			 
-            var flow = importSampleWrapper.SampleResults.FirstOrDefault(i => i.ParameterName.Equals(value: _massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase));
+			}
+
+			var flow = importSampleWrapper.SampleResults.FirstOrDefault(i => i.ParameterName.Equals(value:_massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase));
 			if (flow == null)
 			{
 				return;
@@ -201,24 +201,21 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			// If there is a Flow, but FlowValue or FlowUnit does not exist, throw exception. 
 			double flowValue = flow.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
 			string flowUnitName = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValue;
-			var flowUnitId = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId;
-
+			var flowUnitId = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId; 
+	        
 			if (flowValue <= 0.0)
 			{
-				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowValueIsInvalid, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowValueIsInvalid, rowNumber:flow.RowNumber);
 			}
 
 			if (flowUnitId <= 0)
 			{
-				AddValidationError(validationResult:validationResult, errorMessage: ErrorConstants.SampleImport.DataValication.FlowUnitIsUnSpecified, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowUnitIsUnSpecified, rowNumber:flow.RowNumber);
 			}
 
-			if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.ResultQualifier].OriginalValueString) ||
-			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.MethodDetectionLimit].OriginalValueString) ||
-			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisMethod].OriginalValueString) ||
-			    !string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.AnalysisDateTime].OriginalValueString))
+			if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key: SampleImportColumnName.ResultQualifier].OriginalValueString))
 			{
-				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowResultShouldNotContainsResultQualifier, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowResultQualifierMustBeEmpty, rowNumber: flow.RowNumber);
 			}
 
 			var orgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
@@ -226,16 +223,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			                                    .Select(s => s.ToLower()).ToList();
 			if (!validFlowUnits.Contains(flowUnitName.ToLower()))
 			{
-				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.FlowUnitIsInvalidOnMassLoadingCalculation, rowNumber:flow.RowNumber);
+				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowUnitIsInvalidOnMassLoadingCalculation, rowNumber:flow.RowNumber);
 			}
 
 			importSampleWrapper.SampleResults.Remove(item:flow);
 			importSampleWrapper.FlowRow = new FlowRow
-			                          {
-				                          FlowValue = flowValue,
-				                          FlowUnitName = flowUnitName,
-				                          FlowUnitId = flowUnitId
-			                          };
+			                              {
+				                              FlowValue = flowValue,
+				                              FlowUnitName = flowUnitName,
+				                              FlowUnitId = flowUnitId
+			                              };
 		}
 
 		private List<SampleDto> MergeSamples(List<ImportSampleWrapper> importingSamples)
@@ -252,9 +249,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			foreach (var importingSample in importingSamples)
 			{
-				var massloadingConversionFactor = importingSample.Sample.MassLoadingConversionFactorPounds;
-				var decimalPlaces = importingSample.Sample.MassLoadingCalculationDecimalPlaces ?? 0;
-
 				// Sample results are in a draft sample, then update that draft
 				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:draftSamples, searchFor:importingSample.Sample);
 				if (drftSamplesToUpdate.Any())
@@ -264,12 +258,20 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					//Update all the drafts
 					foreach (var draftSample in drftSamplesToUpdate)
 					{
-						// remove sample results that exists in draft and importing samples
-						var newSampleResults = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
+						var draftParameters = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
+						var draftSampleParameterIds = draftSample.SampleResults.Select(i => i.ParameterId).ToList(); 
+						var commonParameters = importingSample.Sample.SampleResults.Where(i => draftSampleParameterIds.Contains(i.ParameterId)).ToList();
+						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.SampleResultId);  
 
-						// update sample results that are in draft
-						newSampleResults.AddRange(collection:importingSample.Sample.SampleResults);
-						draftSample.SampleResults = newSampleResults;
+						foreach (var parameter in commonParameters)
+						{
+							parameter.SampleResultId = draftSampleResultDict[parameter.ParameterId];
+						}
+
+						var resultSamples = importingSample.Sample.SampleResults.ToList();
+						resultSamples.AddRange(draftParameters); 
+
+						draftSample.SampleResults = resultSamples;
 
 						// re-calculate all mass loadings 
 						if (importingSample.FlowRow != null || draftSample.FlowValue.HasValue)
@@ -297,11 +299,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							{
 								CreateMassLoadingSampleResult(importFlowRow:flowRow,
 								                              sampleResultDto:sampleResult,
-								                              massloadingConversionFactorPounds:massloadingConversionFactor,
-								                              decimalPlaces:decimalPlaces, massLoadingUnitDto:massLoadingUnit,
-								                              useLessThanSignForMassLoading:draftSample.IsMassLoadingResultToUseLessThanSign
+								                              sampleDto:draftSample,
+								                              massLoadingUnitDto:massLoadingUnit
 								                             );
 							}
+
+							importingSample.Sample = draftSample;
 						}
 					}
 
@@ -324,13 +327,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 						// re-calculate mass loadings for all sample results
 						foreach (var sampleResult in importingSample.Sample.SampleResults)
 						{
-							CreateMassLoadingSampleResult(
-							                              importFlowRow:flowRow,
+							CreateMassLoadingSampleResult(importFlowRow:flowRow,
 							                              sampleResultDto:sampleResult,
-							                              massloadingConversionFactorPounds:massloadingConversionFactor,
-							                              decimalPlaces:decimalPlaces,
-							                              massLoadingUnitDto:massLoadingUnit,
-							                              useLessThanSignForMassLoading:importingSample.Sample.IsMassLoadingResultToUseLessThanSign);
+							                              sampleDto:importingSample.Sample,
+							                              massLoadingUnitDto:massLoadingUnit);
 						}
 					}
 				}
@@ -393,7 +393,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			return sampleResultDto;
 		}
 
-		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto, double? massloadingConversionFactorPounds, int decimalPlaces, UnitDto massLoadingUnitDto, bool useLessThanSignForMassLoading)
+		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto, SampleDto sampleDto, UnitDto massLoadingUnitDto)
 		{
 			if (importFlowRow == null)
 			{
@@ -406,22 +406,22 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var flowResult = importFlowRow.FlowValue;
 
 			var massLoadingQualifier = "";
-			if (sampleResultDto.Qualifier == "<" && useLessThanSignForMassLoading)
+			if (sampleResultDto.Qualifier == "<" && sampleDto.IsMassLoadingResultToUseLessThanSign)
 			{
 				massLoadingQualifier = "<";
 			}
 			 
-			var massLoadingMultiplier = massloadingConversionFactorPounds ?? 0.0f; 
+			var massLoadingMultiplier = sampleDto.MassLoadingConversionFactorPounds?? 0.0f; 
 			var flowUnitConversionFactor = sampleResultDto.UnitName.Equals(value: massLoadingBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
 			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(value: resultBaseUnit, comparisonType: StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
 			
-			var numbers = new[] {flowResult, sampleResultDto.Value ?? 0, massLoadingMultiplier, flowUnitConversionFactor , resultUnitConversionFactor}; 
-			var massloading = _sampleService.CalculateFlowNumbersProduct(numbers, decimalPlaces);
+			var numbers = new[] {flowResult, sampleResultDto.Value ?? 0, massLoadingMultiplier, flowUnitConversionFactor , resultUnitConversionFactor};
+			var massloading = _sampleService.CalculateFlowNumbersProduct(numbers,sampleDto.MassLoadingCalculationDecimalPlaces ?? 0);
 			sampleResultDto.MassLoadingValue = massloading.ProductStr; 
 			sampleResultDto.MassLoadingQualifier = massLoadingQualifier;
 
 			sampleResultDto.MassLoadingUnitId = massLoadingUnitDto.UnitId;
-			sampleResultDto.MassLoadingUnitName = massLoadingUnitDto.Name;
+			sampleResultDto.MassLoadingUnitName = massLoadingUnitDto.Name; 
 		}
 
 		private ImportSampleFromFileValidationResultDto GetValidImportingSamples(SampleImportDto sampleImportDto, out List<ImportSampleWrapper> groupedSampleWrappers)
@@ -458,7 +458,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				// Check if sample has duplicate parameters 
 				if (parameterGroup.Count() > 1)
 				{
-					var errorMessage = ErrorConstants.SampleImport.DataValication.DuplicateParametersInSameSample;
+					var errorMessage = ErrorConstants.SampleImport.DataValidation.DuplicateParametersInSameSample;
 					if (validationResult.Errors.Any(i => i.ErrorMessage.Equals(value:errorMessage)))
 					{
 						var error = validationResult.Errors.Single(i => i.ErrorMessage == errorMessage);
@@ -544,7 +544,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			                                                                             .GetAuthority(orgRegProgramId:currentOrganizationRegulatoryProgramId)
 			                                                                             .OrganizationRegulatoryProgramId);
 
-			//TODO: should double check and remove if it is already done by File Validation as valid input value
 			var resultQualifierValidValues = programSettings
 			                                 .Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
 
@@ -679,7 +678,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			public int FlowUnitId { get; set; }
 			public string FlowUnitName { get; set; }
 			public double FlowValue { get; set; }
-
 			#endregion
 		}
 	}
