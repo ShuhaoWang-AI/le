@@ -830,6 +830,17 @@
 	}
 }
 
+<style> 
+	 /*
+		 Just apply this style to this page  
+	*/
+
+	.tooltip-inner {
+		white-space:nowrap;
+		max-width:none;
+	}
+</style> 
+
 <script id="template" type="text/kendo-tmpl">
 
 	@(Html.Kendo().Grid<SampleResultViewModel>()
@@ -848,7 +859,7 @@
 										   + "\\# } else if(ConcentrationResultCompliance==\"Bad\") { \\#"
 										   + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
 										   + "\\# } \\#"
-										   + "aria-hidden='true' data-placement='top' "
+										   + "aria-hidden='true' data-placement='left' "
 										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
 
 			  columns.Bound(c => c.MassLoadingValue)
@@ -864,7 +875,7 @@
 						 + "\\# } else if(MassResultCompliance==\"Bad\") { \\#"
 						 + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
 						 + "\\# } \\#"
-						 + "aria-hidden='true' data-placement='top' "
+						 + "aria-hidden='true' data-placement='left' "
 						 + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
 						 + "\\# } \\#");
 
