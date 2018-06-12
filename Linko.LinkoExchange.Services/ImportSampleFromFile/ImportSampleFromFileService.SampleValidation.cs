@@ -98,7 +98,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				var fromUnit = _authorityUnitDict[key:unitId];
 				var targetUnit = importingSampleResult.EffectiveUnit;
 
-				if (fromUnit.UnitId != targetUnit.UnitId)
+                if (fromUnit.UnitId != targetUnit.UnitId)
 				{
 					try
 					{
@@ -108,7 +108,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					catch (RuleViolationException ex)
 					{
 						_logger.Warn(message:ex.GetFirstErrorMessage());
-						AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValication.TranslatedUnitDoesNotSupportUnitConversion, rowNumber:importingSampleResult.RowNumber);
+						AddValidationError(validationResult:validationResult, 
+						                   errorMessage:string.Format(format:ErrorConstants.SampleImport.DataValication.TranslatedUnitDoesNotSupportUnitConversion, 
+						                                              arg0:fromUnit.Name, arg1:targetUnit.Name), 
+						                   rowNumber:importingSampleResult.RowNumber);
 					}
 				}
 				else

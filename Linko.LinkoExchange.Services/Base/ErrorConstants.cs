@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Services.Base
             #region static fields and constants
 
             public const string CannotFindImportFile = "Cannot find import file.";
-            public const string DataProviderDoesNotExist = "The Data Provider does not exist.";
+            public const string DataProviderDoesNotExist = "The Data Provider no longer exists.";
             public const string DefaultCollectionMethodIsRequired = "Default Monitoring Point is required.";
             public const string DefaultMonitoringPointIsRequired = "Default Monitoring Point is required.";
             public const string DefaultSampleTypeIsRequired = "Default Sample Type is required.";
@@ -38,12 +38,12 @@ namespace Linko.LinkoExchange.Services.Base
                 public const string FileTypeIsUnsupported = "The file type selected is not supported.";
 
                 public const string ImportFileExceedSizeLimitation = "The file size exceeds the maximum supported size of {0} MB.  Try splitting the data into 2 files.";
-                public const string ImportFileIsCorrupted = "The uploaded file is corrupted, please import with the XLSX file again.";
+                public const string ImportFileIsCorrupted = "The file type selected in not an .xlsx file or it may be corrupted.";
                 public const string ImportFileIsEmpty = "The file is empty.";
                 public const string ImportFileMissingRequiredFields = "The file does not contain the required column(s) {0}";
                 public const string ResultIsRequired = "Result is required.";
-                public const string ResultQualifierIsInvalid = "Result Qualifier<{0}> is not valid";
-                public const string ResultQualifierNdNfShoudNotHaveAValue = "Result Qualifier ND/NF cannot be followed by a value in the Result field";
+                public const string ResultQualifierIsInvalid = "Result Qualifier of {0} is not valid";
+                public const string ResultQualifierNdNfShoudNotHaveAValue = "A Result Qualifier of ND or NF cannot be followed by a value in the Result field.";
 
                 #endregion
             }
@@ -55,15 +55,22 @@ namespace Linko.LinkoExchange.Services.Base
                 public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample";
                 public const string FlowResultShouldNotContainsResultQualifier = "Invalid flow column(s).";
                 public const string FlowUnitIsInvalidOnMassLoadingCalculation = "Invalid Flow unit for Mass Loadings calculations.Chosen unit must be gpd or mgd.";
-                public const string FlowUnitIsUnSpecified = "Missing flow value.";
-                public const string FlowValueIsInvalid = "Missing flow value.";
+                public const string FlowUnitIsUnSpecified = "Missing flow units for Mass Loading calculations.";
+                public const string FlowValueIsInvalid = "Missing flow value for Mass Loading calculations.";
                 public const string ParameterUnitIsUnspecified = "Parameter Unit is unspecified, Contact your Authority for assistance.";
+                public const string ResultQualifierMustBeEmpty = "Result Qualifier must be empty.";
 
                 public const string TranslatedUnitDoesNotSupportUnitConversion =
-                    "Translated LinkoExchagne Unit does not support unit conversion. Contact your Authority for assistance.";
+                    "Invalid unit translation. Cannot convert {0} to {1}.  Check the unit translation selected or contact your Authority.";
 
                 #endregion
             }
+        }
+
+        public class Unit
+        {
+            public const string PropertySystemUnitCannotBeNull = "Property SystemUnit should not be null";
+            public const string UnsupportedUnitConversion = "Current unit and target unit are not in same unit dimension.";
         }
     }
 }

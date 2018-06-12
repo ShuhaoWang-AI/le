@@ -367,13 +367,14 @@ namespace Linko.LinkoExchange.Services.Unit
 
                 if (currentSystemUnit == null)
                 {
-                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Can not convert current unit to system unit.");
+                    throw new ArgumentNullException(paramName: nameof(currentAuthorityUnit), message: ErrorConstants.Unit.PropertySystemUnitCannotBeNull);
                 }
-                else if (targetSystemUnit == null)
+                if (targetSystemUnit == null)
                 {
-                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Can not convert target unit to system unit.");
+                    throw new ArgumentNullException(paramName: nameof(targetAuthorityUnit), message: ErrorConstants.Unit.PropertySystemUnitCannotBeNull);
                 }
-                else if (currentSystemUnit.UnitDimensionId == targetSystemUnit.UnitDimensionId)
+
+                if (currentSystemUnit.UnitDimensionId == targetSystemUnit.UnitDimensionId)
                 {
                     return ConvertResultToTargetUnit(result:result, currentUnitConversionFactor:currentSystemUnit.ConversionFactor,
                                                      currentUnitAdditiveFactor:currentSystemUnit.AdditiveFactor,
@@ -381,7 +382,7 @@ namespace Linko.LinkoExchange.Services.Unit
                 }
                 else
                 {
-                    throw CreateRuleViolationExceptionForValidationError(errorMessage:"Current unit and target unit are not in same unit dimension.");
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage:ErrorConstants.Unit.UnsupportedUnitConversion);
                 }
             }
         }
