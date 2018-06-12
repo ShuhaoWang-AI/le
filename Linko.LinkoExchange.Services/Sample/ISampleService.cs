@@ -108,5 +108,7 @@ namespace Linko.LinkoExchange.Services.Sample
 		/// <param name="decimals">The decimals</param>
 		/// <returns></returns>
 	    FloatNumbersProductDto CalculateFlowNumbersProduct(double[] numbers, int decimals);
+
+	    void SampleComplianceCheck(SampleDto sampleDto);
     }
 }
