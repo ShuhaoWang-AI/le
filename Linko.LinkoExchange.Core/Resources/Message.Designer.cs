@@ -205,15 +205,6 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, but your session has timed out. You&apos;ll be redirected to the Sign In page in 30 seconds....
-        /// </summary>
-        public static string SessionTimeOutPopupMessage {
-            get {
-                return ResourceManager.GetString("SessionTimeOutPopupMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Your account is disabled. Please contact your Authority for assistance..
         /// </summary>
         public static string UserAccountDisabled {

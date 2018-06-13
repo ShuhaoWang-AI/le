@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
+using System.Web.Configuration;
 using System.Web.Mvc;
-using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Authentication;
 using Microsoft.AspNet.Identity;
@@ -26,8 +26,8 @@ namespace Linko.LinkoExchange.Web
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party SignIn provider
             // Configure the sign in cookie
-
-            var cookieValidateInterval = ValueParser.TryParseInt(value:ConfigurationManager.AppSettings[name:"CookieValidateInterval"], defaultValue:30);
+            
+            var cookieValidateInterval = ((SessionStateSection) ConfigurationManager.GetSection(sectionName:"system.web/sessionState")).Timeout.Minutes;
             app.UseCookieAuthentication(options:new CookieAuthenticationOptions
                                                 {
                                                     AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
@@ -46,7 +46,7 @@ namespace Linko.LinkoExchange.Web
                                                                }
                                                 });
 
-            app.UseExternalSignInCookie(externalAuthenticationType:DefaultAuthenticationTypes.ExternalCookie);
+            //app.UseExternalSignInCookie(externalAuthenticationType:DefaultAuthenticationTypes.ExternalCookie);
 
             // Enables the application to temporarily store user information when they are verifying the second factor in the two-factor authentication process.
             //app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(5));

@@ -97,7 +97,7 @@
     <script>
         function UpdateBadgeCount(e) {
             console.log(e);
-            if (e.type === "update" && e.response.Errors == null) {
+            if (e.type === "update" && e.response.Errors == null && e.response.Data != null) {
                 var responseData = e.response.Data[0];
                 if (responseData.BadgeCount != null) {
                     $("[name = 'sidebar_PendingUnitTranslationsCount']").html(responseData.BadgeCount);

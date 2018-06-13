@@ -98,11 +98,6 @@ For more information on how to configure your ASP.NET application, please visit 
              value="logo-min.png" />
         <add key="FileName_Logo"
              value="logo.png" />
-
-        <!--minutes -->
-        <!--change sessionState timeout value with same value-->
-        <add key="CookieValidateInterval"
-             value="30" />
         <!-- hours = should be 24 hours (reference: Bug 1909) -->
         <add key="ResetPasswordTokenValidateInterval"
              value="24" />
@@ -133,8 +128,7 @@ For more information on how to configure your ASP.NET application, please visit 
              value="24" />
     </appSettings>
     <system.web>
-        <!--change CookieValidateInterval value with same value-->
-        <sessionState timeout="30" />
+        <sessionState timeout="60" />
         <!--
     A workaround for error outside of MVC: 
     If you supply your own query string variable when specifying the path, then .NET will NOT tack on the "aspxerrorpath" query string.

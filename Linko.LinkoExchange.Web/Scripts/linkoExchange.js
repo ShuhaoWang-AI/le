@@ -73,19 +73,31 @@ doAjaxAction = function(grid, postUrl, returnUrl, noSelectionMessage) {
     }
 };
 
-$(document)
-    .on("ajaxError", function(event, jqXHR) {
-        var json_response = jqXHR.getResponseHeader("X-Responded-JSON");
+$(function() {
+    //setup ajax error handling
+    $(document)
+        .ajaxComplete(function(event, request, settings) {
+            var jsonResponse = request.getResponseHeader("X-Responded-JSON");
+            if (jsonResponse) {
+                var jsonResponseObj = JSON.parse(jsonResponse);
+                if (jsonResponseObj.status === 401) {
 
-        if (json_response) {
-            var json_response_obj = JSON.parse(json_response);
+                    showPopupMessage("Sorry, your session has expired. Please login again to continue");
 
-            if (json_response_obj.status == 401) {
-                $(location).attr("href", json_response_obj.headers.location); //login URL
-                return;
+                    $("#btnClosePopup")
+                        .on('click', function() {
+                            $(location).attr("href", jsonResponseObj.headers.location); //login URL
+                        });
+
+                    setTimeout(function() {
+                        $(location).attr("href", jsonResponseObj.headers.location); //login URL
+                    }, 30 * 1000);
+
+                    return;
+                }
             }
-        }
-    });
+        });
+});
 
 error_handler = function(e) {
     if (e.errors) {
@@ -113,7 +125,7 @@ showPopupMessage = function(message) {
         .append('<div aria-labelledby="Error Handler Message" class="fade modal modal-info" id="ErrorHandlerModal" role="dialog" tabindex="-1">'
             + '<div class="modal-dialog" role="document">'
             + '<div class="alert alert-dismissible alert-danger modal-content">'
-            + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
+            + '<button aria-label="Close" class="close" data-dismiss="modal" id="btnClosePopup" type="button">&times;</button>'
             + '<h4 class="box-title">Error</h4>'
             + '<div class="form-horizontal">'
             + "<p>"
