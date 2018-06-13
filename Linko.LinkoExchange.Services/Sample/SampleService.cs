@@ -544,34 +544,37 @@ namespace Linko.LinkoExchange.Services.Sample
             return dto;
         }
 
-	    public void SampleComplianceCheck(SampleDto sampleDto)
+	    public void SampleComplianceCheck(List<SampleDto> sampleDtos)
 	    {
-			var orgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-			var monitoringPointParameters = _dbContext.MonitoringPointParameters
-				 .Include(mppl => mppl.DefaultUnit)
-				 .Include(a=>a.MonitoringPoint)
-				 .Where(b=>b.MonitoringPoint.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId == orgRegProgramId).ToList(); 
+		    var orgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+		    var monitoringPointParameters = _dbContext.MonitoringPointParameters
+		                                              .Include(mppl => mppl.DefaultUnit)
+		                                              .Include(a => a.MonitoringPoint)
+		                                              .Where(b => b.MonitoringPoint.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId == orgRegProgramId).ToList();
 
 		    var monitoringPointParameterLimits = _dbContext.MonitoringPointParameterLimits
 		                                                   .Include(mppl => mppl.LimitBasis)
 		                                                   .Include(mppl => mppl.LimitType)
-														   .Where(a=>a.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgramId== orgRegProgramId)
-														   .ToList();
+		                                                   .Where(a => a.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId)
+		                                                   .ToList();
 			
-			//Check compliance on all of sample results
-		    foreach (var sampleResult in sampleDto.SampleResults)
+		    foreach (var sampleDto in sampleDtos)
 		    {
-			    CheckResultComplianceInner(sampleResult, sampleDto.MonitoringPointId, monitoringPointParameters, monitoringPointParameterLimits, sampleDto.StartDateTimeLocal,
-			                           LimitBasisName.Concentration);
-			    if (sampleDto.FlowValue.HasValue)
+			    //Check compliance on all of sample results
+			    foreach (var sampleResult in sampleDto.SampleResults)
 			    {
 				    CheckResultComplianceInner(sampleResult, sampleDto.MonitoringPointId, monitoringPointParameters, monitoringPointParameterLimits, sampleDto.StartDateTimeLocal,
-				                           LimitBasisName.MassLoading);
+				                               LimitBasisName.Concentration);
+				    if (sampleDto.FlowValue.HasValue)
+				    {
+					    CheckResultComplianceInner(sampleResult, sampleDto.MonitoringPointId, monitoringPointParameters, monitoringPointParameterLimits, sampleDto.StartDateTimeLocal,
+					                               LimitBasisName.MassLoading);
+				    }
 			    }
 		    }
 	    }
 
-	 
+
 	    private void CheckResultCompliance(ref SampleResultDto sampleResultDto, int monitoringPointId, DateTime sampleDateTime, LimitBasisName limitBasisName)
         {
             //Set compliance as unknown initially by default

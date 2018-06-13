@@ -428,11 +428,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult DoImportPreview(SampleImportViewModel model)
         {
-	        foreach (var sampleDto in model.SampleImportDto.SampleDtos)
-	        {
-		        _sampleService.SampleComplianceCheck(sampleDto);
-	        } 
-
+	        _sampleService.SampleComplianceCheck(model.SampleImportDto.SampleDtos);
 			model.Samples = model.SampleImportDto.SampleDtos.Select(_mapHelper.ToViewModel).ToList();
 			 
 			// to attach a identifier for each sample 
