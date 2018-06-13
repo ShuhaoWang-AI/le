@@ -27,7 +27,7 @@ namespace Linko.LinkoExchange.Web
             // and to use a cookie to temporarily store information about a user logging in with a third party SignIn provider
             // Configure the sign in cookie
             
-            var cookieValidateInterval = ((SessionStateSection) ConfigurationManager.GetSection(sectionName:"system.web/sessionState")).Timeout.Minutes;
+            var cookieValidateInterval = ((SessionStateSection) ConfigurationManager.GetSection(sectionName:"system.web/sessionState")).Timeout.TotalMinutes;
             app.UseCookieAuthentication(options:new CookieAuthenticationOptions
                                                 {
                                                     AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
