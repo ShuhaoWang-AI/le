@@ -28,7 +28,9 @@ namespace Linko.LinkoExchange.Web.Shared
 
             foreach (var sample in samples)
             {
-                if (sample.Id.HasValue)
+				//TODO to populate compliance summary 
+
+                if (sample.ImportStatus == ImportStatus.Updated)
                 {
                     importSummary.UpdateDraftSampleCont++;
                 }
@@ -39,7 +41,7 @@ namespace Linko.LinkoExchange.Web.Shared
 
                 foreach (var sampleResult in sample.SampleResults)
                 {
-                    if (sampleResult.Id.HasValue)
+                    if (sampleResult.ImportStatus == ImportStatus.Updated)
                     {
                         importSummary.UpdateSampleResultCount++;
                     }
