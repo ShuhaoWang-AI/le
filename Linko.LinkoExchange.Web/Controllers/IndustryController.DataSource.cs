@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
+using Linko.LinkoExchange.Web.Shared;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using DataSource = Kendo.Mvc.UI.DataSource;
@@ -235,9 +236,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult DataSourceDetails_ImportSamples(DataSourceViewModel model)
         {
+            var sampleImportId = SampleImportHelpers.ToImportJobId(model: new SampleImportViewModel
+                                                                       {
+                                                                           // ReSharper disable once PossibleInvalidOperationException
+                                                                           SelectedDataSourceId = (int)model.Id
+                                                                       });
             return RedirectToAction(actionName: "SampleImport", routeValues: new RouteValueDictionary {
-                { QueryParameters.DataProviderId, model.Id}
-            });
+                                                                                                          { QueryParameters.ImportJobId, sampleImportId}
+                                                                                                      });
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -576,10 +582,5 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-
-        private class QueryParameters
-        {
-            internal const string DataProviderId = "DataProviderId";
-        }
     }
 }

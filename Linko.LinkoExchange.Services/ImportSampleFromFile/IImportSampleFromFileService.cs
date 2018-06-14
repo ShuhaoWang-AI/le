@@ -37,19 +37,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// ImportSampleFromFileValidationResultDto.Success is equal to "true" if file is valid; otherwise "false"
         /// If success is equal to "false", then "Errors" will have value, otherwise null
         /// </returns>
-        ImportSampleFromFileValidationResultDto DoFileValidation(int dataSourceId, ImportTempFileDto importTempFileDto, out SampleImportDto sampleImportDto);
+        ImportSampleFromFileValidationResultDto DoFileValidation(SampleImportDto sampleImportDto);
 
         /// <summary>
         /// Checks sampleImportDto has any recommended column cell has missing value or not
         /// If missing then return list of RequiredDataDefaultsDto
         /// </summary>
         /// <param name="sampleImportDto"> </param>
-        /// <param name="defaultMonitoringPoint"> </param>
-        /// <param name="defaultCollectionMethod"> </param>
-        /// <param name="defaultSampleType"> </param>
         /// <returns> </returns>
-        List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, 
-                                                              ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType);
+        List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto);
+
+        void PopulateDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType);
 
         List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId);
 
@@ -63,5 +61,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         int? AddOrUpdateFileVersionFieldForAuthorityConfiguration(int fileVersionId, FileVersionFieldDto dto);
         ExportFileDto DownloadSampleImportTemplate(string fileVersionName);
         ExportFileDto DownloadSampleImportTemplateInstruction(string fileVersionName);
+
     }
 }

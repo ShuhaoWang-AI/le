@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using FluentValidation;
@@ -13,6 +14,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
     [Validator(validatorType:typeof(SampleImportViewModelValidator))]
     public class SampleImportViewModel
     {
+        #region constructors and destructor
+
+        public SampleImportViewModel()
+        {
+            ImportId = Guid.NewGuid();
+            CurrentSampleImportStep = SampleImportStep.SelectDataSource;
+            SampleImportDto = new SampleImportDto
+                              {
+                                  ImportId = ImportId
+                              };
+        }
+
+        #endregion
+
         #region public enums
 
         public enum SampleImportStep
@@ -31,6 +46,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         #region public properties
 
+        public Guid ImportId { get; set; }
+
         public SampleImportStep CurrentSampleImportStep { get; set; }
 
         [Display(Name = "Data Provider")]
@@ -38,12 +55,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public string SelectedDataSourceName { get; set; }
 
+        public int ImportTempFileId { get; set; }
+        public int ImportFileId { get; set; }
+
         [Display(Name = "File Name")]
         public string SelectedFileName { get; set; }
-
-        public int? ImportTempFileId { get; set; }
-
-        public SampleImportDto SampleImportDto { get; set; } //TODO:Remove later
 
         public List<SampleViewModel> Samples { get; set; }
 
@@ -68,6 +84,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public string SelectedDefaultSampleTypeName { get; set; }
 
         public MissingTranslationViewModel MissingTranslation { get; set; }
+
+        public SampleImportDto SampleImportDto { get; set; }
+
+        public ImportSummaryViewModel ImportSummary { get; set; }
 
         #endregion
     }
@@ -104,9 +124,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
     public class MissingTranslationViewModel
     {
+        #region public properties
+
         public List<DataSourceTranslationViewModel> MisstingTranslations { get; set; }
         public string Title { get; set; }
         public DataSourceTranslationType TranslationType { get; set; }
+
+        #endregion
     }
 
     public class ErrorWithRowNumberViewModel
@@ -155,6 +179,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
                          .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequred);
                  });
         }
+
+        #endregion
+    }
+
+
+
+    public class ImportSummaryViewModel
+    {
+        #region public properties
+
+        public int NewDraftSampleCount { get; set; }
+        public int UpdateDraftSampleCont { get; set; }
+        public int NewSampleResultCount { get; set; }
+        public int UpdateSampleResultCount { get; set; }
+
+        public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
 
         #endregion
     }

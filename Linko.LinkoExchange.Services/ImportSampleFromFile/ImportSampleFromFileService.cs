@@ -298,21 +298,28 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public ImportSampleFromFileValidationResultDto DoFileValidation(int dataSourceId, ImportTempFileDto importTempFileDto, out SampleImportDto sampleImportDto)
+        public ImportSampleFromFileValidationResultDto DoFileValidation(SampleImportDto sampleImportDto)
         {
+            if (sampleImportDto == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(SampleImportDto));
+            }
+            if (sampleImportDto.DataSource == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(SampleImportDto), message:ErrorConstants.SampleImport.DataProviderDoesNotExist);
+            }
+            if (sampleImportDto.TempFile == null)
+            {
+                throw new ArgumentNullException(paramName: nameof(SampleImportDto), message:ErrorConstants.SampleImport.CannotFindImportFile);
+            }
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"importTempFileId={importTempFileDto?.ImportTempFileId?.ToString() ?? "null"}"))
+                                    descripition:$"importTempFileId={sampleImportDto.TempFile.ImportTempFileId.ToString()}"))
             {
                 var result = new ImportSampleFromFileValidationResultDto();
 
-                sampleImportDto = new SampleImportDto
-                                  {
-                                      TempFile = importTempFileDto
-                                  };
-
                 try
                 {
-                    if (importTempFileDto?.ImportTempFileId != null && !CanUserExecuteApi(id:importTempFileDto.ImportTempFileId.Value))
+                    if (sampleImportDto.TempFile.ImportTempFileId != null && !CanUserExecuteApi(id: sampleImportDto.TempFile.ImportTempFileId.Value))
                     {
                         throw new UnauthorizedAccessException();
                     }
@@ -322,19 +329,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                     if (sampleImportDto.FileVersion?.FileVersionId == null)
                     {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:ErrorConstants.SampleImport.ImportTemplateDoesNotExist);
-                    }
-
-                    //populate DataSource in sampleImportDto
-                    sampleImportDto.DataSource = _dataSourceService.GetDataSourceById(dataSourceId:dataSourceId);
-
-                    if (sampleImportDto.DataSource?.DataSourceId == null)
-                    {
-                        throw new BadRequest(message:ErrorConstants.SampleImport.DataProviderDoesNotExist);
+                        throw new BadRequest(message:ErrorConstants.SampleImport.ImportTemplateDoesNotExist);
                     }
 
                     //populate Rows in sampleImportDto
-                    var importFileWorkbook = GetWorkbook(importTempFileDto:importTempFileDto);
+                    var importFileWorkbook = GetWorkbook(importTempFileDto:sampleImportDto.TempFile);
 
                     sampleImportDto.Rows = GetImportRowObjects(importFileWorkbook:importFileWorkbook, sampleImportDto:sampleImportDto, result:ref result);
 
@@ -345,11 +344,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
                 catch (RuleViolationException ruleViolationException)
                 {
-                    if (importTempFileDto?.ImportTempFileId != null)
-                    {
-                        RemoveImportTempFile(importTempFileId:importTempFileDto.ImportTempFileId.Value);
-                    }
-
                     if (ruleViolationException.ValidationIssues.Count > 0)
                     {
                         result.Errors.AddRange(collection:ruleViolationException
@@ -363,26 +357,32 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint,
-                                                                     ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType)
+        public List<RequiredDataDefaultsDto> GetRequiredDataDefaults(SampleImportDto sampleImportDto)
         {
             var requiredDataDefaults = new List<RequiredDataDefaultsDto>();
 
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
-                                                            columnName:SampleImportColumnName.MonitoringPoint, selectedValue:defaultMonitoringPoint);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
-                                                            columnName:SampleImportColumnName.CollectionMethod, selectedValue:defaultCollectionMethod);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
-                                                            columnName:SampleImportColumnName.SampleType, selectedValue:defaultSampleType);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
+                                                            columnName: SampleImportColumnName.MonitoringPoint);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
+                                                            columnName: SampleImportColumnName.CollectionMethod);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
+                                                            columnName: SampleImportColumnName.SampleType);
 
             return requiredDataDefaults;
+        }
+
+        public void PopulateDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType)
+        {
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.MonitoringPoint, defaultValue: defaultMonitoringPoint);
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.CollectionMethod, defaultValue: defaultCollectionMethod);
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.SampleType, defaultValue: defaultSampleType);
         }
 
         /// <inheritdoc />
         public List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:sampleImportDto.ImportJobId))
+                                    descripition:sampleImportDto.ImportId.ToString()))
             {
                 //TODO: Should add audit log events to indicate system deleted they are no longer available data translations
                 _dataSourceService.DeleteInvalidDataSourceTranslations(dataSourceId:dataSourceId);
@@ -489,7 +489,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                              OrganizationRegulatoryProgramId = currentRegulatoryProgramId
                                          };
 
-                        _fileStoreService.CreateFileStore(fileStoreDto:attachment);
+                        attachment.FileStoreId = _fileStoreService.CreateFileStore(fileStoreDto:attachment);
+
+                        sampleImportDto.ImportedFile = attachment;
                     }
 
                     // remove temp import file
@@ -782,8 +784,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         private void AddRequiredDataDefaultDtoOrPopulateDefaultValue(SampleImportDto sampleImportDto,
                                                                      List<RequiredDataDefaultsDto> requiredDataDefaults,
-                                                                     SampleImportColumnName columnName,
-                                                                     ListItemDto selectedValue)
+                                                                     SampleImportColumnName columnName)
         {
             var emptyValueCells = GetEmptyValueCells(sampleImportDto:sampleImportDto, columnName:columnName);
             if (!emptyValueCells.Any())
@@ -791,24 +792,33 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 return;
             }
 
-            var isDefaultValueValid = selectedValue != null && selectedValue.Id > 0;
-            if (isDefaultValueValid)
+            _logger.Debug(message: "{0} found empty {1} cells which requires default value", argument1: sampleImportDto.ImportId.ToString(), argument2: columnName);
+            requiredDataDefaults.Add(item: new RequiredDataDefaultsDto
+                                           {
+                                               SampleImportColumnName = columnName,
+                                               Options = GetSelectListBySampleImportColumn(columnName: columnName)
+                                           });
+        }
+
+        private void PopulateEmptyColumnValueAsDefaultValue(SampleImportDto sampleImportDto, SampleImportColumnName columnName, ListItemDto defaultValue)
+        {
+            var doesDefaultValueExist = defaultValue != null && defaultValue.Id > 0;
+            if (!doesDefaultValueExist)
             {
-                _logger.Debug(message:"{0} populated empty {1} cells with requires default value", argument1:sampleImportDto.ImportJobId, argument2:columnName);
-                foreach (var cell in emptyValueCells)
-                {
-                    cell.TranslatedValueId = selectedValue.Id;
-                    cell.TranslatedValue = selectedValue.DisplayValue;
-                }
+                return;
             }
-            else
+
+            var emptyValueCells = GetEmptyValueCells(sampleImportDto: sampleImportDto, columnName: columnName);
+            if (!emptyValueCells.Any())
             {
-                _logger.Debug(message:"{0} found empty {1} cells which requires default value", argument1:sampleImportDto.ImportJobId, argument2:columnName);
-                requiredDataDefaults.Add(item:new RequiredDataDefaultsDto
-                                              {
-                                                  SampleImportColumnName = columnName,
-                                                  Options = GetSelectListBySampleImportColumn(columnName:columnName)
-                                              });
+                return;
+            }
+
+            _logger.Debug(message: "{0} populated empty {1} cells with requires default value", argument1: sampleImportDto.ImportId.ToString(), argument2: columnName);
+            foreach (var cell in emptyValueCells)
+            {
+                cell.TranslatedValueId = defaultValue.Id;
+                cell.TranslatedValue = defaultValue.DisplayValue;
             }
         }
 
@@ -872,7 +882,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
             }
 
-            _logger.Debug(message:"Column {0} missing translation(s) at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportJobId,
+            _logger.Debug(message:"Column {0} missing translation(s) at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportId.ToString(),
                           argument3:string.Join(separator:",", values:missingTranslationTerms));
             return new MissingTranslationDto
                    {

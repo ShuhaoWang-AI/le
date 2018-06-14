@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Report;
@@ -95,26 +94,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         protected string GetQueryParameterValue(string parameterName)
         {
-            return Request.QueryString.Get(name: parameterName);
-        }
-
-        protected int? GetQueryParameterValueAsInt(string parameterName)
-        {
-            var parameterValue = GetQueryParameterValue(parameterName:parameterName);
-            if (string.IsNullOrEmpty(value:parameterValue))
-            {
-                return null;
-            }
-
-            int intValue;
-            if (int.TryParse(s:parameterValue, result:out intValue))
-            {
-                return intValue;
-            }
-            else
-            {
-                throw new BadRequest(message:$"The value of Query Parameter {parameterName} should be a integer");
-            }
+            return Request.QueryString.Get(name:parameterName);
         }
     }
 }
