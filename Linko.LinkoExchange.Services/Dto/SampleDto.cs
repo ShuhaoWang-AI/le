@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Linko.LinkoExchange.Core.Enum;
 
@@ -51,6 +52,34 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public DateTime? LastSubmissionDateTimeLocal { get; internal set; }
 
-        #endregion
-    }
+	    public int GoodConcentrationComplianceCount
+	    {
+		    get { return SampleResults.Count(i => i.ConcentrationResultCompliance == ResultComplianceType.Good); }
+	    }
+
+		public int BadConcentrationComplianceCount
+		{
+			get { return SampleResults.Count(i => i.ConcentrationResultCompliance == ResultComplianceType.Bad); }
+		}
+
+        public int UnknowConcentrationComplianceCount
+		{
+			get { return SampleResults.Count(i => i.ConcentrationResultCompliance == ResultComplianceType.Unknown); }
+		}
+
+		public int GoodMassLoadingComplianceCount
+		{
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Good); }
+		}
+
+		public int BadMassLoadingComplianceCount
+		{
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Bad); }
+		}
+		public int UnknowMassLoadingComplianceCount
+		{
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Unknown); }
+		}
+		#endregion
+	}
 }

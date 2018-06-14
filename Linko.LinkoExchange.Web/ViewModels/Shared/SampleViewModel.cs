@@ -7,6 +7,7 @@ using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Web.ViewModels.Industry;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -141,8 +142,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string SampleOverallComplianceComment { get; set; }
 
 		public string Identifier { get; set; }
-        #endregion
-    }
+		public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; }
+		#endregion
+	}
 
 
 	public enum ImportStatus
