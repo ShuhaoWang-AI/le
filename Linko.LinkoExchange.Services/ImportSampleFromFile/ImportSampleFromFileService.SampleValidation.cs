@@ -648,7 +648,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			}
 		}
 
-		private static void AddValidationError(ImportSampleFromFileValidationResultDto validationResult, string errorMessage, int rowNumber)
+		private static void AddValidationError(ImportSampleFromFileValidationResultDto validationResult, string errorMessage, int? rowNumber = default(int?) )
 		{
 			var error = validationResult.Errors.SingleOrDefault(i => i.ErrorMessage == errorMessage);
 			if (error == null)
@@ -656,14 +656,14 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				error = new ErrorWithRowNumberDto
 				        {
 					        ErrorMessage = errorMessage,
-					        RowNumbers = $"{rowNumber}"
+					        RowNumbers = rowNumber.HasValue ? $"{rowNumber}" : ""
 				        };
 
 				validationResult.Errors.Add(item:error);
 			}
 			else
 			{
-				error.RowNumbers = $"{error.RowNumbers}, {rowNumber}";
+				error.RowNumbers = rowNumber.HasValue ? $"{error.RowNumbers}, {rowNumber}" : $"{error.RowNumbers}" ;
 			}
 		}
 

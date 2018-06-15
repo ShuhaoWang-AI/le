@@ -39,13 +39,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         #region static fields and constants
 
         private static readonly IEnumerable<SampleImportColumnName> ColumnsNeedDataTranslation = new List<SampleImportColumnName>
-                                                                                                  {
-                                                                                                      SampleImportColumnName.MonitoringPoint,
-                                                                                                      SampleImportColumnName.CollectionMethod,
-                                                                                                      SampleImportColumnName.SampleType,
-                                                                                                      SampleImportColumnName.ParameterName,
-                                                                                                      SampleImportColumnName.ResultUnit
-                                                                                                  };
+                                                                                                 {
+                                                                                                     SampleImportColumnName.MonitoringPoint,
+                                                                                                     SampleImportColumnName.CollectionMethod,
+                                                                                                     SampleImportColumnName.SampleType,
+                                                                                                     SampleImportColumnName.ParameterName,
+                                                                                                     SampleImportColumnName.ResultUnit
+                                                                                                 };
 
         #endregion
 
@@ -310,16 +310,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
             if (sampleImportDto.TempFile == null)
             {
-                throw new ArgumentNullException(paramName: nameof(SampleImportDto), message:ErrorConstants.SampleImport.CannotFindImportFile);
+                throw new ArgumentNullException(paramName:nameof(SampleImportDto), message:ErrorConstants.SampleImport.CannotFindImportFile);
             }
+
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"importTempFileId={sampleImportDto.TempFile.ImportTempFileId.ToString()}"))
+                                    descripition:$"importTempFileId={sampleImportDto.TempFile.ImportTempFileId}"))
             {
-                var result = new ImportSampleFromFileValidationResultDto();
+                var validationResult = new ImportSampleFromFileValidationResultDto();
 
                 try
                 {
-                    if (sampleImportDto.TempFile.ImportTempFileId != null && !CanUserExecuteApi(id: sampleImportDto.TempFile.ImportTempFileId.Value))
+                    if (sampleImportDto.TempFile.ImportTempFileId != null && !CanUserExecuteApi(id:sampleImportDto.TempFile.ImportTempFileId.Value))
                     {
                         throw new UnauthorizedAccessException();
                     }
@@ -335,24 +336,22 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                     //populate Rows in sampleImportDto
                     var importFileWorkbook = GetWorkbook(importTempFileDto:sampleImportDto.TempFile);
 
-                    sampleImportDto.Rows = GetImportRowObjects(importFileWorkbook:importFileWorkbook, sampleImportDto:sampleImportDto, result:ref result);
+                    sampleImportDto.Rows = GetImportRowObjects(importFileWorkbook:importFileWorkbook, sampleImportDto:sampleImportDto, validationResult:ref validationResult);
 
                     if (sampleImportDto.Rows.Count == 0)
                     {
-                        result.Errors.Add(item:new ErrorWithRowNumberDto {ErrorMessage = ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty});
+                        AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty);
                     }
                 }
                 catch (RuleViolationException ruleViolationException)
                 {
-                    if (ruleViolationException.ValidationIssues.Count > 0)
+                    foreach (var validationIssue in ruleViolationException.ValidationIssues)
                     {
-                        result.Errors.AddRange(collection:ruleViolationException
-                                                   .ValidationIssues?.Select(x => new ErrorWithRowNumberDto {ErrorMessage = x.ErrorMessage, RowNumbers = ""})
-                                                   .ToList());
+                        AddValidationError(validationResult:validationResult, errorMessage:validationIssue.ErrorMessage);
                     }
                 }
 
-                return result;
+                return validationResult;
             }
         }
 
@@ -361,21 +360,21 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         {
             var requiredDataDefaults = new List<RequiredDataDefaultsDto>();
 
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
-                                                            columnName: SampleImportColumnName.MonitoringPoint);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
-                                                            columnName: SampleImportColumnName.CollectionMethod);
-            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto: sampleImportDto, requiredDataDefaults: requiredDataDefaults, 
-                                                            columnName: SampleImportColumnName.SampleType);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
+                                                            columnName:SampleImportColumnName.MonitoringPoint);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
+                                                            columnName:SampleImportColumnName.CollectionMethod);
+            AddRequiredDataDefaultDtoOrPopulateDefaultValue(sampleImportDto:sampleImportDto, requiredDataDefaults:requiredDataDefaults,
+                                                            columnName:SampleImportColumnName.SampleType);
 
             return requiredDataDefaults;
         }
 
         public void PopulateDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType)
         {
-            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.MonitoringPoint, defaultValue: defaultMonitoringPoint);
-            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.CollectionMethod, defaultValue: defaultCollectionMethod);
-            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto: sampleImportDto, columnName: SampleImportColumnName.SampleType, defaultValue: defaultSampleType);
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto:sampleImportDto, columnName:SampleImportColumnName.MonitoringPoint, defaultValue:defaultMonitoringPoint);
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto:sampleImportDto, columnName:SampleImportColumnName.CollectionMethod, defaultValue:defaultCollectionMethod);
+            PopulateEmptyColumnValueAsDefaultValue(sampleImportDto:sampleImportDto, columnName:SampleImportColumnName.SampleType, defaultValue:defaultSampleType);
         }
 
         /// <inheritdoc />
@@ -792,12 +791,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 return;
             }
 
-            _logger.Debug(message: "{0} found empty {1} cells which requires default value", argument1: sampleImportDto.ImportId.ToString(), argument2: columnName);
-            requiredDataDefaults.Add(item: new RequiredDataDefaultsDto
-                                           {
-                                               SampleImportColumnName = columnName,
-                                               Options = GetSelectListBySampleImportColumn(columnName: columnName)
-                                           });
+            _logger.Debug(message:"{0} found empty {1} cells which requires default value", argument1:sampleImportDto.ImportId.ToString(), argument2:columnName);
+            requiredDataDefaults.Add(item:new RequiredDataDefaultsDto
+                                          {
+                                              SampleImportColumnName = columnName,
+                                              Options = GetSelectListBySampleImportColumn(columnName:columnName)
+                                          });
         }
 
         private void PopulateEmptyColumnValueAsDefaultValue(SampleImportDto sampleImportDto, SampleImportColumnName columnName, ListItemDto defaultValue)
@@ -808,13 +807,13 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 return;
             }
 
-            var emptyValueCells = GetEmptyValueCells(sampleImportDto: sampleImportDto, columnName: columnName);
+            var emptyValueCells = GetEmptyValueCells(sampleImportDto:sampleImportDto, columnName:columnName);
             if (!emptyValueCells.Any())
             {
                 return;
             }
 
-            _logger.Debug(message: "{0} populated empty {1} cells with requires default value", argument1: sampleImportDto.ImportId.ToString(), argument2: columnName);
+            _logger.Debug(message:"{0} populated empty {1} cells with requires default value", argument1:sampleImportDto.ImportId.ToString(), argument2:columnName);
             foreach (var cell in emptyValueCells)
             {
                 cell.TranslatedValueId = defaultValue.Id;
@@ -967,15 +966,15 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
         }
 
-        private List<ImportRowObject> GetImportRowObjects(Workbook importFileWorkbook, SampleImportDto sampleImportDto, ref ImportSampleFromFileValidationResultDto result)
+        private List<ImportRowObject> GetImportRowObjects(Workbook importFileWorkbook, SampleImportDto sampleImportDto,
+                                                          ref ImportSampleFromFileValidationResultDto validationResult)
         {
-            var validationIssues = new List<ErrorWithRowNumberDto>();
             var rows = new List<ImportRowObject>();
             var worksheet = importFileWorkbook.Worksheets.FirstOrDefault();
 
             if (worksheet == null)
             {
-                validationIssues.Add(item:new ErrorWithRowNumberDto {ErrorMessage = ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty});
+                AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty);
             }
             else
             {
@@ -1004,7 +1003,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                 if (usedCellRangeWithValues.RowCount == 0)
                 {
-                    validationIssues.Add(item:new ErrorWithRowNumberDto {ErrorMessage = ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty});
+                    AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty);
                 }
 
                 //loop through the rows
@@ -1066,12 +1065,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     //Validate text field length
                                     if (resultAsString.Length > templateColumn.Size)
                                     {
-                                        validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                                  {
-                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueExceedMaximumSize,
-                                                                                                   arg0:templateColumn.FileVersionFieldName, arg1:templateColumn.Size),
-                                                                      RowNumbers = importRowObject.RowNumber.ToString()
-                                                                  });
+                                        AddValidationError(validationResult:validationResult,
+                                                           errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueExceedMaximumSize,
+                                                                                      arg0:templateColumn.FileVersionFieldName, arg1:templateColumn.Size),
+                                                           rowNumber:importRowObject.RowNumber);
                                     }
 
                                     importCellObject.OriginalValue = importCellObject.OriginalValueString;
@@ -1085,13 +1082,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     catch (Exception ex)
                                     {
                                         _logger.Error(value:ex);
-
-                                        validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                                  {
-                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotNumeric,
-                                                                                                   arg0:templateColumn.FileVersionFieldName),
-                                                                      RowNumbers = importRowObject.RowNumber.ToString()
-                                                                  });
+                                        AddValidationError(validationResult:validationResult,
+                                                           errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotNumeric,
+                                                                                      arg0:templateColumn.FileVersionFieldName),
+                                                           rowNumber:importRowObject.RowNumber);
                                         importCellObject.OriginalValue = default(double?);
                                     }
 
@@ -1108,12 +1102,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     catch (Exception ex)
                                     {
                                         _logger.Error(value:ex);
-                                        validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                                  {
-                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotDate,
-                                                                                                   arg0:templateColumn.FileVersionFieldName),
-                                                                      RowNumbers = importRowObject.RowNumber.ToString()
-                                                                  });
+                                        AddValidationError(validationResult:validationResult,
+                                                           errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotDate,
+                                                                                      arg0:templateColumn.FileVersionFieldName),
+                                                           rowNumber:importRowObject.RowNumber);
                                         importCellObject.OriginalValue = default(DateTime?);
                                     }
 
@@ -1127,12 +1119,10 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     catch (Exception ex)
                                     {
                                         _logger.Error(value:ex);
-                                        validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                                  {
-                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotBoolean,
-                                                                                                   arg0:templateColumn.FileVersionFieldName),
-                                                                      RowNumbers = importRowObject.RowNumber.ToString()
-                                                                  });
+                                        AddValidationError(validationResult:validationResult,
+                                                           errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsNotBoolean,
+                                                                                      arg0:templateColumn.FileVersionFieldName),
+                                                           rowNumber:importRowObject.RowNumber);
                                         importCellObject.OriginalValue = default(bool?);
                                     }
 
@@ -1167,7 +1157,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                             // Validate Authority Required fields for system required
                             ValidateAuthorityRequiredFieldsForSystemRequired(templateColumn:templateColumn,
                                                                              importCellObject:importCellObject,
-                                                                             validationIssues:validationIssues,
+                                                                             validationResult:ref validationResult,
                                                                              importRowObject:importRowObject);
 
                             importRowObject.Cells.Add(item:importCellObject);
@@ -1176,7 +1166,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
                     if (rowIndex == 0)
                     {
-                        DoColumnHeaderValidation(requiredColumns:requiredColumns, fileColumns:fileColumns, validationIssues:validationIssues);
+                        DoColumnHeaderValidation(requiredColumns:requiredColumns, fileColumns:fileColumns, validationResult:ref validationResult);
                     }
                     else
                     {
@@ -1191,30 +1181,23 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                             {
                                 if (new List<string> {"", "<", ">"}.Contains(item:resultQualifierColumnValue) && string.IsNullOrWhiteSpace(value:resultColumnValue))
                                 {
-                                    validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                              {
-                                                                  ErrorMessage = ErrorConstants.SampleImport.FileValidation.ResultIsRequired,
-                                                                  RowNumbers = importRowObject.RowNumber.ToString()
-                                                              });
+                                    AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ResultIsRequired,
+                                                       rowNumber:importRowObject.RowNumber);
                                 }
                                 else if (new List<string> {"ND", "NF"}.CaseInsensitiveContains(value:resultQualifierColumnValue)
                                          && !string.IsNullOrWhiteSpace(value:resultColumnValue))
                                 {
-                                    validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                              {
-                                                                  ErrorMessage = ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShouldNotHaveAValue,
-                                                                  RowNumbers = importRowObject.RowNumber.ToString()
-                                                              });
+                                    AddValidationError(validationResult:validationResult,
+                                                       errorMessage:ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShouldNotHaveAValue,
+                                                       rowNumber:importRowObject.RowNumber);
                                 }
                             }
                             else
                             {
-                                validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                          {
-                                                              ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.ResultQualifierIsInvalid,
-                                                                                           arg0:resultQualifierColumnValue),
-                                                              RowNumbers = importRowObject.RowNumber.ToString()
-                                                          });
+                                AddValidationError(validationResult:validationResult,
+                                                   errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.ResultQualifierIsInvalid,
+                                                                              arg0:resultQualifierColumnValue),
+                                                   rowNumber:importRowObject.RowNumber);
                             }
                         }
 
@@ -1224,51 +1207,42 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 }
             }
 
-            // check there is any validation issue or not
-            if (validationIssues.Count > 0)
-            {
-                result.Errors = validationIssues;
-            }
-
             return rows;
         }
 
-        private static void ValidateAuthorityRequiredFieldsForSystemRequired(FileVersionFieldDto templateColumn, ImportCellObject importCellObject, List<ErrorWithRowNumberDto> validationIssues,
-                                                                             ImportRowObject importRowObject)
+        private static void ValidateAuthorityRequiredFieldsForSystemRequired(FileVersionFieldDto templateColumn, ImportCellObject importCellObject,
+                                                                             ImportRowObject importRowObject, ref ImportSampleFromFileValidationResultDto validationResult)
         {
             if (templateColumn.IsSystemRequired && templateColumn.DataOptionalityName == DataOptionalityName.Required)
             {
                 if (string.IsNullOrWhiteSpace(value:importCellObject.OriginalValueString))
                 {
-                    if (importCellObject.SampleImportColumnName == SampleImportColumnName.ResultQualifier)
+                    if (importCellObject.SampleImportColumnName == SampleImportColumnName.ResultQualifier
+                        || importCellObject.SampleImportColumnName == SampleImportColumnName.Result)
                     {
                         importCellObject.OriginalValue = ""; // this is valid for NUMERIC results
                     }
                     else
                     {
-                        validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                  {
-                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsRequired,
-                                                                                   arg0:templateColumn.FileVersionFieldName),
-                                                      RowNumbers = importRowObject.RowNumber.ToString()
-                                                  });
+                        AddValidationError(validationResult:validationResult, errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsRequired,
+                                                                                                         arg0:templateColumn.FileVersionFieldName),
+                                           rowNumber:importRowObject.RowNumber);
                     }
                 }
             }
         }
 
-        private static void DoColumnHeaderValidation(IEnumerable<string> requiredColumns, IEnumerable<string> fileColumns, ICollection<ErrorWithRowNumberDto> validationIssues)
+        private static void DoColumnHeaderValidation(IEnumerable<string> requiredColumns, IEnumerable<string> fileColumns,
+                                                     ref ImportSampleFromFileValidationResultDto validationResult)
         {
             //Check all required columns are exists or not
             var missingRequiredColumns = requiredColumns.Except(second:fileColumns, comparer:StringComparer.OrdinalIgnoreCase).ToList();
 
             if (missingRequiredColumns.Any())
             {
-                validationIssues.Add(item:new ErrorWithRowNumberDto
-                                          {
-                                              ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.ImportFileMissingRequiredFields,
-                                                                           arg0:string.Join(separator:",", values:missingRequiredColumns.Select(name => name)))
-                                          });
+                AddValidationError(validationResult:validationResult, errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.ImportFileMissingRequiredFields,
+                                                                                                 arg0:string.Join(separator:",",
+                                                                                                                  values:missingRequiredColumns.Select(name => name))));
             }
         }
 

@@ -32,19 +32,19 @@ namespace Linko.LinkoExchange.Services.Base
             {
                 #region static fields and constants
 
-                public const string FieldValueExceedMaximumSize = "The length of {0} exceeds the maximum of size of {1}";
-                public const string FieldValueIsNotBoolean = "{0} is not boolean";
-                public const string FieldValueIsNotDate = "{0} is not a valid date";
-                public const string FieldValueIsNotNumeric = "{0} is not numeric";
-                public const string FieldValueIsRequired = "{0} is required and is missing";
+                public const string FieldValueExceedMaximumSize = "The length of {0} exceeds the maximum of size of {1}.";
+                public const string FieldValueIsNotBoolean = "{0} is not boolean.";
+                public const string FieldValueIsNotDate = "{0} is not a valid date.";
+                public const string FieldValueIsNotNumeric = "{0} is not numeric.";
+                public const string FieldValueIsRequired = "{0} is required and is missing.";
                 public const string FileTypeIsUnsupported = "The file type selected is not supported.";
 
                 public const string ImportFileExceedSizeLimitation = "The file size exceeds the maximum supported size of {0} MB.  Try splitting the data into 2 files.";
                 public const string ImportFileIsCorrupted = "The file type selected in not an .xlsx file or it may be corrupted.";
                 public const string ImportFileIsEmpty = "The file is empty.";
-                public const string ImportFileMissingRequiredFields = "The file does not contain the required column(s) {0}";
-                public const string ResultIsRequired = "Result is required.";
-                public const string ResultQualifierIsInvalid = "Result Qualifier of {0} is not valid";
+                public const string ImportFileMissingRequiredFields = "The file does not contain the required column(s) {0}.";
+                public const string ResultIsRequired = "Result is required and is missing.";
+                public const string ResultQualifierIsInvalid = "Result Qualifier of {0} is not valid.";
                 public const string ResultQualifierNdNfShouldNotHaveAValue = "A Result Qualifier of ND or NF cannot be followed by a value in the Result field.";
 
                 #endregion
@@ -54,9 +54,9 @@ namespace Linko.LinkoExchange.Services.Base
             {
                 #region static fields and constants
 
-                public const string FieldValueIsRequired = "{0} is required and is missing";
+                public const string FieldValueIsRequired = "{0} is required and is missing.";
 
-                public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample";
+                public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample.";
                 public const string FlowUnitIsInvalidOnMassLoadingCalculation = "Invalid Flow unit for Mass Loadings calculations.Chosen unit must be gpd or mgd.";
                 public const string FlowUnitIsUnSpecified = "Missing flow units for Mass Loading calculations.";
                 public const string FlowValueIsInvalid = "Missing flow value for Mass Loading calculations.";
