@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Services.Base
         {
             #region static fields and constants
 
-            public const string PropertyNameIsRequred = "{PropertyName} is required.";
+            public const string PropertyNameIsRequired = "{PropertyName} is required.";
 
             #endregion
         }
@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Services.Base
             {
                 #region static fields and constants
 
-                public const string FieldValueExceedMaxmimumSize = "The length of {0} exceeds the maximum of size of {1}";
+                public const string FieldValueExceedMaximumSize = "The length of {0} exceeds the maximum of size of {1}";
                 public const string FieldValueIsNotBoolean = "{0} is not boolean";
                 public const string FieldValueIsNotDate = "{0} is not a valid date";
                 public const string FieldValueIsNotNumeric = "{0} is not numeric";
@@ -45,7 +45,7 @@ namespace Linko.LinkoExchange.Services.Base
                 public const string ImportFileMissingRequiredFields = "The file does not contain the required column(s) {0}";
                 public const string ResultIsRequired = "Result is required.";
                 public const string ResultQualifierIsInvalid = "Result Qualifier of {0} is not valid";
-                public const string ResultQualifierNdNfShoudNotHaveAValue = "A Result Qualifier of ND or NF cannot be followed by a value in the Result field.";
+                public const string ResultQualifierNdNfShouldNotHaveAValue = "A Result Qualifier of ND or NF cannot be followed by a value in the Result field.";
 
                 #endregion
             }
@@ -53,6 +53,8 @@ namespace Linko.LinkoExchange.Services.Base
             public class DataValidation
             {
                 #region static fields and constants
+
+                public const string FieldValueIsRequired = "{0} is required and is missing";
 
                 public const string DuplicateParametersInSameSample = "Duplicate parameters exist for the same sample";
                 public const string FlowUnitIsInvalidOnMassLoadingCalculation = "Invalid Flow unit for Mass Loadings calculations.Chosen unit must be gpd or mgd.";

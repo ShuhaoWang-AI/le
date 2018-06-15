@@ -427,7 +427,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		private ImportSampleFromFileValidationResultDto GetValidImportingSamples(SampleImportDto sampleImportDto, out List<ImportSampleWrapper> groupedSampleWrappers)
 		{
 			var validationResult = new ImportSampleFromFileValidationResultDto();
-
+			ValidateAuthorityRequiredFieldsForNonSystemRequired(sampleImportDto:sampleImportDto, validationResult:validationResult);
             groupedSampleWrappers = GroupSampleWrappers(sampleImportDto:sampleImportDto);
 
 			foreach (var importingSample in groupedSampleWrappers)
@@ -476,6 +476,37 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			}
 		}
 
+		private void ValidateAuthorityRequiredFieldsForNonSystemRequired(SampleImportDto sampleImportDto, ImportSampleFromFileValidationResultDto validationResult)
+		{
+			if (_massLoadingFlowParameter == null)
+			{
+				_massLoadingFlowParameter = _parameterService.GetFlowParameter();
+			}
+
+			// Validate Authority Required fields for non-system required, Except row is not for mass loading flow parameter
+			var columnsToValidate = sampleImportDto.FileVersion.FileVersionFields
+			                                       .Where(x => x.IsSystemRequired == false && x.DataOptionalityName == DataOptionalityName.Required)
+			                                       .ToDictionary(k => k.SystemFieldName, v => v.FileVersionFieldName);
+
+			var rowsToValidate =
+				sampleImportDto.Rows.Where(row => !(((string) row.Cells.First(x => x.SampleImportColumnName == SampleImportColumnName.ParameterName).TranslatedValue)
+					                                   .Equals(value:_massLoadingFlowParameter.Name, comparisonType:StringComparison.OrdinalIgnoreCase)));
+
+			foreach (var row in rowsToValidate)
+			{
+				foreach (var cell in row.Cells.Where(x => columnsToValidate.Keys.Contains(value:x.SampleImportColumnName)))
+				{
+					if (string.IsNullOrWhiteSpace(value:cell.OriginalValueString))
+					{
+						AddValidationError(validationResult:validationResult,
+						                   errorMessage:string.Format(format:ErrorConstants.SampleImport.DataValidation.FieldValueIsRequired,
+						                                              arg0:columnsToValidate[key:cell.SampleImportColumnName]),
+						                   rowNumber:row.RowNumber);
+					}
+				}
+			}
+		}
+
 		private List<ImportSampleWrapper> GroupSampleWrappers(SampleImportDto sampleImportDto)
 		{
 			var rowsToGroupBySample = new List<ImportRowObjectForGroupBySample>();
@@ -489,7 +520,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				                   };
 
 				rowsToGroupBySample.Add(item:rowToGroupBy);
-
+				
 				foreach (var cell in row.Cells)
 				{
 					rowToGroupBy.ColumnMap.Add(key:cell.SampleImportColumnName, value:cell);

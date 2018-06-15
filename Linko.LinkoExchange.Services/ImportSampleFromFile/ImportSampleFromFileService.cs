@@ -991,7 +991,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 resultQualifierValidValues.Add(item:""); // for "NUMERIC" values
 
                 var templateColumnDictionary = sampleImportDto.FileVersion.FileVersionFields.ToDictionary(x => x.FileVersionFieldName.ToLower(), x => x);
-                var requiredColumns = sampleImportDto.FileVersion.FileVersionFields.Where(x => x.DataOptionalityName == DataOptionalityName.Required)
+                var requiredColumns = sampleImportDto.FileVersion.FileVersionFields
+                                                     .Where(x => x.DataOptionalityName == DataOptionalityName.Required || x.IsSystemRequired)
                                                      .Select(x => x.FileVersionFieldName.ToLower())
                                                      .ToList();
 
@@ -1038,7 +1039,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                             }
                             else
                             {
-                                _logger.Error(message:$"Column header '{resultAsString}' is not belongs the authority's file template."
+                                _logger.Error(message:$"#NewSampleImportFileColumn - Column header '{resultAsString}' is not belongs the authority's file template."
                                                       + $" Current OrgRegProgramId:{currentOrgRegProgramId}. DataScource: {sampleImportDto.DataSource.Name} ");
                             }
                         }
@@ -1067,7 +1068,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                     {
                                         validationIssues.Add(item:new ErrorWithRowNumberDto
                                                                   {
-                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueExceedMaxmimumSize,
+                                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueExceedMaximumSize,
                                                                                                    arg0:templateColumn.FileVersionFieldName, arg1:templateColumn.Size),
                                                                       RowNumbers = importRowObject.RowNumber.ToString()
                                                                   });
@@ -1163,37 +1164,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 default: throw new NotImplementedException();
                             }
 
-                            switch (templateColumn.DataOptionalityName)
-                            {
-                                //Check each row that any required field is missing or not
-                                case DataOptionalityName.Required:
-
-                                    if (string.IsNullOrWhiteSpace(value:importCellObject.OriginalValueString))
-                                    {
-                                        if (importCellObject.SampleImportColumnName == SampleImportColumnName.ResultQualifier)
-                                        {
-                                            importCellObject.OriginalValue = ""; // this is valid for NUMERIC results
-                                        }
-                                        else
-                                        {
-                                            validationIssues.Add(item:new ErrorWithRowNumberDto
-                                                                      {
-                                                                          ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsRequired,
-                                                                                                       arg0:templateColumn.FileVersionFieldName),
-                                                                          RowNumbers = importRowObject.RowNumber.ToString()
-                                                                      });
-                                        }
-                                    }
-
-                                    break;
-
-                                case DataOptionalityName.Optional: break;
-                                case DataOptionalityName.Recommended:
-
-                                    //TODO: User Story 8199, could reserve cell optionality state to speed up missing default values look up
-                                    break;
-                                default: throw new NotImplementedException();
-                            }
+                            // Validate Authority Required fields for system required
+                            ValidateAuthorityRequiredFieldsForSystemRequired(templateColumn:templateColumn,
+                                                                             importCellObject:importCellObject,
+                                                                             validationIssues:validationIssues,
+                                                                             importRowObject:importRowObject);
 
                             importRowObject.Cells.Add(item:importCellObject);
                         }
@@ -1227,7 +1202,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                 {
                                     validationIssues.Add(item:new ErrorWithRowNumberDto
                                                               {
-                                                                  ErrorMessage = ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShoudNotHaveAValue,
+                                                                  ErrorMessage = ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShouldNotHaveAValue,
                                                                   RowNumbers = importRowObject.RowNumber.ToString()
                                                               });
                                 }
@@ -1256,6 +1231,30 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
 
             return rows;
+        }
+
+        private static void ValidateAuthorityRequiredFieldsForSystemRequired(FileVersionFieldDto templateColumn, ImportCellObject importCellObject, List<ErrorWithRowNumberDto> validationIssues,
+                                                                             ImportRowObject importRowObject)
+        {
+            if (templateColumn.IsSystemRequired && templateColumn.DataOptionalityName == DataOptionalityName.Required)
+            {
+                if (string.IsNullOrWhiteSpace(value:importCellObject.OriginalValueString))
+                {
+                    if (importCellObject.SampleImportColumnName == SampleImportColumnName.ResultQualifier)
+                    {
+                        importCellObject.OriginalValue = ""; // this is valid for NUMERIC results
+                    }
+                    else
+                    {
+                        validationIssues.Add(item:new ErrorWithRowNumberDto
+                                                  {
+                                                      ErrorMessage = string.Format(format:ErrorConstants.SampleImport.FileValidation.FieldValueIsRequired,
+                                                                                   arg0:templateColumn.FileVersionFieldName),
+                                                      RowNumbers = importRowObject.RowNumber.ToString()
+                                                  });
+                    }
+                }
+            }
         }
 
         private static void DoColumnHeaderValidation(IEnumerable<string> requiredColumns, IEnumerable<string> fileColumns, ICollection<ErrorWithRowNumberDto> validationIssues)

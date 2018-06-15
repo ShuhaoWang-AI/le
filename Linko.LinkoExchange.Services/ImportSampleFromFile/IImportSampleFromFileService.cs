@@ -30,8 +30,6 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <summary>
         /// Checks file is valid to import or not
         /// </summary>
-        /// <param name="dataSourceId"> </param>
-        /// <param name="importTempFileDto"> </param>
         /// <param name="sampleImportDto"> </param>
         /// <returns>
         /// ImportSampleFromFileValidationResultDto.Success is equal to "true" if file is valid; otherwise "false"

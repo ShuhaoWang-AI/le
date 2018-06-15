@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		public SampleImportViewModelValidator()
 		{
-			RuleFor(x => x.SelectedDataSourceId).GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequred);
+			RuleFor(x => x.SelectedDataSourceId).GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequired);
 
 			When(x => x.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectFile,
 			     () =>
@@ -162,21 +162,21 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 			     () =>
 			     {
 				     RuleFor(x => x.SelectedDefaultMonitoringPointId)
-					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequred);
+					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequired);
 			     });
 			When(x => x.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataDefault
 			          && !string.IsNullOrEmpty(value:x.SelectedDefaultCollectionMethodName),
 			     () =>
 			     {
 				     RuleFor(x => x.SelectedDefaultCollectionMethodId)
-					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequred);
+					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequired);
 			     });
 			When(x => x.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataDefault
 			          && !string.IsNullOrEmpty(value:x.SelectedDefaultSampleTypeName),
 			     () =>
 			     {
 				     RuleFor(x => x.SelectedDefaultSampleTypeId)
-					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequred);
+					     .GreaterThan(valueToCompare:0).WithMessage(errorMessage:ErrorConstants.Validator.PropertyNameIsRequired);
 			     });
 		}
 
