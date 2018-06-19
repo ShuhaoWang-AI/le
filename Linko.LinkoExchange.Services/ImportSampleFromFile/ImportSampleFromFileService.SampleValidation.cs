@@ -91,7 +91,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DefaultSampleTypeIsRequired, rowNumber:importingSampleResult.RowNumber);
 				}
 
-				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
+				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue?? 0;
 
 				importingSampleResult.EffectiveUnit = GetEffectiveUnit(monitoringPointId:monitoringPointId, parameterId:parameterId, start:start, end:end);
 
@@ -197,8 +197,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			{
 				return;
 			}
-
-			// If there is a Flow, but FlowValue or FlowUnit does not exist, throw exception. 
+ 
+			string qualifier = flow.ColumnMap[key: SampleImportColumnName.ResultQualifier].TranslatedValue;
+			if (!string.IsNullOrWhiteSpace(qualifier))
+			{
+				if (qualifier.Equals("ND", StringComparison.OrdinalIgnoreCase) || qualifier.Equals("NF", StringComparison.OrdinalIgnoreCase))
+				{
+					return;
+				}
+			}
+			
+			// If there is a Flow, but FlowValue or FlowUnit does not exist, throw exception.
 			double flowValue = flow.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
 			string flowUnitName = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValue;
 			var flowUnitId = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId; 
