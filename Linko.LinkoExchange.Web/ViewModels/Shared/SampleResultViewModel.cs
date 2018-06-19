@@ -25,8 +25,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Result")]
         public string Value { get; set; }
+		
+	    [Display(Name = "Result")]
+	    public string DisplayValue => $"{Qualifier} {Value}";
 
-        [Display(Name = "Unit")]
+	    [Display(Name = "Unit")]
         public int UnitId { get; set; }
 
         [Display(Name = "Unit")]
