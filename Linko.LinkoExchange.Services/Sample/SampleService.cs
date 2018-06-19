@@ -415,7 +415,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.LastModifierFullName = "N/A";
             }
 
-            if (sample != null && sample.IsReadyToReport)
+            if (sample.IsReadyToReport)
             {
                 dto.SampleStatusName = SampleStatusName.ReadyToReport;
             }
@@ -424,7 +424,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.SampleStatusName = SampleStatusName.Draft;
             }
 
-            if (sample?.ReportSamples != null && sample.ReportSamples.Any())
+            if (sample.ReportSamples != null && sample.ReportSamples.Any())
             {
                 dto.SampleStatusName = SampleStatusName.Reported;
             }
@@ -521,18 +521,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         //  will be ignored until we change the code..." - mj
                     }
                 }
-
-                var sampleResultList = resultDtoList.Values.ToList();
-
-                //Check compliance on all of these
-                for (int i = 0; i < sampleResultList.Count(); i++)
-                {
-                    var resultDto = sampleResultList[i];
-                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleDateTimeLocal, LimitBasisName.Concentration);
-                    CheckResultCompliance(ref resultDto, sample.MonitoringPointId, sampleDateTimeLocal, LimitBasisName.MassLoading);
-                }
-
-                dto.SampleResults = sampleResultList;
+				
+                dto.SampleResults = resultDtoList.Values.ToList(); 
             }
 
 
@@ -541,7 +531,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 _logger.Info(message:"End: SampleService.GetSampleDetails.");
             }
 
-            return dto;
+			SampleComplianceCheck(new List<SampleDto> {dto});
+			return dto;
         }
 
 	    public void SampleComplianceCheck(List<SampleDto> sampleDtos)
@@ -560,6 +551,11 @@ namespace Linko.LinkoExchange.Services.Sample
 			
 		    foreach (var sampleDto in sampleDtos)
 		    {
+			    if (sampleDto.SampleResults == null)
+			    {
+				    continue;
+			    }
+
 			    //Check compliance on all of sample results
 			    foreach (var sampleResult in sampleDto.SampleResults)
 			    {
@@ -573,207 +569,7 @@ namespace Linko.LinkoExchange.Services.Sample
 			    }
 		    }
 	    }
-
-
-	    private void CheckResultCompliance(ref SampleResultDto sampleResultDto, int monitoringPointId, DateTime sampleDateTime, LimitBasisName limitBasisName)
-        {
-            //Set compliance as unknown initially by default
-            if (limitBasisName == LimitBasisName.Concentration)
-            {
-                sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Unknown;
-                sampleResultDto.ConcentrationResultComplianceComment = string.Format(Message.ResultComplianceUnknown, sampleResultDto.ParameterName);
-            }
-            else if (limitBasisName == LimitBasisName.MassLoading)
-            {
-                sampleResultDto.MassResultCompliance = ResultComplianceType.Unknown;
-                sampleResultDto.MassResultComplianceComment = string.Format(Message.ResultComplianceUnknown, sampleResultDto.ParameterName);
-            }
-
-            //Get possible limits
-            var parameterId = sampleResultDto.ParameterId;
-
-            //Check MonitoringPointParameter table
-            var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
-                .Include(mppl => mppl.DefaultUnit)
-                .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
-                    && mppl.ParameterId == parameterId
-                    && mppl.EffectiveDateTime <= sampleDateTime
-                    && mppl.RetirementDateTime >= sampleDateTime);
-
-            if (foundMonitoringPointParameter == null)
-            {
-                return;
-            }
-
-            int foundMonitoringPointParameterId = foundMonitoringPointParameter.MonitoringPointParameterId;
-
-            var foundLimit = _dbContext.MonitoringPointParameterLimits
-               .Include(mppl => mppl.LimitBasis)
-               .Include(mppl => mppl.LimitType)
-               .FirstOrDefault(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameterId
-                       && mppl.LimitBasis.Name == limitBasisName.ToString()
-                       && mppl.LimitType.Name == LimitTypeName.Daily.ToString()
-                       && !mppl.IsAlertOnly);
-
-            if (foundLimit != null)
-            {
-                var floor = foundLimit.MinimumValue;
-                var ceiling = foundLimit.MaximumValue;
-
-                //If qualifier is "ND" or "NF" both concentration and mass is in compliance
-                if (sampleResultDto.Qualifier == "ND" || sampleResultDto.Qualifier == "NF")
-                {
-                    //Compliance met
-                    if (limitBasisName == LimitBasisName.Concentration)
-                    {
-                        sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                        if (floor.HasValue)
-                        {
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier, floor, ceiling);
-                        }
-                        else
-                        {
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.Qualifier, ceiling);
-                        }
-                        
-                    }
-                    else if (limitBasisName == LimitBasisName.MassLoading)
-                    {
-                        sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                        if (floor.HasValue)
-                        {
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier, floor, ceiling);
-                        }
-                        else
-                        {
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.Qualifier, ceiling);
-                        }
-
-                    }
-
-                    return;
-                }
-
-                double valueToCheck; //Concentration value or mass loading value
-                string qualifierToCheck;
-                if (limitBasisName == LimitBasisName.Concentration)
-                {
-                    if (sampleResultDto.Value != null)
-                    {
-                        valueToCheck = sampleResultDto.Value.Value;
-                        qualifierToCheck = sampleResultDto.Qualifier;
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                else if (limitBasisName == LimitBasisName.MassLoading)
-                {
-                    if (!string.IsNullOrWhiteSpace(sampleResultDto.MassLoadingValue)
-                        && Double.TryParse(sampleResultDto.MassLoadingValue, out valueToCheck))
-                    {
-                        //valueToCheck is set via "out" parameter
-                        qualifierToCheck = sampleResultDto.MassLoadingQualifier;
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    throw new Exception($"CheckResultCompliance. ERROR: cannot check compliance. Limit Basis = {limitBasisName}.");
-                }
-
-
-                if (floor.HasValue)
-                {
-                    //Range limit
-                    if ((qualifierToCheck == ">" && valueToCheck >= ceiling)
-                        || (qualifierToCheck == "<" && valueToCheck <= floor)
-                        || (valueToCheck > ceiling || valueToCheck < floor))
-                    {
-                        //Outside the range
-                        if (limitBasisName == LimitBasisName.Concentration)
-                        {
-                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Bad;
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceBadOutsideRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier + sampleResultDto.EnteredValue, floor, ceiling);
-                        }
-                        else if (limitBasisName == LimitBasisName.MassLoading)
-                        {
-                            sampleResultDto.MassResultCompliance = ResultComplianceType.Bad;
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceBadOutsideRange, sampleResultDto.ParameterName, sampleResultDto.MassLoadingQualifier + sampleResultDto.MassLoadingValue, floor, ceiling);
-
-                        }
-                    }
-                    else
-                    {
-                        //Compliance met
-                        if (limitBasisName == LimitBasisName.Concentration)
-                        {
-                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.Qualifier + sampleResultDto.EnteredValue, floor, ceiling);
-                        }
-                        else if (limitBasisName == LimitBasisName.MassLoading)
-                        {
-                            sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinRange, sampleResultDto.ParameterName, sampleResultDto.MassLoadingQualifier + sampleResultDto.MassLoadingValue, floor, ceiling);
-                        }
-                    }
-                }
-                else
-                {
-                    //Max-only limit
-                    if ((qualifierToCheck == ">" && valueToCheck >= ceiling)
-                        || (valueToCheck > ceiling))
-                    {
-                        //Over the max
-                        if (limitBasisName == LimitBasisName.Concentration)
-                        {
-                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Bad;
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceBadAboveMax, sampleResultDto.ParameterName, sampleResultDto.Qualifier + sampleResultDto.EnteredValue, ceiling);
-                        }
-                        else if (limitBasisName == LimitBasisName.MassLoading)
-                        {
-                            sampleResultDto.MassResultCompliance = ResultComplianceType.Bad;
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceBadAboveMax, sampleResultDto.ParameterName, sampleResultDto.MassLoadingQualifier + sampleResultDto.MassLoadingValue, ceiling);
-
-                        }
-                    }
-                    else
-                    {
-                        //Compliance met
-                        if (limitBasisName == LimitBasisName.Concentration)
-                        {
-                            sampleResultDto.ConcentrationResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.ConcentrationResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.Qualifier + sampleResultDto.EnteredValue, ceiling);
-                        }
-                        else if (limitBasisName == LimitBasisName.MassLoading)
-                        {
-                            sampleResultDto.MassResultCompliance = ResultComplianceType.Good;
-                            sampleResultDto.MassResultComplianceComment =
-                                string.Format(Message.ResultComplianceGoodWithinLimit, sampleResultDto.ParameterName, sampleResultDto.MassLoadingQualifier + sampleResultDto.MassLoadingValue, ceiling);
-                        }
-                    }
-
-                }
-
-            }
-            
-        }
-
+		
         /// <summary>
         ///     Gets the complete details of a single Sample
         /// </summary>
