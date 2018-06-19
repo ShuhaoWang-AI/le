@@ -38,15 +38,25 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
     {
         #region static fields and constants
 
-        private static readonly IEnumerable<SampleImportColumnName> ColumnsNeedDataTranslation = new List<SampleImportColumnName>
-                                                                                                 {
-                                                                                                     SampleImportColumnName.MonitoringPoint,
-                                                                                                     SampleImportColumnName.CollectionMethod,
-                                                                                                     SampleImportColumnName.SampleType,
-                                                                                                     SampleImportColumnName.ParameterName,
-                                                                                                     SampleImportColumnName.ResultUnit
-                                                                                                 };
+        public static readonly Dictionary<SampleImportColumnName, DataSourceTranslationType> ColumnNameTranslationTypeDict = 
+            new Dictionary<SampleImportColumnName, DataSourceTranslationType>
+            {
+                { SampleImportColumnName.MonitoringPoint, DataSourceTranslationType.MonitoringPoint },
+                { SampleImportColumnName.CollectionMethod, DataSourceTranslationType.CollectionMethod },
+                { SampleImportColumnName.SampleType, DataSourceTranslationType.SampleType },
+                { SampleImportColumnName.ParameterName, DataSourceTranslationType.Parameter },
+                { SampleImportColumnName.ResultUnit, DataSourceTranslationType.Unit }
+            };
 
+        public static readonly Dictionary<DataSourceTranslationType, SelectListType> TranslationTypeSelectListTypeDict =
+            new Dictionary<DataSourceTranslationType, SelectListType>
+            {
+                { DataSourceTranslationType.MonitoringPoint, SelectListType.IndustryMonitoringPoint },
+                { DataSourceTranslationType.CollectionMethod, SelectListType.AuthorityCollectionMethod },
+                { DataSourceTranslationType.SampleType, SelectListType.AuthoritySampleType },
+                { DataSourceTranslationType.Parameter, SelectListType.AuthorityParameter },
+                { DataSourceTranslationType.Unit, SelectListType.AuthorityUnit }
+            };
         #endregion
 
         #region fields
@@ -378,7 +388,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         }
 
         /// <inheritdoc />
-        public List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId)
+        public List<ImportDataTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
                                     descripition:sampleImportDto.ImportId.ToString()))
@@ -390,7 +400,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 PopulateExistingTranslationData(sampleImportDto:sampleImportDto);
 
                 List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate;
-                var missingTranslations = GetMissingTranslationSet(sampleImportDto:sampleImportDto, translationItemsShouldAutoGenerate:out translationItemsShouldAutoGenerate);
+                var missingTranslations = GetMissingImportDataTranslations(sampleImportDto:sampleImportDto, translationItemsShouldAutoGenerate:out translationItemsShouldAutoGenerate);
 
                 if (translationItemsShouldAutoGenerate.Any())
                 {
@@ -828,16 +838,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                                   .ToList();
         }
 
-        private List<MissingTranslationDto> GetMissingTranslationSet(SampleImportDto sampleImportDto, out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
+        private List<ImportDataTranslationDto> GetMissingImportDataTranslations(SampleImportDto sampleImportDto, 
+                                                                                out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
         {
             translationItemsShouldAutoGenerate = new List<DataSourceTranslationItemDto>();
 
-            var missingTranslations = new List<MissingTranslationDto>();
-            foreach (var columnName in ColumnsNeedDataTranslation)
+            var missingTranslations = new List<ImportDataTranslationDto>();
+            foreach (var columnName in ColumnNameTranslationTypeDict.Keys)
             {
                 List<DataSourceTranslationItemDto> translationItemsNeedToAutoGenerate;
-                var missingTranslation = GetMissingTranslationOrNull(sampleImportDto:sampleImportDto, columnName:columnName,
-                                                                     translationItemsShouldAutoGenerate:out translationItemsNeedToAutoGenerate);
+                var missingTranslation = GetMissingImportDataTranslationOrNull(sampleImportDto:sampleImportDto, columnName:columnName,
+                                                                               translationItemsShouldAutoGenerate:out translationItemsNeedToAutoGenerate);
                 if (missingTranslation != null)
                 {
                     missingTranslations.Add(item:missingTranslation);
@@ -852,8 +863,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             return missingTranslations;
         }
 
-        private MissingTranslationDto GetMissingTranslationOrNull(SampleImportDto sampleImportDto, SampleImportColumnName columnName,
-                                                                  out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
+        private ImportDataTranslationDto GetMissingImportDataTranslationOrNull(SampleImportDto sampleImportDto, SampleImportColumnName columnName,
+                                                                               out List<DataSourceTranslationItemDto> translationItemsShouldAutoGenerate)
         {
             translationItemsShouldAutoGenerate = new List<DataSourceTranslationItemDto>();
             var missingTranslationTerms = sampleImportDto.Rows.Select(row => row.Cells.First(cell => cell.SampleImportColumnName == columnName))
@@ -883,7 +894,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
             _logger.Debug(message:"Column {0} missing translation(s) at {1}: {2}", argument1:columnName, argument2:sampleImportDto.ImportId.ToString(),
                           argument3:string.Join(separator:",", values:missingTranslationTerms));
-            return new MissingTranslationDto
+            return new ImportDataTranslationDto
                    {
                        SampleImportColumnName = columnName,
                        MissingTranslations = missingTranslationTerms,
@@ -1339,28 +1350,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         private static SampleImportColumnName ToSampleImportColumnName(DataSourceTranslationType fromTranslationType)
         {
-            switch (fromTranslationType)
-            {
-                case DataSourceTranslationType.MonitoringPoint: return SampleImportColumnName.MonitoringPoint;
-                case DataSourceTranslationType.SampleType: return SampleImportColumnName.SampleType;
-                case DataSourceTranslationType.CollectionMethod: return SampleImportColumnName.CollectionMethod;
-                case DataSourceTranslationType.Parameter: return SampleImportColumnName.ParameterName;
-                case DataSourceTranslationType.Unit: return SampleImportColumnName.ResultUnit;
-                default: throw new NotSupportedException(message:$"DataSourceTranslationType {fromTranslationType} is unsupported");
-            }
+            return ColumnNameTranslationTypeDict.First(x => x.Value == fromTranslationType).Key;
         }
 
         private static DataSourceTranslationType ToTranslationType(SampleImportColumnName columnName)
         {
-            switch (columnName)
-            {
-                case SampleImportColumnName.MonitoringPoint: return DataSourceTranslationType.MonitoringPoint;
-                case SampleImportColumnName.SampleType: return DataSourceTranslationType.SampleType;
-                case SampleImportColumnName.CollectionMethod: return DataSourceTranslationType.CollectionMethod;
-                case SampleImportColumnName.ParameterName: return DataSourceTranslationType.Parameter;
-                case SampleImportColumnName.ResultUnit: return DataSourceTranslationType.Unit;
-                default: throw new BadRequest(message:$"Cannot convert SampleImportColumnName {columnName} to DataSourceTranslationType.");
-            }
+            return ColumnNameTranslationTypeDict[key:columnName];
         }
 
         private bool IsImportTempFileWithThisOwnerExist(int importTempFileId, int orgRegProgramId)

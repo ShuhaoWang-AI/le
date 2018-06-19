@@ -5,6 +5,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Web.Routing;
+using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Newtonsoft.Json;
@@ -20,9 +22,19 @@ namespace Linko.LinkoExchange.Web.Shared
 			                                                                  NullValueHandling = NullValueHandling.Ignore
 		                                                                  };
 
-		#endregion
+        #endregion
 
-		public static ImportSummaryViewModel CreateImportSummary(List<SampleViewModel> samples)
+		public static string GetDefaultDropdownOptionKey(DataSourceTranslationType translationType)
+		{
+			return $"default{ImportSampleFromFileService.TranslationTypeSelectListTypeDict[key: translationType]}";
+		}
+
+		public static string GetDropdownOptionsKey(DataSourceTranslationType translationType)
+		{
+			return $"available{ImportSampleFromFileService.TranslationTypeSelectListTypeDict[key: translationType]}s";
+		}
+
+        public static ImportSummaryViewModel CreateImportSummary(List<SampleViewModel> samples)
 		{
 			var importSummary = new ImportSummaryViewModel();
 			foreach (var sample in samples)
@@ -118,31 +130,32 @@ namespace Linko.LinkoExchange.Web.Shared
 			return GetBackImportJobId(sampleImportQueryParameters:sampleImportQueryParameters, currentStep:model.CurrentSampleImportStep);
 		}
 
-		private static string GetBackImportJobId(SampleImportQueryParameters sampleImportQueryParameters, SampleImportViewModel.SampleImportStep currentStep)
-		{
-			switch (currentStep)
-			{
-				case SampleImportViewModel.SampleImportStep.SelectDataSource:
-				case SampleImportViewModel.SampleImportStep.SelectFile:
-					sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource;
-					break;
-				case SampleImportViewModel.SampleImportStep.FileValidation:
-				case SampleImportViewModel.SampleImportStep.SelectDataDefault:
-					sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
-					break;
-				case SampleImportViewModel.SampleImportStep.DataTranslations:
-				case SampleImportViewModel.SampleImportStep.DataValidation:
-				case SampleImportViewModel.SampleImportStep.ShowPreImportOutput:
-					var anyDefaultValuesAssigned = sampleImportQueryParameters.SelectedDefaultMonitoringPointId > 0
-					                               || sampleImportQueryParameters.SelectedDefaultCollectionMethodId > 0
-					                               || sampleImportQueryParameters.SelectedDefaultSampleTypeId > 0;
-					sampleImportQueryParameters.CurrentSampleImportStep =
-						anyDefaultValuesAssigned ? SampleImportViewModel.SampleImportStep.SelectDataDefault : SampleImportViewModel.SampleImportStep.SelectFile;
-					break;
-				case SampleImportViewModel.SampleImportStep.ShowImportOutput:
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
+        private static string GetBackImportJobId(SampleImportQueryParameters sampleImportQueryParameters, SampleImportViewModel.SampleImportStep currentStep)
+        {
+            switch (currentStep)
+            {
+                case SampleImportViewModel.SampleImportStep.SelectDataSource:
+                case SampleImportViewModel.SampleImportStep.SelectFile:
+                    sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource;
+                    break;
+                case SampleImportViewModel.SampleImportStep.FileValidation:
+                case SampleImportViewModel.SampleImportStep.SelectDataDefault:
+                    sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
+                    break;
+                case SampleImportViewModel.SampleImportStep.DataTranslations:
+                    var anyDefaultValuesAssigned = sampleImportQueryParameters.SelectedDefaultMonitoringPointId > 0
+                                                   || sampleImportQueryParameters.SelectedDefaultCollectionMethodId > 0
+                                                   || sampleImportQueryParameters.SelectedDefaultSampleTypeId > 0;
+                    sampleImportQueryParameters.CurrentSampleImportStep =
+                        anyDefaultValuesAssigned ? SampleImportViewModel.SampleImportStep.SelectDataDefault : SampleImportViewModel.SampleImportStep.SelectFile;
+                    break;
+                case SampleImportViewModel.SampleImportStep.DataValidation:
+                case SampleImportViewModel.SampleImportStep.ShowPreImportOutput:
+                    sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.DataTranslations;
+                    break;
+                case SampleImportViewModel.SampleImportStep.ShowImportOutput:
+                default: throw new ArgumentOutOfRangeException();
+            }
 
 			return Encode(objectToEncode:sampleImportQueryParameters);
 		}

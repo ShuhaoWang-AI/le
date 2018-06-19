@@ -22,6 +22,7 @@ namespace Linko.LinkoExchange.Services.Base
             public const string DefaultCollectionMethodIsRequired = "Default Monitoring Point is required.";
             public const string DefaultMonitoringPointIsRequired = "Default Monitoring Point is required.";
             public const string DefaultSampleTypeIsRequired = "Default Sample Type is required.";
+            public const string DataTranslationsAreRequired = "Data Translation(s) is required.";
             public const string ImportTemplateDoesNotExist = "No file format has been defined. Contact your Authority for assistance.";
             public const string QueryParameterIsInvalid = "Query Parameter {0} is not valid.";
             public const string ImportSummaryIsOutDate = "The import is done, please start another import.";

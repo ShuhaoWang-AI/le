@@ -5,12 +5,81 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
-    public class DataSourceTranslationViewModel
+
+    public interface IDataSourceTranslationViewModel
+    {
+        int? Id { get; set; }
+        bool IsTranslated { get; }
+        int DataSourceId { get; set; }
+        string DataSourceTerm { get; set; }
+        DataSourceTranslationType TranslationType { get; set; }
+        DropdownOptionViewModel TranslatedItem { get; set; }
+    }
+
+    public class DataSourceTranslationViewModelHelper
+    {
+        public static IDataSourceTranslationViewModel Create(DataSourceTranslationType translationType, DropdownOptionViewModel defaultValue = null)
+        {
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint:
+                    return new DataSourceMonitoringPointTranslationViewModel
+                           {
+                               TranslatedItem = defaultValue,
+                               MonitoringPoint = defaultValue
+                           };
+                case DataSourceTranslationType.SampleType:
+                    return new DataSourceSampleTypeTranslationViewModel
+                           {
+                               TranslatedItem = defaultValue,
+                               SampleType = defaultValue
+                           };
+                case DataSourceTranslationType.CollectionMethod:
+                    return new DataSourceCollectionMethodTranslationViewModel
+                           {
+                               TranslatedItem = defaultValue,
+                               CollectionMethod = defaultValue
+                           };
+                case DataSourceTranslationType.Parameter:
+                    return new DataSourceParameterTranslationViewModel
+                           {
+                               TranslatedItem = defaultValue,
+                               Parameter = defaultValue
+                           };
+                case DataSourceTranslationType.Unit:
+                    return new DataSourceUnitTranslationViewModel
+                           {
+                               TranslatedItem = defaultValue,
+                               Unit = defaultValue
+                           };
+                default: throw new NotImplementedException(message: $"DataSourceTranslationType {translationType} is unsupported");
+            }
+        }
+
+        public static T To<T>(IDataSourceTranslationViewModel viewModel) where T : IDataSourceTranslationViewModel, new()
+        {
+            return new T
+                   {
+                       Id = viewModel.Id,
+                       DataSourceId = viewModel.DataSourceId,
+                       DataSourceTerm = viewModel.DataSourceTerm,
+                       TranslationType = viewModel.TranslationType,
+                       TranslatedItem = viewModel.TranslatedItem
+                   };
+        }
+    }
+
+    public abstract class DataSourceTranslationViewModel : IDataSourceTranslationViewModel
     {
         #region public properties
 
         [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
+
+        public bool IsTranslated
+        {
+            get { return Id.HasValue; }
+        }
 
         public int DataSourceId { get; set; }
 
@@ -19,39 +88,18 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         public DataSourceTranslationType TranslationType { get; set; }
 
-        [UIHint(uiHint:"LinkoExchangeTermEditor")]
-        [Display(Name = "LinkoExchange term")]
-        public virtual DropdownOptionViewModel TranslatedItem { get; set; }
+        public DropdownOptionViewModel TranslatedItem { get; set; }
 
         #endregion
-
-        public static DataSourceTranslationViewModel Create(DataSourceTranslationType translationType)
-        {
-            switch (translationType)
-            {
-                case DataSourceTranslationType.MonitoringPoint: return new DataSourceMonitoringPointTranslationViewModel();
-                case DataSourceTranslationType.SampleType: return new DataSourceSampleTypeTranslationViewModel();
-                case DataSourceTranslationType.CollectionMethod: return new DataSourceCollectionMethodTranslationViewModel();
-                case DataSourceTranslationType.Parameter: return new DataSourceParameterTranslationViewModel();
-                case DataSourceTranslationType.Unit: return new DataSourceUnitTranslationViewModel();
-                default: throw new NotImplementedException(message:$"DataSourceTranslationType {translationType} is unsupported");
-            }
-        }
     }
 
     public class DataSourceMonitoringPointTranslationViewModel : DataSourceTranslationViewModel
     {
         #region public properties
 
-        [UIHint(uiHint:"AuthorityMonitoringPointEditor")]
+        [UIHint(uiHint: "IndustryMonitoringPointEditor")]
         [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel MonitoringPoint { get; set; }
-
-        public override DropdownOptionViewModel TranslatedItem
-        {
-            get { return MonitoringPoint; }
-            set { MonitoringPoint = value; }
-        }
 
         #endregion
     }
@@ -64,12 +112,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel SampleType { get; set; }
 
-        public override DropdownOptionViewModel TranslatedItem
-        {
-            get { return SampleType; }
-            set { SampleType = value; }
-        }
-
         #endregion
     }
 
@@ -80,12 +122,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [UIHint(uiHint:"AuthorityCollectionMethodEditor")]
         [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel CollectionMethod { get; set; }
-
-        public override DropdownOptionViewModel TranslatedItem
-        {
-            get { return CollectionMethod; }
-            set { CollectionMethod = value; }
-        }
 
         #endregion
     }
@@ -98,12 +134,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel Parameter { get; set; }
 
-        public override DropdownOptionViewModel TranslatedItem
-        {
-            get { return Parameter; }
-            set { Parameter = value; }
-        }
-
         #endregion
     }
 
@@ -114,12 +144,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [UIHint(uiHint:"AuthorityUnitEditor")]
         [Display(Name = "LinkoExchange term")]
         public DropdownOptionViewModel Unit { get; set; }
-
-        public override DropdownOptionViewModel TranslatedItem
-        {
-            get { return Unit; }
-            set { Unit = value; }
-        }
 
         #endregion
     }

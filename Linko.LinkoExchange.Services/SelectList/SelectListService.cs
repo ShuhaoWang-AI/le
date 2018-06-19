@@ -76,6 +76,19 @@ namespace Linko.LinkoExchange.Services.SelectList
 
         #region Implementation of ISelectListService
 
+        public List<ListItemDto> GetSelectList(SelectListType selectListType, bool withEmptyItem = false)
+        {
+            switch (selectListType)
+            {
+                case SelectListType.IndustryMonitoringPoint: return GetIndustryMonitoringPointSelectList(withEmptyItem:withEmptyItem);
+                case SelectListType.AuthorityCollectionMethod: return GetAuthorityCollectionMethodSelectList(withEmptyItem: withEmptyItem);
+                case SelectListType.AuthoritySampleType: return GetAuthoritySampleTypeSelectList(withEmptyItem: withEmptyItem);
+                case SelectListType.AuthorityParameter: return GetAuthorityParameterSelectList(withEmptyItem: withEmptyItem);
+                case SelectListType.AuthorityUnit: return GetAuthorityUnitSelectList(withEmptyItem: withEmptyItem);
+                default: throw new NotSupportedException(message: $"SelectListType {selectListType} is unsupported");
+            }
+        }
+
         /// <inheritdoc />
         public List<ListItemDto> GetIndustryMonitoringPointSelectList(bool withEmptyItem = false)
         {

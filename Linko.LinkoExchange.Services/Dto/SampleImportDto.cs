@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public SampleImportDto(Guid importId)
         {
             RequiredDefaultValues = new List<RequiredDataDefaultsDto>();
-            MissingTranslations = new List<MissingTranslationDto>();
+            MissingTranslations = new List<ImportDataTranslationDto>();
             ImportId = importId;
         }
 
@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ImportRowObject> Rows { get; set; }
 
         public List<RequiredDataDefaultsDto> RequiredDefaultValues { get; set; }
-        public List<MissingTranslationDto> MissingTranslations { get; set; }
+        public List<ImportDataTranslationDto> MissingTranslations { get; set; }
 
         public List<SampleDto> SampleDtos { get; set; }
 

@@ -1,4 +1,7 @@
-﻿@using Linko.LinkoExchange.Core.Enum
+﻿@using Linko.LinkoExchange.Core.Domain
+@using Linko.LinkoExchange.Core.Enum
+@using Linko.LinkoExchange.Core.Validation
+@using Linko.LinkoExchange.Services.ImportSampleFromFile
 @using Linko.LinkoExchange.Web.Shared
 @using Linko.LinkoExchange.Web.ViewModels.Industry
 @using Linko.LinkoExchange.Web.ViewModels.Shared
@@ -41,124 +44,103 @@
         <div class="stepwizard-row">
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepSelectDataProvider ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectDataProvider ? "" : "disabled=\"disabled\"")>
-                    1
-                </span>
-                <p>
-                    <small>Select Data Provider</small>
-                </p>
+                      @(isStepSelectDataProvider ? "" : "disabled=\"disabled\"")>1</span>
+                <p><small>Select Data Provider</small></p>
             </div>
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepSelectFile ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectFile ? "" : "disabled=\"disabled\"")>
-                    2
-                </span>
-                <p>
-                    <small>Select File</small>
-                </p>
+                      @(isStepSelectFile ? "" : "disabled=\"disabled\"")>2</span>
+                <p><small>Select File</small></p>
             </div>
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepSelectDataDefault ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectDataDefault ? "" : "disabled=\"disabled\"")>
-                    3
-                </span>
-                <p>
-                    <small>Select Data Default</small>
-                </p>
+                      @(isStepSelectDataDefault ? "" : "disabled=\"disabled\"")>3</span>
+                <p><small>Select Data Defaults</small></p>
             </div>
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepDataTranslations ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepDataTranslations ? "" : "disabled=\"disabled\"")>
-                    4
-                </span>
-                <p>
-                    <small>Data Translation</small>
-                </p>
+                      @(isStepDataTranslations ? "" : "disabled=\"disabled\"")>4</span>
+                <p><small>Data Translations</small></p>
             </div>
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepPreview ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepPreview ? "" : "disabled=\"disabled\"")>
-                    5
-                </span>
-                <p>
-                    <small>Preview</small>
-                </p>
+                      @(isStepPreview ? "" : "disabled=\"disabled\"")>5</span>
+                <p><small>Preview</small></p>
             </div>
             <div class="col-xs-2 stepwizard-step">
                 <span class="btn @(isStepImport ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepImport ? "" : "disabled=\"disabled\"")>
-                    6
-                </span>
-                <p>
-                    <small>Import</small>
-                </p>
+                      @(isStepImport ? "" : "disabled=\"disabled\"")>6</span>
+                <p><small>Import</small></p>
             </div>
         </div>
     </div>
 
     // SampleImportStep.SelectDataSource
-    <section class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">Select Data Provider</h3>
-            <div class="box-tools pull-right">
+    if (!isStepImport)
+    {
+        <section id="@SampleImportViewModel.SampleImportStep.SelectDataSource.ToString()" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title width200">Select Data Provider</h3>
+                <div class="box-tools pull-right">
+                    @if (isStepSelectDataProvider)
+                    {
+                        <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
+                            Create New Data Provider
+                        </button>
+                    }
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
                 @if (isStepSelectDataProvider)
                 {
-                    <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
-                        Create New Data Provider
-                    </button>
-                }
-                <button class="btn btn-box-tool" data-widget="collapse">
-                    <i class="fa fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="box-body form-horizontal">
-            @if (isStepSelectDataProvider)
-            {
-                @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText,
-                    htmlAttributes:new {@class = "alert alert-danger"})
+                    @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText,
+                        htmlAttributes:new {@class = "alert alert-danger"})
 
-                if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                    if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                    {
+                        <div class="alert alert-info">
+                            <h5>
+                                You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
+                            </h5>
+                        </div>
+                    }
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2 required"})
+                        <div class="col-md-4">
+                            @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources,
+                                htmlAttributes:new {@class = "form-control"})
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="form-group pull-right">
+                            <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                        </div>
+                    </div>
+                }
+                else
                 {
-                    <div class="alert alert-info">
-                        <h5>
-                            You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
-                        </h5>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2"})
+                        <div class="col-md-4">
+                            @Html.HiddenFor(model => model.SelectedDataSourceId)
+                            @Html.EditorFor(model => model.SampleImportDto.DataSource.Name,
+                                additionalViewData:new {htmlAttributes = new {@class = "form-control", @readonly = "readonly"}})
+                        </div>
                     </div>
                 }
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2 required"})
-                    <div class="col-md-4">
-                        @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources,
-                            htmlAttributes:new {@class = "form-control"})
-                    </div>
-                </div>
-
-                <div class="box-footer">
-                    <div class="form-group pull-right">
-                        <input class="btn btn-primary btn-sm" type="submit" value="Next" />
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2"})
-                    <div class="col-md-4">
-                        @Html.HiddenFor(model => model.SelectedDataSourceId)
-                        @Html.EditorFor(model => model.SampleImportDto.DataSource.Name,
-                            additionalViewData:new {htmlAttributes = new {@class = "form-control", @readonly = "readonly"}})
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
+            </div>
+        </section>
+    }
 
     // SampleImportStep.SelectFile
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataSource)
+    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataSource && !isStepImport)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.SelectFile.ToString()" class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Select File</h3>
                 <div class="box-tools pull-right">
@@ -198,8 +180,8 @@
 
                     <div class="box-footer">
                         <div class="form-group pull-right">
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                            SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                            SampleImportHelpers.GetBackRouteValues(model:Model))'">
                                 Back
                             </a>
                         </div>
@@ -296,7 +278,7 @@
     // SampleImportStep.FileValidation
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.FileValidation.ToString()">
             <div class="box-header with-border">
                 <h3 class="box-title">File Validation</h3>
                 <div class="box-tools pull-right">
@@ -331,8 +313,8 @@
 
                     <div class="box-footer">
                         <div class="form-group pull-right">
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                            SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                            SampleImportHelpers.GetBackRouteValues(model:Model))'">
                                 Back
                             </a>
                             <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
@@ -346,11 +328,11 @@
     }
 
     //SampleImportStep.SelectDataDefault
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.FileValidation)
+    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.FileValidation && !isStepImport)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.SelectDataDefault.ToString()" class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Select Data Default</h3>
+                <h3 class="box-title">Select Data Defaults</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
                         <i class="fa fa-minus"></i>
@@ -366,6 +348,14 @@
                     var requiredDefaultMonitoringPoint = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.MonitoringPoint);
                     var requiredDefaultCollectionMethod = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.CollectionMethod);
                     var requiredDefaultSampleType = Model.SampleImportDto.RequiredDefaultValues.Find(x => x.SampleImportColumnName == SampleImportColumnName.SampleType);
+
+                    if (Model.SampleImportDto.RequiredDefaultValues.Any())
+                    {
+                        <div class="alert alert-info">
+                            <h5>Some required data is missing from the file.What data should we use for the missing data?</h5>
+                        </div>
+                    }
+
                     if (requiredDefaultMonitoringPoint != null)
                     {
                         <div class="form-group">
@@ -441,8 +431,8 @@
                     </script>
                     <div class="box-footer">
                         <div class="form-group pull-right">
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                            SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                            SampleImportHelpers.GetBackRouteValues(model:Model))'">
                                 Back
                             </a>
                             <input class="btn btn-primary btn-sm" type="submit" value="Next" />
@@ -453,7 +443,7 @@
                 {
                     if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
                     {
-                        <div class="alert-light" role="alert">
+                        <div class="fg-gray" role="alert">
                             No empty recommended field(s) requires Default Value from the import file.
                         </div>
                     }
@@ -511,12 +501,12 @@
         </section>
     }
 
-    //SampleImportStep.DataTranslation
-    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataDefault)
+    //SampleImportStep.DataTranslations
+    if (Model.CurrentSampleImportStep > SampleImportViewModel.SampleImportStep.SelectDataDefault && !isStepImport)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.DataTranslations.ToString()" class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Data Translation</h3>
+                <h3 class="box-title">Data Translations</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
                         <i class="fa fa-minus"></i>
@@ -528,71 +518,118 @@
                 {
                     @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
                         htmlAttributes:new {@class = "alert alert-danger", id = "validationSummaryDataTranslations"})
-
-                    <div class="alert alert-info">
-                        <h5>
-                            There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
-                        </h5>
-                        <h5>
-                            The following Import file term(s) must be translated to LinkoExchange term(s) before proceed to next step.
-                        </h5>
-                    </div>
-
-                    <h4>@(Model.MissingTranslation.Title)</h4>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            @(Html.Kendo().Grid(dataSource:Model.MissingTranslation.MisstingTranslations)
-                                  .Name(componentName:"gridMissingTranslation")
-                                  .Columns(columns =>
-                                           {
-                                               columns.Bound(c => c.DataSourceTerm)
-                                                      .HtmlAttributes(attributes:new {@class = "col-sm-2"})
-                                                      .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"});
-                                               columns.Bound(c => c.TranslatedItem)
-                                                      .ClientTemplate(value:"#= (TranslatedItem==null)? '' : TranslatedItem.DisplayName #")
-                                                      .HtmlAttributes(attributes:new {@class = "col-sm-4"})
-                                                      .HeaderHtmlAttributes(attributes:new {@class = "col-sm-4"});
-                                               columns.Command(command => { command.Edit().UpdateText(text:"Save"); });
-                                           })
-                                  .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
-                                  .Pageable(pager => pager.Enabled(value:false))
-                                  .Scrollable(s => s.Enabled(value:false))
-                                  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                                  .Resizable(resizable => resizable.Columns(value:true))
-                                  .NoRecords(text:"No translation required.")
-                                  .DataSource(dataSource =>
-                                              dataSource.Ajax()
-                                                        .ServerOperation(enabled:false)
-                                                        .Batch(enabled:false)
-                                                        .Sort(sort => { sort.Add(memberName:"DataSourceTerm").Ascending(); })
-                                                        .PageSize(pageSize:100)
-                                                        .Update(update => update.Action(actionName:"SampleImportAddMissingTranslation", controllerName:"Industry"))
-                                                        .Model(model =>
-                                                               {
-                                                                   model.Id(p => p.DataSourceTerm);
-                                                                   model.Field(p => p.DataSourceTerm).Editable(enabled:false);
-                                                                   model.Field(p => p.Id).Editable(enabled:false);
-                                                                   model.Field(p => p.DataSourceId).Editable(enabled:false);
-                                                                   model.Field(p => p.TranslationType).Editable(enabled:false);
-                                                                   model.Field(p => p.TranslatedItem).DefaultValue(value:ViewData[key:"defaultLinkoExchangeTerm"] as DropdownOptionViewModel);
-                                                               })
-                                  ))
-                        </div>
-                    </div>
                 }
-                else
+                @if (Model.DataTranslations != null)
                 {
-                    <div class="alert-light" role="alert">
-                        No Data Translation(s) is required.
-                    </div>
+                    var missingDataTranslations = Model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0);
+                    if (missingDataTranslations && ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert bg-gray-light">
+                            <h5>
+                                There is data in the file we don't recognize. Tell us what this data is and we'll use it instead.Plus we'll remember it for next time so we won't have to ask you again.
+                            </h5>
+                        </div>
+                    }
+                    foreach (var translationType in ImportSampleFromFileService.ColumnNameTranslationTypeDict.Values)
+                    {
+                        var dataTranslations = Model.DataTranslations.FirstOrDefault(x => x.TranslationType == translationType);
+                        if (dataTranslations == null)
+                        {
+                            continue;
+                        }
+                        var isUntranslatedSwitchOn = dataTranslations.NumberOfMissingTranslations > 0;
+                        var gridToggleName = "toggle" + translationType;
+                        var segmentedControlName = "segmentedControl" + translationType;
+
+                        <div class="box-body box-collapse collapse form-horizontal in" style="display: block;">
+                            <div class="box box-group box-solid @(isUntranslatedSwitchOn ? "collapsed-box" : "")">
+                                <div class="box-header">
+                                    <button id="@gridToggleName" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa @(isUntranslatedSwitchOn ? "fa-minus" : "fa-plus")"></i>
+                                    </button>
+                                    &nbsp;
+                                    <h3 class="box-title width450">
+                                        @dataTranslations.Title
+                                        @if (isUntranslatedSwitchOn)
+                                        {
+                                            <span class="fg-red">(Required)</span>
+                                        }
+                                    </h3>
+                                </div>
+                                <div class="box-body box-collapse collapse form-horizontal in" style="display: @(isUntranslatedSwitchOn ? "block" : "none"); padding: 0px 40px;">
+                                    @if (isUntranslatedSwitchOn)
+                                    {
+                                        <div class="col-md-12 voffset1">
+                                            <div id="@segmentedControlName" class="input-group">
+                                                <div class="input-group-btn">
+                                                    <a href="#" class="btn btn-sm btn-primary">Untranslated</a>
+                                                </div>
+                                                <div class="input-group-btn">
+                                                    <a href="#" class="btn btn-sm btn-default">Translated</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (translationType == DataSourceTranslationType.MonitoringPoint)
+                                    {
+                                        <div class="col-md-12 voffset2">
+                                            @Html.KendoSampleImportDataTranslationGrid(dataTranslations
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceMonitoringPointTranslationViewModel>).ToList(), 
+                                                "MonitoringPoint", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
+                                        </div>
+                                    }
+                                    else if (translationType == DataSourceTranslationType.SampleType)
+                                    {
+                                        <div class="col-md-12 voffset2">
+                                            @Html.KendoSampleImportDataTranslationGrid(dataTranslations
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceSampleTypeTranslationViewModel>).ToList(),
+                                                "SampleType", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
+                                        </div>
+                                    }
+                                    else if (translationType == DataSourceTranslationType.CollectionMethod)
+                                    {
+                                        <div class="col-md-12 voffset2">
+                                            @Html.KendoSampleImportDataTranslationGrid(dataTranslations
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceCollectionMethodTranslationViewModel>).ToList(),
+                                                "CollectionMethod", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
+                                        </div>
+                                    }
+                                    else if (translationType == DataSourceTranslationType.Parameter)
+                                    {
+                                        <div class="col-md-12 voffset2">
+                                            @Html.KendoSampleImportDataTranslationGrid(dataTranslations
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceParameterTranslationViewModel>).ToList(),
+                                                "Parameter", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
+                                        </div>
+                                    }
+                                    else if (translationType == DataSourceTranslationType.Unit)
+                                    {
+                                        <div class="col-md-12 voffset2">
+                                            @Html.KendoSampleImportDataTranslationGrid(dataTranslations
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceUnitTranslationViewModel>).ToList(),
+                                                "Unit", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-danger">
+                                            <h5>
+                                                TranslationType @translationType does not supported.
+                                            </h5>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
                 }
             </div>
             @if (isStepDataTranslations)
             {
                 <div class="box-footer">
                     <div class="form-group pull-right">
-                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                        SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))'">
                             Back
                         </a>
                         <input class="btn btn-primary btn-sm" type="submit" value="Next" />
@@ -605,7 +642,7 @@
     // SampleImportStep.DataValidation
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataValidation)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.DataValidation.ToString()" class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Data Validation</h3>
                 <div class="box-tools pull-right">
@@ -637,8 +674,8 @@
                 </div>
                 <div class="box-footer">
                     <div class="form-group pull-right">
-                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                        SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))'">
                             Back
                         </a>
                         <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
@@ -653,7 +690,7 @@
     // SampleImportStep.ShowPreImportOutput
     if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.ShowPreImportOutput)
     {
-        <section class="box box-primary">
+        <section id="@SampleImportViewModel.SampleImportStep.ShowPreImportOutput.ToString()" class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Preview Import</h3>
                 <div class="box-tools pull-right">
@@ -925,8 +962,8 @@
             </div>
                 <div class="box-footer">
                     <div class="form-group pull-right">
-                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
-                                                                                        SampleImportHelpers.GetBackRouteValues(model: Model))'">
+                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))'">
                             Back
                         </a>
                         <input class="btn btn-primary btn-sm" type="submit" value="Import" />
@@ -1055,3 +1092,53 @@
           )
 
 </script>
+
+@section Scripts {
+    <script type="text/javascript">
+        switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn) {
+            var translationsGrid = $("#" + gridName).data("kendoGrid");
+            var filter = {
+                field: "IsTranslated",
+                operator: "eq",
+                value: false
+            };
+            if (isUntranslatedSwitchOn === false) {
+                filter.value = true;
+            }
+            translationsGrid.dataSource.filter(filter);
+            if (isUntranslatedSwitchOn) {
+                translationsGrid.showColumn("IsTranslated");
+            } else {
+                translationsGrid.hideColumn("IsTranslated");
+            }
+        };
+    </script>
+    @if (Model.DataTranslations != null)
+    {
+        foreach (var translationType in ImportSampleFromFileService.ColumnNameTranslationTypeDict.Values)
+        {
+            var dataTranslations = Model.DataTranslations.FirstOrDefault(x => x.TranslationType == translationType);
+            if (dataTranslations == null)
+            {
+                continue;
+            }
+            var isUntranslatedSwitchOn = dataTranslations.NumberOfMissingTranslations > 0;
+            if (isUntranslatedSwitchOn)
+            {
+                var gridName = "grid" + translationType;
+                var segmentedControlName = "segmentedControl" + translationType;
+
+                <script type="text/javascript">
+                    $("#@segmentedControlName a").click(function (e) {
+                        e.preventDefault();
+                        $("#@segmentedControlName a").removeClass("btn-primary").addClass("btn-default");
+                        $(this).removeClass("btn-default").addClass("btn-primary");
+
+                        var isUntranslatedSwitchOn = $(this).text() === "Untranslated";
+                        switchDataTranslationGrid("@gridName", isUntranslatedSwitchOn);
+                    });
+                </script>
+            }
+        }
+    }
+}

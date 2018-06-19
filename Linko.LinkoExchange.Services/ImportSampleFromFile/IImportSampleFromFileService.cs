@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
-using Telerik.Windows.Documents.Spreadsheet.Model;
 
 namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 {
@@ -47,14 +46,14 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
         void PopulateDataDefaults(SampleImportDto sampleImportDto, ListItemDto defaultMonitoringPoint, ListItemDto defaultCollectionMethod, ListItemDto defaultSampleType);
 
-        List<MissingTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId);
+        List<ImportDataTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId);
 
         ImportSampleFromFileValidationResultDto DoDataValidation(SampleImportDto sampleImportDto);
 
         FileVersionDto GetFileVersion(string fileVersionName);
 
         void ImportSampleAndCreateAttachment(SampleImportDto sampleImportDto);
-        
+
         FileVersionDto GetFileVersionForAuthorityConfiguration(FileVersionTemplateName fileVersionTemplateName);
         int? AddOrUpdateFileVersionFieldForAuthorityConfiguration(int fileVersionId, FileVersionFieldDto dto);
         ExportFileDto DownloadSampleImportTemplate(string fileVersionName);

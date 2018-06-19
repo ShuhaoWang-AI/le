@@ -497,7 +497,7 @@
     <Content Include="Views\Shared\EditorTemplates\AuthorityParameterEditor.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\AuthorityCollectionMethodEditor.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\AuthoritySampleTypeEditor.cshtml" />
-    <Content Include="Views\Shared\EditorTemplates\AuthorityMonitoringPointEditor.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\IndustryMonitoringPointEditor.cshtml" />
     <Content Include="Views\Authority\ImportFileTemplate.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\FileVersionFieldEditor.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\LinkoExchangeTermEditor.cshtml" />
@@ -534,6 +534,7 @@
     <Compile Include="Mvc\PortalAuthorizeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\ProfileHelper.cs" />
+    <Compile Include="Shared\RedirectToActionAnchor.cs" />
     <Compile Include="Shared\SampleImportHelpers.cs" />
     <Compile Include="Shared\QueryParameters.cs" />
     <Compile Include="Startup.cs" />

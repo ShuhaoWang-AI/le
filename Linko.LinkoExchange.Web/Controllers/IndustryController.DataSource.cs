@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.Shared;
@@ -276,48 +277,39 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                            .Select(x => _mapHelper.ToDropdownOptionViewModel(fromDto:x))
                                                            .ToList();
             SaveViewDataDataSourceTranslationDropdownOptions(dropdownOptions:monitoryPointsDropdown,
-                                                             translationType:DataSourceTranslationType.MonitoringPoint,
-                                                             dropdownOptionsKey:"availableAuthorityMonitoringPoints",
-                                                             defaultDropdownOptionKey:"defaultAuthorityMonitoringPoint");
+                                                             translationType:DataSourceTranslationType.MonitoringPoint);
 
             var sampleTypesDropdown = _selectListService.GetAuthoritySampleTypeSelectList()
                                                         .Select(x => _mapHelper.ToDropdownOptionViewModel(fromDto:x))
                                                         .ToList();
             SaveViewDataDataSourceTranslationDropdownOptions(dropdownOptions:sampleTypesDropdown,
-                                                             translationType:DataSourceTranslationType.SampleType,
-                                                             dropdownOptionsKey:"availableAuthoritySampleTypes",
-                                                             defaultDropdownOptionKey:"defaultAuthoritySampleType");
+                                                             translationType:DataSourceTranslationType.SampleType);
 
             var collectionMethodsDropdown = _selectListService.GetAuthorityCollectionMethodSelectList()
                                                               .Select(x => _mapHelper.ToDropdownOptionViewModel(fromDto:x))
                                                               .ToList();
             SaveViewDataDataSourceTranslationDropdownOptions(dropdownOptions:collectionMethodsDropdown,
-                                                             translationType:DataSourceTranslationType.CollectionMethod,
-                                                             dropdownOptionsKey:"availableAuthorityCollectionMethods",
-                                                             defaultDropdownOptionKey:"defaultAuthorityCollectionMethod");
+                                                             translationType:DataSourceTranslationType.CollectionMethod);
 
             var parameterDropdownOptionViewModels = _selectListService.GetAuthorityParameterSelectList()
                                                                       .Select(x => _mapHelper.ToDropdownOptionViewModel(fromDto:x))
                                                                       .ToList();
             SaveViewDataDataSourceTranslationDropdownOptions(dropdownOptions:parameterDropdownOptionViewModels,
-                                                             translationType:DataSourceTranslationType.Parameter,
-                                                             dropdownOptionsKey:"availableAuthorityParameters",
-                                                             defaultDropdownOptionKey:"defaultAuthorityParameter");
+                                                             translationType:DataSourceTranslationType.Parameter);
 
             var unitDropdownOptionViewModels = _selectListService.GetAuthorityUnitSelectList()
                                                                  .Select(x => _mapHelper.ToDropdownOptionViewModel(fromDto:x))
                                                                  .ToList();
             SaveViewDataDataSourceTranslationDropdownOptions(dropdownOptions:unitDropdownOptionViewModels,
-                                                             translationType:DataSourceTranslationType.Unit,
-                                                             dropdownOptionsKey:"availableAuthorityUnits",
-                                                             defaultDropdownOptionKey:"defaultAuthorityUnit");
+                                                             translationType:DataSourceTranslationType.Unit);
         }
 
         private void SaveViewDataDataSourceTranslationDropdownOptions(List<DropdownOptionViewModel> dropdownOptions,
-                                                                      DataSourceTranslationType translationType,
-                                                                      string dropdownOptionsKey,
-                                                                      string defaultDropdownOptionKey)
+                                                                      DataSourceTranslationType translationType)
         {
+            var dropdownOptionsKey = SampleImportHelpers.GetDropdownOptionsKey(translationType:translationType);
+            var defaultDropdownOptionKey = SampleImportHelpers.GetDefaultDropdownOptionKey(translationType:translationType);
+
             ViewData[key:dropdownOptionsKey] = dropdownOptions;
             ViewData[key:defaultDropdownOptionKey] = dropdownOptions.First();
         }
@@ -361,21 +353,21 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-        private DataSourceTranslationViewModel CreateDataSourceTranslationViewModel(DataSourceTranslationDto dataSourceTranslation,
+        private IDataSourceTranslationViewModel CreateDataSourceTranslationViewModel(DataSourceTranslationDto dataSourceTranslation,
                                                                                     DataSourceTranslationType translationType,
                                                                                     IReadOnlyDictionary<int, string> translationNameDict)
         {
-            var viewModel = DataSourceTranslationViewModel.Create(translationType:translationType);
+            var viewModel = DataSourceTranslationViewModelHelper.Create(translationType: translationType,
+                                                                        defaultValue: new DropdownOptionViewModel
+                                                                                      {
+                                                                                          Id = dataSourceTranslation.TranslationItem.TranslationId,
+                                                                                          DisplayName = translationNameDict[key: dataSourceTranslation.TranslationItem.TranslationId]
+                                                                                      });
 
             viewModel.Id = dataSourceTranslation.Id;
             viewModel.DataSourceId = dataSourceTranslation.DataSourceId;
             viewModel.DataSourceTerm = dataSourceTranslation.DataSourceTerm;
             viewModel.TranslationType = translationType;
-            viewModel.TranslatedItem = new DropdownOptionViewModel
-                                       {
-                                           Id = dataSourceTranslation.TranslationItem.TranslationId,
-                                           DisplayName = translationNameDict[key:dataSourceTranslation.TranslationItem.TranslationId]
-                                       };
 
             return viewModel;
         }
@@ -383,30 +375,35 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult UpdateDataSourceMonitoringPointTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceMonitoringPointTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.MonitoringPoint;
             return UpdateDataSourceDetailsTranslation(request:request, viewModel:viewModel, translationType:DataSourceTranslationType.MonitoringPoint);
         }
 
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         public ActionResult UpdateDataSourceCollectionMethodTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceCollectionMethodTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.CollectionMethod;
             return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.CollectionMethod);
         }
 
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         public ActionResult UpdateDataSourceSampleTypeTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceSampleTypeTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.SampleType;
             return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.SampleType);
         }
 
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         public ActionResult UpdateDataSourceParameterTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceParameterTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.Parameter;
             return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Parameter);
         }
 
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         public ActionResult UpdateDataSourceUnitTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.Unit;
             return UpdateDataSourceDetailsTranslation(request: request, viewModel: viewModel, translationType: DataSourceTranslationType.Unit);
         }
 

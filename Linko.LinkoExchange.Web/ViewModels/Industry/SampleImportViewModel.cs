@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		public string SelectedDefaultSampleTypeName { get; set; }
 
-		public MissingTranslationViewModel MissingTranslation { get; set; }
+        public List<ImportDataTranslationViewModel> DataTranslations { get; set; }
 
 		public SampleImportDto SampleImportDto { get; set; }
 
@@ -122,13 +122,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		#endregion
 	}
 
-	public class MissingTranslationViewModel
-	{
-		#region public properties
+    public class ImportDataTranslationViewModel
+    {
+        #region public properties
 
-		public List<DataSourceTranslationViewModel> MisstingTranslations { get; set; }
-		public string Title { get; set; }
-		public DataSourceTranslationType TranslationType { get; set; }
+        public List<IDataSourceTranslationViewModel> DataTranslations { get; set; }
+        public string Title { get; set; }
+        public int NumberOfMissingTranslations { get; set; }
+        public int NumberOfExistingTranslations { get; set; }
+        public int NumberOfTotalTranslations => NumberOfMissingTranslations + NumberOfExistingTranslations;
+        public DataSourceTranslationType TranslationType { get; set; }
 
 		#endregion
 	}

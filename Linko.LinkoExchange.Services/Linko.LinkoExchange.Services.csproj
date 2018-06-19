@@ -162,7 +162,7 @@
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CopyOfRecordDataXmlFileDto.cs" />
     <Compile Include="Dto\CopyOfRecordPdfFileDto.cs" />
-    <Compile Include="Dto\MissingTranslationDto.cs" />
+    <Compile Include="Dto\ImportDataTranslationDto.cs" />
     <Compile Include="Dto\RequiredDataDefaultsDto.cs" />
     <Compile Include="Dto\SampleImportDto.cs" />
     <Compile Include="Dto\LimitBasisDto.cs" />
