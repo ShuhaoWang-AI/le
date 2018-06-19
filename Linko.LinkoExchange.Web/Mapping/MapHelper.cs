@@ -153,6 +153,7 @@ namespace Linko.LinkoExchange.Web.Mapping
 				                   MassLoadingQualifier = sampleResultDto.MassLoadingQualifier,
 				                   MassLoadingUnitId = sampleResultDto.MassLoadingUnitId,
 				                   MassLoadingValue = sampleResultDto.MassLoadingValue,
+								   MassLoadingDisplayValue = sampleResultDto.MassLoadingValue,
 				                   MassLoadingUnitName = sampleResultDto.MassLoadingUnitName,
 				                   MassLoadingSampleResultId = sampleResultDto.MassLoadingSampleResultId,
 				                   MassResultCompliance = sampleResultDto.MassResultCompliance.ToString(),
@@ -191,7 +192,7 @@ namespace Linko.LinkoExchange.Web.Mapping
 				                      MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces ?? 0,
 				                      MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds ?? 0.0f,
 				                      IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign,
-				                      SampleResults = sampleDto.SampleResults.Select(selector:ToViewModel),
+				                      SampleResults = sampleDto.SampleResults.Select(selector:ToViewModel).ToList(),
 				                      SampleComplianceSummary = new SampleComplianceSummaryViewModel
 				                                                {
 					                                                BadConcentrationComplianceCount = sampleDto.BadConcentrationComplianceCount,
@@ -202,6 +203,17 @@ namespace Linko.LinkoExchange.Web.Mapping
 					                                                UnknownMassLoadingComplianceCount = sampleDto.UnknowMassLoadingComplianceCount
 				                                                }
 			                      };
+
+			if (sampleDto.IsMassLoadingResultToUseLessThanSign && sampleDto.FlowValue.HasValue)
+			{
+				foreach (var sampleResult in sampleViewModel.SampleResults)
+				{
+					if (!string.IsNullOrWhiteSpace(sampleResult.Qualifier))
+					{
+						sampleResult.MassLoadingDisplayValue = $"{sampleResult.Qualifier} {sampleResult.MassLoadingValue}";
+					}
+				}
+			}
 
 			return sampleViewModel;
 		}

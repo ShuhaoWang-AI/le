@@ -56,7 +56,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Mass Loading Result")]
         public string MassLoadingValue { get; set; }
 
-        public int MassLoadingUnitId { get; set; }
+		[Display(Name = "Mass Loading Result")]
+		public string MassLoadingDisplayValue { get; set; }
+
+		public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
 
         public string ConcentrationResultCompliance { get; set; }
