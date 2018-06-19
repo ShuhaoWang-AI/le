@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
+using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Web.Mapping
 {
@@ -215,6 +217,10 @@ namespace Linko.LinkoExchange.Web.Mapping
 				}
 			}
 
+			sampleViewModel.SampleOverallCompliance =
+				sampleDto.SampleResults.Any(sr => sr.ConcentrationResultCompliance == ResultComplianceType.Bad || sr.MassResultCompliance == ResultComplianceType.Bad) ? "Bad" : "Good";
+
+			sampleViewModel.SampleOverallComplianceComment = sampleViewModel.SampleOverallCompliance == ResultComplianceType.Good.ToString() ? Message.OverallSampleComplianceGood : Message.OverallSampleComplianceBad;
 			return sampleViewModel;
 		}
 
