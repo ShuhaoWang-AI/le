@@ -35,8 +35,8 @@ namespace Linko.LinkoExchange.Web.Shared
 				importSummary.SampleComplianceSummary.GoodConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.GoodConcentrationComplianceCount);
 				importSummary.SampleComplianceSummary.GoodMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.GoodMassLoadingComplianceCount);
 				
-				importSummary.SampleComplianceSummary.UnknowConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknowConcentrationComplianceCount);
-				importSummary.SampleComplianceSummary.UnknowMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknowMassLoadingComplianceCount);
+				importSummary.SampleComplianceSummary.UnknownConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownConcentrationComplianceCount);
+				importSummary.SampleComplianceSummary.UnknownMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownMassLoadingComplianceCount);
 
 				if (sample.ImportStatus == ImportStatus.Updated)
 				{

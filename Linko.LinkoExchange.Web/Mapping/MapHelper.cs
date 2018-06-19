@@ -198,8 +198,8 @@ namespace Linko.LinkoExchange.Web.Mapping
 					                                                BadMassLoadingComplianceCount = sampleDto.BadMassLoadingComplianceCount,
 					                                                GoodConcentrationComplianceCount = sampleDto.GoodConcentrationComplianceCount,
 					                                                GoodMassLoadingComplianceCount = sampleDto.GoodMassLoadingComplianceCount,
-					                                                UnknowConcentrationComplianceCount = sampleDto.UnknowConcentrationComplianceCount,
-					                                                UnknowMassLoadingComplianceCount = sampleDto.UnknowMassLoadingComplianceCount
+					                                                UnknownConcentrationComplianceCount = sampleDto.UnknowConcentrationComplianceCount,
+					                                                UnknownMassLoadingComplianceCount = sampleDto.UnknowMassLoadingComplianceCount
 				                                                }
 			                      };
 

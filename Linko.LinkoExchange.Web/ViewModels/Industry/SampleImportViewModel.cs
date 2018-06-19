@@ -196,6 +196,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		public int NewDraftSampleCount { get; set; }
 		public int UpdateDraftSampleCont { get; set; }
+		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
 		public int NewSampleResultCount { get; set; }
 		public int UpdateSampleResultCount { get; set; }
 		public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
@@ -208,9 +209,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 	{
 		public int GoodConcentrationComplianceCount { get; set; }
 		public int BadConcentrationComplianceCount { get; set; }
-		public int UnknowConcentrationComplianceCount { get; set; }
+		public int UnknownConcentrationComplianceCount { get; set; }
+		public int ConcentrationComplianceCount => GoodConcentrationComplianceCount + BadConcentrationComplianceCount + UnknownConcentrationComplianceCount;
 		public int GoodMassLoadingComplianceCount { get; set; }
 		public int BadMassLoadingComplianceCount { get; set; }
-		public int UnknowMassLoadingComplianceCount { get; set; }
+		public int UnknownMassLoadingComplianceCount { get; set; }
+		public int MassLoadingComplianceCount => GoodMassLoadingComplianceCount + BadMassLoadingComplianceCount + UnknownMassLoadingComplianceCount;
 	}
 }

@@ -662,126 +662,267 @@
                     </button>
                 </div>
             </div>
-            <div class="box-body form-horizontal">
-                <div class="alert alert-info">
-                    <h5>
-                        Sample file is ready to import
-                    </h5>
-                </div>
-                <h4 class="box-title">Preview Summary </h4>
-                <div class="form-group" style="padding: 0 5px;">
-                    @Model.ImportSummary.SampleResultCount sample result(s) are ready to import. <br /> <br />
-
-                    @if (Model.ImportSummary.NewDraftSampleCount > 0)
-                    {
-                        <span>@Model.ImportSummary.NewDraftSampleCount new draft sample(s) are ready to create. <br /></span>
-                    }
-                    @if (Model.ImportSummary.UpdateDraftSampleCont > 0)
-                    {
-                        <span>@Model.ImportSummary.UpdateDraftSampleCont  existing draft sample(s) are ready to update. <br /></span>
-                    }
-                </div>
-                <!-- sample results preview -->
-                <h4 class="box-title">Import Sample Preview </h4>
-                <div class="form-group" style="padding: 0 5px;">
-                    @(Html.Kendo().Grid(dataSource: Model.Samples)
-                                      .Name(componentName: "gridImportSamplesPreview")
-                                      .Columns(columns =>
-                                      {
-                                          columns.Bound(c => c.SampleOverallCompliance)
-                                                 .ClientTemplate(
-                                                                 value: "# if (SampleOverallCompliance == 'Bad') { #" +
-                                                                       "<i class='fa fa-lg fa-exclamation-circle' style='color:red' " +
-                                                                       "# } else { #" +
-                                                                       "<i class='fa fa-lg fa-check-circle' style='color:green' " +
-                                                                       "# } #" +
-                                                                       "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
-                                              )
-                                                 .HtmlAttributes(attributes: new
-                                                 {
-                                                     align = "center"
-                                                 })
-                                                 .Filterable(f => f.Enabled(value: false))
-                                                 .Width(pixelWidth: 40);
-                                          columns.Bound(c => c.MonitoringPointName)
-                                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                                          columns.Bound(c => c.CtsEventTypeName)
-                                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                                          columns.Bound(c => c.CollectionMethodName)
-                                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                                          columns.Bound(c => c.StartDateTimeLocal)
-                                                 .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
-                                          columns.Bound(c => c.EndDateTimeLocal)
-                                                 .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
-                                          columns.Bound(c => c.LabSampleIdentifier)
-                                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-
-                                          columns.Bound(c => c.FlowValueAndFlow)
-                                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                                      })
-                                      .Pageable(pageable => pageable
-                                                                .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
-                                                                .Refresh(enabled: true)
-                                                                .Input(enabled: true)
-                                                                .Numeric(enabled: false)
-                                      )
-                                      .ClientDetailTemplateId(id: "template")
-                                      .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
-                                      .Resizable(resizable => resizable.Columns(value: true))
-                                      .Scrollable(s => s.Height(value: "auto"))
-                                      .NoRecords(text: "No sample exists.")
-                                      .Events(e => { e.DetailInit(handler: "detailInit"); })
-                                      .DataSource(dataSource => dataSource
-                                                                    .Ajax()
-                                                                    .PageSize(pageSize: 15)
-                                                                    .Sort(sort =>
-                                                                    {
-                                                                        sort.Add(memberName: "StartDateTimeLocal").Ascending();
-                                                                        sort.Add(memberName: "MonitoringPointName").Ascending();
-                                                                        sort.Add(memberName: "CollectionMethodName").Ascending();
-                                                                    })
-                                                                    .Group(g => g.Add(c => c.Status))
-                                                                    .ServerOperation(enabled: false)
-                                      ))
+        <div class="box-body form-horizontal">
+            <div class="alert alert-info">
+                <h5>
+                    Sample file is ready to import
+                </h5>
+            </div>
+            <div class="box box-group box-solid collapsed-box" >
+                <div class="box-header">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    &nbsp;
+                    <h4 class="box-title">Draft Sample Summary </h4>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        <span class="progress-text">
+                            <i aria-hidden="true" class="fa fa-plus-circle fa-lg text-blue" data-placement="top" data-toggle="tooltip"></i> New: @(Model.ImportSummary.NewDraftSampleCount) 
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-exclamation-triangle fa-lg text-yellow" data-placement="top" data-toggle="tooltip"></i>Updated: @(Model.ImportSummary.UpdateDraftSampleCont)
+                        </span>
+                        <span class="progress-number">&nbsp;</span>
+                        <div class="active progress progress-xs"style="height: 7px;">
+                            <div class="progress-bar bg-blue" style="width: @((Model.ImportSummary.NewDraftSampleCount*100)/Model.ImportSummary.SampleCount)%; background-color: #00a65a;"></div>
+                            <div class="progress-bar bg-yellow" style="width: @((Model.ImportSummary.UpdateDraftSampleCont*100)/Model.ImportSummary.SampleCount)%"></div>
+                        </div>
                     </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
+                    <table class="dataTable table table-bordered table-condensed table-striped text-center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Draft Sample Status</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th><i aria-hidden="true" class="fa fa-plus-circle fa-lg text-blue" data-placement="top" data-toggle="tooltip"></i></th>
+                                <th>New</th>
+                                <th>@Model.ImportSummary.NewDraftSampleCount</th>
+                            </tr>
+                            <tr>
+                                <th><i aria-hidden="true" class="fa fa-exclamation-triangle fa-lg text-yellow" data-placement="top" data-toggle="tooltip"></i></th>
+                                <th>Updated</th>
+                                <th>@Model.ImportSummary.UpdateDraftSampleCont</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer" style="padding: 0 40px ;">
+                </div>
+            </div>
 
-                <script>
-                    function detailInit(e) {
+            <div class="box box-group box-solid collapsed-box" >
+                <div class="box-header">
+                    &nbsp;
+                    <h4 class="box-title" style="padding: 0 40px ;">Draft Sample Result Summary </h4>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        <span class="progress-text">
+                            <i aria-hidden="true" class="fa fa-plus-circle fa-lg text-blue" data-placement="top" data-toggle="tooltip"></i> New: @(Model.ImportSummary.NewSampleResultCount) 
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-exclamation-triangle fa-lg text-yellow" data-placement="top" data-toggle="tooltip"></i> Updated: @(Model.ImportSummary.UpdateSampleResultCount)
+                        </span>
+                        <span class="progress-number">&nbsp;</span>
+                        <div class="active progress progress-xs"style="height: 7px;">
+                            <div class="progress-bar bg-blue" style="width: @((Model.ImportSummary.NewSampleResultCount*100)/Model.ImportSummary.SampleResultCount)%;"></div>
+                            <div class="progress-bar bg-yellow" style="width: @((Model.ImportSummary.UpdateSampleResultCount*100)/Model.ImportSummary.SampleResultCount)%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
+                </div>
+                <div class="box-footer" style="padding: 0 40px ;">
+                </div>
+            </div>
 
-                        var sampleIdentifier = e.data.Identifier;
-                        var gridId = "gridSampleResult" + sampleIdentifier;
-                        $("#gridSampleResult").attr("id", gridId);
+            <div class="box box-group box-solid collapsed-box" >
+                <div class="box-header">
+                    &nbsp;
+                    <h4 class="box-title" style="padding: 0 40px ;">Concentration Result Compliance Summary </h4>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        <span class="progress-text">
+                            <i aria-hidden="true" class="fa fa-check-circle fa-lg text-green" data-placement="top" data-toggle="tooltip"></i> In Compliance: @(Model.ImportSummary.SampleComplianceSummary.GoodConcentrationComplianceCount) 
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-exclamation-circle fa-lg text-red" data-placement="top" data-toggle="tooltip"></i> In Non-compliance: @(Model.ImportSummary.SampleComplianceSummary.BadConcentrationComplianceCount)
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-circle fa-lg text-yellow" data-placement="top" data-toggle="tooltip"></i> No Limit: @(Model.ImportSummary.SampleComplianceSummary.UnknownConcentrationComplianceCount)
+                        </span>
+                        <span class="progress-number">&nbsp;</span>
+                        <div class="active progress progress-xs"style="height: 7px;">
+                            <div class="progress-bar bg-green" style="width: @((Model.ImportSummary.SampleComplianceSummary.GoodConcentrationComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.ConcentrationComplianceCount)%;"></div>
+                            <div class="progress-bar bg-red" style="width: @((Model.ImportSummary.SampleComplianceSummary.BadConcentrationComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.ConcentrationComplianceCount)%"></div>
+                            <div class="progress-bar bg-yellow" style="width: @((Model.ImportSummary.SampleComplianceSummary.UnknownConcentrationComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.ConcentrationComplianceCount)%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
+                </div>
+                <div class="box-footer" style="padding: 0 40px ;">
+                </div>
+            </div>
 
-                        var sampleResult = e.data.SampleResults.map(function(item) {
-                            item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
-                            return item;
-                        });
+            <div class="box box-group box-solid collapsed-box" >
+                <div class="box-header">
+                    &nbsp;
+                    <h4 class="box-title" style="padding: 0 40px ;">Mass Loading Result Compliance Summary </h4>
+                    <div class="box-tools pull-right progress-group" style="width: 450px;">
+                        <span class="progress-text">
+                            <i aria-hidden="true" class="fa fa-check-circle fa-lg text-green" data-placement="top" data-toggle="tooltip"></i> In Compliance: @(Model.ImportSummary.SampleComplianceSummary.GoodMassLoadingComplianceCount), 
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-exclamation-circle fa-lg text-red" data-placement="top" data-toggle="tooltip"></i> In Non-compliance: @(Model.ImportSummary.SampleComplianceSummary.BadMassLoadingComplianceCount),
+                            &nbsp;
+                            &nbsp;
+                            <i aria-hidden="true" class="fa fa-circle fa-lg text-yellow" data-placement="top" data-toggle="tooltip"></i> No Limit: @(Model.ImportSummary.SampleComplianceSummary.UnknownMassLoadingComplianceCount)
+                        </span>
+                        <span class="progress-number">&nbsp;</span>
+                        <div class="active progress progress-xs"style="height: 7px;">
+                            <div class="progress-bar bg-green" style="width: @((Model.ImportSummary.SampleComplianceSummary.GoodMassLoadingComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.MassLoadingComplianceCount)%;"></div>
+                            <div class="progress-bar bg-red" style="width: @((Model.ImportSummary.SampleComplianceSummary.BadMassLoadingComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.MassLoadingComplianceCount)%"></div>
+                            <div class="progress-bar bg-yellow" style="width: @((Model.ImportSummary.SampleComplianceSummary.UnknownMassLoadingComplianceCount*100)/Model.ImportSummary.SampleComplianceSummary.MassLoadingComplianceCount)%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0 40px ;">
+                </div>
+                <div class="box-footer" style="padding: 0 40px ;">
+                </div>
+            </div>
+            
+            <!-- sample results preview -->
+            <div class="box box-group box-solid" >
+                <div class="box-header">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    &nbsp;
+                    <h4 class="box-title">Import Sample Preview </h4>
+                </div>
+                <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0  40px 20px ;">
+                    @(Html.Kendo().Grid(dataSource: Model.Samples)
+                          .Name(componentName: "gridImportSamplesPreview")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.Status)
+                                     .ClientTemplate( value:
+                                         "# if (Status == 'New') { #" +
+                                         "<i class='fa fa-plus-circle fa-lg text-blue' aria-hidden='true' data-placement='top' data-toggle='tooltip' title='New' /> " +
+                                         "# } else { #" +
+                                         "<i class='fa fa-exclamation-triangle fa-lg text-yellow' aria-hidden='true' data-placement='top' data-toggle='tooltip' title='Updated' /> " +
+                                         "# } #"
+                                  )
+                                     .HtmlAttributes(attributes: new
+                                     {
+                                         align = "center"
+                                     })
+                                     .Title(" ")
+                                     .Filterable(f => f.Enabled(value: false))
+                                     .Width(pixelWidth: 40);
 
-                        sampleResult = sampleResult.sort(function(a, b) {
-                            return a.Status > b.Status;
-                        });
+                              columns.Bound(c => c.SampleOverallCompliance)
+                                     .ClientTemplate( value:
+                                         "# if (SampleOverallCompliance == 'Bad') { #" +
+                                            "<i class='fa fa-lg fa-exclamation-circle bg-red' " +
+                                         "# } else { #" +
+                                            "<i class='fa fa-lg fa-check-circle text-green' " +
+                                         "# } #" +
+                                            "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
+                                  )
+                                     .HtmlAttributes(attributes: new
+                                     {
+                                         align = "center"
+                                     })
+                                     .Title(" ")
+                                     .Filterable(f => f.Enabled(value: false))
+                                     .Width(pixelWidth: 40);
+                              columns.Bound(c => c.MonitoringPointName)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                              columns.Bound(c => c.CtsEventTypeName)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                              columns.Bound(c => c.CollectionMethodName)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                              columns.Bound(c => c.StartDateTimeLocal)
+                                     .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                     .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                              columns.Bound(c => c.EndDateTimeLocal)
+                                     .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
+                                     .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                              columns.Bound(c => c.LabSampleIdentifier)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
 
-                        var sampleResultGrid = $("#" + gridId).data("kendoGrid");
+                              columns.Bound(c => c.FlowValueAndFlow)
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                          })
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
+                                                    .Refresh(enabled: true)
+                                                    .Input(enabled: true)
+                                                    .Numeric(enabled: false)
+                          )
+                          .ClientDetailTemplateId(id: "template")
+                          .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .NoRecords(text: "No sample exists.")
+                          .Events(e => { e.DetailInit(handler: "detailInit"); })
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .PageSize(pageSize: 15)
+                                                        .Sort(sort =>
+                                                        {
+                                                            sort.Add(memberName: "Status").Ascending();
+                                                            sort.Add(memberName: "StartDateTimeLocal").Ascending();
+                                                            sort.Add(memberName: "MonitoringPointName").Ascending();
+                                                            sort.Add(memberName: "CollectionMethodName").Ascending();
+                                                        })
+                                                        //.Group(g => g.Add(c => c.Status))
+                                                        .ServerOperation(enabled: false)
+                          ))
 
-                        sampleResultGrid.dataSource.data(sampleResult);
-                    }
+                    <script>
+                        function detailInit(e) {
 
-                    $(document)
-                        .ready(function() {
-                            $("#LinkoExchangeForm")
-                                .submit(function() {
-                                    $("#CurrentSampleImportStep").val(@((int) SampleImportViewModel.SampleImportStep.ShowImportOutput));
-                                    return true;
-                                });
-                        });
-                </script>
+                            var sampleIdentifier = e.data.Identifier;
+                            var gridId = "gridSampleResult" + sampleIdentifier;
+                            $("#gridSampleResult").attr("id", gridId);
+
+                            var sampleResult = e.data.SampleResults.map(function(item) {
+                                item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
+                                return item;
+                            });
+
+                            sampleResult = sampleResult.sort(function(a, b) {
+                                return a.Status > b.Status;
+                            });
+
+                            var sampleResultGrid = $("#" + gridId).data("kendoGrid");
+
+                            sampleResultGrid.dataSource.data(sampleResult);
+                        }
+
+                        $(document)
+                            .ready(function() {
+                                $("#LinkoExchangeForm")
+                                    .submit(function() {
+                                        $("#CurrentSampleImportStep").val(@((int) SampleImportViewModel.SampleImportStep.ShowImportOutput));
+                                        return true;
+                                    });
+                            });
+                    </script>
+                </div>
+            </div>
                 <div class="box-footer">
                     <div class="form-group pull-right">
                         <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues: 
@@ -852,17 +993,31 @@
 		  .Name(componentName:"gridSampleResult")
 		  .Columns(columns =>
 		  {
+		      columns.Bound(c => c.Status)
+		             .ClientTemplate( value:
+		                 "\\# if (Status == 'New') { \\#" +
+		                 "<i class='fa fa-plus-circle fa-lg text-blue' aria-hidden='true' data-placement='top' data-toggle='tooltip' title='New' /> " +
+		                 "\\# } else { \\#" +
+		                 "<i class='fa fa-exclamation-triangle fa-lg text-yellow' aria-hidden='true' data-placement='top' data-toggle='tooltip' title='Updated' /> " +
+		                 "\\# } \\#"
+		          )
+		             .HtmlAttributes(attributes: new
+		                                         {
+		                                             align = "center"
+		                                         })
+		             .Title(" ")
+		             .Filterable(f => f.Enabled(value: false))
+		             .Width(pixelWidth: 40);
 			  columns.Bound(c => c.ParameterName);
-			  columns.Bound(c => c.Status);
 			  columns.Bound(c => c.Value)
 					 .HtmlAttributes(attributes:new {align = "right"})
 					 .ClientTemplate(value:"\\#=Value\\#&nbsp;&nbsp;<i "
 										   + "\\#if(ConcentrationResultCompliance==\"Good\") { \\#"
-										   + "class='fa fa-lg fa-check-circle' style='color:green' "
+										   + "class='fa fa-lg fa-check-circle text-green' "
 										   + "\\# } else if(ConcentrationResultCompliance==\"Unknown\") { \\#"
-										   + "class='fa fa-lg fa-circle' style='color:green' "
+										   + "class='fa fa-lg fa-circle text-yellow' "
 										   + "\\# } else if(ConcentrationResultCompliance==\"Bad\") { \\#"
-										   + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
+										   + "class='fa fa-lg fa-exclamation-circle text-red' "
 										   + "\\# } \\#"
 										   + "aria-hidden='true' data-placement='top' "
 										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
@@ -874,11 +1029,11 @@
 						 + "\\# } else { \\#"
 						 + "\\#=MassLoadingValue\\#&nbsp;&nbsp;<i "
 						 + "\\#if(MassResultCompliance==\"Good\") { \\#"
-						 + "class='fa fa-lg fa-check-circle' style='color:green' "
+						 + "class='fa fa-lg fa-check-circle text-green' "
 						 + "\\# } else if(MassResultCompliance==\"Unknown\") { \\#"
-						 + "class='fa fa-lg fa-circle' style='color:green' "
+						 + "class='fa fa-lg fa-circle text-yellow' "
 						 + "\\# } else if(MassResultCompliance==\"Bad\") { \\#"
-						 + "class='fa fa-lg fa-exclamation-circle' style='color:red' "
+						 + "class='fa fa-lg fa-exclamation-circle text-red' "
 						 + "\\# } \\#"
 						 + "aria-hidden='true' data-placement='top' "
 						 + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
