@@ -566,6 +566,10 @@ namespace Linko.LinkoExchange.Services.Sample
 					    CheckResultComplianceInner(sampleResult, sampleDto.MonitoringPointId, monitoringPointParameters, monitoringPointParameterLimits, sampleDto.StartDateTimeLocal,
 					                               LimitBasisName.MassLoading);
 				    }
+				    else
+				    {
+					    sampleResult.MassResultCompliance = ResultComplianceType.Unknown;
+				    }
 			    }
 		    }
 	    }
