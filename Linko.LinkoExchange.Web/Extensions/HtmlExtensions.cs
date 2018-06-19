@@ -126,7 +126,7 @@ namespace Linko.LinkoExchange.Web.Extensions
             grid.Pageable(pager => pager.Enabled(value:false))
                 .Scrollable(s => s.Enabled(value:false))
                 .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                .NoRecords(text:"No translations exists")
+                .NoRecords(text:"No translations in the list")
                 .DataSource(configurator:GetSampleImportDataTranslationDataSource<T>(memberName:memberName,
                                                                                      actionName:actionName,
                                                                                      defaultValue:defaultValue,
