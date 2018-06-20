@@ -98,7 +98,7 @@ namespace Linko.LinkoExchange.Services.SelectList
 
                 var monitoringPoints = _dbContext.MonitoringPoints
                                                  .Where(x => x.OrganizationRegulatoryProgramId == industryOrganizationRegulatoryProgramId
-                                                             && x.IsRemoved == false)
+                                                             && x.IsRemoved == false && x.IsEnabled)
                                                  .Select(x => new {x.MonitoringPointId, x.Name})
                                                  .OrderBy(x => x.Name)
                                                  .ToList();
@@ -108,7 +108,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                     Id = x.MonitoringPointId,
                     DisplayValue = x.Name
                 }).ToList();
-                if (withEmptyItem)
+                if (!list.Any() || withEmptyItem)
                 {
                     list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Monitoring Point" });
                 }
@@ -126,7 +126,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                 var sampleTypes = _dbContext.CtsEventTypes
                                             .Where(x => x.OrganizationRegulatoryProgramId == authorityOrganizationRegulatoryProgramId
                                                         && x.CtsEventCategoryName == "SAMPLE"
-                                                        && x.IsRemoved == false)
+                                                        && x.IsRemoved == false && x.IsEnabled)
                                             .Select(x => new {x.CtsEventTypeId, x.Name})
                                             .OrderBy(x => x.Name)
                                             .ToList();
@@ -136,7 +136,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                     Id = x.CtsEventTypeId,
                     DisplayValue = x.Name
                 }).ToList();
-                if (withEmptyItem)
+                if (!list.Any() || withEmptyItem)
                 {
                     list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Sample Type" });
                 }
@@ -153,7 +153,7 @@ namespace Linko.LinkoExchange.Services.SelectList
 
                 var collectionMethods = _dbContext.CollectionMethods
                                                   .Where(x => x.OrganizationId == authrotyOrganizationId 
-                                                              && x.IsRemoved == false)
+                                                              && x.IsRemoved == false && x.IsEnabled)
                                                   .Select(x => new {x.CollectionMethodId, x.Name})
                                                   .OrderBy(x => x.Name)
                                                   .ToList();
@@ -163,7 +163,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                     Id = x.CollectionMethodId,
                     DisplayValue = x.Name
                 }).ToList();
-                if (withEmptyItem)
+                if (!list.Any() || withEmptyItem)
                 {
                     list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Collection Method" });
                 }
@@ -190,7 +190,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                     Id = x.ParameterId,
                     DisplayValue = x.Name
                 }).ToList();
-                if (withEmptyItem)
+                if (!list.Any() || withEmptyItem)
                 {
                     list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Parameter" });
                 }
@@ -219,7 +219,7 @@ namespace Linko.LinkoExchange.Services.SelectList
                     DisplayValue = x.Name,
                     Description = x.Description
                 }).ToList();
-                if (withEmptyItem)
+                if (!list.Any() || withEmptyItem)
                 {
                     list.Insert(index: 0, item: new ListItemDto { Id = 0, DisplayValue = "Select Unit" });
                 }

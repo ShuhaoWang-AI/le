@@ -72,7 +72,7 @@
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .NoRecords(text: "No Monitoring Point Translation exists.")
+                          .NoRecords(text: "No Monitoring Point translations in the list")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
@@ -95,7 +95,7 @@
                                                             model.Field(p => p.DataSourceId).Editable(enabled: false).DefaultValue(Model.Id);
                                                             model.Field(p => p.TranslationType).Editable(enabled: false).DefaultValue(DataSourceTranslationType.MonitoringPoint);
                                                             model.Field(p => p.DataSourceTerm);
-                                                            model.Field(p => p.MonitoringPoint).DefaultValue(ViewData[key: "defaultAuthorityMonitoringPoint"] as DropdownOptionViewModel);
+                                                            model.Field(p => p.MonitoringPoint).DefaultValue(ViewData[key: "defaultIndustryMonitoringPoint"] as DropdownOptionViewModel);
                                                         })
                           ))
                 </div>
@@ -144,7 +144,7 @@
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .NoRecords(text: "No Collection Method Translation exists.")
+                          .NoRecords(text: "No Collection Method translations in the list")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
@@ -216,7 +216,7 @@
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .NoRecords(text: "No Sample Type Translation exists.")
+                          .NoRecords(text: "No Sample Type translations in the list")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
@@ -288,7 +288,7 @@
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .NoRecords(text: "No Unit Translation exists.")
+                          .NoRecords(text: "No Unit translations in the list")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)
@@ -360,7 +360,7 @@
                           .Scrollable(s => s.Enabled(value: false))
                           .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
                           .Resizable(resizable => resizable.Columns(value: true))
-                          .NoRecords(text: "No Parameter Translation exists.")
+                          .NoRecords(text: "No Parameter translations in the list")
                           .DataSource(dataSource => dataSource
                                                         .Ajax()
                                                         .ServerOperation(enabled: false)

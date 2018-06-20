@@ -417,11 +417,13 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                          join d in _dbContext.DataSources on t.DataSourceId equals d.DataSourceId
                                                          join s in _dbContext.MonitoringPoints on t.MonitoringPointId equals s.MonitoringPointId
                                                          where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
-                                                               && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
-                                                               && s.IsRemoved == true
+                                                               && s.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                                               && (s.IsRemoved || !s.IsEnabled)
                                                          select t).ToList();
                 if (invalidDataSourceMonitoringPoints.Any())
                 {
+                    _logger.Info(message:"Found unavailable Monitoring Point Translation(s): {0}", 
+                                 argument:string.Join(separator:",", values:invalidDataSourceMonitoringPoints.Select(x => x.DataSourceTerm)));
                     _dbContext.DataSourceMonitoringPoints.RemoveRange(entities:invalidDataSourceMonitoringPoints);
                     shouldSaveChanges = true;
                 }
@@ -431,10 +433,12 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                           join s in _dbContext.CollectionMethods on t.CollectionMethodId equals s.CollectionMethodId
                                                           where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                                                                 && s.OrganizationId == authorityOrganizationId
-                                                                && s.IsRemoved == true
+                                                                && (s.IsRemoved || !s.IsEnabled)
                                                           select t).ToList();
                 if (invalidDataSourceCollectionMethods.Any())
                 {
+                    _logger.Info(message: "Found unavailable Collection Method Translation(s): {0}",
+                                 argument: string.Join(separator: ",", values: invalidDataSourceCollectionMethods.Select(x => x.DataSourceTerm)));
                     _dbContext.DataSourceCollectionMethods.RemoveRange(entities:invalidDataSourceCollectionMethods);
                     shouldSaveChanges = true;
                 }
@@ -445,10 +449,12 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                     where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId 
                                                           && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
                                                           && s.CtsEventCategoryName == "SAMPLE"
-                                                          && s.IsRemoved == true
+                                                          && (s.IsRemoved || !s.IsEnabled)
                                                     select t).ToList();
                 if (invalidDataSourceSampleTypes.Any())
                 {
+                    _logger.Info(message: "Found unavailable Sample Type Translation(s): {0}",
+                                 argument: string.Join(separator: ",", values: invalidDataSourceSampleTypes.Select(x => x.DataSourceTerm)));
                     _dbContext.DataSourceCtsEventTypes.RemoveRange(entities:invalidDataSourceSampleTypes);
                     shouldSaveChanges = true;
                 }
@@ -462,6 +468,8 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                     select t).ToList();
                 if (invalidDataSourceParameters.Any())
                 {
+                    _logger.Info(message: "Found unavailable Parameter Translation(s): {0}",
+                                 argument: string.Join(separator: ",", values: invalidDataSourceParameters.Select(x => x.DataSourceTerm)));
                     _dbContext.DataSourceParameters.RemoveRange(entities:invalidDataSourceParameters);
                     shouldSaveChanges = true;
                 }
@@ -475,6 +483,8 @@ namespace Linko.LinkoExchange.Services.DataSource
                                               select t).ToList();
                 if (invalidDataSourceUnits.Any())
                 {
+                    _logger.Info(message: "Found unavailable Unit Translation(s): {0}",
+                                 argument: string.Join(separator: ",", values: invalidDataSourceUnits.Select(x => x.DataSourceTerm)));
                     _dbContext.DataSourceUnits.RemoveRange(entities:invalidDataSourceUnits);
                     shouldSaveChanges = true;
                 }

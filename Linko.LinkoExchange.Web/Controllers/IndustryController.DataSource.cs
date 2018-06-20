@@ -223,6 +223,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private DataSourceViewModel PrepareDataSourcesDetails(int id)
         {
+            _dataSourceService.DeleteInvalidDataSourceTranslations(dataSourceId:id);
             var dataSource = _dataSourceService.GetDataSourceById(dataSourceId:id);
 
             var viewModel = new DataSourceViewModel
@@ -312,6 +313,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ViewData[key:dropdownOptionsKey] = dropdownOptions;
             ViewData[key:defaultDropdownOptionKey] = dropdownOptions.First();
+
         }
 
         private string GetTranslatedTypeDomainName(DataSourceTranslationType translationType)
@@ -332,7 +334,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                DataSourceTranslationType translationType)
         {
             var dataSourceTranslations = _dataSourceService.GetDataSourceTranslations(dataSourceId:dataSourceId, translationType:translationType);
-            var translationNameDict = GetTranslationSelectListDictionay(translationType:translationType);
+            var translationNameDict = GetTranslationSelectListDictionary(translationType:translationType);
 
             var viewModels = dataSourceTranslations.Select(x => CreateDataSourceTranslationViewModel(dataSourceTranslation:x, translationType:translationType,
                                                                                                      translationNameDict:translationNameDict));
@@ -340,7 +342,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(data:result);
         }
 
-        private Dictionary<int, string> GetTranslationSelectListDictionay(DataSourceTranslationType translationType)
+        private Dictionary<int, string> GetTranslationSelectListDictionary(DataSourceTranslationType translationType)
         {
             switch (translationType)
             {
@@ -357,11 +359,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                     DataSourceTranslationType translationType,
                                                                                     IReadOnlyDictionary<int, string> translationNameDict)
         {
+            string displayName;
+            if (!translationNameDict.TryGetValue(key:dataSourceTranslation.TranslationItem.TranslationId, value:out displayName))
+            {
+                throw new InternalServerError(message:$"{translationType} translation '{dataSourceTranslation.DataSourceTerm} is unavailable, "
+                                                      + "it should be already automatically removed.");
+            }
             var viewModel = DataSourceTranslationViewModelHelper.Create(translationType: translationType,
                                                                         defaultValue: new DropdownOptionViewModel
                                                                                       {
                                                                                           Id = dataSourceTranslation.TranslationItem.TranslationId,
-                                                                                          DisplayName = translationNameDict[key: dataSourceTranslation.TranslationItem.TranslationId]
+                                                                                          DisplayName = displayName
                                                                                       });
 
             viewModel.Id = dataSourceTranslation.Id;
@@ -516,12 +524,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult CreateDataSourceMonitoringPointTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceMonitoringPointTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.MonitoringPoint;
             return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel, translationType:DataSourceTranslationType.MonitoringPoint);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult CreateDataSourceCollectionMethodTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceCollectionMethodTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.CollectionMethod;
             return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
                                                       translationType:DataSourceTranslationType.CollectionMethod);
         }
@@ -529,6 +539,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult CreateDataSourceSampleTypeTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceSampleTypeTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.SampleType;
             return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
                                                       translationType:DataSourceTranslationType.SampleType);
         }
@@ -536,6 +547,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult CreateDataSourceParameterTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceParameterTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.Parameter;
             return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
                                                       translationType:DataSourceTranslationType.Parameter);
         }
@@ -543,6 +555,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult CreateDataSourceUnitTranslation([CustomDataSourceRequest] DataSourceRequest request, DataSourceUnitTranslationViewModel viewModel)
         {
+            viewModel.TranslatedItem = viewModel.Unit;
             return CreateDataSourceDetailsTranslation(request:request, viewModel:viewModel,
                                                       translationType:DataSourceTranslationType.Unit);
         }
