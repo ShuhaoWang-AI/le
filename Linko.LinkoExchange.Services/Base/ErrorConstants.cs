@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Base
             public const string DataTranslationsAreRequired = "Data Translation(s) is required.";
             public const string ImportTemplateDoesNotExist = "No file format has been defined. Contact your Authority for assistance.";
             public const string QueryParameterIsInvalid = "Query Parameter {0} is not valid.";
-            public const string ImportSummaryIsOutDate = "The import is done, please start another import.";
+            public const string ImportSummaryIsOutDate = "The Import is done, please Import Another File.";
 
             #endregion
 

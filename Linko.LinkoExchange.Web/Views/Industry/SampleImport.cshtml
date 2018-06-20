@@ -921,24 +921,66 @@
                 
                 @if (Model.ImportSummary != null)
                 {
-                    <div class="alert alert-success">
-                        <h5>
-                            Samples imported successfully!
-                        </h5>
-                    </div>
-                    
-                    <h5 class="box-title">Import Summary </h5>
-                    <div class="form-group" style="padding: 0 60px;">
-                        @Model.ImportSummary.SampleResultCount sample result(s) imported. <br /> <br />
 
-                        @if (Model.ImportSummary.NewDraftSampleCount > 0)
-                        {
-                            <span>@Model.ImportSummary.NewDraftSampleCount new draft sample(s) created. <br /></span>
-                        }
-                        @if (Model.ImportSummary.UpdateDraftSampleCont > 0)
-                        {
-                            <span>@Model.ImportSummary.UpdateDraftSampleCont existing draft sample(s) updated. <br /></span>
-                        }
+                    <div class="alert alert-success">
+                        <h5> Samples imported successfully!</h5>
+                    </div>
+
+                    <div class="box-header voffset2">
+                        <h3 class="box-title loffset20 voffset2">Import Summary </h3>
+
+                        <div class="loffset40">
+                            <div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountImportDescription</div>
+                            @if (Model.ImportSummary.NewDraftSampleCount > 0)
+                            {
+                                <span class="fa-stack">
+                                    <i class="fa fa-stack-1x fa-lg fa-circle-thin text-blue"></i>
+                                    <i class="fa fa-stack-1x font-12 text-blue">N</i>
+                                </span>
+                                <span>@Model.ImportSummary.NewDraftSampleCount new</span>
+                            }
+                            @if (Model.ImportSummary.UpdateDraftSampleCont > 0)
+                            {
+                                <span class="fa-stack">
+                                    <i class="fa fa-stack-1x fa-lg fa-circle-thin text-yellow"></i>
+                                    <i class="fa fa-stack-1x font-12 text-yellow">U</i>
+                                </span>
+                                <span>@Model.ImportSummary.UpdateDraftSampleCont @Model.ImportSummary.UpdateDraftSampleCountDescription</span>
+                            }
+                        </div>
+                        <div class="loffset40">
+                            <span class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountImportDescription</span>
+                                @if (Model.ImportSummary.NewSampleResultCount > 0)
+                                {
+                                    <span class="fa-stack">
+                                        <i class="fa fa-stack-1x fa-lg fa-circle-thin text-blue"></i>
+                                        <i class="fa fa-stack-1x font-12 text-blue">N</i>
+                                    </span>
+                                    <span>@(Model.ImportSummary.NewSampleResultCount) new</span>
+                                }
+
+                                @if (Model.ImportSummary.UpdateSampleResultCount > 0)
+                                {
+                                    <span class="fa-stack">
+                                        <i class="fa fa-stack-1x fa-lg fa-circle-thin text-yellow"></i>
+                                        <i class="fa fa-stack-1x font-12 text-yellow">U</i>
+                                    </span>
+                                    <span>@Model.ImportSummary.UpdateSampleResultCount @Model.ImportSummary.UpdateSampleResultCountDescription</span>
+                                }
+                        </div>
+                    </div>
+
+                    <div class="box-header voffset2 width450">
+                        <h3 class="box-title loffset20 voffset2">Sample Result Compliance Summary </h3>
+                        
+                        <div class="loffset40 width450">
+                            <div class="voffset1">@Model.ImportSummary.SampleComplianceSummary.FinalComplianceDescription</div>
+                    
+                            <div class="active progress progress-xs" style="height: 7px;">
+                                <div class="progress-bar progress-bar-green" style="background-color: #00a65a; width: @(Model.ImportSummary.SampleComplianceSummary.TotalGoodPercentage)%;"></div>
+                                <div class="progress-bar progress-bar-danger" style="width: @(Model.ImportSummary.SampleComplianceSummary.TotalBadPercentage)%"></div>
+                            </div>
+                        </div>
                     </div>
                 }
             </div>

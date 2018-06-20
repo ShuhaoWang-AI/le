@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Newtonsoft.Json;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
@@ -198,12 +199,25 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		#region public properties
 
 		public int NewDraftSampleCount { get; set; }
-		public int UpdateDraftSampleCont { get; set; }
+        public int UpdateDraftSampleCont { get; set; }
+		[JsonIgnore]
+		public string UpdateDraftSampleCountDescription => UpdateDraftSampleCont > 1 ? "updates" : "update";
+        [JsonIgnore]
 		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
-		public int NewSampleResultCount { get; set; }
-		public int UpdateSampleResultCount { get; set; }
-		public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
-		public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; } 
+		[JsonIgnore]
+		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples are imported." : "Draft Sample are imported.";
+		[JsonIgnore]
+		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples will be imported." : "Draft Sample will be imported.";
+        public int NewSampleResultCount { get; set; }
+        public int UpdateSampleResultCount { get; set; }
+		public string UpdateSampleResultCountDescription => UpdateSampleResultCount > 1 ? "updates" : "update";
+        [JsonIgnore]
+        public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
+		[JsonIgnore]
+		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results are imported." : "Sample Result are imported.";
+        [JsonIgnore]
+		public string SampleResultCountPreviewDescription => SampleResultCount > 1 ? "Sample Results will be imported." : "Sample Result will be imported.";
+        public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; } 
 		#endregion
 	}
 
@@ -213,14 +227,31 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		public int GoodConcentrationComplianceCount { get; set; }
 		public int BadConcentrationComplianceCount { get; set; }
 		public int UnknownConcentrationComplianceCount { get; set; }
-		public int ConcentrationComplianceCount => GoodConcentrationComplianceCount + BadConcentrationComplianceCount + UnknownConcentrationComplianceCount;
 		public int GoodMassLoadingComplianceCount { get; set; }
 		public int BadMassLoadingComplianceCount { get; set; }
 		public int UnknownMassLoadingComplianceCount { get; set; }
-		public int MassLoadingComplianceCount => GoodMassLoadingComplianceCount + BadMassLoadingComplianceCount + UnknownMassLoadingComplianceCount;
-		public int TotalGoodComplianceCount => GoodConcentrationComplianceCount + GoodMassLoadingComplianceCount;
-		public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
-		public int TotalUnknownComplianceCount => UnknownConcentrationComplianceCount + UnknownMassLoadingComplianceCount;
 
-	}
+		[JsonIgnore]
+        public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
+
+		[JsonIgnore]
+		private int TotalGoodComplianceCount => GoodConcentrationComplianceCount + 
+		                                       UnknownConcentrationComplianceCount + 
+		                                       GoodMassLoadingComplianceCount + 
+		                                       UnknownMassLoadingComplianceCount;
+
+		[JsonIgnore]
+		private int TotalComplianceCount => TotalGoodComplianceCount + TotalBadComplianceCount;
+		[JsonIgnore]
+		public int TotalGoodPercentage => TotalGoodComplianceCount > 0 ?
+			                                  Convert.ToInt32(value: Convert.ToDecimal(value: TotalGoodComplianceCount) / Convert.ToDecimal(value: TotalComplianceCount) * 100) : 100;
+		[JsonIgnore]
+		public int TotalBadPercentage => 100 - TotalGoodPercentage;
+        [JsonIgnore]
+        public string FinalComplianceDescription => string.Format(format:"{0} of {1} {2}", 
+                                                                  arg0:TotalGoodComplianceCount, 
+                                                                  arg1:TotalComplianceCount, 
+                                                                  arg2:TotalComplianceCount > 1 ? "Sample Results are in compliance" : "Sample Result is in compliance") ;
+
+    }
 }

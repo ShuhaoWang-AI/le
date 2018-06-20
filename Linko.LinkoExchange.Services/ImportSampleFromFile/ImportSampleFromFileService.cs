@@ -231,7 +231,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             {
                 if (!CanUserExecuteApi(id:importTempFileId))
                 {
-                    throw new UnauthorizedAccessException();
+                    throw new BadRequest(message: ErrorConstants.SampleImport.CannotFindImportFile);
                 }
 
                 var currentRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));

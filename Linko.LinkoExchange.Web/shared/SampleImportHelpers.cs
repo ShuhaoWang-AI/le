@@ -91,8 +91,9 @@ namespace Linko.LinkoExchange.Web.Shared
 				       SelectedDataSourceId = sampleImportQueryParameters.SelectedDataSourceId,
 				       SelectedDefaultMonitoringPointId = sampleImportQueryParameters.SelectedDefaultMonitoringPointId,
 				       SelectedDefaultCollectionMethodId = sampleImportQueryParameters.SelectedDefaultCollectionMethodId,
-				       SelectedDefaultSampleTypeId = sampleImportQueryParameters.SelectedDefaultSampleTypeId
-			       };
+				       SelectedDefaultSampleTypeId = sampleImportQueryParameters.SelectedDefaultSampleTypeId,
+				       ImportSummary = sampleImportQueryParameters.ImportSummary
+            };
 		}
 
 		public static string ToImportJobId(SampleImportViewModel model)
@@ -112,8 +113,9 @@ namespace Linko.LinkoExchange.Web.Shared
 				       SelectedDataSourceId = model.SelectedDataSourceId,
 				       SelectedDefaultMonitoringPointId = model.SelectedDefaultMonitoringPointId,
 				       SelectedDefaultCollectionMethodId = model.SelectedDefaultCollectionMethodId,
-				       SelectedDefaultSampleTypeId = model.SelectedDefaultSampleTypeId
-			       };
+				       SelectedDefaultSampleTypeId = model.SelectedDefaultSampleTypeId,
+				       ImportSummary = model.ImportSummary
+            };
 		}
 
 		public static RouteValueDictionary GetBackRouteValues(SampleImportViewModel model)
@@ -225,6 +227,7 @@ namespace Linko.LinkoExchange.Web.Shared
 			public int SelectedDefaultMonitoringPointId { get; set; }
 			public int SelectedDefaultCollectionMethodId { get; set; }
 			public int SelectedDefaultSampleTypeId { get; set; }
+			public ImportSummaryViewModel ImportSummary { get; set; }
 
 			#endregion
 		}

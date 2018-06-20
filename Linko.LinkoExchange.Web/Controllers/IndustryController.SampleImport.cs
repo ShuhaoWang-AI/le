@@ -121,7 +121,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     return RedirectSampleImportStepView(model:model, step:SampleImportViewModel.SampleImportStep.ShowPreImportOutput);
                 }
 
-                DoImportFinalSaveAndReserveImportSummaryToTempData(model:model);
+                DoImportFinalSaveAndUpdateImportSummaryToViewModel(model:model);
                 return RedirectSampleImportStepView(model:model, step:SampleImportViewModel.SampleImportStep.ShowImportOutput);
             }
             catch (RuleViolationException rve)
@@ -710,12 +710,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                       + "#"
                       + step;
             return Redirect(url: url);
-            // return new RedirectToActionAnchor(action: "SampleImport", controller: "Industry", anchor:step.ToString(),
-            //                                   routeValues: new RouteValueDictionary {{ QueryParameters.ImportJobId, importJobId }});
-
         }
 
-        private void DoImportFinalSaveAndReserveImportSummaryToTempData(SampleImportViewModel model)
+        private void DoImportFinalSaveAndUpdateImportSummaryToViewModel(SampleImportViewModel model)
         {
             PopulatePreviewData(model:model);
 
@@ -723,14 +720,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // ReSharper disable once PossibleInvalidOperationException
             model.ImportFileId = (int) model.SampleImportDto.ImportedFile.FileStoreId;
-
-            TempData[key:model.ImportId.ToString()] = model.ImportSummary;
         }
 
         private ActionResult RenderImportSummaryView(SampleImportViewModel model)
         {
-            model.ImportSummary = TempData[key:model.ImportId.ToString()] as ImportSummaryViewModel;
-
             if (model.ImportSummary == null)
             {
                 ModelState.AddModelError(key:string.Empty, errorMessage:ErrorConstants.SampleImport.ImportSummaryIsOutDate);
