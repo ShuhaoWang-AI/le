@@ -409,7 +409,7 @@
                                       columns.Bound(c => c.AnalysisDateTimeLocal)
                                              .ClientTemplate(value: "\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.toString(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
                                   })
-                                  .Pageable()
+                                  //.Pageable()
                                   .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                                   .Scrollable(s => s.Height(value:"auto"))
                                   .NoRecords(text:"No sample result exists.")
