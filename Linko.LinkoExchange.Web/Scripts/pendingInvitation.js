@@ -15,7 +15,7 @@ function confirmDelete(e) {
 
     $("#DeletePendingInvitationModal").modal();
 
-    $("#YesDelete").click(function () {
+    $("#DeletePendingInvitationModalYesDelete").click(function () {
         $("#DeletePendingInvitationModal").modal('hide');
         $("#DeletePendingInvitationModal").hide();
         var row = $(e.currentTarget).closest("tr");
