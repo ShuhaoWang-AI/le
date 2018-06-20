@@ -1094,6 +1094,21 @@
 
 @section Scripts {
     <script type="text/javascript">
+        //keep stepper sticky at the top with initial width
+        var stepper = $(".stepwizard");
+        var sticky = stepper.offset().top;
+        var setpperWidth = stepper.width();
+
+        window.onscroll = function() {
+            if (window.pageYOffset >= sticky) {
+                stepper.addClass("sticky");
+                stepper.width(setpperWidth);
+            } else {
+                stepper.removeClass("sticky");
+                stepper.width(setpperWidth);
+            }
+        };
+
         switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn) {
             var translationsGrid = $("#" + gridName).data("kendoGrid");
             var filter = {

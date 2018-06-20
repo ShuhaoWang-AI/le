@@ -314,7 +314,7 @@ input[type="search"]::-webkit-search-cancel-button
 /* Horizental Steps */
 .stepwizard-step p
 {
-	margin: 2px 0 2px;
+	margin: 10px 0 0 0;
 }
 
 .stepwizard-row
@@ -324,15 +324,14 @@ input[type="search"]::-webkit-search-cancel-button
 
 .stepwizard
 {
-	position: fixed;
-	top: 52px;
-	right: 15px;
-	background-color: rgba(255,255,255, 0.9);
-	border-radius: 3px;
+	position: relative;
+	width: 100%;
 	display: table;
-	width: 660px;
-	z-index: 1000;
-	padding: 2px 0 0;
+	background-color: #f5f5f5;
+	width: 100%;
+	border-radius: 3px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
 }
 
 .stepwizard-step button[disabled]
@@ -370,6 +369,12 @@ input[type="search"]::-webkit-search-cancel-button
 	padding: 6px 0;
 	text-align: center;
 	width: 30px;
+}
+
+.sticky {
+	position: fixed;
+	top: 50px;
+	z-index: 1000;
 }
 
 /* End: Custom notification template*/
