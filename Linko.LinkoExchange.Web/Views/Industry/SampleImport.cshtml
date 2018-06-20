@@ -943,6 +943,7 @@
                             sampleResult = sampleResult.sort(function(a, b) {
                                 return a.Status > b.Status;
                             });
+
                             var sampleResultGrid = $("#" + gridId).data("kendoGrid");
 
                             sampleResultGrid.dataSource.data(sampleResult);
@@ -1058,12 +1059,12 @@
 										   + "aria-hidden='true' data-placement='top' "
 										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
 
-			  columns.Bound(c => c.MassLoadingDisplayValue)
+			  columns.Bound(c => c.MassLoadingValue)
 					 .HtmlAttributes(attributes:new {align = "right"})
 					 .ClientTemplate(value:
-						 "\\#if(MassLoadingDisplayValue==\"\" || MassLoadingDisplayValue== null ) { \\#"
+						 "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
 						 + "\\# } else { \\#"
-						 + "\\#=MassLoadingDisplayValue\\#&nbsp;&nbsp;<i "
+						 + "\\#=MassLoadingValue\\#&nbsp;&nbsp;<i "
 						 + "\\#if(MassResultCompliance==\"Good\") { \\#"
 						 + "class='fa fa-lg fa-check-circle text-green' "
 						 + "\\# } else if(MassResultCompliance==\"Unknown\") { \\#"
