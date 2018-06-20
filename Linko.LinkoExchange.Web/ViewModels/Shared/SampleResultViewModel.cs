@@ -27,7 +27,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string Value { get; set; }
 		
 	    [Display(Name = "Result")]
-	    public string DisplayValue => $"{Qualifier} {Value}";
+	    public string DisplayValue => $"{Qualifier} {Value} {UnitName}";
 
 	    [Display(Name = "Unit")]
         public int UnitId { get; set; }
@@ -58,6 +58,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
+		
+	    [Display(Name = "Mass Loading Result")]
+	    public string DisplayMassLoadingValue => $"{MassLoadingQualifier} {MassLoadingValue} {MassLoadingUnitName}";
 
         public string ConcentrationResultCompliance { get; set; }
         public string ConcentrationResultComplianceComment { get; set; }

@@ -218,5 +218,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		public int BadMassLoadingComplianceCount { get; set; }
 		public int UnknownMassLoadingComplianceCount { get; set; }
 		public int MassLoadingComplianceCount => GoodMassLoadingComplianceCount + BadMassLoadingComplianceCount + UnknownMassLoadingComplianceCount;
+		public int TotalGoodComplianceCount => GoodConcentrationComplianceCount + GoodMassLoadingComplianceCount;
+		public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
+		public int TotalUnknownComplianceCount => UnknownConcentrationComplianceCount + UnknownMassLoadingComplianceCount;
+
 	}
 }

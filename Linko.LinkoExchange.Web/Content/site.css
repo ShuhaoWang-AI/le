@@ -383,3 +383,18 @@ input[type="search"]::-webkit-search-cancel-button
 {
 	position: static;
 }
+
+.font-12
+{
+	font-size: 12px;
+}
+
+.font-10
+{
+	font-size: 10px;
+}
+
+.fg-transparent
+{
+	color: transparent;
+}
