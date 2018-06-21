@@ -92,6 +92,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 {
                     var existingDataSource = GetExistingDataSource(organizationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
                     Core.Domain.DataSource dataSourceToPersist;
+
                     if (existingDataSource != null)
                     {
                         if (existingDataSource.DataSourceId != dataSourceDto.DataSourceId)
@@ -102,7 +103,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                         {
                             dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource:existingDataSource);
                             dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                            dataSourceToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                            dataSourceToPersist.LastModificationDateTimeUtc = DateTime.UtcNow;
                             dataSourceToPersist.LastModifierUserId = currentUserProfileId;
                         }
                     }
@@ -110,8 +111,8 @@ namespace Linko.LinkoExchange.Services.DataSource
                     {
                         dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource:null);
                         dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        dataSourceToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
-                        dataSourceToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                        dataSourceToPersist.CreationDateTimeUtc = DateTime.UtcNow;
+                        dataSourceToPersist.LastModificationDateTimeUtc = DateTime.UtcNow;
                         dataSourceToPersist.LastModifierUserId = currentUserProfileId;
 
                         _dbContext.DataSources.Add(entity:dataSourceToPersist);

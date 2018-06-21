@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
@@ -55,7 +56,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Id,
                                                                                            vm.Name,
                                                                                            vm.Description,
-                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider: CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
