@@ -45,7 +45,8 @@
                                                                                             htmlAttributes = new
                                                                                                              {
                                                                                                                  @class = "form-control",
-                                                                                                                 maxlength = 50
+                                                                                                                 maxlength = 50,
+                                                                                                                 @readonly = "readonly"
                                                                                                              }
                                                                                         })
                 @Html.ValidationMessageFor(model => model.FileVersionFieldName)
@@ -79,7 +80,8 @@
                                                                              {
                                                                                  @class = "form-control",
                                                                                  rows = 5,
-                                                                                 maxlength = 500
+                                                                                 maxlength = 500,
+                                                                                 @readonly = "readonly"
                                                                              })
                 @Html.ValidationMessageFor(model => model.Description)
             </div>
@@ -178,7 +180,8 @@
                                                                              {
                                                                                  @class = "form-control",
                                                                                  rows = 5,
-                                                                                 maxlength = 500
+                                                                                 maxlength = 500,
+                                                                                 @readonly = "readonly"
                                                                              })
                 @Html.ValidationMessageFor(model => model.ExampleData)
             </div>
@@ -194,7 +197,8 @@
                                                                                     {
                                                                                         @class = "form-control",
                                                                                         rows = 5,
-                                                                                        maxlength = 500
+                                                                                        maxlength = 500,
+                                                                                        @readonly = "readonly"
                                                                                     })
                 @Html.ValidationMessageFor(model => model.AdditionalComments)
             </div>

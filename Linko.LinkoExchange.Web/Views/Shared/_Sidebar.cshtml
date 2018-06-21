@@ -107,11 +107,11 @@
                         </li>
                     </ul>
                 </li>
-
-                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings,UnitTranslations,ImportFileTemplate", controllers:"Authority")">
+                
+                <li class="treeview @Html.IsActive(actions:"UnitTranslations,ImportFileTemplate", controllers:"Authority")">
                     <a href="#">
-                        <i class="fa fa-bank fa-fw"></i>
-                        <span>Authority Account</span>
+                        <i class="fa fa-upload fa-fw"></i>
+                        <span>Import File Settings</span>
                         @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
                         {
                             <span class="pull-right-container">
@@ -120,18 +120,6 @@
                         }
                     </a>
                     <ul class="treeview-menu">
-                        <li class="@Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset", controllers:"Authority")">
-                            <a href="#" onclick="location.href = '@Url.Action(actionName:"AuthorityUsers", controllerName:"Authority")'">
-                                <i class="fa fa-fw fa-users"></i>
-                                <span>Users</span>
-                            </a>
-                        </li>
-                        <li class="@Html.IsActive(actions:"Settings", controllers:"Authority")">
-                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Settings", controllerName:"Authority")'">
-                                <i class="fa fa-cog fa-fw"></i>
-                                <span>Settings</span>
-                            </a>
-                        </li>
                         <li class="@Html.IsActive(actions:"ImportFileTemplate", controllers:"Authority")">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ImportFileTemplate", controllerName:"Authority")'">
                                 <i class="fa fa-cloud-upload fa-fw"></i>
@@ -148,6 +136,27 @@
                                         <span name="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
                                     </span>
                                 }
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings", controllers:"Authority")">
+                    <a href="#">
+                        <i class="fa fa-bank fa-fw"></i>
+                        <span>Authority Account</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="@Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"AuthorityUsers", controllerName:"Authority")'">
+                                <i class="fa fa-fw fa-users"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                        <li class="@Html.IsActive(actions:"Settings", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Settings", controllerName:"Authority")'">
+                                <i class="fa fa-cog fa-fw"></i>
+                                <span>Settings</span>
                             </a>
                         </li>
                     </ul>
