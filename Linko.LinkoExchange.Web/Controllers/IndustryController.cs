@@ -1239,7 +1239,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var id = _sampleService.SaveSample(sample:vm);
 
                     TempData[key:"ShowSuccessMessage"] = true;
-                    TempData[key:"SuccessMessage"] = "Sample updated successfully!";
+                    TempData[key:"SuccessMessage"] = "Sample created successfully!";
 
                     ModelState.Clear();
 
