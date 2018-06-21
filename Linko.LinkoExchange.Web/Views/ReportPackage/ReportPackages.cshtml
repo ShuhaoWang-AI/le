@@ -42,7 +42,8 @@
 
             @Html.Partial(partialViewName:"_ConfirmationMessageView", model:vm)
         }
-        <div class="col-md-12 k-grid-header">
+        <div class="col-md-12 k-grid-header hidden">
+            @*made hidden as Chris decided to park this feature for now*@
             <div class="pull-right" style="height: 35px; padding-top: 5px;">
                 <a class="k-button" href="#" id="saveGridSetting">Save Grid Setting</a>
                 <a class="k-button" href="#" id="loadGridSetting">Load Grid Setting</a>
