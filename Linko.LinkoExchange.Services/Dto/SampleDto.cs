@@ -69,16 +69,16 @@ namespace Linko.LinkoExchange.Services.Dto
 
 		public int GoodMassLoadingComplianceCount
 		{
-			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Good); }
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Good && !string.IsNullOrWhiteSpace(i.MassLoadingValue)); }
 		}
 
 		public int BadMassLoadingComplianceCount
 		{
-			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Bad); }
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Bad && !string.IsNullOrWhiteSpace(i.MassLoadingValue)); }
 		}
 		public int UnknowMassLoadingComplianceCount
 		{
-			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Unknown); }
+			get { return SampleResults.Count(i => i.MassResultCompliance == ResultComplianceType.Unknown && !string.IsNullOrWhiteSpace(i.MassLoadingValue)); }
 		}
 		#endregion
 	}
