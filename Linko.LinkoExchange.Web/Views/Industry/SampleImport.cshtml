@@ -350,9 +350,15 @@
 
                     if (Model.SampleImportDto.RequiredDefaultValues.Any())
                     {
-                        <div class="alert alert-info">
-                            <h5>Some required data is missing from the file.What data should we use for the missing data?</h5>
-                        </div>
+                        <p>
+                            Some required data is missing from the file. What data should we use for the missing data?
+                        </p>
+                    }
+                    else
+                    {
+                        <p>
+                            No data defaults were missing. Please click Next to continue.
+                        </p>
                     }
 
                     if (requiredDefaultMonitoringPoint != null)
@@ -442,9 +448,9 @@
                 {
                     if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
                     {
-                        <div class="fg-gray" role="alert">
+                        <p>
                             No data defaults were missing.
-                        </div>
+                        </p>
                     }
 
                     if (Model.SelectedDefaultMonitoringPointId > 0)
@@ -521,12 +527,21 @@
                 @if (Model.DataTranslations != null)
                 {
                     var missingDataTranslations = Model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0);
-                    if (missingDataTranslations && ViewData.ModelState.IsValid)
+                    if (ViewData.ModelState.IsValid)
                     {
-                        <div class="alert bg-gray-light">
-                            <h5>
+                        <div class="alert">
+                        @if (missingDataTranslations)
+                        {
+                            <p>
                                 There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
-                            </h5>
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                                Data in the file has been translated previously, you can review them or click Next to continue.
+                            </p>
+                        }
                         </div>
                     }
                     foreach (var translationType in ImportSampleFromFileService.ColumnNameTranslationTypeDict.Values)
@@ -595,6 +610,14 @@
                                     }
                                     else if (translationType == DataSourceTranslationType.Parameter)
                                     {
+                                        <div class="col-md-12 voffset1">
+                                            <span>Importing Flow for Mass Loadings calculations?  Choose LinkoExchangeSampleFlowForMass.</span>
+                                            <span style="padding-left: 15px;">
+                                                <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="" type="button" data-original-title="If one of the parameters you are importing contains the flow used for calculating mass loadings, translate it to the parameter noted and LinkoExchange will use it to automatically calculate Mass Loadings for all the other parameters in that sample.">
+                                                    <i class="fa fa-info-circle fa-lg"></i>
+                                                </button>
+                                            </span>
+                                        </div>
                                         <div class="col-md-12 voffset2">
                                             @Html.KendoSampleImportDataTranslationGrid(dataTranslations
                                                 .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceParameterTranslationViewModel>).ToList(),

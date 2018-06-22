@@ -94,14 +94,19 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
                 PopulateRequiredDefaultValuesDropdownsForEmptyRecommendedCells(model:model);
-                if (model.SampleImportDto.RequiredDefaultValues.Any() && model.SampleImportDto.RequiredDefaultValues.Count != GetNumberOfAssignedRequiredDefaultValues(model:model))
+                var shouldRenderSelectDataDefaultView = model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile || 
+                                                      (model.SampleImportDto.RequiredDefaultValues.Any() && 
+                                                       model.SampleImportDto.RequiredDefaultValues.Count != GetNumberOfAssignedRequiredDefaultValues(model: model));
+                if (shouldRenderSelectDataDefaultView)
                 {
                     return RedirectSampleImportStepView(model:model, step:SampleImportViewModel.SampleImportStep.SelectDataDefault);
                 }
 
                 PopulateEmptyRecommendedCellsWithDataDefaults(model:model);
                 PopulateDataTranslationsAndMissingTranslationIfExists(model:model);
-                if (model.DataTranslations != null && model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0))
+                var shouldRenderTranslateDataView = model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectDataDefault ||
+                                                      (model.DataTranslations != null && model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0));
+                if (shouldRenderTranslateDataView)
                 {
                     if (model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.DataTranslations)
                     {

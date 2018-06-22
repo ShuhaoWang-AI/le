@@ -146,18 +146,14 @@ namespace Linko.LinkoExchange.Web.Shared
             {
                 case SampleImportViewModel.SampleImportStep.SelectDataSource:
                 case SampleImportViewModel.SampleImportStep.SelectFile:
+                case SampleImportViewModel.SampleImportStep.FileValidation:
                     sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource;
                     break;
-                case SampleImportViewModel.SampleImportStep.FileValidation:
                 case SampleImportViewModel.SampleImportStep.SelectDataDefault:
                     sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
                     break;
                 case SampleImportViewModel.SampleImportStep.DataTranslations:
-                    var anyDefaultValuesAssigned = sampleImportQueryParameters.SelectedDefaultMonitoringPointId > 0
-                                                   || sampleImportQueryParameters.SelectedDefaultCollectionMethodId > 0
-                                                   || sampleImportQueryParameters.SelectedDefaultSampleTypeId > 0;
-                    sampleImportQueryParameters.CurrentSampleImportStep =
-                        anyDefaultValuesAssigned ? SampleImportViewModel.SampleImportStep.SelectDataDefault : SampleImportViewModel.SampleImportStep.SelectFile;
+	                sampleImportQueryParameters.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
                     break;
                 case SampleImportViewModel.SampleImportStep.DataValidation:
                 case SampleImportViewModel.SampleImportStep.ShowPreImportOutput:

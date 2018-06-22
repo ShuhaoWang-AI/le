@@ -44,8 +44,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 { SampleImportColumnName.MonitoringPoint, DataSourceTranslationType.MonitoringPoint },
                 { SampleImportColumnName.CollectionMethod, DataSourceTranslationType.CollectionMethod },
                 { SampleImportColumnName.SampleType, DataSourceTranslationType.SampleType },
-                { SampleImportColumnName.ParameterName, DataSourceTranslationType.Parameter },
-                { SampleImportColumnName.ResultUnit, DataSourceTranslationType.Unit }
+                { SampleImportColumnName.ResultUnit, DataSourceTranslationType.Unit },
+                { SampleImportColumnName.ParameterName, DataSourceTranslationType.Parameter }
             };
 
         public static readonly Dictionary<DataSourceTranslationType, SelectListType> TranslationTypeSelectListTypeDict =
@@ -54,8 +54,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 { DataSourceTranslationType.MonitoringPoint, SelectListType.IndustryMonitoringPoint },
                 { DataSourceTranslationType.CollectionMethod, SelectListType.AuthorityCollectionMethod },
                 { DataSourceTranslationType.SampleType, SelectListType.AuthoritySampleType },
-                { DataSourceTranslationType.Parameter, SelectListType.AuthorityParameter },
-                { DataSourceTranslationType.Unit, SelectListType.AuthorityUnit }
+                { DataSourceTranslationType.Unit, SelectListType.AuthorityUnit },
+                { DataSourceTranslationType.Parameter, SelectListType.AuthorityParameter }
             };
         #endregion
 
