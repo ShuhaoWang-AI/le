@@ -53,10 +53,17 @@ namespace Linko.LinkoExchange.Web.Shared
 				if (sample.ImportStatus == ImportStatus.Updated)
 				{
 					importSummary.UpdateDraftSampleCont++;
+					//Check if sample has mass loading value or not,  if sample has, count it as updated
+					importSummary.UpdateDraftSampleCont += sample.SampleResults.Where(a=>a.Id.HasValue).Count(i => !string.IsNullOrWhiteSpace(i.MassLoadingValue));
+
+					//Check if sample has mass loading value or not, if a new sample result has mass loading, count it as new
+					importSummary.NewDraftSampleCount += sample.SampleResults.Where(i=>!i.Id.HasValue).Count(i => !string.IsNullOrWhiteSpace(i.MassLoadingValue));
 				}
 				else
 				{
 					importSummary.NewDraftSampleCount++;
+					//Check if sample has mass loading value or not,  if sample has, count it as well. 
+					importSummary.NewDraftSampleCount += sample.SampleResults.Count(i => !string.IsNullOrWhiteSpace(i.MassLoadingValue));
 				}
 
 				foreach (var sampleResult in sample.SampleResults)
