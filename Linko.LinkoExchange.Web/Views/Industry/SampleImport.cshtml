@@ -443,7 +443,7 @@
                     if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
                     {
                         <div class="fg-gray" role="alert">
-                            No empty recommended field(s) requires Default Value from the import file.
+                            No data defaults were missing.
                         </div>
                     }
 
@@ -525,7 +525,7 @@
                     {
                         <div class="alert bg-gray-light">
                             <h5>
-                                There is data in the file we don't recognize. Tell us what this data is and we'll use it instead.Plus we'll remember it for next time so we won't have to ask you again.
+                                There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
                             </h5>
                         </div>
                     }
@@ -715,6 +715,7 @@
                                                 <i class="fa fa-stack-1x fa-lg fa-circle-thin text-blue"></i>
                                                 <i class="fa fa-stack-1x font-12 text-blue">N</i>
                                             </span>
+                                            <i class="fa fa-check fa-lg text-blue"></i>
                                             @(Model.ImportSummary.NewDraftSampleCount)
                                             <span> new </span>
 
@@ -725,6 +726,7 @@
                                             <i class="fa fa-stack-1x fa-lg fa-circle-thin text-yellow"></i>
                                             <i class="fa fa-stack-1x font-12 text-yellow">U</i>
                                         </span>
+                                        <i class="fa fa-mars-double fa-lg text-yellow"></i>
                                         @(Model.ImportSummary.UpdateDraftSampleCont)
                                         <span> update(s) </span>
 
@@ -785,9 +787,9 @@
                                   columns.Bound(c => c.Status)
                                          .ClientTemplate( value:
                                              "# if (Status == 'New') { #" +
-                                             "<span class='fa-stack' data-placement='top' data-toggle='tooltip' title='New'> <i class='fa fa-stack-1x fa-lg fa-circle-thin text-blue'></i> <i class='fa fa-stack-1x font-10 text-blue'>N</i> </span> " +
+                                             "<i class='fa fa-check fa-lg text-blue'></i>" +
                                              "# } else { #" +
-                                             "<span class='fa-stack' data-placement='top' data-toggle='tooltip' title='Updated'> <i class='fa fa-stack-1x fa-lg fa-circle-thin text-yellow'></i> <i class='fa fa-stack-1x font-10 text-yellow'>U</i> </span> " +
+                                             "<i class='fa fa-check fa-lg text-yellow'></i>" +
                                              "# } #"
                                       )
                                          .HtmlAttributes(attributes: new
@@ -1082,7 +1084,7 @@
             }
         };
 
-        switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn) {
+        switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn, untranslatedNoResultsDescription, translatedNoResultsDescription) {
             var translationsGrid = $("#" + gridName).data("kendoGrid");
             var filter = {
                 field: "IsTranslated",
@@ -1097,6 +1099,13 @@
                 translationsGrid.showColumn("IsTranslated");
             } else {
                 translationsGrid.hideColumn("IsTranslated");
+            }
+            
+            var noResultsElement = $("#" + gridName + " >.k-grid-norecords >.k-grid-norecords-template");
+            if (isUntranslatedSwitchOn) {
+                noResultsElement.html(untranslatedNoResultsDescription);
+            } else {
+                noResultsElement.html(translatedNoResultsDescription);
             }
         };
     </script>
@@ -1114,6 +1123,8 @@
             {
                 var gridName = "grid" + translationType;
                 var segmentedControlName = "segmentedControl" + translationType;
+                var untranslatedNoResultDescription = HtmlExtensions.GetNoDataTranslationsDescription(translationType:translationType, isUntranslated:true);
+                var translatedNoResultDescription = HtmlExtensions.GetNoDataTranslationsDescription(translationType:translationType, isUntranslated:false);
 
                 <script type="text/javascript">
                     $("#@segmentedControlName a").click(function (e) {
@@ -1122,7 +1133,7 @@
                         $(this).removeClass("btn-default").addClass("btn-primary");
 
                         var isUntranslatedSwitchOn = $(this).text() === "Untranslated";
-                        switchDataTranslationGrid("@gridName", isUntranslatedSwitchOn);
+                        switchDataTranslationGrid("@gridName", isUntranslatedSwitchOn, "@untranslatedNoResultDescription", "@translatedNoResultDescription");
                     });
                 </script>
             }

@@ -317,15 +317,15 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         }
 
-        private string GetTranslatedTypeDomainName(DataSourceTranslationType translationType)
+        public static string GetTranslatedTypeDomainName(DataSourceTranslationType translationType, bool plural = false)
         {
             switch (translationType)
             {
-                case DataSourceTranslationType.MonitoringPoint: return "Monitoring Point";
-                case DataSourceTranslationType.SampleType: return "Sample Type";
-                case DataSourceTranslationType.CollectionMethod: return "Collection Method";
-                case DataSourceTranslationType.Parameter: return "Parameter";
-                case DataSourceTranslationType.Unit: return "Unit";
+                case DataSourceTranslationType.MonitoringPoint: return plural ? "Monitoring Points" : "Monitoring Point";
+                case DataSourceTranslationType.SampleType: return plural ? "Sample Types": "Sample Type";
+                case DataSourceTranslationType.CollectionMethod: return plural ? "Collection Methods" : "Collection Method";
+                case DataSourceTranslationType.Parameter: return plural ? "Parameters" : "Parameter";
+                case DataSourceTranslationType.Unit: return plural ? "Units" : "Unit";
                 default: throw new NotImplementedException(message:$"DataSourceTranslationType {translationType} is unsupported");
             }
         }

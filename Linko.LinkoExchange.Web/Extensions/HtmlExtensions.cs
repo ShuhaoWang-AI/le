@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Kendo.Mvc.UI;
 using Kendo.Mvc.UI.Fluent;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Web.Controllers;
 using Linko.LinkoExchange.Web.Shared;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -126,13 +127,21 @@ namespace Linko.LinkoExchange.Web.Extensions
             grid.Pageable(pager => pager.Enabled(value:false))
                 .Scrollable(s => s.Enabled(value:false))
                 .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                .NoRecords(text: "No translations in the list")
+                .NoRecords(text: GetNoDataTranslationsDescription(translationType:translationType, isUntranslated:isUntranslatedSwitchOn))
                 .DataSource(configurator:GetSampleImportDataTranslationDataSource<T>(memberName:memberName,
                                                                                      actionName:actionName,
                                                                                      defaultValue:defaultValue,
                                                                                      isUntranslatedSwitchOn:isUntranslatedSwitchOn));
 
             return grid;
+        }
+
+        public static string GetNoDataTranslationsDescription(DataSourceTranslationType translationType, bool isUntranslated)
+        {
+            var pattern = isUntranslated ? "There are no untranslated {0}." : "There are no translated {0}.";
+            var domainName = IndustryController.GetTranslatedTypeDomainName(translationType:translationType, plural:true);
+
+            return string.Format(format:pattern, arg0:domainName);
         }
 
         private static Action<DataSourceBuilder<T>> GetSampleImportDataTranslationDataSource<T>(string memberName,

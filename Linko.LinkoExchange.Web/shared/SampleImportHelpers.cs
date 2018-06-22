@@ -72,7 +72,11 @@ namespace Linko.LinkoExchange.Web.Shared
 					else
 					{
 						importSummary.NewSampleResultCount++;
-					}
+						if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
+						{
+							importSummary.NewDraftSampleCount++;
+						}
+                    }
 				}
 			}
 

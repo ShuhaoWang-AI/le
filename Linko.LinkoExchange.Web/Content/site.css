@@ -274,6 +274,12 @@ input[type="search"]::-webkit-search-cancel-button
 	color: #dd4b39 !important;
 }
 
+
+.ai-gold
+{
+	color: #ffcc02 !important;
+}
+
 .width200
 {
 	display: inline-block;
@@ -328,6 +334,11 @@ input[type="search"]::-webkit-search-cancel-button
 .box .input-group .input-group-btn
 {
 	width: auto;
+}
+
+.k-grid-norecords-template
+{
+	min-width: 450px;
 }
 
 /* Horizental Steps */

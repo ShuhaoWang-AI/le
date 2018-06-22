@@ -210,7 +210,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples will be imported." : "Draft Sample will be imported.";
         public int NewSampleResultCount { get; set; }
         public int UpdateSampleResultCount { get; set; }
-		public string UpdateSampleResultCountDescription => UpdateSampleResultCount > 1 ? "updates" : "update";
+		public string UpdateSampleResultCountDescription => UpdateSampleResultCount > 1 ? "updates" : "update"; 
         [JsonIgnore]
         public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
 		[JsonIgnore]
