@@ -25,6 +25,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
+
+        public string FlowParameterName { get; set; }
         #endregion
     }
 }

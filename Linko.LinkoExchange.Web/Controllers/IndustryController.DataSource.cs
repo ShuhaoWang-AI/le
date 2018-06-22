@@ -231,7 +231,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                             {
                                 Id = dataSource.DataSourceId,
                                 Name = dataSource.Name,
-                                Description = dataSource.Description
+                                Description = dataSource.Description,
+                                FlowParameterName = _parameterService.GetFlowParameter().Name
                             };
             return viewModel;
         }

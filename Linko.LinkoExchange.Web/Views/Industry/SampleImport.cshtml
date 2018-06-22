@@ -610,8 +610,8 @@
                                     }
                                     else if (translationType == DataSourceTranslationType.Parameter)
                                     {
-                                        <div class="col-md-12 voffset1">
-                                            <span>Importing Flow for Mass Loadings calculations?  Choose LinkoExchangeSampleFlowForMass.</span>
+                                        <div id="FlowParameterHint" class="col-md-12 voffset1 @(isUntranslatedSwitchOn ? "show" : "hidden")">
+                                            <span>Importing Flow for Mass Loadings calculations?  Choose @(Model.FlowParameterName).</span>
                                             <span style="padding-left: 15px;">
                                                 <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="" type="button" data-original-title="If one of the parameters you are importing contains the flow used for calculating mass loadings, translate it to the parameter noted and LinkoExchange will use it to automatically calculate Mass Loadings for all the other parameters in that sample.">
                                                     <i class="fa fa-info-circle fa-lg"></i>
@@ -1084,7 +1084,7 @@
             }
         };
 
-        switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn, untranslatedNoResultsDescription, translatedNoResultsDescription) {
+        switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn, untranslatedNoResultsDescription, translatedNoResultsDescription, isParameter) {
             var translationsGrid = $("#" + gridName).data("kendoGrid");
             var filter = {
                 field: "IsTranslated",
@@ -1100,12 +1100,18 @@
             } else {
                 translationsGrid.hideColumn("IsTranslated");
             }
-            
+
             var noResultsElement = $("#" + gridName + " >.k-grid-norecords >.k-grid-norecords-template");
             if (isUntranslatedSwitchOn) {
                 noResultsElement.html(untranslatedNoResultsDescription);
+                if (isParameter) {
+                    $("#FlowParameterHint").removeClass("hidden").addClass("show");
+                }
             } else {
                 noResultsElement.html(translatedNoResultsDescription);
+                if (isParameter) {
+                    $("#FlowParameterHint").removeClass("show").addClass("hidden");
+                }
             }
         };
     </script>
@@ -1122,19 +1128,22 @@
             if (isUntranslatedSwitchOn)
             {
                 var gridName = "grid" + translationType;
+                var isParameter = translationType == DataSourceTranslationType.Parameter ? "true" : "false";
                 var segmentedControlName = "segmentedControl" + translationType;
                 var untranslatedNoResultDescription = HtmlExtensions.GetNoDataTranslationsDescription(translationType:translationType, isUntranslated:true);
                 var translatedNoResultDescription = HtmlExtensions.GetNoDataTranslationsDescription(translationType:translationType, isUntranslated:false);
 
                 <script type="text/javascript">
-                    $("#@segmentedControlName a").click(function (e) {
-                        e.preventDefault();
-                        $("#@segmentedControlName a").removeClass("btn-primary").addClass("btn-default");
-                        $(this).removeClass("btn-default").addClass("btn-primary");
+                    $("#@segmentedControlName a")
+                        .click(function(e) {
+                            e.preventDefault();
+                            $("#@segmentedControlName a").removeClass("btn-primary").addClass("btn-default");
+                            $(this).removeClass("btn-default").addClass("btn-primary");
 
-                        var isUntranslatedSwitchOn = $(this).text() === "Untranslated";
-                        switchDataTranslationGrid("@gridName", isUntranslatedSwitchOn, "@untranslatedNoResultDescription", "@translatedNoResultDescription");
-                    });
+                            var isUntranslatedSwitchOn = $(this).text() === "Untranslated";
+                            switchDataTranslationGrid("@gridName", isUntranslatedSwitchOn, "@untranslatedNoResultDescription", "@translatedNoResultDescription",
+                                @isParameter);
+                        });
                 </script>
             }
         }

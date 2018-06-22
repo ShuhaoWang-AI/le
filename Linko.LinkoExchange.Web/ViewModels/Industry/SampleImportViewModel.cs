@@ -79,6 +79,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		public string SelectedDefaultCollectionMethodName { get; set; }
 
+		public string FlowParameterName { get; set; }
+
 		[Display(Name = "Default Sample Type")]
 		public int SelectedDefaultSampleTypeId { get; set; }
 

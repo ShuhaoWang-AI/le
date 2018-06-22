@@ -427,6 +427,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void PopulateDataTranslationsAndMissingTranslationIfExists(SampleImportViewModel model)
         {
+            model.FlowParameterName = _parameterService.GetFlowParameter().Name;
+
             var missingTranslations = _importSampleFromFileService
                 .PopulateExistingTranslationDataAndReturnMissingTranslationSet(sampleImportDto:model.SampleImportDto, dataSourceId:model.SelectedDataSourceId);
 
