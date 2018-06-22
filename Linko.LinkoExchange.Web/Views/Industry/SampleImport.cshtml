@@ -726,7 +726,7 @@
 
                 <div class="loffset40">
                     <h5>
-                        @(Model.ImportSummary.SampleResultCount) @(Model.ImportSummary.SampleCountPreviewDescription)
+                        @(Model.ImportSummary.SampleResultCount) @(Model.ImportSummary.SampleResultCountPreviewDescription)
                     </h5>
                 </div>
                 <div class="loffset40">
@@ -745,7 +745,7 @@
                     }
                 </div>
 
-                <div class="loffset40 width450">
+                <div class="loffset40 vtoffset2 width450">
                     @if (Model.ImportSummary.SampleComplianceSummary.TotalBadComplianceCount > 0)
                     {
                         <h5 class="text-bold">
@@ -932,7 +932,7 @@
                             {
                                 <i class='fa fa-check fa-lg text-yellow'></i>
                                 <span>@Model.ImportSummary.UpdateDraftSampleCont</span>
-                                <span>@Model.ImportSummary.UpdateDraftSampleCountDescription</span>
+                                <span>@Model.ImportSummary.Updated</span>
                             }
                         </div>
                         <div class="loffset40">
@@ -948,31 +948,21 @@
                                 {
                                     <i class='fa fa-check fa-lg text-yellow'></i>
                                     <span>@Model.ImportSummary.UpdateSampleResultCount</span>
-                                    <span>@Model.ImportSummary.UpdateSampleResultCountDescription</span>
+                                    <span>@Model.ImportSummary.Updated</span>
                                 }
                         </div>
                     </div>
 
                     <div class="box-header voffset2 width450">
                         <h3 class="box-title loffset20 voffset2">Sample Result Compliance Summary </h3>
-
+                        
                         <div class="loffset40 width450">
-                            @if (Model.ImportSummary.SampleComplianceSummary.TotalBadComplianceCount > 0)
-                            {
-                                <h5 class="text-bold">
-                                    @Model.ImportSummary.SampleComplianceSummary.TotalBadComplianceDescription
-                                    &nbsp;
-                                    <i aria-hidden="true" class="fa fa-exclamation-circle fa-lg text-red" data-placement="top" data-toggle="tooltip"></i>
-                                </h5>
-                            }
-                            else
-                            {
-                                <h5 class="text-bold">
-                                    @Model.ImportSummary.SampleComplianceSummary.AllResultsAreInCompliance
-                                    &nbsp;
-                                    <i aria-hidden="true" class="fa fa-check-circle fa-lg text-green" data-placement="top" data-toggle="tooltip"></i>
-                                </h5>
-                            }
+                            <div class="voffset1">@Model.ImportSummary.SampleComplianceSummary.FinalComplianceDescription</div>
+
+                            <div class="active progress progress-xs" style="height: 7px;">
+                                <div class="progress-bar progress-bar-green" style="background-color: #00a65a; width: @(Model.ImportSummary.SampleComplianceSummary.TotalGoodPercentage)%;"></div>
+                                <div class="progress-bar progress-bar-danger" style="width: @(Model.ImportSummary.SampleComplianceSummary.TotalBadPercentage)%"></div>
+                            </div>
                         </div>
                     </div>
                 }

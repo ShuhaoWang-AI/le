@@ -202,6 +202,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public int UpdateDraftSampleCont { get; set; }
 		[JsonIgnore]
 		public string UpdateDraftSampleCountDescription => UpdateDraftSampleCont > 1 ? "updates" : "update";
+		[JsonIgnore]
+        public string Updated => "updated";
         [JsonIgnore]
 		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
 		[JsonIgnore]
@@ -234,8 +236,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		[JsonIgnore]
         public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
 		[JsonIgnore]
-		public string TotalBadComplianceDescription => TotalBadComplianceCount + TotalBadComplianceCount > 1 ? 
-			                                               " result(s) are not in compliance" : " result are not in compliance";
+		public string TotalBadComplianceDescription => string.Format(format:"{0} {1} not in compliance", 
+		                                                             arg0:TotalBadComplianceCount,  
+																	 arg1:TotalBadComplianceCount > 1 ? " results are " : " result is");
 
 		[JsonIgnore]
 		public string AllResultsAreInCompliance => "All results are in compliance";
@@ -258,7 +261,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public string FinalComplianceDescription => string.Format(format:"{0} of {1} {2}", 
                                                                   arg0:TotalGoodComplianceCount, 
                                                                   arg1:TotalComplianceCount, 
-                                                                  arg2:TotalComplianceCount > 1 ? "Sample Results are in compliance" : "Sample Result is in compliance") ;
+                                                                  arg2: TotalGoodComplianceCount > 1 ? "Sample Results were in compliance" : "Sample Result was in compliance") ;
 
     }
 }
