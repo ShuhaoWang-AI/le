@@ -576,7 +576,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				                                                             SampleType = i.ColumnMap[key:SampleImportColumnName.SampleType].TranslatedValueId,
 				                                                             SampleStartDateTime = i.ColumnMap[key:SampleImportColumnName.SampleStartDateTime].TranslatedValue,
 				                                                             SampleEndDateTime = i.ColumnMap[key:SampleImportColumnName.SampleEndDateTime].TranslatedValue,
-				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValueId
+				                                                             LabSampleId = i.ColumnMap[key:SampleImportColumnName.LabSampleId].TranslatedValue
 			                                                             })
 			                                               .Select(group =>
 				                                                       new ImportSampleWrapper
