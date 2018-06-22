@@ -233,8 +233,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		[JsonIgnore]
         public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
+		[JsonIgnore]
+		public string TotalBadComplianceDescription => TotalBadComplianceCount + TotalBadComplianceCount > 1 ? 
+			                                               " result(s) are not in compliance" : " result are not in compliance";
 
 		[JsonIgnore]
+		public string AllResultsAreInCompliance => "All results are in compliance";
+
+
+        [JsonIgnore]
 		private int TotalGoodComplianceCount => GoodConcentrationComplianceCount + 
 		                                       UnknownConcentrationComplianceCount + 
 		                                       GoodMassLoadingComplianceCount + 

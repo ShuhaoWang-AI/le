@@ -50,7 +50,7 @@ namespace Linko.LinkoExchange.Web.Shared
 				importSummary.SampleComplianceSummary.UnknownConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownConcentrationComplianceCount);
 				importSummary.SampleComplianceSummary.UnknownMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownMassLoadingComplianceCount);
 
-				if (sample.ImportStatus == ImportStatus.Updated)
+				if (sample.ImportStatus == ImportStatus.Update)
 				{
 					importSummary.UpdateDraftSampleCont++;
 				}
@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Web.Shared
 
 				foreach (var sampleResult in sample.SampleResults)
 				{
-					if (sampleResult.ImportStatus == ImportStatus.Updated)
+					if (sampleResult.ImportStatus == ImportStatus.Update)
 					{
 						importSummary.UpdateSampleResultCount++;
 						if (!string.IsNullOrWhiteSpace(sampleResult.MassLoadingValue))
@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Web.Shared
 						importSummary.NewSampleResultCount++;
 						if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
 						{
-							importSummary.NewDraftSampleCount++;
+							importSummary.NewSampleResultCount++;
 						}
                     }
 				}

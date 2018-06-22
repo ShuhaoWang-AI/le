@@ -80,7 +80,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 	    [Display(Name = "Flow")]
 	    public string FlowValueAndFlow => string.IsNullOrWhiteSpace(FlowValue) ? "" : $"{FlowValue} {FlowUnitName}";
 
-		public ImportStatus ImportStatus => Id.HasValue ? ImportStatus.Updated : ImportStatus.New;
+		public ImportStatus ImportStatus => Id.HasValue ? ImportStatus.Update : ImportStatus.New;
 
 	    [Display(Name = "Import Status")]
 	    public string Status => ImportStatus.ToString();
@@ -150,7 +150,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 	public enum ImportStatus
 	{
 		New,
-		Updated
+		Update
 	}
 
     public class SampleViewModelValidator : AbstractValidator<SampleViewModel>

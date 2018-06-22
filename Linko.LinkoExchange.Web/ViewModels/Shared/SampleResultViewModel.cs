@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string MassResultCompliance { get; set; }
         public string MassResultComplianceComment { get; set; }
 		
-		public ImportStatus ImportStatus => Id.HasValue ? ImportStatus.Updated : ImportStatus.New;
+		public ImportStatus ImportStatus => Id.HasValue ? ImportStatus.Update : ImportStatus.New;
 	    public string Status => ImportStatus.ToString();
 
 	    #endregion
