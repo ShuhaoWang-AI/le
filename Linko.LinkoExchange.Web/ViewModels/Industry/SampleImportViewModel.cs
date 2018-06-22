@@ -205,7 +205,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [JsonIgnore]
 		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
 		[JsonIgnore]
-		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples are imported." : "Draft Sample are imported.";
+		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples were imported." : "Draft Sample was imported.";
 		[JsonIgnore]
 		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples will be imported." : "Draft Sample will be imported.";
         public int NewSampleResultCount { get; set; }
@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [JsonIgnore]
         public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
 		[JsonIgnore]
-		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results are imported." : "Sample Result are imported.";
+		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results were imported." : "Sample Result was imported.";
         [JsonIgnore]
 		public string SampleResultCountPreviewDescription => SampleResultCount > 1 ? "Sample Results will be imported." : "Sample Result will be imported.";
         public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; } 
