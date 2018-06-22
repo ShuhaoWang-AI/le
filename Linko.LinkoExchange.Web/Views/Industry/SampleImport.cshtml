@@ -40,41 +40,40 @@
     @Html.HiddenFor(model => model.ImportId)
     @Html.HiddenFor(model => model.CurrentSampleImportStep)
 
-    <div class="stepwizard">
-        <div class="stepwizard-row">
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepSelectDataProvider ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectDataProvider ? "" : "disabled=\"disabled\"")>1</span>
-                <p><small>Select Data Provider</small></p>
-            </div>
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepSelectFile ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectFile ? "" : "disabled=\"disabled\"")>2</span>
-                <p><small>Select File</small></p>
-            </div>
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepSelectDataDefault ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepSelectDataDefault ? "" : "disabled=\"disabled\"")>3</span>
-                <p><small>Select Data Defaults</small></p>
-            </div>
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepDataTranslations ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepDataTranslations ? "" : "disabled=\"disabled\"")>4</span>
-                <p><small>Data Translations</small></p>
-            </div>
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepPreview ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepPreview ? "" : "disabled=\"disabled\"")>5</span>
-                <p><small>Preview</small></p>
-            </div>
-            <div class="col-xs-2 stepwizard-step">
-                <span class="btn @(isStepImport ? "btn-primary" : "btn-default") stepwizard-btn-circle"
-                      @(isStepImport ? "" : "disabled=\"disabled\"")>6</span>
-                <p><small>Import</small></p>
-            </div>
-        </div>
-    </div>
-
+	if (Model.CurrentSampleImportStep != SampleImportViewModel.SampleImportStep.ShowImportOutput)
+	{
+		<div class="stepwizard">
+			<div class="stepwizard-row">
+				<div class="col-xs-1"></div>
+				<div class="col-xs-2 stepwizard-step">
+					<span class="btn @(isStepSelectDataProvider ? "btn-primary" : "btn-default") stepwizard-btn-circle"
+						  @(isStepSelectDataProvider ? "" : "disabled=\"disabled\"")>1</span>
+					<p><small>Select Data Provider</small></p>
+				</div>
+				<div class="col-xs-2 stepwizard-step">
+					<span class="btn @(isStepSelectFile ? "btn-primary" : "btn-default") stepwizard-btn-circle"
+						  @(isStepSelectFile ? "" : "disabled=\"disabled\"")>2</span>
+					<p><small>Select File</small></p>
+				</div>
+				<div class="col-xs-2 stepwizard-step">
+					<span class="btn @(isStepSelectDataDefault ? "btn-primary" : "btn-default") stepwizard-btn-circle"
+						  @(isStepSelectDataDefault ? "" : "disabled=\"disabled\"")>3</span>
+					<p><small>Select Data Defaults</small></p>
+				</div>
+				<div class="col-xs-2 stepwizard-step">
+					<span class="btn @(isStepDataTranslations ? "btn-primary" : "btn-default") stepwizard-btn-circle"
+						  @(isStepDataTranslations ? "" : "disabled=\"disabled\"")>4</span>
+					<p><small>Data Translations</small></p>
+				</div>
+				<div class="col-xs-2 stepwizard-step">
+					<span class="btn @(isStepPreview ? "btn-primary" : "btn-default") stepwizard-btn-circle"
+						  @(isStepPreview ? "" : "disabled=\"disabled\"")>5</span>
+					<p><small>Preview & Import</small></p>
+				</div>
+				<div class="col-xs-1"></div>
+			</div>
+		</div>
+     }
     // SampleImportStep.SelectDataSource
     if (!isStepImport)
     {
