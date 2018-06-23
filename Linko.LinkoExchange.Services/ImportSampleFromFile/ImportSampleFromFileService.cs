@@ -260,7 +260,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var maxFileSize = _fileStoreService.GetMaxFileSize();
                 if (importTempFileDto.RawFile == null || importTempFileDto.RawFile.Length < 1)
                 {
-                    throw new BadRequest(message:ErrorConstants.SampleImport.CannotFindImportFile);
+                    throw new BadRequest(message:ErrorConstants.SampleImport.FileValidation.ImportFileIsEmpty);
                 }
 
                 if (importTempFileDto.RawFile.Length > maxFileSize)

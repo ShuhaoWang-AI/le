@@ -90,7 +90,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PopulateRowObjectsOrFileValidationErrors(model:model);
                 if (model.StepFileValidation != null)
                 {
-                    return RedirectSampleImportStepView(model:model, step:SampleImportViewModel.SampleImportStep.FileValidation);
+                    return RedirectSampleImportStepView(model:model, step:SampleImportViewModel.SampleImportStep.SelectFile);
                 }
 
                 PopulateRequiredDefaultValuesDropdownsForEmptyRecommendedCells(model:model);
@@ -140,34 +140,33 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                int id;
+                ImportTempFileDto importTempFileDto;
 
-                if (upload != null && upload.ContentLength > 0)
-                {
+                
                     using (var reader = new BinaryReader(input:upload.InputStream))
                     {
                         var content = reader.ReadBytes(count:upload.ContentLength);
 
-                        var importTempFileDto = new ImportTempFileDto
+                        importTempFileDto = new ImportTempFileDto
                                                 {
                                                     OriginalFileName = upload.FileName,
                                                     RawFile = content,
                                                     MediaType = upload.ContentType
                                                 };
 
-                        id = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
+                        var importTempFileId = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
+                        importTempFileDto.ImportTempFileId = importTempFileId;
+                        model.ImportTempFileId = importTempFileId;
+                        model.SelectedFileName = upload.FileName;
                     }
-                }
-                else
-                {
-                    var validationIssues = new List<RuleViolation>();
-                    var message = "No file was selected.";
-                    validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
-                    throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
-                }
 
-                model.ImportTempFileId = id;
-                model.SelectedFileName = upload.FileName;
+
+                
+                PopulateSelectedDataProvider(model:model);
+                model.SampleImportDto.TempFile = importTempFileDto;
+                //PopulateSampleImportTempFile(model:model);
+                PopulateRowObjectsOrFileValidationErrors(model:model);
+                model.SampleImportDto = null;
 
                 return Json(data:model, behavior:JsonRequestBehavior.AllowGet);
             }
@@ -611,7 +610,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     case SampleImportViewModel.SampleImportStep.SelectDataSource: return RenderImportSelectDataProviderView(model:model);
                     case SampleImportViewModel.SampleImportStep.SelectFile: return RenderImportSelectFileView(model:model);
-                    case SampleImportViewModel.SampleImportStep.FileValidation: return RenderImportFileValidationView(model:model);
+                    //case SampleImportViewModel.SampleImportStep.FileValidation: return RenderImportFileValidationView(model:model);
                     case SampleImportViewModel.SampleImportStep.SelectDataDefault: return RenderImportSelectDataDefaultView(model:model);
                     case SampleImportViewModel.SampleImportStep.DataTranslations: return RenderImportDataTranslationsView(model:model);
                     case SampleImportViewModel.SampleImportStep.DataValidation: return RenderImportDataValidationView(model:model);
@@ -648,7 +647,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             PopulateSelectedDataProvider(model:model);
             PopulateSampleImportTempFile(model:model);
             PopulateRowObjectsOrFileValidationErrors(model:model);
-
+            
+            ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
             return View(model:model);
         }
 

@@ -153,8 +153,40 @@
                 @Html.HiddenFor(model => model.ImportTempFileId)
                 @Html.HiddenFor(model => model.SelectedFileName)
 
-                @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+                @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile || Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
                 {
+                    <style>
+                        .k-dropzone
+                        {
+                            text-align: center;
+                            height: 110px;
+                        }
+
+                        .k-dropzone >  em
+                        {
+                            padding-top: 20px;
+                            display: block !important;
+                            font-size: 16px;
+                            color: #337ab7;
+                            font-weight: bold;
+                            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                        } 
+
+                        .k-dropzone > .k-upload-button
+                        {
+                            margin-top: 10px;
+                        }
+
+                        .k-dropzone > .k-upload-status
+                        {
+                            padding-top: 40px;
+                            margin-left: -25px;
+                            display: block !important;
+                            color: #337ab7;
+                        }
+
+                    </style>
+
                     <div class="alert alert-danger validation-summary-valid" id="validationSummarySelectFile">
                         <h5>
                             @Message.ValidationSummaryHeaderText
@@ -162,19 +194,41 @@
                         <ul></ul>
                     </div>
 
-                    <div class="alert alert-info">
+                    @(Html.Kendo().Upload()
+                          .Name(componentName:"upload")
+                          .Async(a => a
+                                          .Save(actionName:"ImportSampleFile", controllerName:"Industry")
+                                          .AutoUpload(value:true)
+                          )
+                          .Events(e => e.Success(onSuccessHandlerName:"onFileUploadSuccess").Upload(onUploadHandlerName:"onFileUpload").Error(onErrorHandlerName:"onFileUploadError").Progress(onProgressHandlerName:"onFileUploadProgress"))
+                          .ShowFileList(value:true)
+                          .Multiple(value:false)
+                          .Messages(m => m.Select(selectMessage:"Select file").DropFilesHere(dropFilesHereMessage:"Drag and drop an .xlsx file into here"))
+                          )
+
+                    <div name="showOnFileValidationError" class="alert alert-danger hidden">
                         <h5>
-                            Select an .xlsx file to upload or drag and drop the file into the area below.
+                            File import failed! Check the errors below.
                         </h5>
                     </div>
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SelectedFileName, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2"
-                                                                                       })
-                        <div class="col-md-8">
-                            <input id="upload" name="upload" style="width: 100%;" type="file" />
+
+                    <div name="showOnFileValidationError" class="form-group hidden">
+                        <div class="col-md-12">
+                            @(Html.Kendo().Grid<ErrorWithRowNumberViewModel>()
+                                  .Name(componentName:"gridFileValidationErrors")
+                                  .Columns(columns =>
+                                  {
+                                      columns.Bound(c => c.ErrorMessage).Title(text:"Error");
+                                      columns.Bound(c => c.RowNumbers).Title(text:"Row Number(s)");
+                                  })
+                                  .Scrollable(s => s.Height(value:"auto")))
                         </div>
+                    </div>
+
+                    <div name="showOnfileValidationSuccess" class="alert alert-success hidden">
+                        <h5>
+                            File validation successful.
+                        </h5>
                     </div>
 
                     <div class="box-footer">
@@ -183,6 +237,11 @@
                                                                                             SampleImportHelpers.GetBackRouteValues(model:Model))'">
                                 Back
                             </a>
+
+                            <input name="showOnfileValidationSuccess" class="btn btn-primary btn-sm hidden" type="submit" value="Next" />
+
+                            <input name="showOnFileValidationError" class="btn btn-primary btn-sm hidden" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'" type="button" value="Import Another File" />
+
                         </div>
                     </div>
                 }
@@ -207,46 +266,35 @@
                 }
             </div>
 
-            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile)
+            @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile || Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
             {
                 @Scripts.Render(paths:"~/bundles/jqueryval")
 
                 <script>
-                    var allowedFileExtensions = [".xlsx"];
 
-                    $("#upload")
-                        .kendoUpload({
-                            async: {
-                                saveUrl: "@Url.Action(actionName:"ImportSampleFile", controllerName:"Industry")",
-                                autoUpload: false
-                            },
-                            upload: function(e) {
-                                var additional = {
-                                    "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
-                                    "SelectedDataSourceId": "@Model.SelectedDataSourceId",
-                                    "SelectedDataSourceName": "@Model.SelectedDataSourceName"
-                                };
-                                e.data = additional;
-                            },
-                            multiple: false,
-                            localization: {
-                                "select": "Select file to upload...",
-                                dropFilesHere: "Drop file here to upload"
-                            },
-                            validation: {
-                                allowedExtensions: allowedFileExtensions,
-                                maxFileSize: @ViewBag.MaxFileSize,
-                                minFileSize: 1
-                            },
-                            success: function(e) {
-                                var result = e.response;
-                                $("#ImportTempFileId").val(result.ImportTempFileId);
-                                $("#SelectedFileName").val(result.SelectedFileName);
-                                $("#LinkoExchangeForm").submit();
-                            },
-                            error: onFileUploadError,
-                            progress: onFileUploadProgress
-                        });
+                    function onFileUpload(e) {
+                        var additional = {
+                            "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
+                            "SelectedDataSourceId": "@Model.SelectedDataSourceId",
+                            "SelectedDataSourceName": "@Model.SelectedDataSourceName"
+                        };
+                        e.data = additional;
+                    }
+
+                    function onFileUploadSuccess(e) {
+                        var result = e.response;
+                        $("#ImportTempFileId").val(result.ImportTempFileId);
+                        $("#SelectedFileName").val(result.SelectedFileName);
+
+                        if (result.StepFileValidation != null) {
+                            $("[name='showOnFileValidationError']").removeClass("hidden");
+                            $("[name='showOnfileValidationSuccess']").addClass("hidden");
+                            $("#gridFileValidationErrors").data("kendoGrid").dataSource.data(result.StepFileValidation.Errors);
+                        } else {
+                            $("[name='showOnfileValidationSuccess']").removeClass("hidden");
+                            $("[name='showOnFileValidationError']").addClass("hidden");
+                        }
+                    }
 
                     function onFileUploadError(e) {
                         var errorData = eval(e.XMLHttpRequest.response);
@@ -254,7 +302,6 @@
                         errorData.forEach(function(item, index) {
                             errorMessages.push("<li>" + item + "</li>");
                         });
-
 
                         var validationSummary = $("#validationSummarySelectFile");
 
@@ -271,58 +318,6 @@
                     }
                 </script>
             }
-        </section>
-    }
-
-    // SampleImportStep.FileValidation
-    if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
-    {
-        <section id="@SampleImportViewModel.SampleImportStep.FileValidation.ToString()">
-            <div class="box-header with-border">
-                <h3 class="box-title">File Validation</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="box-body form-horizontal">
-                @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText,
-                    htmlAttributes:new {@class = "alert alert-danger"})
-
-                @if (Model.StepFileValidation != null && Model.StepFileValidation.Errors != null)
-                {
-                    <div class="alert alert-danger">
-                        <h5>
-                            File import failed! Check the errors below.
-                        </h5>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            @(Html.Kendo().Grid(dataSource:Model.StepFileValidation.Errors)
-                                  .Name(componentName:"gridFileValidationErrors")
-                                  .Columns(columns =>
-                                           {
-                                               columns.Bound(c => c.ErrorMessage).Title(text:"Error");
-                                               columns.Bound(c => c.RowNumbers).Title(text:"Row Number(s)");
-                                           })
-                                  .Scrollable(s => s.Height(value:"auto")))
-                        </div>
-                    </div>
-
-                    <div class="box-footer">
-                        <div class="form-group pull-right">
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
-                                                                                            SampleImportHelpers.GetBackRouteValues(model:Model))'">
-                                Back
-                            </a>
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
-                                Import Another File
-                            </a>
-                        </div>
-                    </div>
-                }
-            </div>
         </section>
     }
 
@@ -588,7 +583,7 @@
                                     {
                                         <div class="col-md-12 voffset2">
                                             @Html.KendoSampleImportDataTranslationGrid(dataTranslations
-                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceMonitoringPointTranslationViewModel>).ToList(), 
+                                                .DataTranslations.Select(DataSourceTranslationViewModelHelper.To<DataSourceMonitoringPointTranslationViewModel>).ToList(),
                                                 "MonitoringPoint", translationType, isStepDataTranslations, isUntranslatedSwitchOn)
                                         </div>
                                     }
@@ -786,7 +781,7 @@
                         </h5>
                     }
                 </div>
-                    <div style="padding: 20px 40px;">
+                    <div style="padding: 20px 10px;">
                         @(Html.Kendo().Grid(dataSource: Model.Samples)
                               .Name(componentName: "gridImportSamplesPreview")
                               .Columns(columns =>
@@ -806,7 +801,7 @@
                                          })
                                          .Title(" ")
                                          .Filterable(f => f.Enabled(value: false))
-                                         .Width(pixelWidth: 40);
+                                         .Width(pixelWidth: 35);
 
                                   columns.Bound(c => c.SampleOverallCompliance)
                                          .ClientTemplate( value:
@@ -823,7 +818,7 @@
                                          })
                                          .Title(" ")
                                          .Filterable(f => f.Enabled(value: false))
-                                         .Width(pixelWidth: 40);
+                                         .Width(pixelWidth: 35);
                                   columns.Bound(c => c.MonitoringPointName)
                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
                                                                                  .SuggestionOperator(filterType: FilterType.Contains)));
@@ -932,7 +927,7 @@
             <div class="box-body form-horizontal">
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText,
                     htmlAttributes:new {@class = "alert alert-danger", id = "validationSummaryDataTranslations"})
-                
+
                 @if (Model.ImportSummary != null)
                 {
 
@@ -978,7 +973,7 @@
 
                     <div class="box-header voffset2 width450">
                         <h3 class="box-title loffset20 voffset2">Sample Result Compliance Summary </h3>
-                        
+
                         <div class="loffset40 width450">
                             <div class="voffset1">@Model.ImportSummary.SampleComplianceSummary.FinalComplianceDescription</div>
 
