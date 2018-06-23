@@ -70,6 +70,10 @@
       <HintPath>..\..\XternalObjects\FluentValidation.Mvc5.7.1.1\lib\net45\FluentValidation.Mvc.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Gelf4NLog.Target, Version=1.0.0.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Gelf4NLog.Target.1.0.0.2\lib\net40\Gelf4NLog.Target.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Glimpse.AspNet, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\XternalObjects\Glimpse.AspNet.1.9.2\lib\net45\Glimpse.AspNet.dll</HintPath>
       <Private>True</Private>

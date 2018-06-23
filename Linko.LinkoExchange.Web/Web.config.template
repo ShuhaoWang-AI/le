@@ -25,14 +25,17 @@ For more information on how to configure your ASP.NET application, please visit 
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           autoReload="true"
           throwExceptions="true">
+      <extensions>
+        <add assembly="Gelf4NLog.Target"/>
+      </extensions>
         <variable name="logDirectory"
                   value="D:/logs/" />
         <targets async="true">
-            <!--https://github.com/yarseyah/sentinel-->
-            <target xsi:type="NLogViewer"
-                    name="viewer"
-                    includeSourceInfo="true"
-                    address="udp://127.0.0.1:9999" />
+          <target name="graylog"
+                  type="graylog"
+                  hostip="192.168.60.249"
+                  hostport="12201"
+                  facility="LinkoExchange" />
             <target type="File"
                     name="default"
                     layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
@@ -68,10 +71,9 @@ For more information on how to configure your ASP.NET application, please visit 
                     keepFileOpen="false" />
         </targets>
         <rules>
-            <logger name="*"
-                    minlevel="Debug"
-                    writeTo="viewer">
-            </logger>
+          <logger name="*"
+                  minlevel="Info"
+                  writeTo="graylog" />
             <logger name="*"
                     writeTo="default"
                     minlevel="Info">
