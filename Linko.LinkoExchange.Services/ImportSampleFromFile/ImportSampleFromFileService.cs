@@ -997,7 +997,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                 var templateColumnDictionary = sampleImportDto.FileVersion.FileVersionFields.ToDictionary(x => x.FileVersionFieldName.ToLower(), x => x);
                 var requiredColumns = sampleImportDto.FileVersion.FileVersionFields
                                                      .Where(x => x.DataOptionalityName == DataOptionalityName.Required || x.IsSystemRequired)
-                                                     .Select(x => x.FileVersionFieldName.ToLower())
+                                                     .Select(x => x.FileVersionFieldName)
                                                      .ToList();
 
                 var fileColumnDictionary = new Dictionary<int, FileVersionFieldDto>();
@@ -1246,7 +1246,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             if (missingRequiredColumns.Any())
             {
                 AddValidationError(validationResult:validationResult, errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.ImportFileMissingRequiredFields,
-                                                                                                 arg0:string.Join(separator:",",
+                                                                                                 arg0:string.Join(separator:", ",
                                                                                                                   values:missingRequiredColumns.Select(name => name))));
             }
         }
