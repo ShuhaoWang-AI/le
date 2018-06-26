@@ -289,7 +289,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </ul>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails,DataSources,DataSourceDetails,DataSourceDetailsTranslations", controllers:"Industry")">
+                <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails,DataSources,DataSourceDetails,NewDataSourceDetails,DataSourceDetailsTranslations", controllers:"Industry")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>
@@ -313,7 +313,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 <span>Settings</span>
                             </a>
                         </li>
-                        <li class="@Html.IsActive(actions:"DataSources,DataSourceDetails,DataSourceDetailsTranslations", controllers:"Industry")">
+                        <li class="@Html.IsActive(actions:"DataSources,DataSourceDetails,NewDataSourceDetails,DataSourceDetailsTranslations", controllers:"Industry")">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"DataSources", controllerName:"Industry")'">
                                 <i class="fa fa-cogs fa-fw"></i>
                                 <span>Data Providers</span>
