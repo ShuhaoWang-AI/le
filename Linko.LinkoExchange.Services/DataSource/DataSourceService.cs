@@ -90,22 +90,24 @@ namespace Linko.LinkoExchange.Services.DataSource
                 int parameterGroupIdToReturn;
                 using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {
-                    var existingDataSource = GetExistingDataSource(organizationRegulatoryProgramId:currentOrgRegProgramId, dataSourceDto:dataSourceDto);
-                    Core.Domain.DataSource dataSourceToPersist;
+                    var existingDataSourceByName = GetExistingDataSourceByName(organizationRegulatoryProgramId:currentOrgRegProgramId, name:dataSourceDto.Name);
+                    var existingDataSourceById = GetExistingDataSourceById(dataSourceId:dataSourceDto.DataSourceId);
 
-                    if (existingDataSource != null)
+                    var doesNewDataSourceWithAlreadyExistName = existingDataSourceById == null && existingDataSourceByName != null;
+                    var doesUpdateDataSourceWithAlreadyExistName = existingDataSourceById != null && 
+                                                                   existingDataSourceById.DataSourceId != existingDataSourceByName.DataSourceId;
+                    if (doesNewDataSourceWithAlreadyExistName || doesUpdateDataSourceWithAlreadyExistName)
                     {
-                        if (existingDataSource.DataSourceId != dataSourceDto.DataSourceId)
-                        {
-                            throw CreateRuleViolationExceptionForValidationError(errorMessage:"A Data Provider with the name already exists. Please select another name.");
-                        }
-                        else
-                        {
-                            dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource:existingDataSource);
-                            dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                            dataSourceToPersist.LastModificationDateTimeUtc = DateTime.UtcNow;
-                            dataSourceToPersist.LastModifierUserId = currentUserProfileId;
-                        }
+                        throw CreateRuleViolationExceptionForValidationError(errorMessage: "A Data Provider with the name already exists. Please select another name.");
+                    }
+
+                    Core.Domain.DataSource dataSourceToPersist;
+                    if (existingDataSourceById != null)
+                    {
+                        dataSourceToPersist = _mapHelper.GetDataSourceFromDataSourceDto(dto:dataSourceDto, existingDataSource: existingDataSourceById);
+                        dataSourceToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                        dataSourceToPersist.LastModificationDateTimeUtc = DateTime.UtcNow;
+                        dataSourceToPersist.LastModifierUserId = currentUserProfileId;
                     }
                     else
                     {
@@ -608,15 +610,9 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                                && ds.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
         }
 
-        private Core.Domain.DataSource GetExistingDataSource(int organizationRegulatoryProgramId, DataSourceDto dataSourceDto)
+        private Core.Domain.DataSource GetExistingDataSourceById(int? dataSourceId)
         {
-            if (dataSourceDto.DataSourceId.HasValue)
-            {
-                return _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceDto.DataSourceId);
-            }
-
-            return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), dataSourceDto.Name.Trim())
-                                                               && ds.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
+            return dataSourceId.HasValue ? _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId) : null;
         }
     }
 }
