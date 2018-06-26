@@ -62,7 +62,7 @@
                               columns.Command(command =>
                                               {
                                                   command.Edit().UpdateText("Save");
-                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                                  command.Custom(name: "Delete").Click(handler: "deleteDataSourceTranslation");
                                               });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
@@ -134,7 +134,7 @@
                               columns.Command(command =>
                                               {
                                                   command.Edit().UpdateText("Save");
-                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                                  command.Custom(name: "Delete").Click(handler: "deleteDataSourceTranslation");
                                               });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
@@ -206,7 +206,7 @@
                               columns.Command(command =>
                                               {
                                                   command.Edit().UpdateText("Save");
-                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                                  command.Custom(name: "Delete").Click(handler: "deleteDataSourceTranslation");
                                               });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
@@ -278,7 +278,7 @@
                               columns.Command(command =>
                               {
                                   command.Edit().UpdateText("Save");
-                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                  command.Custom(name: "Delete").Click(handler: "deleteDataSourceTranslation");
                               });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
@@ -353,7 +353,7 @@
                               columns.Command(command =>
                                               {
                                                   command.Edit().UpdateText("Save");
-                                                  command.Custom(name: "Delete").Click(handler: "commonConfirmDelete");
+                                                  command.Custom(name: "Delete").Click(handler: "deleteDataSourceTranslation");
                                               });
                           })
                           .ToolBar(t => t.Create().Text("Create New").HtmlAttributes(attributes: new { @class = "pull-right" }))
@@ -394,6 +394,11 @@
     </div>
 
     <script>
+        function deleteDataSourceTranslation(e) {
+            var row = $(e.currentTarget).closest("tr");
+            var fileTerm = row.find('td').first().text();
+            commonConfirmDelete(e, 'Are you sure you want to delete Import file term "' + fileTerm + '"?');
+        }
         function dataSourceManipulatingErrorHandler(e) {
             if (e.errors) {
                 var errorMessages = [];
