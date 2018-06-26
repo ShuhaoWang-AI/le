@@ -101,7 +101,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title width200">Select Data Provider</h3>
                 <div class="box-tools pull-right">
-                    @if (isStepSelectDataProvider)
+                    @if (isStepSelectDataProvider && Model.StepSelectDataSource.AvailableDataSources.Count > 1)
                     {
                         <a href="#" class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
                             Create New Data Provider
@@ -122,24 +122,34 @@
                     {
                         <div class="alert alert-info">
                             <h5>
-                                You can import sample data from an .xlsx file, but you must create a data source first. Click the Create New Data Source button to be taken to the Industry Account - Data Sources screen to create one.
+                                You can import sample data from an .xlsx file, but you must Create a Data Provider first. Click the Create New Data Provider button to be taken to the Industry Account - Data Providers screen to create one.
                             </h5>
                         </div>
+                        <div class="box-footer">
+                            <div class="form-group pull-right">
+                                <a href="#" class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
+                                    Create New Data Provider
+                                </a>
+                            </div>
+                        </div>
                     }
+                    else
+                    {
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2 required"})
-                        <div class="col-md-4">
-                            @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources,
-                                htmlAttributes:new {@class = "form-control"})
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SelectedDataSourceId, htmlAttributes:new {@class = "control-label col-md-2 required"})
+                            <div class="col-md-4">
+                                @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources,
+                                    htmlAttributes:new {@class = "form-control"})
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="box-footer">
-                        <div class="form-group pull-right">
-                            <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                        <div class="box-footer">
+                            <div class="form-group pull-right">
+                                <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                            </div>
                         </div>
-                    </div>
+                    }
                 }
                 else
                 {
