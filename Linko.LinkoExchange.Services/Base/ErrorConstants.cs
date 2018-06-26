@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Services.Base
                 public const string FieldValueIsNotDate = "{0} is not a valid date.";
                 public const string FieldValueIsNotNumeric = "{0} is not numeric.";
                 public const string FieldValueIsRequired = "{0} is required and is missing.";
-                public const string FileTypeIsUnsupported = "The file type selected is not supported.";
+                public const string FileTypeIsUnsupported = "The file type selected in not an .xlsx file.";
 
                 public const string ImportFileExceedSizeLimitation = "The file size exceeds the maximum supported size of {0} MB.  Try splitting the data into 2 files.";
                 public const string ImportFileIsCorrupted = "The file type selected in not an .xlsx file or it may be corrupted.";

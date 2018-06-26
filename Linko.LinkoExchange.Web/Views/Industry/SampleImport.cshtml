@@ -281,6 +281,14 @@
                 <script>
 
                     function onFileUpload(e) {
+                        var validationSummary = $("#validationSummarySelectFile");
+
+                        validationSummary.removeClass("validation-summary-errors");
+                        validationSummary.addClass("validation-summary-valid");
+
+                        $("[name='showOnfileValidationSuccess']").addClass("hidden");
+                        $("[name='showOnFileValidationError']").addClass("hidden");
+
                         var additional = {
                             "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
                             "SelectedDataSourceId": "@Model.SelectedDataSourceId",
