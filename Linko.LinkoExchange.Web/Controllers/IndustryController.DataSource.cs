@@ -145,7 +145,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "Data Provider created successfully!";
                 ModelState.Clear();
-                return RedirectToAction(actionName:"DataSourceDetails", controllerName:"Industry", routeValues:new {id});
+
+                model = PrepareDataSourcesDetails(id: id);
+                return View(viewName: "DataSourceDetails", model: model);
             }
             catch (RuleViolationException rve)
             {
