@@ -162,9 +162,17 @@
                             height: 110px;
                         }
 
+                        .k-dropzone >  em::before
+                        {
+                            margin-left: -25px;
+                            content: 'Or \a';
+                            font-size: 16px;
+                            white-space: pre-wrap;
+                        }
+
                         .k-dropzone >  em
                         {
-                            padding-top: 20px;
+                            padding-top: 5px;
                             display: block !important;
                             font-size: 16px;
                             color: #337ab7;
@@ -203,7 +211,7 @@
                           .Events(e => e.Success(onSuccessHandlerName:"onFileUploadSuccess").Upload(onUploadHandlerName:"onFileUpload").Error(onErrorHandlerName:"onFileUploadError").Progress(onProgressHandlerName:"onFileUploadProgress"))
                           .ShowFileList(value:true)
                           .Multiple(value:false)
-                          .Messages(m => m.Select(selectMessage:"Select file").DropFilesHere(dropFilesHereMessage:"Drag and drop an .xlsx file into here"))
+                          .Messages(m => m.Select(selectMessage:"Select file").DropFilesHere(dropFilesHereMessage: "Drag and drop a .xlsx file here"))
                           )
 
                     <div name="showOnFileValidationError" class="alert alert-danger hidden">
