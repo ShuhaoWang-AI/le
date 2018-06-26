@@ -97,7 +97,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                     {
                         if (existingDataSource.DataSourceId != dataSourceDto.DataSourceId)
                         {
-                            throw CreateRuleViolationExceptionForValidationError(errorMessage:"A DataSource with the name already exists. Please select another name.");
+                            throw CreateRuleViolationExceptionForValidationError(errorMessage:"A Data Provider with the name already exists. Please select another name.");
                         }
                         else
                         {
