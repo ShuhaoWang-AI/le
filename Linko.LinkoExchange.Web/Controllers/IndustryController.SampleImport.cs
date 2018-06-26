@@ -292,6 +292,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                          }).ToList()
                                          };
             model.StepSelectDataSource.AvailableDataSources.Insert(index:0, item:new SelectListItem {Text = @"Select Data Provider", Value = "0", Disabled = true});
+
+            if (model.SelectedDataSourceId > 0 || model.StepSelectDataSource.AvailableDataSources.Count != 2)
+            {
+                return;
+            }
+
+            var selectedDataSource = model.StepSelectDataSource.AvailableDataSources[index:1];
+            model.SelectedDataSourceId = int.Parse(s:selectedDataSource.Value);
+            model.SelectedDataSourceName = selectedDataSource.Text;
         }
 
         private void PopulateSelectedDataProvider(SampleImportViewModel model)
