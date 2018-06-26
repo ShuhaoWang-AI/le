@@ -1178,31 +1178,40 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                         //validate result field with qualifier
                         if (isResultQualifierColumnIncluded)
                         {
-                            var resultColumnValue = importRowObject.Cells.First(x => x.SampleImportColumnName == SampleImportColumnName.Result).OriginalValueString;
-                            var resultQualifierColumnValue =
-                                importRowObject.Cells.First(x => x.SampleImportColumnName == SampleImportColumnName.ResultQualifier).OriginalValueString;
-
-                            if (resultQualifierValidValues.Contains(item:resultQualifierColumnValue))
+                            var resultImportCellObject = importRowObject.Cells.FirstOrDefault(x => x.SampleImportColumnName == SampleImportColumnName.Result);
+                            if (resultImportCellObject == null)
                             {
-                                if (new List<string> {"", "<", ">"}.Contains(item:resultQualifierColumnValue) && string.IsNullOrWhiteSpace(value:resultColumnValue))
-                                {
-                                    AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ResultIsRequired,
-                                                       rowNumber:importRowObject.RowNumber);
-                                }
-                                else if (new List<string> {"ND", "NF"}.CaseInsensitiveContains(value:resultQualifierColumnValue)
-                                         && !string.IsNullOrWhiteSpace(value:resultColumnValue))
-                                {
-                                    AddValidationError(validationResult:validationResult,
-                                                       errorMessage:ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShouldNotHaveAValue,
-                                                       rowNumber:importRowObject.RowNumber);
-                                }
+                                AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ResultIsRequired,
+                                                   rowNumber:importRowObject.RowNumber);
                             }
                             else
                             {
-                                AddValidationError(validationResult:validationResult,
-                                                   errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.ResultQualifierIsInvalid,
-                                                                              arg0:resultQualifierColumnValue),
-                                                   rowNumber:importRowObject.RowNumber);
+                                var resultColumnValue = resultImportCellObject.OriginalValueString;
+                                var resultQualifierColumnValue =
+                                    importRowObject.Cells.First(x => x.SampleImportColumnName == SampleImportColumnName.ResultQualifier).OriginalValueString;
+
+                                if (resultQualifierValidValues.Contains(item:resultQualifierColumnValue))
+                                {
+                                    if (new List<string> {"", "<", ">"}.Contains(item:resultQualifierColumnValue) && string.IsNullOrWhiteSpace(value:resultColumnValue))
+                                    {
+                                        AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.FileValidation.ResultIsRequired,
+                                                           rowNumber:importRowObject.RowNumber);
+                                    }
+                                    else if (new List<string> {"ND", "NF"}.CaseInsensitiveContains(value:resultQualifierColumnValue)
+                                             && !string.IsNullOrWhiteSpace(value:resultColumnValue))
+                                    {
+                                        AddValidationError(validationResult:validationResult,
+                                                           errorMessage:ErrorConstants.SampleImport.FileValidation.ResultQualifierNdNfShouldNotHaveAValue,
+                                                           rowNumber:importRowObject.RowNumber);
+                                    }
+                                }
+                                else
+                                {
+                                    AddValidationError(validationResult:validationResult,
+                                                       errorMessage:string.Format(format:ErrorConstants.SampleImport.FileValidation.ResultQualifierIsInvalid,
+                                                                                  arg0:resultQualifierColumnValue),
+                                                       rowNumber:importRowObject.RowNumber);
+                                }
                             }
                         }
 
