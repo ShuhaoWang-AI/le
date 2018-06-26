@@ -770,16 +770,12 @@
 
             <div class="box-body form-horizontal">
                 <div class="loffset40">
-                    <h5>
-                        @(Model.ImportSummary.SampleCount) @Model.ImportSummary.SampleCountPreviewDescription
-                    </h5>
-                </div>
-                <div class="loffset40">
+					<div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountPreviewDescription:</div>
                     @if (Model.ImportSummary.NewDraftSampleCount > 0)
                     {
                         <i class="fa fa-check fa-lg text-blue"></i>
                         <span>@(Model.ImportSummary.NewDraftSampleCount)</span>
-                        <span>new</span>
+                        <span>new &nbsp;&nbsp;</span>
                     }
                     @if (Model.ImportSummary.UpdateDraftSampleCont > 0)
                     {
@@ -790,16 +786,12 @@
                 </div>
 
                 <div class="loffset40">
-                    <h5>
-                        @(Model.ImportSummary.SampleResultCount) @(Model.ImportSummary.SampleResultCountPreviewDescription)
-                    </h5>
-                </div>
-                <div class="loffset40">
+					<div class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountPreviewDescription:</div>
                     @if (Model.ImportSummary.NewSampleResultCount > 0)
                     {
                         <i class="fa fa-check fa-lg text-blue"></i>
                         <span>@(Model.ImportSummary.NewSampleResultCount)</span>
-                        <span>new</span>
+                        <span>new &nbsp;&nbsp;</span>
                     }
 
                     @if (Model.ImportSummary.UpdateSampleResultCount > 0)
@@ -986,12 +978,12 @@
                         <h3 class="box-title loffset20 voffset2">Import Summary </h3>
 
                         <div class="loffset40">
-                            <div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountImportDescription</div>
+                            <div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountImportDescription:</div>
                             @if (Model.ImportSummary.NewDraftSampleCount > 0)
                             {
                                 <i class='fa fa-check fa-lg text-blue'></i>
                                 <span>@Model.ImportSummary.NewDraftSampleCount</span>
-                                <span>new</span>
+                                <span>new &nbsp;&nbsp;</span>
                             }
                             @if (Model.ImportSummary.UpdateDraftSampleCont > 0)
                             {
@@ -1001,12 +993,12 @@
                             }
                         </div>
                         <div class="loffset40">
-                            <span class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountImportDescription</span>
+                            <span class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountImportDescription:</span>
                             @if (Model.ImportSummary.NewSampleResultCount > 0)
                             {
                                 <i class='fa fa-check fa-lg text-blue'></i>
                                 <span>@(Model.ImportSummary.NewSampleResultCount)</span>
-                                <span>new</span>
+                                <span>new &nbsp;&nbsp;</span>
                             }
 
                             @if (Model.ImportSummary.UpdateSampleResultCount > 0)
@@ -1047,64 +1039,64 @@
 <script id="template" type="text/kendo-tmpl">
 
     @(Html.Kendo().Grid<SampleResultViewModel>()
-          .Name(componentName:"gridSampleResult")
-          .Columns(columns =>
-                   {
-                       columns.Bound(c => c.Status)
-                              .ClientTemplate(value:
-                                  "\\# if (Status == 'New') { \\#" +
-                                  "<i class='fa fa-check text-blue' data-placement='top' data-toggle='tooltip' title='New'></i>" +
-                                  "\\# } else { \\#" +
-                                  "<i class='fa fa-check text-yellow' data-placement='top' data-toggle='tooltip' title='Update'></i>" +
-                                  "\\# } \\#"
-                           )
-                              .HtmlAttributes(attributes:new
-                                                         {
-                                                             align = "center"
-                                                         })
-                              .Title(text:" ")
-                              .Filterable(f => f.Enabled(value:false))
-                              .Width(pixelWidth:40);
-                       columns.Bound(c => c.ParameterName);
-                       columns.Bound(c => c.DisplayValue)
-                              .HtmlAttributes(attributes:new {align = "right"})
-                              .ClientTemplate(value:"\\#=DisplayValue\\#&nbsp;&nbsp;<i "
-                                                    + "\\#if(ConcentrationResultCompliance==\"Bad\") { \\#"
-                                                    + "class='fa fa-lg fa-exclamation-circle text-red' "
-                                                    + "\\# } else {\\#"
-                                                    + "class='fa fa-lg fa-circle fg-transparent' "
-                                                    + "\\# } \\#"
-                                                    + "aria-hidden='true' data-placement='top' "
-                                                    + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
+		  .Name(componentName:"gridSampleResult")
+		  .Columns(columns =>
+		  {
+			  columns.Bound(c => c.Status)
+					 .ClientTemplate(value:
+						 "\\# if (Status == 'New') { \\#" +
+						 "<i class='fa fa-check text-blue' data-placement='top' data-toggle='tooltip' title='New'></i>" +
+						 "\\# } else { \\#" +
+						 "<i class='fa fa-check text-yellow' data-placement='top' data-toggle='tooltip' title='Update'></i>" +
+						 "\\# } \\#"
+				  )
+					 .HtmlAttributes(attributes:new
+					 {
+						 align = "center"
+					 })
+					 .Title(text:" ")
+					 .Filterable(f => f.Enabled(value:false))
+					 .Width(pixelWidth:40);
+			  columns.Bound(c => c.ParameterName);
+			  columns.Bound(c => c.DisplayValue)
+					 .HtmlAttributes(attributes:new {align = "right"})
+					 .ClientTemplate(value: "<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'> \\#=DisplayValue\\#</span> &nbsp;&nbsp;<i "
+										   + "\\#if(ConcentrationResultCompliance==\"Bad\") { \\#"
+										   + "class='fa fa-lg fa-exclamation-circle text-red' "
+										   + "\\# } else {\\#"
+										   + "class='fa fa-lg fa-circle fg-transparent' "
+										   + "\\# } \\#"
+										   + "aria-hidden='true' data-placement='top' "
+										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
 
-                       columns.Bound(c => c.DisplayMassLoadingValue)
-                              .HtmlAttributes(attributes:new {align = "right"})
-                              .ClientTemplate(value:
-                                  "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
-                                  + "\\# } else { \\#"
-                                  + "\\#=DisplayMassLoadingValue\\#&nbsp;&nbsp;<i "
-                                  + "\\#if(MassResultCompliance==\"Bad\") { \\#"
-                                  + "class='fa fa-lg fa-exclamation-circle text-red' "
-                                  + "\\# } else {\\#"
-                                  + "class='fa fa-lg fa-circle fg-transparent' "
-                                  + "\\# } \\#"
-                                  + "aria-hidden='true' data-placement='top' "
-                                  + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
-                                  + "\\# } \\#");
+			  columns.Bound(c => c.DisplayMassLoadingValue)
+					 .HtmlAttributes(attributes:new {align = "right"})
+					 .ClientTemplate(value:
+						 "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
+						 + "\\# } else { \\#"
+						 + "<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'>\\#=DisplayMassLoadingValue\\#</span>&nbsp;&nbsp;<i "
+						 + "\\#if(MassResultCompliance==\"Bad\") { \\#"
+						 + "class='fa fa-lg fa-exclamation-circle text-red' "
+						 + "\\# } else {\\#"
+						 + "class='fa fa-lg fa-circle fg-transparent' "
+						 + "\\# } \\#"
+						 + "aria-hidden='true' data-placement='top' "
+						 + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
+						 + "\\# } \\#");
 
-                       columns.Bound(c => c.AnalysisMethod);
-                       columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
-                       columns.Bound(c => c.AnalysisDateTimeLocal)
-                              .ClientTemplate(value:"\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.parseDate(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
-                   })
-          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-          .Scrollable(s => s.Height(value:"auto"))
-          .NoRecords(text:"No sample result exists.")
-          .DataSource(dataSource => dataSource
-                                        .Ajax()
-                                        .ServerOperation(enabled:false)
-          )
-          .ToClientTemplate()
+			  columns.Bound(c => c.AnalysisMethod);
+			  columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
+			  columns.Bound(c => c.AnalysisDateTimeLocal)
+					 .ClientTemplate(value:"\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.parseDate(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
+		  })
+		  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+		  .Scrollable(s => s.Height(value:"auto"))
+		  .NoRecords(text:"No sample result exists.")
+		  .DataSource(dataSource => dataSource
+										.Ajax()
+										.ServerOperation(enabled:false)
+		  )
+		  .ToClientTemplate()
           )
 
 </script>
