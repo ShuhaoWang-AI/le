@@ -451,7 +451,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(value:viewModel.DataSourceTerm))
             {
-                ModelState.AddModelError(key:"DataSourceTerm", errorMessage:@"The value in the file should not be empty");
+                ModelState.AddModelError(key:"DataSourceTerm", errorMessage: @"Import file term is required.");
             }
 
             if (viewModel.TranslatedItem?.Id != null && viewModel.TranslatedItem.Id != 0)

@@ -553,12 +553,6 @@ namespace Linko.LinkoExchange.Services.DataSource
                                     : _dbContext.DataSourceMonitoringPoints.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                        && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
-                    if (doesExist)
-                    {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:
-                                                                             $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Monitoring Point");
-                    }
-
                     break;
                 case DataSourceTranslationType.SampleType:
                     doesExist = dataSourceTranslation.Id.HasValue
@@ -569,12 +563,6 @@ namespace Linko.LinkoExchange.Services.DataSource
                                     : _dbContext.DataSourceCtsEventTypes.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                     && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
-                    if (doesExist)
-                    {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:
-                                                                             $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Sample Type");
-                    }
-
                     break;
                 case DataSourceTranslationType.CollectionMethod:
                     doesExist = dataSourceTranslation.Id.HasValue
@@ -585,12 +573,6 @@ namespace Linko.LinkoExchange.Services.DataSource
                                     : _dbContext.DataSourceCollectionMethods.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                         && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
-                    if (doesExist)
-                    {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:
-                                                                             $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Collection Method");
-                    }
-
                     break;
                 case DataSourceTranslationType.Parameter:
                     doesExist = dataSourceTranslation.Id.HasValue
@@ -601,12 +583,6 @@ namespace Linko.LinkoExchange.Services.DataSource
                                     : _dbContext.DataSourceParameters.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                                  && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
-                    if (doesExist)
-                    {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:
-                                                                             $"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to a Parameter");
-                    }
-
                     break;
                 case DataSourceTranslationType.Unit:
                     doesExist = dataSourceTranslation.Id.HasValue
@@ -617,13 +593,12 @@ namespace Linko.LinkoExchange.Services.DataSource
                                     : _dbContext.DataSourceUnits.Count(x => x.DataSourceTerm.ToLower().Equals(dataSourceTerm)
                                                                             && x.DataSourceId == dataSourceTranslation.DataSourceId)
                                       > 0;
-                    if (doesExist)
-                    {
-                        throw CreateRuleViolationExceptionForValidationError(errorMessage:$"'{dataSourceTranslation.DataSourceTerm}' in the file is already translated to an Unit");
-                    }
-
                     break;
                 default: throw CreateRuleViolationExceptionForValidationError(errorMessage:$"DataSourceTranslationType {translationType} is unsupported");
+            }
+            if (doesExist)
+            {
+                throw CreateRuleViolationExceptionForValidationError(errorMessage:$"An Import File Term \"{dataSourceTranslation.DataSourceTerm}\" already exists. Please select another name.");
             }
         }
 
