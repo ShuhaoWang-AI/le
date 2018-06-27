@@ -153,7 +153,6 @@ table tbody td .btn
 
 /*tr:nth-child(even) {background-color: #f2f2f2}*/
 
-
 .handler
 {
 	background: url('Images/handle.png') no-repeat 50% 50% #ccc;
@@ -177,6 +176,12 @@ table tbody td .btn
 .hint .handler
 {
 	background-color: #2db245;
+}
+
+.hint-text
+{
+	font-size: 14px;
+	font-weight: 400;
 }
 
 .validation-summary-valid

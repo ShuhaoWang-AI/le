@@ -273,7 +273,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-success hidden" name="showOnfileValidationSuccess">
+                    <div class="alert alert-success hidden vtoffset2" name="showOnfileValidationSuccess">
                         <h5>
                             File validation successful.
                         </h5>
@@ -416,15 +416,15 @@
 
                     if (Model.SampleImportDto.RequiredDefaultValues.Any())
                     {
-                        <p>
+                        <h5 class="voffset2 box-body">
                             Some required data is missing from the file. What data should we use for the missing data?
-                        </p>
+                        </h5>
                     }
                     else
                     {
-                        <p>
+                        <h5 class="voffset2 box-body">
                             No data defaults were missing. Please click Next to continue.
-                        </p>
+                        </h5>
                     }
 
                     if (requiredDefaultMonitoringPoint != null)
@@ -514,9 +514,9 @@
                 {
                     if (!(Model.SelectedDefaultMonitoringPointId > 0 || Model.SelectedDefaultCollectionMethodId > 0 || Model.SelectedDefaultSampleTypeId > 0))
                     {
-                        <p>
+                        <h5 class="voffset2 box-body">
                             No data defaults were missing.
-                        </p>
+                        </h5>
                     }
 
                     if (Model.SelectedDefaultMonitoringPointId > 0)
@@ -595,20 +595,19 @@
                     var missingDataTranslations = Model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0);
                     if (ViewData.ModelState.IsValid)
                     {
-                        <div class="alert">
-                            @if (missingDataTranslations)
+                        
+                            if (missingDataTranslations)
                             {
-                                <p>
+                                <h5 class="voffset2 box-body">
                                     There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
-                                </p>
+                                </h5>
                             }
                             else
                             {
-                                <p>
-                                    Data in the file has been translated previously, you can review them or click Next to continue.
-                                </p>
+                                <h5 class="voffset2 box-body">
+                                    No data translations were missing. Data has already been translated.
+                                </h5>
                             }
-                        </div>
                     }
                     foreach (var translationType in ImportSampleFromFileService.ColumnNameTranslationTypeDict.Values)
                     {
@@ -784,13 +783,13 @@
                 </div>
             </div>
 
-            <div class="alert alert-success">
-                <h5>Data validation passed, you can preview the import summary.</h5>
-            </div>
-
             <div class="box-body form-horizontal">
-                <div class="loffset40">
-					<div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountPreviewDescription:</div>
+                <div class="alert alert-success">
+                    <h5>Data validation passed, you can preview the import summary.</h5>
+                </div>
+
+                <div class="loffset20 hint-text">
+					<div class="width250">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountPreviewDescription:</div>
                     @if (Model.ImportSummary.NewDraftSampleCount > 0)
                     {
                         <i class="fa fa-check fa-lg text-blue"></i>
@@ -805,8 +804,8 @@
                     }
                 </div>
 
-                <div class="loffset40">
-					<div class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountPreviewDescription:</div>
+                <div class="loffset20 hint-text">
+					<div class="width250">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountPreviewDescription:</div>
                     @if (Model.ImportSummary.NewSampleResultCount > 0)
                     {
                         <i class="fa fa-check fa-lg text-blue"></i>
@@ -822,7 +821,7 @@
                     }
                 </div>
 
-                <div class="loffset40 vtoffset2 width450">
+                <div class="loffset20 vtoffset2 width450">
                     @if (Model.ImportSummary.SampleComplianceSummary.TotalBadComplianceCount > 0)
                     {
                         <h5 class="text-bold">
@@ -840,7 +839,7 @@
                         </h5>
                     }
                 </div>
-                <div style="padding: 20px 10px;">
+                <div style="padding: 20px 0;">
                     @(Html.Kendo().Grid(dataSource:Model.Samples)
                           .Name(componentName:"gridImportSamplesPreview")
                           .Columns(columns =>
@@ -995,10 +994,10 @@
                     </div>
 
                     <div class="box-header voffset2">
-                        <h3 class="box-title loffset20 voffset2">Import Summary </h3>
+                        <h3 class="box-title voffset2">Import Summary </h3>
 
-                        <div class="loffset40">
-                            <div class="width200">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountImportDescription:</div>
+                        <div class="loffset20 hint-text">
+                            <div class="width250">@Model.ImportSummary.SampleCount @Model.ImportSummary.SampleCountImportDescription:</div>
                             @if (Model.ImportSummary.NewDraftSampleCount > 0)
                             {
                                 <i class='fa fa-check fa-lg text-blue'></i>
@@ -1012,8 +1011,8 @@
                                 <span>@Model.ImportSummary.Updated</span>
                             }
                         </div>
-                        <div class="loffset40">
-                            <span class="width200">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountImportDescription:</span>
+                        <div class="loffset20 hint-text">
+                            <span class="width250">@Model.ImportSummary.SampleResultCount @Model.ImportSummary.SampleResultCountImportDescription:</span>
                             @if (Model.ImportSummary.NewSampleResultCount > 0)
                             {
                                 <i class='fa fa-check fa-lg text-blue'></i>
@@ -1031,10 +1030,10 @@
                     </div>
 
                     <div class="box-header voffset2 width450">
-                        <h3 class="box-title loffset20 voffset2">Sample Result Compliance Summary </h3>
+                        <h3 class="box-title voffset2">Sample Result Compliance Summary </h3>
 
-                        <div class="loffset40 width450">
-                            <div class="voffset1">@Model.ImportSummary.SampleComplianceSummary.FinalComplianceDescription</div>
+                        <div class="loffset20 width450">
+                            <div class="voffset1 hint-text">@Model.ImportSummary.SampleComplianceSummary.FinalComplianceDescription</div>
 
                             <div class="active progress progress-xs" style="height: 7px;">
                                 <div class="progress-bar progress-bar-green" style="background-color: #00a65a; width: @(Model.ImportSummary.SampleComplianceSummary.TotalGoodPercentage)%;"></div>
