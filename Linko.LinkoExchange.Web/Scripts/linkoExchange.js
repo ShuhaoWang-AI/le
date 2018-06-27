@@ -281,9 +281,8 @@ function isEmptyOrSpaces(str) {
     return str === null || str.match(/^ *$/) !== null;
 }
 
-function commonConfirmDelete(e, subject) {
+function commonConfirmGridDelete(e, grid, rowOjbect, subject) {
     e.preventDefault();
-    var grid = this;
     var modelObject = $("#CommonDeleteConfirmationModal");
     if (subject) {
         $('#commonDeleteText').text(subject);
@@ -295,8 +294,7 @@ function commonConfirmDelete(e, subject) {
     $("#YesDelete").click(function () {
         modelObject.modal('hide');
         modelObject.hide();
-        var row = $(e.currentTarget).closest("tr");
-        grid.removeRow(row);
+        grid.removeRow(rowOjbect);
     });
 }
 
