@@ -251,7 +251,8 @@ namespace Linko.LinkoExchange.Services.DataSource
         {
             using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
             {
-                ThrowRuleViolationErrroIfDataSourceTermIsAlreayExist(dataSourceTranslation:dataSourceTranslation, translationType:translationType);
+                ThrowRuleViolationErrorIfDataSourceTermIsAlreadyExist(dataSourceTranslation:dataSourceTranslation, translationType:translationType);
+                ThrowRuleViolationErrorIfTranslationItemIsInvalid(translationItem:dataSourceTranslation.TranslationItem, translationType: translationType);
                 switch (translationType)
                 {
                     case DataSourceTranslationType.MonitoringPoint:
@@ -540,7 +541,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                              .ToList();
         }
 
-        private void ThrowRuleViolationErrroIfDataSourceTermIsAlreayExist(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
+        private void ThrowRuleViolationErrorIfDataSourceTermIsAlreadyExist(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
         {
             bool doesExist;
             var dataSourceTerm = dataSourceTranslation.DataSourceTerm.ToLower();
@@ -604,6 +605,45 @@ namespace Linko.LinkoExchange.Services.DataSource
             }
         }
 
+        private void ThrowRuleViolationErrorIfTranslationItemIsInvalid(DataSourceTranslationItemDto translationItem, DataSourceTranslationType translationType)
+        {
+            var isInvalid = false;
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint:
+                    var monitoringPoint = _dbContext.MonitoringPoints.FirstOrDefault(x => x.MonitoringPointId == translationItem.TranslationId);
+                    isInvalid = monitoringPoint == null || !monitoringPoint.IsEnabled || monitoringPoint.IsRemoved;
+                    break;
+                case DataSourceTranslationType.SampleType:
+                    var sampleType = _dbContext.CtsEventTypes.FirstOrDefault(x => x.CtsEventTypeId == translationItem.TranslationId);
+                    isInvalid = sampleType == null || !sampleType.IsEnabled || sampleType.IsRemoved;
+                    break;
+                case DataSourceTranslationType.CollectionMethod:
+                    var collectionMethod = _dbContext.CollectionMethods.FirstOrDefault(x => x.CollectionMethodId == translationItem.TranslationId);
+                    isInvalid = collectionMethod == null || !collectionMethod.IsEnabled || collectionMethod.IsRemoved;
+                    break;
+                case DataSourceTranslationType.Parameter:
+                    var parameter = _dbContext.Parameters.FirstOrDefault(x => x.ParameterId == translationItem.TranslationId);
+                    isInvalid = parameter == null || parameter.IsRemoved;
+                    break;
+                case DataSourceTranslationType.Unit:
+                    var unit = _dbContext.Units.FirstOrDefault(x => x.UnitId == translationItem.TranslationId);
+                    isInvalid = unit == null || unit.IsRemoved || !unit.IsAvailableToRegulatee;
+                    break;
+                default: throw CreateRuleViolationExceptionForValidationError(errorMessage: $"DataSourceTranslationType {translationType} is unsupported");
+            }
+
+            if (!isInvalid)
+            {
+                return;
+            }
+
+            var errorMessage = string.Format(format: "{0} \"{1}\" is no longer available. Please refresh the page and continue on.",
+                                             arg0: DataSourceHelper.GetTranslatedTypeDomainName(translationType: translationType),
+                                             arg1: translationItem.TranslationName);
+            throw CreateRuleViolationExceptionForValidationError(errorMessage: errorMessage);
+        }
+
         private Core.Domain.DataSource GetExistingDataSourceByName(int organizationRegulatoryProgramId, string name)
         {
             return _dbContext.DataSources.FirstOrDefault(ds => string.Equals(ds.Name.Trim(), name.Trim())
@@ -613,6 +653,24 @@ namespace Linko.LinkoExchange.Services.DataSource
         private Core.Domain.DataSource GetExistingDataSourceById(int? dataSourceId)
         {
             return dataSourceId.HasValue ? _dbContext.DataSources.FirstOrDefault(param => param.DataSourceId == dataSourceId) : null;
+        }
+
+        
+    }
+
+    public class DataSourceHelper
+    {
+        public static string GetTranslatedTypeDomainName(DataSourceTranslationType translationType, bool plural = false)
+        {
+            switch (translationType)
+            {
+                case DataSourceTranslationType.MonitoringPoint: return plural ? "Monitoring Points" : "Monitoring Point";
+                case DataSourceTranslationType.SampleType: return plural ? "Sample Types" : "Sample Type";
+                case DataSourceTranslationType.CollectionMethod: return plural ? "Collection Methods" : "Collection Method";
+                case DataSourceTranslationType.Parameter: return plural ? "Parameters" : "Parameter";
+                case DataSourceTranslationType.Unit: return plural ? "Units" : "Unit";
+                default: throw new NotImplementedException(message: $"DataSourceTranslationType {translationType} is unsupported");
+            }
         }
     }
 }

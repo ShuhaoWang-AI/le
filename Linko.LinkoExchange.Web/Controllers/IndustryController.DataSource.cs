@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.Extensions;
@@ -322,15 +323,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public static string GetTranslatedTypeDomainName(DataSourceTranslationType translationType, bool plural = false)
         {
-            switch (translationType)
-            {
-                case DataSourceTranslationType.MonitoringPoint: return plural ? "Monitoring Points" : "Monitoring Point";
-                case DataSourceTranslationType.SampleType: return plural ? "Sample Types": "Sample Type";
-                case DataSourceTranslationType.CollectionMethod: return plural ? "Collection Methods" : "Collection Method";
-                case DataSourceTranslationType.Parameter: return plural ? "Parameters" : "Parameter";
-                case DataSourceTranslationType.Unit: return plural ? "Units" : "Unit";
-                default: throw new NotImplementedException(message:$"DataSourceTranslationType {translationType} is unsupported");
-            }
+            return DataSourceHelper.GetTranslatedTypeDomainName(translationType:translationType, plural:plural);
         }
 
         public ActionResult DataSourceDetailsTranslations_Read([CustomDataSourceRequest] DataSourceRequest request,
@@ -435,8 +428,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                        DataSourceTerm = viewModel.DataSourceTerm,
                                                        TranslationItem = new DataSourceTranslationItemDto
                                                                          {
-                                                                             TranslationId = viewModel.TranslatedItem.Id.Value
-                                                                         }
+                                                                             TranslationId = viewModel.TranslatedItem.Id.Value,
+                                                                             TranslationName = viewModel.TranslatedItem.DisplayName
+                                                       }
                                                    };
                     viewModel.Id = _dataSourceService.SaveDataSourceTranslation(dataSourceTranslation:dataSourceTranslationDto, translationType:translationType);
                 }
