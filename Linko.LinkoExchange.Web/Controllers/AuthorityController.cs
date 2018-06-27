@@ -2642,6 +2642,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ModelState.AddModelError(key:"SystemUnit", errorMessage:@"System Unit is required when the unit is available to industry.");
             }
 
+            if (viewModel.ShowInBadgeCount && (viewModel.SystemUnit?.Id != null && viewModel.SystemUnit?.Id != 0))
+            {
+                ModelState.AddModelError(key:"SystemUnit", errorMessage:@"You can only set Show in Badge Count = Yes when no System Unit is selected.");
+            }
+
             if (ModelState.IsValid && viewModel.Id.HasValue)
             {
                 var unitDto = _unitService.GetUnit(unitId:viewModel.Id.Value);

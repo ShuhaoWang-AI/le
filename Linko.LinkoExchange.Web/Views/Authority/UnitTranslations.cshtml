@@ -32,65 +32,64 @@
                 <ul></ul>
             </div>
 
-            <div class="form-horizontal">
-                <p>
-                    During data import, Industries will choose from a list of Authority Units that are also translated to a System Unit. 
-                    Only translate Authority Units you want the Industry to be able to choose, then set "Is Available to Industry" to Yes. 
-                    Set all other units as "Show in Badge Count" to No.
-                </p>
+            <div class="col-md-12">
+                <h5>
+                    If you want Industries to be able to choose an Authority Unit during import, translate it to a System Unit and set "Is Available to Industry" to Yes.
+                </h5>
+                <h5>
+                    Set "Show in Badge Count" to No to remove the Unit Translations warning badge.
+                </h5>
             </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    @* grid name should be start with grid for centralized error handling *@
-                    @(Html.Kendo().Grid<AuthorityUnitViewModel>()
-                          .Name(componentName:"gridAuthorityUnitTranslation")
-                          .Columns(columns =>
-                                   {
-                                       columns.Bound(c => c.Name)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.SystemUnit).ClientTemplate(value:"#= (SystemUnit==null)? '' : SystemUnit.Name #")
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.ShowInBadgeCount).ClientTemplate(value:"#= ShowInBadgeCount ? 'Yes' : 'No' #")
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Command(command => { command.Edit().UpdateText(text:"Save"); }).Width(pixelWidth:170);
-                                   })
-                          .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(enabled:true)
-                                                    .Refresh(enabled:true)
-                                                    .Input(enabled:true)
-                                                    .Numeric(enabled:false)
-                          )
-                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<AuthorityUnitViewModel>()
+                        .Name(componentName:"gridAuthorityUnitTranslation")
+                        .Columns(columns =>
+                                {
+                                    columns.Bound(c => c.Name)
+                                            .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                    columns.Bound(c => c.SystemUnit).ClientTemplate(value:"#= (SystemUnit==null)? '' : SystemUnit.Name #")
+                                            .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                    columns.Bound(c => c.IsAvailableToRegulatee).ClientTemplate(value:"#= IsAvailableToRegulatee ? 'Yes' : 'No' #")
+                                            .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                    columns.Bound(c => c.ShowInBadgeCount).ClientTemplate(value:"#= ShowInBadgeCount ? 'Yes' : 'No' #")
+                                            .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                    columns.Command(command => { command.Edit().UpdateText(text:"Save"); }).Width(pixelWidth:170);
+                                })
+                        .Editable(editable => editable.Mode(mode:GridEditMode.InLine))
+                        .Pageable(pageable => pageable
+                                                .PageSizes(enabled:true)
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
+                        )
+                        .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
 
-                          //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                          .Resizable(resizable => resizable.Columns(value:true))
-                          .Scrollable(s => s.Height(value:"auto"))
-                          .NoRecords(text:"No authority unit exists.")
-                          .DataSource(dataSource => dataSource
-                                                        .Ajax()
-                                                        .ServerOperation(enabled:false)
-                                                        .Batch(enabled:false)
-                                                        .Sort(sort => { sort.Add(memberName:"Name").Ascending(); }) // <-- initial sort expression
-                                                        .Read(read => read.Action(actionName:"UnitTranslations_Read", controllerName:"Authority"))
-                                                        .Update(update => update.Action(actionName:"UnitTranslations_Update", controllerName:"Authority")
-                                                        )
-                                                        .PageSize(pageSize:25)
-                                                        .Events(events => events.RequestEnd(handler:"UpdateBadgeCount").Error(handler:"error_handler_AuthorityUnitTranslation.bind({gridId: '#gridAuthorityUnitTranslation'})"))
-                                                        .Model(model =>
-                                                               {
-                                                                   model.Id(p => p.Id);
-                                                                   model.Field(p => p.Id).Editable(enabled:false);
-                                                                   model.Field(p => p.Name).Editable(enabled:false);
-                                                                   model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
-                                                                   model.Field(p => p.IsAvailableToRegulatee);
-                                                                   model.Field(p => p.ShowInBadgeCount);
-                                                               })
-                          )
-                          )
-                </div>
+                        //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                        .Resizable(resizable => resizable.Columns(value:true))
+                        .Scrollable(s => s.Height(value:"auto"))
+                        .NoRecords(text:"No authority unit exists.")
+                        .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:false)
+                                                    .Sort(sort => { sort.Add(memberName:"Name").Ascending(); }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"UnitTranslations_Read", controllerName:"Authority"))
+                                                    .Update(update => update.Action(actionName:"UnitTranslations_Update", controllerName:"Authority")
+                                                    )
+                                                    .PageSize(pageSize:25)
+                                                    .Events(events => events.RequestEnd(handler:"UpdateBadgeCount").Error(handler:"error_handler_AuthorityUnitTranslation.bind({gridId: '#gridAuthorityUnitTranslation'})"))
+                                                    .Model(model =>
+                                                            {
+                                                                model.Id(p => p.Id);
+                                                                model.Field(p => p.Id).Editable(enabled:false);
+                                                                model.Field(p => p.Name).Editable(enabled:false);
+                                                                model.Field(p => p.SystemUnit).DefaultValue(value:ViewData[key:"defaultSystemUnit"] as SystemUnitViewModel);
+                                                                model.Field(p => p.IsAvailableToRegulatee);
+                                                                model.Field(p => p.ShowInBadgeCount);
+                                                            })
+                        )
+                        )
             </div>
         </section>
     </div>

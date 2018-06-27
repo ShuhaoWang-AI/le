@@ -62,79 +62,77 @@
                                    id = "validationSummaryImportFileTemplate"
                                })
 
-            <div class="alert alert-info">
+            <div class="col-md-12">
                 <h5>
                     You can set additional required columns using "Authority Optionality". System required fields are never optional.
                     "Authority Optionality" is ignored for Flow results used in Mass Loading calculations.
                 </h5>
             </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    @* grid name should be start with grid for centralized error handling *@
-                    @(Html.Kendo().Grid<FileVersionFieldViewModel>()
-                          .Name(componentName:"gridAuthorityImportFileTemplate")
-                          .Columns(columns =>
-                                   {
-                                       //columns.Bound(c => c.SystemFieldNameDisplayText);
-                                       columns.Bound(c => c.FileVersionFieldName);
-                                       columns.Bound(c => c.Description);
-                                       columns.Bound(c => c.DataFormatName);
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<FileVersionFieldViewModel>()
+                        .Name(componentName:"gridAuthorityImportFileTemplate")
+                        .Columns(columns =>
+                                {
+                                    //columns.Bound(c => c.SystemFieldNameDisplayText);
+                                    columns.Bound(c => c.FileVersionFieldName);
+                                    columns.Bound(c => c.Description);
+                                    columns.Bound(c => c.DataFormatName);
 
-                                       //columns.Bound(c => c.Size);
-                                       columns.Bound(c => c.DataOptionalityName);
+                                    //columns.Bound(c => c.Size);
+                                    columns.Bound(c => c.DataOptionalityName);
 
-                                       columns.Bound(c => c.IsIncluded)
-                                              .ClientTemplate(value:"#= IsIncluded ? 'Yes' : 'No' #")
-                                              .ClientGroupHeaderTemplate(value:"#= value ? 'Included in Template': 'Not Included in Template'#")
-                                              .Hidden(value:true)
-                                              .Width(pixelWidth:75);
-                                       columns.Command(command => { command.Edit().UpdateText(text:"Save"); }).Width(pixelWidth:170);
-                                   })
+                                    columns.Bound(c => c.IsIncluded)
+                                            .ClientTemplate(value:"#= IsIncluded ? 'Yes' : 'No' #")
+                                            .ClientGroupHeaderTemplate(value:"#= value ? 'Included in Template': 'Not Included in Template'#")
+                                            .Hidden(value:true)
+                                            .Width(pixelWidth:75);
+                                    columns.Command(command => { command.Edit().UpdateText(text:"Save"); }).Width(pixelWidth:170);
+                                })
 
-                          //.ClientDetailTemplateId(id:"detailTemplate")
-                          .Editable(editable => editable.Mode(mode:GridEditMode.PopUp)
-                                                        .TemplateName(templateName:"FileVersionFieldEditor")
-                                                        .Window(x => x.Title(title:"Customize Sample Import Column")))
-                          .Pageable(pageable => pageable.Enabled(value:false))
+                        //.ClientDetailTemplateId(id:"detailTemplate")
+                        .Editable(editable => editable.Mode(mode:GridEditMode.PopUp)
+                                                    .TemplateName(templateName:"FileVersionFieldEditor")
+                                                    .Window(x => x.Title(title:"Customize Sample Import Column")))
+                        .Pageable(pageable => pageable.Enabled(value:false))
 
-                          //.Sortable(sortable => { sortable.SortMode(value:GridSortMode.SingleColumn); })
+                        //.Sortable(sortable => { sortable.SortMode(value:GridSortMode.SingleColumn); })
 
-                          //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                          .Resizable(resizable => resizable.Columns(value:true))
-                          .Scrollable(s => s.Height(value:"auto"))
-                          .NoRecords(text:"No system field exists.")
-                          .Events(events => events.DataBound(handler:"dataBound"))
-                          .DataSource(dataSource => dataSource
-                                                        .Ajax()
-                                                        .ServerOperation(enabled:false)
-                                                        .Batch(enabled:false)
-                                                        .Sort(sort => { sort.Add(memberName:"SystemFieldName").Ascending(); }) // <-- initial sort expression
-                                                        .Read(read => read.Action(actionName:"ImportFileTemplate_Read", controllerName:"Authority"))
-                                                        .Update(update => update.Action(actionName:"ImportFileTemplate_Update", controllerName:"Authority"))
-                                                        .Events(events => events.Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
-                                                        .Model(model =>
-                                                               {
-                                                                   model.Id(p => p.SystemFieldName); // Need to use SystemFieldName as this is unique and multiple FileVersionFieldId is null
-                                                                   model.Field(p => p.FileVersionFieldId).Editable(enabled:false);
-                                                                   model.Field(p => p.FileVersionId).Editable(enabled:false);
-                                                                   model.Field(p => p.SystemFieldName).Editable(enabled:false);
-                                                                   model.Field(p => p.SystemFieldNameDisplayText).Editable(enabled:false);
-                                                                   model.Field(p => p.FileVersionFieldName);
-                                                                   model.Field(p => p.IsSystemRequired).Editable(enabled:false);
-                                                                   model.Field(p => p.DataOptionalityName);
-                                                                   model.Field(p => p.DataFormatDescription);
-                                                                   model.Field(p => p.Size).Editable(enabled:false);
-                                                                   model.Field(p => p.DataFormatName).Editable(enabled:false);
-                                                                   model.Field(p => p.Description);
-                                                                   model.Field(p => p.ExampleData);
-                                                                   model.Field(p => p.AdditionalComments);
-                                                                   model.Field(p => p.IsIncluded);
-                                                               })
+                        //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                        .Resizable(resizable => resizable.Columns(value:true))
+                        .Scrollable(s => s.Height(value:"auto"))
+                        .NoRecords(text:"No system field exists.")
+                        .Events(events => events.DataBound(handler:"dataBound"))
+                        .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:false)
+                                                    .Sort(sort => { sort.Add(memberName:"SystemFieldName").Ascending(); }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"ImportFileTemplate_Read", controllerName:"Authority"))
+                                                    .Update(update => update.Action(actionName:"ImportFileTemplate_Update", controllerName:"Authority"))
+                                                    .Events(events => events.Error(handler:"error_handler_ImportFileTemplate.bind({gridId: '#gridAuthorityImportFileTemplate'})"))
+                                                    .Model(model =>
+                                                            {
+                                                                model.Id(p => p.SystemFieldName); // Need to use SystemFieldName as this is unique and multiple FileVersionFieldId is null
+                                                                model.Field(p => p.FileVersionFieldId).Editable(enabled:false);
+                                                                model.Field(p => p.FileVersionId).Editable(enabled:false);
+                                                                model.Field(p => p.SystemFieldName).Editable(enabled:false);
+                                                                model.Field(p => p.SystemFieldNameDisplayText).Editable(enabled:false);
+                                                                model.Field(p => p.FileVersionFieldName);
+                                                                model.Field(p => p.IsSystemRequired).Editable(enabled:false);
+                                                                model.Field(p => p.DataOptionalityName);
+                                                                model.Field(p => p.DataFormatDescription);
+                                                                model.Field(p => p.Size).Editable(enabled:false);
+                                                                model.Field(p => p.DataFormatName).Editable(enabled:false);
+                                                                model.Field(p => p.Description);
+                                                                model.Field(p => p.ExampleData);
+                                                                model.Field(p => p.AdditionalComments);
+                                                                model.Field(p => p.IsIncluded);
+                                                            })
 
-                          //.Group(g => g.AddDescending(c => c.IsIncluded))
-                          )
-                          )
-                </div>
+                        //.Group(g => g.AddDescending(c => c.IsIncluded))
+                        )
+                        )
             </div>
         </section>
     </div>
