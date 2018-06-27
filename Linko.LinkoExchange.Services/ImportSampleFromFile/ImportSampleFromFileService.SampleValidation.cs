@@ -462,6 +462,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			sampleResultDto.MassLoadingUnitId = massLoadingUnitDto.UnitId;
 			sampleResultDto.MassLoadingUnitName = massLoadingUnitDto.Name;
+			sampleResultDto.IsCalcMassLoading = true; 
 		}
 
 		private ImportSampleFromFileValidationResultDto GetValidImportingSamples(SampleImportDto sampleImportDto, out List<ImportSampleWrapper> groupedSampleWrappers)
