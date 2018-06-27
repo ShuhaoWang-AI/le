@@ -244,6 +244,10 @@
                                           .Save(actionName:"ImportSampleFile", controllerName:"Industry")
                                           .AutoUpload(value:true)
                           )
+                          .HtmlAttributes(attributes:new
+                                          {
+                                              accept = ".xlsx"
+                                          })
                           .Events(e => e.Success(onSuccessHandlerName:"onFileUploadSuccess").Upload(onUploadHandlerName:"onFileUpload").Error(onErrorHandlerName:"onFileUploadError").Progress(onProgressHandlerName:"onFileUploadProgress"))
                           .ShowFileList(value:true)
                           .Multiple(value:false)
