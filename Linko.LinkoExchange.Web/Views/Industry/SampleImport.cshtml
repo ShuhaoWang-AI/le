@@ -251,7 +251,7 @@
                           .Events(e => e.Success(onSuccessHandlerName:"onFileUploadSuccess").Upload(onUploadHandlerName:"onFileUpload").Error(onErrorHandlerName:"onFileUploadError").Progress(onProgressHandlerName:"onFileUploadProgress"))
                           .ShowFileList(value:true)
                           .Multiple(value:false)
-                          .Messages(m => m.Select(selectMessage:"Select file").DropFilesHere(dropFilesHereMessage:"Drag and drop a .xlsx file here"))
+                          .Messages(m => m.Select(selectMessage:"Select file").DropFilesHere(dropFilesHereMessage:"Drag and drop an .xlsx file here"))
                           )
 
                     <div class="alert alert-danger hidden" name="showOnFileValidationError">
