@@ -94,8 +94,8 @@ namespace Linko.LinkoExchange.Services.DataSource
                     var existingDataSourceById = GetExistingDataSourceById(dataSourceId:dataSourceDto.DataSourceId);
 
                     var doesNewDataSourceWithAlreadyExistName = existingDataSourceById == null && existingDataSourceByName != null;
-                    var doesUpdateDataSourceWithAlreadyExistName = existingDataSourceById != null && 
-                                                                   existingDataSourceById.DataSourceId != existingDataSourceByName.DataSourceId;
+                    var doesUpdateDataSourceWithAlreadyExistName = existingDataSourceById != null && existingDataSourceByName != null
+                                                                   && existingDataSourceById.DataSourceId != existingDataSourceByName.DataSourceId;
                     if (doesNewDataSourceWithAlreadyExistName || doesUpdateDataSourceWithAlreadyExistName)
                     {
                         throw CreateRuleViolationExceptionForValidationError(errorMessage: "A Data Provider with the name already exists. Please select another name.");

@@ -143,12 +143,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              Name = model.Name,
                                                                              Description = model.Description
                                                                          });
-                ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = "Data Provider created successfully!";
+                TempData[key: "ShowSuccessMessage"] = true;
+                TempData[key: "SuccessMessage"] = "Sample created successfully!";
                 ModelState.Clear();
 
-                model = PrepareDataSourcesDetails(id: id);
-                return View(viewName: "DataSourceDetails", model: model);
+                return RedirectToAction(actionName: "DataSourceDetails", controllerName: "Industry", routeValues: new { id });
             }
             catch (RuleViolationException rve)
             {
@@ -184,8 +183,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                     Name = model.Name,
                                                                     Description = model.Description
                                                                 });
-                ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = "Data Provider updated successfully!";
+                TempData[key: "ShowSuccessMessage"] = true;
+                TempData[key: "SuccessMessage"] = "Data Provider updated successfully!";
                 ModelState.Clear();
                 model = PrepareDataSourcesDetails(id:id);
             }
@@ -237,6 +236,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Description = dataSource.Description,
                                 FlowParameterName = _parameterService.GetFlowParameter().Name
                             };
+
+            ViewBag.ShowSuccessMessage = TempData[key: "ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key: "SuccessMessage"] ?? "";
+
             return viewModel;
         }
 
