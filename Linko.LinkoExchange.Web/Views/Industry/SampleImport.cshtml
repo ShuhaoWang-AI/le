@@ -1,5 +1,6 @@
 ﻿@using Linko.LinkoExchange.Core.Domain
 @using Linko.LinkoExchange.Core.Enum
+@using Linko.LinkoExchange.Services.Base
 @using Linko.LinkoExchange.Services.ImportSampleFromFile
 @using Linko.LinkoExchange.Web.Shared
 @using Linko.LinkoExchange.Web.ViewModels.Industry
@@ -315,18 +316,34 @@
                     function onFileUpload(e) {
                         var validationSummary = $("#validationSummarySelectFile");
 
-                        validationSummary.removeClass("validation-summary-errors");
-                        validationSummary.addClass("validation-summary-valid");
-
                         $("[name='showOnfileValidationSuccess']").addClass("hidden");
                         $("[name='showOnFileValidationError']").addClass("hidden");
 
-                        var additional = {
-                            "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
-                            "SelectedDataSourceId": "@Model.SelectedDataSourceId",
-                            "SelectedDataSourceName": "@Model.SelectedDataSourceName"
-                        };
-                        e.data = additional;
+                        var maxFileSize = @ViewBag.MaxFileSize;
+                        var totalFileSize = e.files[0].size;
+
+                        if (totalFileSize > maxFileSize) {
+                            validationSummary.removeClass("validation-summary-valid");
+                            validationSummary.addClass("validation-summary-errors");
+
+                            validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+
+                            validationSummary.find("ul").append("<li>" + "@string.Format(format: ErrorConstants.SampleImport.FileValidation.ImportFileExceedSizeLimitation, arg0: ViewBag.MaxFileSize / 1024 / 1024)" + "</li>");
+
+                            e.preventDefault();
+                            return false;
+                        } else {
+                            validationSummary.removeClass("validation-summary-errors");
+                            validationSummary.addClass("validation-summary-valid");
+
+                            var additional = {
+                                "CurrentSampleImportStep": "@Model.CurrentSampleImportStep",
+                                "SelectedDataSourceId": "@Model.SelectedDataSourceId",
+                                "SelectedDataSourceName": "@Model.SelectedDataSourceName"
+                            };
+                            e.data = additional;
+                            return true;
+                        }
                     }
 
                     function onFileUploadSuccess(e) {
