@@ -182,6 +182,7 @@ For more information on how to configure your ASP.NET application, please visit 
                   validationKey="7FF3F17976859E0D0DA4BE34A1B66D60909D5734DFF2E633DDDA0D8D7C24F510FA0FDDFE40FFDC041B1033A15B20A12D2CF2045F4EF4A2CEE9C6364CE5BC0E23" />
     </system.web>
     <system.webServer>
+        <httpErrors existingResponse="PassThrough"/>
         <modules>
             <remove name="FormsAuthentication" />
             <add name="Glimpse"

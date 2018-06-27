@@ -366,7 +366,9 @@
                     }
 
                     function onFileUploadError(e) {
-                        var errorData = eval(e.XMLHttpRequest.response);
+						var errorData = [];
+	                    errorData.push(JSON.parse(e.XMLHttpRequest.response));
+	                
                         var errorMessages = [];
                         errorData.forEach(function(item, index) {
                             errorMessages.push("<li>" + item + "</li>");
@@ -1064,7 +1066,7 @@
 					 .ClientTemplate(value:
 						 "\\# if (Status == 'New') { \\#" +
 						 "<i class='fa fa-check text-blue' data-placement='top' data-toggle='tooltip' title='New'></i>" +
-						 "\\# } else { \\#" +
+						 "\\# } else if (Status == 'Update') { \\#" +
 						 "<i class='fa fa-check text-yellow' data-placement='top' data-toggle='tooltip' title='Update'></i>" +
 						 "\\# } \\#"
 				  )

@@ -135,49 +135,45 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return RenderSampleImportStepView(model:model);
             }
         }
+		
+	    public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
+	    {
+		    try
+		    {
+			    ImportTempFileDto importTempFileDto;
+			    using (var reader = new BinaryReader(input:upload.InputStream))
+			    {
+				    var content = reader.ReadBytes(count:upload.ContentLength);
 
-        public JsonResult ImportSampleFile(SampleImportViewModel model, HttpPostedFileBase upload)
-        {
-            try
-            {
-                ImportTempFileDto importTempFileDto;
+				    importTempFileDto = new ImportTempFileDto
+				                        {
+					                        OriginalFileName = upload.FileName,
+					                        RawFile = content,
+					                        MediaType = upload.ContentType
+				                        };
 
-                
-                    using (var reader = new BinaryReader(input:upload.InputStream))
-                    {
-                        var content = reader.ReadBytes(count:upload.ContentLength);
+				    var importTempFileId = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
+				    importTempFileDto.ImportTempFileId = importTempFileId;
+				    model.ImportTempFileId = importTempFileId;
+				    model.SelectedFileName = upload.FileName;
+			    }
 
-                        importTempFileDto = new ImportTempFileDto
-                                                {
-                                                    OriginalFileName = upload.FileName,
-                                                    RawFile = content,
-                                                    MediaType = upload.ContentType
-                                                };
+			    PopulateSelectedDataProvider(model:model);
+			    model.SampleImportDto.TempFile = importTempFileDto;
+			    //PopulateSampleImportTempFile(model:model);
+			    PopulateRowObjectsOrFileValidationErrors(model:model);
+			    model.SampleImportDto = null;
 
-                        var importTempFileId = _importSampleFromFileService.CreateImportTempFile(importTempFileDto:importTempFileDto);
-                        importTempFileDto.ImportTempFileId = importTempFileId;
-                        model.ImportTempFileId = importTempFileId;
-                        model.SelectedFileName = upload.FileName;
-                    }
+			    return Json(data:model, behavior:JsonRequestBehavior.AllowGet);
+		    }
+		    catch (RuleViolationException rve)
+		    {
+			    Response.StatusCode = (int) HttpStatusCode.BadRequest;
+			    return Json(data:MvcValidationExtensions.GetViolationErrors(ruleViolationException:rve), behavior:JsonRequestBehavior.AllowGet);
+		    }
+	    }
 
-
-                
-                PopulateSelectedDataProvider(model:model);
-                model.SampleImportDto.TempFile = importTempFileDto;
-                //PopulateSampleImportTempFile(model:model);
-                PopulateRowObjectsOrFileValidationErrors(model:model);
-                model.SampleImportDto = null;
-
-                return Json(data:model, behavior:JsonRequestBehavior.AllowGet);
-            }
-            catch (RuleViolationException rve)
-            {
-                Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                return Json(data:MvcValidationExtensions.GetViolationErrors(ruleViolationException:rve), behavior:JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [AcceptVerbs(verbs:HttpVerbs.Post)]
+	    [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult SampleImportSaveMonitoringPointDataTranslation([CustomDataSourceRequest] DataSourceRequest request,
                                                             DataSourceMonitoringPointTranslationViewModel viewModel)
         {
