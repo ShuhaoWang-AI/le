@@ -269,12 +269,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			var massLoadingUnit = _unitService.GetUnitForMassLoadingCalculations();
 
 			// Get existing draft samples for that user;
-			var draftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
+			var existingDraftSamples = _sampleService.GetSamples(status:SampleStatusName.Draft, startDate:min, endDate:max, isIncludeChildObjects:true).ToList();
 
 			foreach (var importingSample in importingSamples)
 			{
-				// Sample results are in a draft sample, then update that draft
-				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:draftSamples, searchFor:importingSample.Sample);
+				// Sample results are in an existing draft sample, then update that draft
+				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:existingDraftSamples, searchFor:importingSample.Sample);
 				if (drftSamplesToUpdate.Any())
 				{
 					var importingSampleResultParameterIds = importingSample.Sample.SampleResults.Select(k => k.ParameterId);
@@ -282,8 +282,20 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					//Update all the drafts
 					foreach (var draftSample in drftSamplesToUpdate)
 					{
+						// Parameters only exist in existing draft. 
 						var draftParameters = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
-						var draftSampleParameterIds = draftSample.SampleResults.Select(i => i.ParameterId).ToList();
+						var draftSampleParameterIds = draftSample.SampleResults.Select(i => i.ParameterId).ToList(); 
+
+						// Mark sample results that only exist in existing draft as "Existing and Unchanged"
+						// If there is no flow in importing file,
+						if (importingSample.FlowRow == null)
+						{
+							foreach (var parameter in draftParameters)
+							{
+								parameter.ExistingUnchanged = true;
+							}
+						}
+
 						var commonParameters = importingSample.Sample.SampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
 						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.SampleResultId);
 
@@ -307,7 +319,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 								                 FlowUnitId = draftSample.FlowUnitId ?? 0,
 								                 FlowUnitName = draftSample.FlowUnitName,
 								                 FlowValue = draftSample.FlowValue ?? 0.0
-							                 };
+										  };
 							if (flowRow.FlowUnitId < 1)
 							{
 								continue;
@@ -321,11 +333,15 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							// re-calculate mass loadings for all sample results
 							foreach (var sampleResult in draftSample.SampleResults)
 							{
-								CreateMassLoadingSampleResult(importFlowRow:flowRow,
-								                              sampleResultDto:sampleResult,
-								                              sampleDto:draftSample,
-								                              massLoadingUnitDto:massLoadingUnit
-								                             );
+								//TODO
+								//if (sampleResult.IsCalcMassLoading)
+								{
+									CreateMassLoadingSampleResult(importFlowRow:flowRow,
+									                              sampleResultDto:sampleResult,
+									                              sampleDto:draftSample,
+									                              massLoadingUnitDto:massLoadingUnit
+									                             );
+								}
 							}
 
 							importingSample.Sample = draftSample;

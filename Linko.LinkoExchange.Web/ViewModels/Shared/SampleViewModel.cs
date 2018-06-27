@@ -150,7 +150,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 	public enum ImportStatus
 	{
 		New,
-		Update
+		Update,
+		ExistingUnchanged
 	}
 
     public class SampleViewModelValidator : AbstractValidator<SampleViewModel>

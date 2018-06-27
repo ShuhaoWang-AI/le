@@ -158,7 +158,8 @@ namespace Linko.LinkoExchange.Web.Mapping
 				                   MassLoadingUnitName = sampleResultDto.MassLoadingUnitName,
 				                   MassLoadingSampleResultId = sampleResultDto.MassLoadingSampleResultId,
 				                   MassResultCompliance = sampleResultDto.MassResultCompliance.ToString(),
-				                   MassResultComplianceComment = sampleResultDto.MassResultComplianceComment
+				                   MassResultComplianceComment = sampleResultDto.MassResultComplianceComment,
+				                   ExistingUnchanged = sampleResultDto.ExistingUnchanged
 			                   };
 			return sampleResult;
 		}

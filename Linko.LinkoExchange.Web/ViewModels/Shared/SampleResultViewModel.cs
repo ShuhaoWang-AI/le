@@ -66,12 +66,27 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string ConcentrationResultComplianceComment { get; set; }
         public string MassResultCompliance { get; set; }
         public string MassResultComplianceComment { get; set; }
-		
-		public ImportStatus ImportStatus => Id.HasValue ? ImportStatus.Update : ImportStatus.New;
+
+	    public ImportStatus ImportStatus
+	    {
+
+		    get
+		    {
+			    if (Id.HasValue && ExistingUnchanged)
+			    {
+				    return ImportStatus.ExistingUnchanged;
+			    }
+				
+				return Id.HasValue? ImportStatus.Update: ImportStatus.New;
+			}  
+	    } 
+
 	    public string Status => ImportStatus.ToString();
 
-	    #endregion
-    }
+		public bool ExistingUnchanged { get; set; }
+
+		#endregion
+	}
 
     public class SampleResultViewModelValidator : AbstractValidator<SampleResultViewModel> { }
 }

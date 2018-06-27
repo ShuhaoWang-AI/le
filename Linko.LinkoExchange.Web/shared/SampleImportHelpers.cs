@@ -69,7 +69,7 @@ namespace Linko.LinkoExchange.Web.Shared
 							importSummary.UpdateSampleResultCount++;
 						}
 					}
-					else
+					else if(sampleResult.ImportStatus == ImportStatus.New)
 					{
 						importSummary.NewSampleResultCount++;
 						if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
