@@ -467,7 +467,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                                                    join s in _dbContext.Parameters on t.ParameterId equals s.ParameterId
                                                    where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                                                           && s.OrganizationRegulatoryProgramId == authorityOrgRegProgramId
-                                                          && s.IsRemoved == true
+                                                          && s.IsRemoved
                                                     select t).ToList();
                 if (invalidDataSourceParameters.Any())
                 {
@@ -482,7 +482,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                                               join s in _dbContext.Units on t.UnitId equals s.UnitId
                                               where d.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                                                     && s.OrganizationId == authorityOrganizationId
-                                                    && s.IsRemoved == true && s.IsAvailableToRegulatee == false
+                                                    && (s.IsRemoved || !s.IsAvailableToRegulatee)
                                               select t).ToList();
                 if (invalidDataSourceUnits.Any())
                 {
