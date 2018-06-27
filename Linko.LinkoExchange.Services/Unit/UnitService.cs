@@ -322,7 +322,7 @@ namespace Linko.LinkoExchange.Services.Unit
                 var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
 
-                return _dbContext.Units.Where(i => i.OrganizationId == authOrganizationId && !i.IsReviewed).ToList().Count;
+                return _dbContext.Units.Where(i => i.OrganizationId == authOrganizationId && !i.IsReviewed && !i.IsRemoved).ToList().Count;
             }
         }
 
