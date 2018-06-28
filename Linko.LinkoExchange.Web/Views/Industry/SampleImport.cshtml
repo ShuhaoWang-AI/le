@@ -765,7 +765,7 @@
                 <div class="box-footer">
                     <div class="form-group pull-right">
                         <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
-                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))'">
+                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))#@(SampleImportViewModel.SampleImportStep.SelectDataDefault.ToString())'">
                             Back
                         </a>
                         <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
@@ -969,7 +969,7 @@
             <div class="box-footer">
                 <div class="form-group pull-right">
                     <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
-                                                                                    SampleImportHelpers.GetBackRouteValues(model:Model))'">
+                                                                                    SampleImportHelpers.GetBackRouteValues(model:Model))#@(SampleImportViewModel.SampleImportStep.DataTranslations.ToString())'">
                         Back
                     </a>
                     <input class="btn btn-primary btn-sm" type="submit" value="Import" />
@@ -1143,6 +1143,25 @@
                 stepper.width(setpperWidth);
             }
         };
+
+        $(document).ready(function() {
+            var windowScrollTopOffset = $(window).scrollTop();
+            var visibleTopOffset = $("#SelectDataSource").position().top - 25;
+            var dataTranslations = $('#DataTranslations');
+            if (dataTranslations.length === 1) {
+                var expectedTranslationsTop = dataTranslations.position().top - visibleTopOffset;
+                if (windowScrollTopOffset > expectedTranslationsTop) {
+                    $(window).scrollTop(expectedTranslationsTop);
+                }
+            }
+            var preview = $('#ShowPreImportOutput');
+            if (preview.length === 1) {
+                var expectedPreviewTop = preview.position().top - visibleTopOffset;
+                if (windowScrollTopOffset > expectedPreviewTop) {
+                    $(window).scrollTop(expectedPreviewTop);
+                }
+            }
+        });
 
         switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn, untranslatedNoResultsDescription, translatedNoResultsDescription, isParameter) {
             var translationsGrid = $("#" + gridName).data("kendoGrid");
