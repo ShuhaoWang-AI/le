@@ -652,6 +652,11 @@
                                             </div>
                                         </div>
                                     }
+                                    <div class="col-md-12">
+                                        <div class="alert alert-danger validation-summary-valid" id="validationSummary@(translationType)">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
                                     @if (translationType == DataSourceTranslationType.MonitoringPoint)
                                     {
                                         <div class="col-md-12 voffset2">
@@ -1169,6 +1174,39 @@
                 }
             }
         };
+
+        dataSourceManipulatingErrorHandler = function(e) {
+            if (e.errors) {
+                var errorMessages = [];
+                $.each(e.errors, function(key, value) {
+                    if ("errors" in value) {
+                        $.each(value.errors, function() {
+                            errorMessages.push("<li>" + this + "</li>");
+                        });
+                    }
+                });
+
+                var validationSummary = $(this.errorDivId);
+                validationSummary.removeClass("validation-summary-valid");
+                validationSummary.addClass("validation-summary-errors");
+
+                validationSummary.find("ul").empty();
+                validationSummary.find("ul").append(errorMessages);
+
+                // Cancel the changes.
+                var grid = $(this.gridId).data("kendoGrid");
+                grid.one("dataBinding", function(e) {
+                    e.preventDefault(); // cancel grid rebind if error occurs
+                });
+
+                $(".k-button").click(function () {
+                    console.log('validationSummary: ', validationSummary);
+                    validationSummary.addClass("validation-summary-valid");
+                    validationSummary.removeClass("validation-summary-errors");
+                    validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                });
+            }
+        }
     </script>
     @if (Model.DataTranslations != null)
     {

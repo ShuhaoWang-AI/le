@@ -251,6 +251,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         {
             using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
             {
+                ThrowRuleViolationErrorIfDataSourceNotExist(dataSourceTranslation: dataSourceTranslation, translationType: translationType);
                 ThrowRuleViolationErrorIfDataSourceTermIsAlreadyExist(dataSourceTranslation:dataSourceTranslation, translationType:translationType);
                 ThrowRuleViolationErrorIfTranslationItemIsInvalid(translationItem:dataSourceTranslation.TranslationItem, translationType: translationType);
                 switch (translationType)
@@ -539,6 +540,15 @@ namespace Linko.LinkoExchange.Services.DataSource
                              .OrderBy(d => d.DataSourceTerm).ToList()
                              .Select(x => _mapHelper.ToDataSourceUnitDto(from:x))
                              .ToList();
+        }
+
+        private void ThrowRuleViolationErrorIfDataSourceNotExist(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)
+        {
+            var doesDataSourceExist = _dbContext.DataSources.Any(x => x.DataSourceId == dataSourceTranslation.DataSourceId);
+            if (!doesDataSourceExist)
+            {
+                throw CreateRuleViolationExceptionForValidationError(errorMessage: ErrorConstants.SampleImport.DataProviderDoesNotExist);
+            }
         }
 
         private void ThrowRuleViolationErrorIfDataSourceTermIsAlreadyExist(DataSourceTranslationDto dataSourceTranslation, DataSourceTranslationType translationType)

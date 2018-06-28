@@ -315,6 +315,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
                 model.SelectedDataSourceId = 0;
+                model.ImportFileId = 0;
+                ModelState.Remove(key: "CurrentSampleImportStep");
                 model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataSource;
                 throw new BadRequest(message:ErrorConstants.SampleImport.DataProviderDoesNotExist);
             }
@@ -334,6 +336,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (importTempFileDto == null)
             {
                 model.ImportTempFileId = 0;
+                ModelState.Remove(key: "CurrentSampleImportStep");
                 model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectFile;
                 throw new BadRequest(message:ErrorConstants.SampleImport.CannotFindImportFile);
             }
@@ -708,6 +711,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult RedirectSampleImportStepView(SampleImportViewModel model, SampleImportViewModel.SampleImportStep step)
         {
+            ModelState.Remove(key: "CurrentSampleImportStep");
             model.CurrentSampleImportStep = step;
             var importJobId = SampleImportHelpers.ToImportJobId(model:model);
 
