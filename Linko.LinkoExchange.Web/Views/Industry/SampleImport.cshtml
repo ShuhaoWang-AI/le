@@ -1148,17 +1148,16 @@
             var windowScrollTopOffset = $(window).scrollTop();
             var visibleTopOffset = $("#SelectDataSource").position().top - 25;
             var dataTranslations = $('#DataTranslations');
-            if (dataTranslations.length === 1) {
-                var expectedTranslationsTop = dataTranslations.position().top - visibleTopOffset;
-                if (windowScrollTopOffset > expectedTranslationsTop) {
-                    $(window).scrollTop(expectedTranslationsTop);
-                }
-            }
             var preview = $('#ShowPreImportOutput');
             if (preview.length === 1) {
                 var expectedPreviewTop = preview.position().top - visibleTopOffset;
                 if (windowScrollTopOffset > expectedPreviewTop) {
                     $(window).scrollTop(expectedPreviewTop);
+                }
+            } else if (dataTranslations.length === 1) {
+                var expectedTranslationsTop = dataTranslations.position().top - visibleTopOffset;
+                if (windowScrollTopOffset > expectedTranslationsTop) {
+                    $(window).scrollTop(expectedTranslationsTop);
                 }
             }
         });
