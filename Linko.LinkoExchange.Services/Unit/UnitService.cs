@@ -365,14 +365,10 @@ namespace Linko.LinkoExchange.Services.Unit
                 var currentSystemUnit = currentAuthorityUnit?.SystemUnit;
                 var targetSystemUnit = targetAuthorityUnit?.SystemUnit;
 
-                if (currentSystemUnit == null)
+                if (currentSystemUnit == null || targetSystemUnit == null)
                 {
-                    throw new ArgumentNullException(paramName: nameof(currentAuthorityUnit), message: ErrorConstants.Unit.PropertySystemUnitCannotBeNull);
-                }
-                if (targetSystemUnit == null)
-                {
-                    throw new ArgumentNullException(paramName: nameof(targetAuthorityUnit), message: ErrorConstants.Unit.PropertySystemUnitCannotBeNull);
-                }
+                    throw CreateRuleViolationExceptionForValidationError(errorMessage: ErrorConstants.Unit.PropertySystemUnitCannotBeNull);
+                } 
 
                 if (currentSystemUnit.UnitDimensionId == targetSystemUnit.UnitDimensionId)
                 {
