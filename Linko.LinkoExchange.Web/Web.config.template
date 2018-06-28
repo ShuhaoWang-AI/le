@@ -35,7 +35,7 @@ For more information on how to configure your ASP.NET application, please visit 
                   type="graylog"
                   hostip="192.168.60.249"
                   hostport="12201"
-                  facility="LinkoExchange" />
+                  facility="Linko.LinkoExchange" />
             <target type="File"
                     name="default"
                     layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
