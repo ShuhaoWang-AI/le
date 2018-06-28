@@ -25,9 +25,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Result")]
         public string Value { get; set; }
-		
+
 	    [Display(Name = "Result")]
-	    public string DisplayValue => $"{Qualifier} {Value} {UnitName}";
+	    public string DisplayValue
+	    {
+		    get
+		    {
+			    if (!string.IsNullOrWhiteSpace(Qualifier) && (Qualifier.Equals("ND", StringComparison.OrdinalIgnoreCase) || Qualifier.Equals("NF", StringComparison.OrdinalIgnoreCase)))
+			    {
+				    return $"{Qualifier}";
+			    }
+
+				return $"{Qualifier} {Value} {UnitName}";
+			}
+	    }
 
 	    [Display(Name = "Unit")]
         public int UnitId { get; set; }
@@ -58,11 +69,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
-		
-	    [Display(Name = "Mass Loading Result")]
-	    public string DisplayMassLoadingValue => $"{MassLoadingQualifier} {MassLoadingValue} {MassLoadingUnitName}";
 
-        public string ConcentrationResultCompliance { get; set; }
+	    [Display(Name = "Mass Loading Result")]
+	    public string DisplayMassLoadingValue
+	    {
+		    get
+		    {
+			    if (!string.IsNullOrWhiteSpace(MassLoadingQualifier) && (MassLoadingQualifier.Equals("ND", StringComparison.OrdinalIgnoreCase) || MassLoadingQualifier.Equals("NF", StringComparison.OrdinalIgnoreCase)))
+			    {
+				     return $"{MassLoadingQualifier}";
+			    }
+
+			    return $"{ MassLoadingQualifier} { MassLoadingValue} { MassLoadingUnitName}";
+		    }
+	    }
+
+		public string ConcentrationResultCompliance { get; set; }
         public string ConcentrationResultComplianceComment { get; set; }
         public string MassResultCompliance { get; set; }
         public string MassResultComplianceComment { get; set; }
