@@ -16,20 +16,29 @@
     </section>
     <div class="box box-primary">
         <section class="box-body form-horizontal">
-            <div class="form-group">
-                <div class="col-md-1 col-sm-3">
-                    @* ReSharper disable once UnknownCssClass *@
-                    <input checked="checked" class="onoffswitch" data-off-text="Basic" data-on-text="Advanced" name="onOffSwitchSearchControl" type="checkbox" />
-                </div>
-                <div class="col-sm-1">
-                </div>
-                <div class="col-sm-6" id="basicSearch">
-                    <div class="input-group">
-                        <input type="search" name="SearchString" id="searchString" value="@ViewBag.SearchString" class="form-control single-line text-box" placeholder="Search for Industry Number, Industry Name, Address">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="glyphicon glyphicon-search"></i>
-                            </button>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-sm-3">
+                        
+                        <div id="advancedOrBasic" class="input-group">
+                            <div class="input-group-btn">
+                                <a class="btn btn-primary width100" href="#">Basic</a>
+                            </div>
+                            <div class="input-group-btn">
+                                <a class="btn btn-default width100" href="#">Advanced</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                    </div>
+                    <div class="col-sm-8 pull-right" id="basicSearch">
+                        <div class="input-group">
+                            <input type="search" name="SearchString" id="searchString" value="@ViewBag.SearchString" class="form-control single-line text-box" placeholder="Search for Industry Number, Industry Name, Address">
+                            <div class="input-group-btn">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -122,19 +131,6 @@
                 $("#grid .k-filter-row").hide();
             });
 
-        $("[name='onOffSwitchSearchControl']").bootstrapSwitch();
-        $("[name='onOffSwitchSearchControl']")
-            .on('switchChange.bootstrapSwitch', function()
-            {
-                $("[id='basicSearch']").toggle(500);
-                $("#grid .k-filter-row").toggle(500);
-
-                //console.debug($("#grid .k-filter-row")); // DOM element
-                //console.debug(this); // DOM element
-                //console.debug(event); // jQuery event
-                //console.debug(state); // true | false
-            });
-
         gotoNextPage = function()
         {
             var grid = $("#grid").data("kendoGrid");
@@ -142,5 +138,15 @@
 
             doAjaxAction(grid, postUrl, "", "Select an industry");
         };
+
+        $("#advancedOrBasic a")
+            .click(function(e) {
+                e.preventDefault();
+                $("#advancedOrBasic a").removeClass("btn-primary").addClass("btn-default");
+                $(this).removeClass("btn-default").addClass("btn-primary");
+
+                $("[id='basicSearch']").toggle(500);
+                $("#grid .k-filter-row").toggle(500);
+            });
     </script>
 }

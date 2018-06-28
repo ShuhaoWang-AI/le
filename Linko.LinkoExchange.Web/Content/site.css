@@ -259,6 +259,16 @@ input[type="search"]::-webkit-search-cancel-button
 	font-weight: 400;
 }
 
+#basicSearch .input-group
+{
+	width: 100%;
+}
+
+#basicSearch .input-group-btn
+{
+	width: 50px;
+}
+
 .box-primary .btn-primary
 {
 	min-width: 76px;
@@ -278,6 +288,12 @@ input[type="search"]::-webkit-search-cancel-button
 .ai-gold
 {
 	color: #ffcc02 !important;
+}
+
+.width100
+{
+	display: inline-block;
+	width: 100px;
 }
 
 .width200

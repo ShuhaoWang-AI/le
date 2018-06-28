@@ -4,7 +4,7 @@
     $(".datepicker").datepicker({
         autoclose: true
     });
-    $('input[type="checkbox"], input[type="radio"]').not('[name*="onOffSwitch"]').iCheck({
+    $('input[type="checkbox"], input[type="radio"]').iCheck({
         checkboxClass: "icheckbox_minimal-blue",
         radioClass: "iradio_minimal-blue"
     });
