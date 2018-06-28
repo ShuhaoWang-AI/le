@@ -64,6 +64,7 @@
                                                                                                @class = "form-control",
                                                                                                disabled = "disabled"
                                                                                            })
+                <span id="SystemRequiredHintText" class="text-muted">System Required.</span>
                 @Html.ValidationMessageFor(model => model.SystemFieldName)
             </div>
         </div>
@@ -84,20 +85,6 @@
                                                                                  @readonly = "readonly"
                                                                              })
                 @Html.ValidationMessageFor(model => model.Description)
-            </div>
-        </div>
-        <div class="col-md-6 form-group">
-            @Html.LabelFor(model => model.IsSystemRequired, htmlAttributes:new
-                                                                           {
-                                                                               @class = "control-label col-md-3"
-                                                                           })
-
-            <div class="col-md-7">
-                @Html.CheckBoxFor(model => model.IsSystemRequired, htmlAttributes:new
-                                                                                  {
-                                                                                      disabled = "disabled"
-                                                                                  })
-                @Html.ValidationMessageFor(model => model.IsSystemRequired)
             </div>
         </div>
         <div class="col-md-6 form-group">
@@ -137,6 +124,20 @@
         <a id="linkShowAditionalConfiguration" href="#" onclick="showAditionalConfiguration()">Show Aditional Configuration</a>
     </div>
     <div class="col-md-12" name="sampleImportAditionalConfiguration">
+        <div class="col-md-6 form-group">
+            @Html.LabelFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-3"
+                                                                           })
+
+            <div class="col-md-7">
+                @Html.CheckBoxFor(model => model.IsSystemRequired, htmlAttributes:new
+                                                                                  {
+                                                                                      disabled = "disabled"
+                                                                                  })
+                @Html.ValidationMessageFor(model => model.IsSystemRequired)
+            </div>
+        </div>
         <div class="col-md-6 form-group">
             @Html.LabelFor(model => model.DataFormatName, htmlAttributes:new
                                                                          {
@@ -216,6 +217,7 @@
                 $("#IsIncluded").prop("disabled", true);
 
                 $("option[value='@((int) DataOptionalityName.Optional)']").remove();
+                $("#SystemRequiredHintText").removeClass("hidden");
             }
 
             var columnNames = [
