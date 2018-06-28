@@ -93,6 +93,29 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue?? 0;
 
+				if (_massLoadingFlowParameter == null)
+				{
+					_massLoadingFlowParameter = _parameterService.GetFlowParameter();
+				}
+
+				if (importingSampleResult.ParameterName.Equals(_massLoadingFlowParameter.Name))
+				{
+					var validMassFlowUnits = _unitService.GetFlowUnitValidValues().ToList();
+					var validMassFlowUnitIds = validMassFlowUnits.Select(i => i.UnitId).ToList(); 
+
+					if (importingSampleResult.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
+					{
+						if (validMassFlowUnits.Count > 1 && validMassFlowUnitIds.Contains(importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId))
+						{
+							importingSampleResult.EffectiveUnitResult = result;
+							var index = validMassFlowUnitIds.IndexOf(importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId); 
+							importingSampleResult.EffectiveUnit = validMassFlowUnits[index];
+
+							continue;
+						}
+					}
+				}
+
 				importingSampleResult.EffectiveUnit = GetEffectiveUnit(monitoringPointId:monitoringPointId, parameterId:parameterId, start:start, end:end);
 
 				var fromUnit = _authorityUnitDict[key:unitId];
@@ -209,29 +232,25 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				{
 					if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.ResultQualifier].OriginalValueString))
 					{
-						AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowResultQualifierMustBeEmpty, rowNumber: flow.RowNumber);
+						AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowResultQualifierMustBeEmpty, rowNumber:flow.RowNumber);
 					}
 
-					if (string.IsNullOrWhiteSpace(flow.ColumnMap[key: SampleImportColumnName.Result].OriginalValueString))
+					if (string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.Result].OriginalValueString))
 					{
-						AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowValueIsInvalid, rowNumber: flow.RowNumber);
+						AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowValueIsInvalid, rowNumber:flow.RowNumber);
 					}
 
 					return;
 				}
 			}
 
-			// If there is a Flow, but FlowValue or FlowUnit does not exist, throw exception.
-			double flowValue = flow.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
-			string flowUnitName = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValue;
-			var flowUnitId = flow.ColumnMap[key:SampleImportColumnName.ResultUnit].TranslatedValueId;
-
-			if (flowValue <= 0.0)
+			// If there is a Flow, but FlowValue or FlowUnit does not exist, throw exception. 
+			if (!flow.EffectiveUnitResult.HasValue  || flow.EffectiveUnitResult <= 0.0)
 			{
 				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowValueIsInvalid, rowNumber:flow.RowNumber);
 			}
 
-			if (flowUnitId <= 0)
+			if (flow.EffectiveUnit.UnitId <= 0)
 			{
 				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowUnitIsUnSpecified, rowNumber:flow.RowNumber);
 			}
@@ -241,35 +260,41 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DataValidation.FlowResultQualifierMustBeEmpty, rowNumber:flow.RowNumber);
 			}
 
-			var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-			var validFlowUnits = _settingService.GetOrgRegProgramSettingValue(orgRegProgramId:orgRegProgramId, settingType:SettingType.FlowUnitValidValues).Split(',')
-			                                    .Select(s => s.ToLower()).ToList();
-			if (!validFlowUnits.Contains(item:flowUnitName.ToLower()))
+			var validFlowUnits = _unitService.GetFlowUnitValidValues().ToList();
+			var validFlowUnitIds = validFlowUnits.Select(s => s.UnitId).ToList();
+
+			if (!validFlowUnitIds.Contains(item: flow.EffectiveUnit.UnitId))
 			{
 				var unitsStr = "";
-
-				if (validFlowUnits.Count > 2)
+				if (validFlowUnitIds.Count > 2)
 				{
-					unitsStr = string.Join(separator:", ", values:validFlowUnits);
+					unitsStr = string.Join(separator:", ", values:validFlowUnitIds);
 					var lastPosition = unitsStr.LastIndexOf(value:",", comparisonType:StringComparison.OrdinalIgnoreCase);
 					unitsStr = unitsStr.Substring(startIndex:0, length:lastPosition) + " or" + unitsStr.Substring(startIndex:lastPosition + 1);
 				}
 				else
 				{
-					unitsStr = string.Join(separator:" or ", values:validFlowUnits);
+					unitsStr = string.Join(separator:" or ", values:validFlowUnitIds);
 				}
 
 				AddValidationError(validationResult:validationResult,
 				                   errorMessage:string.Format(format:ErrorConstants.SampleImport.DataValidation.FlowUnitIsInvalidOnMassLoadingCalculation, arg0:unitsStr),
 				                   rowNumber:flow.RowNumber);
 			}
+			else if (validFlowUnits.Count == 1 && validFlowUnits[0].UnitId != flow.EffectiveUnit.UnitId)
+			{
+				// need to do unit conversion again
+				var newEffectiveUnit = validFlowUnits[0]; 
+				flow.EffectiveUnitResult = _unitService.ConvertResultToTargetUnit(result:flow.EffectiveUnitResult, currentAuthorityUnit:flow.EffectiveUnit,targetAuthorityUnit: newEffectiveUnit);
+				flow.EffectiveUnit = newEffectiveUnit;
+			}
 
 			importSampleWrapper.SampleResults.Remove(item:flow);
 			importSampleWrapper.FlowRow = new FlowRow
 			                              {
-				                              FlowValue = flowValue,
-				                              FlowUnitName = flowUnitName,
-				                              FlowUnitId = flowUnitId
+				                              FlowValue = flow.EffectiveUnitResult ?? 0.0f,
+				                              FlowUnitName = flow.EffectiveUnit.Name,
+				                              FlowUnitId = flow.EffectiveUnit.UnitId
 			                              };
 		}
 
@@ -466,7 +491,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			}
 
 			var massLoadingMultiplier = sampleDto.MassLoadingConversionFactorPounds ?? 0.0f;
-			var flowUnitConversionFactor = sampleResultDto.UnitName.Equals(value:massLoadingBaseUnit, comparisonType:StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
+			var flowUnitConversionFactor = importFlowRow.FlowUnitName.Equals(value:massLoadingBaseUnit, comparisonType:StringComparison.OrdinalIgnoreCase) ? 1 : 0.000001;
 			var resultUnitConversionFactor = sampleResultDto.UnitName.Equals(value:resultBaseUnit, comparisonType:StringComparison.OrdinalIgnoreCase) ? 1 : 0.001;
 
 			var numbers = new[] {flowResult, sampleResultDto.Value ?? 0, massLoadingMultiplier, flowUnitConversionFactor, resultUnitConversionFactor};
