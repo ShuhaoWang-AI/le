@@ -71,8 +71,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 
 		[Display(Name = "Default Monitoring Point")]
 		public int SelectedDefaultMonitoringPointId { get; set; }
-
-		public string SelectedDefaultMonitoringPointName { get; set; }
+        public string SelectedDefaultMonitoringPointName { get; set; }
 
 		[Display(Name = "Default Collection Method")]
 		public int SelectedDefaultCollectionMethodId { get; set; }

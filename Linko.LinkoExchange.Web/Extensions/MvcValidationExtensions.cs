@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Validation;
 
@@ -15,9 +17,21 @@ namespace Linko.LinkoExchange.Web.Extensions
         {
             foreach (var issue in ruleViolationException.ValidationIssues)
             {
+                if (DoesModelStateContainSamePropertyErrorMessage(modelState:modelState, issue:issue))
+                {
+                    continue;
+                }
+
                 //var value = issue.PropertyValue ?? string.Empty;
                 modelState.AddModelError(key:issue.PropertyName, errorMessage:issue.ErrorMessage);
             }
+        }
+
+        private static bool DoesModelStateContainSamePropertyErrorMessage(ModelStateDictionary modelState, RuleViolation issue)
+        {
+            ModelState value;
+            return modelState.TryGetValue(key:issue.PropertyName, value:out value) && 
+                   value.Errors.ToList().Any(e => issue.ErrorMessage.Equals(value:e.ErrorMessage, comparisonType:StringComparison.Ordinal));
         }
 
         public static string GetViolationMessages(RuleViolationException ruleViolationException)

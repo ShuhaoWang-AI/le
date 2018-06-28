@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.DataSource;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.Extensions;
@@ -20,6 +21,7 @@ using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.Shared;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using DataSource = Kendo.Mvc.UI.DataSource;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -376,24 +378,42 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.SampleImportDto.RequiredDefaultValues = requiredDefaultValues;
             model.SelectedDefaultMonitoringPointName = GetSelectedRequiredDefaultName(requiredDefaultValues:requiredDefaultValues,
                                                                                       columnName:SampleImportColumnName.MonitoringPoint,
-                                                                                      defaultDataId:model.SelectedDefaultMonitoringPointId);
+                                                                                      model:model,
+                                                                                      defaultDataId:model.SelectedDefaultMonitoringPointId,
+                                                                                      defaultDataName:model.SelectedDefaultMonitoringPointName);
             model.SelectedDefaultCollectionMethodName = GetSelectedRequiredDefaultName(requiredDefaultValues:requiredDefaultValues,
                                                                                        columnName:SampleImportColumnName.CollectionMethod,
-                                                                                       defaultDataId:model.SelectedDefaultCollectionMethodId);
+                                                                                       defaultDataId:model.SelectedDefaultCollectionMethodId,
+                                                                                       model:model,
+                                                                                       defaultDataName:model.SelectedDefaultCollectionMethodName);
             model.SelectedDefaultSampleTypeName = GetSelectedRequiredDefaultName(requiredDefaultValues:requiredDefaultValues,
                                                                                  columnName:SampleImportColumnName.SampleType,
-                                                                                 defaultDataId:model.SelectedDefaultSampleTypeId);
+                                                                                 model:model,
+                                                                                 defaultDataId:model.SelectedDefaultSampleTypeId,
+                                                                                 defaultDataName:model.SelectedDefaultSampleTypeName);
         }
 
-        private string GetSelectedRequiredDefaultName(List<RequiredDataDefaultsDto> requiredDefaultValues, SampleImportColumnName columnName, int defaultDataId)
+        private string GetSelectedRequiredDefaultName(List<RequiredDataDefaultsDto> requiredDefaultValues, SampleImportColumnName columnName,
+                                                      SampleImportViewModel model, int defaultDataId, string defaultDataName)
         {
             if (defaultDataId == 0)
             {
                 return null;
             }
 
-            return requiredDefaultValues.Find(x => x.SampleImportColumnName == columnName)?
+            var requiredDefaultName = requiredDefaultValues.Find(x => x.SampleImportColumnName == columnName)?
                 .Options.Find(x => x.Id == defaultDataId)?.DisplayValue;
+            if (requiredDefaultName != null)
+            {
+                return requiredDefaultName;
+            }
+
+            ModelState.Remove(key: "CurrentSampleImportStep");
+            model.CurrentSampleImportStep = SampleImportViewModel.SampleImportStep.SelectDataDefault;
+            var translationType = ImportSampleFromFileService.ColumnNameTranslationTypeDict[key:columnName];
+            var translationTypeName = DataSourceHelper.GetTranslatedTypeDomainName(translationType:translationType);
+            throw new BadRequest(message:string.Format(format:ErrorConstants.SampleImport.LinkoExchangeTermNoLongerAvailable, 
+                                                       arg0:translationTypeName, arg1:defaultDataName));
         }
 
         private int GetNumberOfAssignedRequiredDefaultValues(SampleImportViewModel model)

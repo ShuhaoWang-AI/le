@@ -98,11 +98,14 @@ namespace Linko.LinkoExchange.Web.Shared
 				       ImportTempFileId = sampleImportQueryParameters.ImportTempFileId,
 				       SelectedDataSourceId = sampleImportQueryParameters.SelectedDataSourceId,
 				       SelectedDefaultMonitoringPointId = sampleImportQueryParameters.SelectedDefaultMonitoringPointId,
+				       SelectedDefaultMonitoringPointName = sampleImportQueryParameters.SelectedDefaultMonitoringPointName,
 				       SelectedDefaultCollectionMethodId = sampleImportQueryParameters.SelectedDefaultCollectionMethodId,
+				       SelectedDefaultCollectionMethodName = sampleImportQueryParameters.SelectedDefaultCollectionMethodName,
 				       SelectedDefaultSampleTypeId = sampleImportQueryParameters.SelectedDefaultSampleTypeId,
+				       SelectedDefaultSampleTypeName = sampleImportQueryParameters.SelectedDefaultSampleTypeName,
 				       ImportSummary = sampleImportQueryParameters.ImportSummary
-            };
-		}
+			       };
+        }
 
 		public static string ToImportJobId(SampleImportViewModel model)
 		{
@@ -120,11 +123,14 @@ namespace Linko.LinkoExchange.Web.Shared
 				       ImportTempFileId = model.ImportTempFileId,
 				       SelectedDataSourceId = model.SelectedDataSourceId,
 				       SelectedDefaultMonitoringPointId = model.SelectedDefaultMonitoringPointId,
+				       SelectedDefaultMonitoringPointName = model.SelectedDefaultMonitoringPointName,
 				       SelectedDefaultCollectionMethodId = model.SelectedDefaultCollectionMethodId,
+				       SelectedDefaultCollectionMethodName = model.SelectedDefaultCollectionMethodName,
 				       SelectedDefaultSampleTypeId = model.SelectedDefaultSampleTypeId,
+				       SelectedDefaultSampleTypeName = model.SelectedDefaultSampleTypeName,
 				       ImportSummary = model.ImportSummary
-            };
-		}
+			       };
+        }
 
 		public static RouteValueDictionary GetBackRouteValues(SampleImportViewModel model)
 		{
@@ -229,9 +235,12 @@ namespace Linko.LinkoExchange.Web.Shared
 			public int ImportTempFileId { get; set; }
 			public int ImportFileId { get; set; }
 			public int SelectedDefaultMonitoringPointId { get; set; }
-			public int SelectedDefaultCollectionMethodId { get; set; }
-			public int SelectedDefaultSampleTypeId { get; set; }
-			public ImportSummaryViewModel ImportSummary { get; set; }
+			public string SelectedDefaultMonitoringPointName { get; set; }
+            public int SelectedDefaultCollectionMethodId { get; set; }
+			public string SelectedDefaultCollectionMethodName { get; set; }
+            public int SelectedDefaultSampleTypeId { get; set; }
+			public string SelectedDefaultSampleTypeName { get; set; }
+            public ImportSummaryViewModel ImportSummary { get; set; }
 
 			#endregion
 		}
