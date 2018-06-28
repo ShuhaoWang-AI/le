@@ -1415,8 +1415,12 @@ namespace Linko.LinkoExchange.Services.Mapping
 			               MonitoringPointId = @from.TranslationItem.TranslationId
 		               };
 	        }
-
-	        existingDomainObject.MonitoringPointId = @from.TranslationItem.TranslationId;
+	        else
+	        {
+		        existingDomainObject.MonitoringPointId = @from.TranslationItem.TranslationId;
+		        existingDomainObject.DataSourceTerm = @from.DataSourceTerm;
+	        }
+	        
 	        return existingDomainObject;
         }
 
@@ -1458,9 +1462,13 @@ namespace Linko.LinkoExchange.Services.Mapping
 			               CtsEventTypeId = from.TranslationItem.TranslationId
 		               };
 	        }
+	        else
+	        {
+		        existingDomainObject.DataSourceTerm = @from.DataSourceTerm;
+		        existingDomainObject.CtsEventTypeId = @from.TranslationItem.TranslationId;
+            }
 
-	        existingDomainObject.CtsEventTypeId = @from.TranslationItem.TranslationId;
-	        return existingDomainObject;
+            return existingDomainObject;
         }
 
         public DataSourceTranslationDto ToDataSourceCollectionMethodDto(DataSourceCollectionMethod @from)
@@ -1501,8 +1509,12 @@ namespace Linko.LinkoExchange.Services.Mapping
 			               CollectionMethodId = from.TranslationItem.TranslationId
 		               };
 	        }
+	        else
+	        {
+		        existingDomainObject.DataSourceTerm = @from.DataSourceTerm;
+		        existingDomainObject.CollectionMethodId = @from.TranslationItem.TranslationId;
+            }
 
-	        existingDomainObject.CollectionMethodId = @from.TranslationItem.TranslationId;
             return existingDomainObject;
         }
 
@@ -1544,9 +1556,13 @@ namespace Linko.LinkoExchange.Services.Mapping
 			               ParameterId = from.TranslationItem.TranslationId
 		               };
 	        }
+	        else
+	        {
+		        existingDomainObject.DataSourceTerm = @from.DataSourceTerm;
+		        existingDomainObject.ParameterId = @from.TranslationItem.TranslationId;
+			}
 
-	        existingDomainObject.ParameterId = @from.TranslationItem.TranslationId;
-	        return existingDomainObject;
+            return existingDomainObject;
         }
 
         public DataSourceTranslationDto ToDataSourceUnitDto(DataSourceUnit @from)
@@ -1587,9 +1603,13 @@ namespace Linko.LinkoExchange.Services.Mapping
 			               UnitId = from.TranslationItem.TranslationId
 		               };
 	        }
+	        else
+	        {
+		        existingDomainObject.DataSourceTerm = @from.DataSourceTerm;
+                existingDomainObject.UnitId = @from.TranslationItem.TranslationId;
+	        }
 
-	        existingDomainObject.UnitId = @from.TranslationItem.TranslationId;
-	        return existingDomainObject;
+            return existingDomainObject;
         }
 
         /// <inheritdoc />
