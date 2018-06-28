@@ -207,6 +207,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			{
 				if (qualifier.Equals(value:"ND", comparisonType:StringComparison.OrdinalIgnoreCase) || qualifier.Equals(value:"NF", comparisonType:StringComparison.OrdinalIgnoreCase))
 				{
+					if (!string.IsNullOrWhiteSpace(flow.ColumnMap[key:SampleImportColumnName.ResultQualifier].OriginalValueString))
+					{
+						AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowResultQualifierMustBeEmpty, rowNumber: flow.RowNumber);
+					}
+
+					if (string.IsNullOrWhiteSpace(flow.ColumnMap[key: SampleImportColumnName.Result].OriginalValueString))
+					{
+						AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.FlowValueIsInvalid, rowNumber: flow.RowNumber);
+					}
+
 					return;
 				}
 			}
