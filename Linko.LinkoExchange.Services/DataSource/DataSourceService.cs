@@ -648,7 +648,7 @@ namespace Linko.LinkoExchange.Services.DataSource
                 return;
             }
 
-            var errorMessage = string.Format(format: "{0} \"{1}\" is no longer available. Please refresh the page and continue on.",
+            var errorMessage = string.Format(format: ErrorConstants.SampleImport.LinkoExchangeTermNoLongerAvailable,
                                              arg0: DataSourceHelper.GetTranslatedTypeDomainName(translationType: translationType),
                                              arg1: translationItem.TranslationName);
             throw CreateRuleViolationExceptionForValidationError(errorMessage: errorMessage);
