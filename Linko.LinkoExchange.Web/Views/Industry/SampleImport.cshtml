@@ -603,20 +603,17 @@
                 @if (Model.DataTranslations != null)
                 {
                     var missingDataTranslations = Model.DataTranslations.Any(x => x.NumberOfMissingTranslations > 0);
-                    if (ViewData.ModelState.IsValid)
+                    if (missingDataTranslations)
                     {
-                        if (missingDataTranslations)
-                        {
-                            <h5 class="box-body voffset2">
-                                There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
-                            </h5>
-                        }
-                        else
-                        {
-                            <h5 class="box-body voffset2">
-                                No data translations were missing. Data has already been translated.
-                            </h5>
-                        }
+                        <h5 class="box-body voffset2">
+                            There is data in the file we don't recognize. Tell us what this data is and we'll use it instead. Plus we'll remember it for next time so we won't have to ask you again.
+                        </h5>
+                    }
+                    else
+                    {
+                        <h5 class="box-body voffset2">
+                            No data translations were missing. Data has already been translated.
+                        </h5>
                     }
                     foreach (var translationType in ImportSampleFromFileService.ColumnNameTranslationTypeDict.Values)
                     {
@@ -639,10 +636,6 @@
                                     &nbsp;
                                     <h3 class="box-title width450">
                                         @dataTranslations.Title
-                                        @if (isUntranslatedSwitchOn)
-                                        {
-                                            <span class="fg-red">(Required)</span>
-                                        }
                                     </h3>
                                 </div>
                                 <div class="box-body box-collapse collapse form-horizontal in" style="padding: 0px 40px;">

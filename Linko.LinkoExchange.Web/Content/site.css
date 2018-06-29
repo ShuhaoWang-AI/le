@@ -424,6 +424,12 @@ input[type="search"]::-webkit-search-cancel-button
 	z-index: 1000;
 }
 
+.fa-asterisk
+{
+	color: #dd4b39;
+	font-size: 0.75em;
+}
+
 /* End: Custom notification template*/
 
 .k-grid-content

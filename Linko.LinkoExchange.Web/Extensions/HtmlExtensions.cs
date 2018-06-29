@@ -93,7 +93,7 @@ namespace Linko.LinkoExchange.Web.Extensions
                          {
                              columns.Bound(c => c.IsTranslated)
                                     .ClientTemplate(
-                                                    value:"# if (!IsTranslated) { #" + "<i class='fa fa-lg fa-exclamation-triangle fg-yellow'/> " + "# } #"
+                                                    value:"# if (!IsTranslated) { #" + "<i class='fa fa-asterisk' aria-hidden='true'></i>" + "# } #"
                                                    ).Title(text:"")
                                     .HtmlAttributes(attributes:new
                                                                {
