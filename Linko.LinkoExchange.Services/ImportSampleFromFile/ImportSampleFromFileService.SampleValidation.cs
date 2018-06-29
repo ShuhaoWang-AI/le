@@ -105,6 +105,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 					if (importingSampleResult.ColumnMap.ContainsKey(SampleImportColumnName.ResultUnit))
 					{
+						if (validMassFlowUnitIds.Contains(importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId))
+						{
+							importingSampleResult.EffectiveUnit = new UnitDto
+							                                      {
+								                                      UnitId = importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId,
+								                                      Name = importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValue 
+							                                      };
+							continue;
+						}
+
 						if (validMassFlowUnits.Count > 1 && validMassFlowUnitIds.Contains(importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId))
 						{
 							importingSampleResult.EffectiveUnitResult = result;
@@ -262,19 +272,19 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			var validFlowUnits = _unitService.GetFlowUnitValidValues().ToList();
 			var validFlowUnitIds = validFlowUnits.Select(s => s.UnitId).ToList();
-
-			if (!validFlowUnitIds.Contains(item: flow.EffectiveUnit.UnitId))
+			var validFlowUnitNames = validFlowUnits.Select(i => i.Name).ToList();
+			if (validFlowUnits.Count >1 && !validFlowUnitIds.Contains(item: flow.EffectiveUnit.UnitId))
 			{
 				var unitsStr = "";
 				if (validFlowUnitIds.Count > 2)
 				{
-					unitsStr = string.Join(separator:", ", values:validFlowUnitIds);
+					unitsStr = string.Join(separator:", ", values: validFlowUnitNames);
 					var lastPosition = unitsStr.LastIndexOf(value:",", comparisonType:StringComparison.OrdinalIgnoreCase);
 					unitsStr = unitsStr.Substring(startIndex:0, length:lastPosition) + " or" + unitsStr.Substring(startIndex:lastPosition + 1);
 				}
 				else
 				{
-					unitsStr = string.Join(separator:" or ", values:validFlowUnitIds);
+					unitsStr = string.Join(separator:" or ", values: validFlowUnitNames);
 				}
 
 				AddValidationError(validationResult:validationResult,
