@@ -100,6 +100,12 @@
                 var responseData = e.response.Data[0];
                 if (responseData.BadgeCount != null) {
                     $("[name = 'sidebar_PendingUnitTranslationsCount']").html(responseData.BadgeCount);
+
+                    if (responseData.BadgeCount === 0) {
+                        $("[name = 'sidebar_PendingUnitTranslationsCount']").addClass("hidden");
+                    } else {
+                        $("[name = 'sidebar_PendingUnitTranslationsCount']").removeClass("hidden");
+                    }
                 }
             }
         }

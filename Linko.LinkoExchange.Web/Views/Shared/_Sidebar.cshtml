@@ -112,10 +112,11 @@
                     <a href="#">
                         <i class="fa fa-upload fa-fw"></i>
                         <span>Import File Settings</span>
-                        @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
+                        @if (ViewBag.PendingUnitTranslationsCount != null )
+                            //&& ViewBag.PendingUnitTranslationsCount > 0 logic moved to the page as ajax call updates value
                         {
                             <span class="pull-right-container">
-                                <span name="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                <span name="sidebar_PendingUnitTranslationsCount" class="label label-info @(ViewBag.PendingUnitTranslationsCount > 0 ? "" : "hidden" )">@ViewBag.PendingUnitTranslationsCount</span>
                             </span>
                         }
                     </a>
@@ -130,10 +131,11 @@
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"UnitTranslations", controllerName:"Authority")'">
                                 <i class="fa fa-cogs fa-fw"></i>
                                 <span>Unit Translations</span>
-                                @if (ViewBag.PendingUnitTranslationsCount != null && ViewBag.PendingUnitTranslationsCount > 0)
+                                @if (ViewBag.PendingUnitTranslationsCount != null )
+                                        //&& ViewBag.PendingUnitTranslationsCount > 0 logic moved to the page as ajax call updates value
                                 {
                                     <span class="pull-right-container">
-                                        <span name="sidebar_PendingUnitTranslationsCount" class="label label-info">@ViewBag.PendingUnitTranslationsCount</span>
+                                        <span name="sidebar_PendingUnitTranslationsCount" class="label label-info @(ViewBag.PendingUnitTranslationsCount > 0 ? "" : "hidden" )">@ViewBag.PendingUnitTranslationsCount</span>
                                     </span>
                                 }
                             </a>
