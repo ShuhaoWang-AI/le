@@ -2674,6 +2674,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 _unitService.UpdateAuthorityUnit(unitDto:unitDto);
 
+                viewModel.SystemUnit = new SystemUnitViewModel {Id = unitDto.SystemUnitId, Name = unitDto.SystemUnit?.Name ?? ""};
+
                 viewModel.BadgeCount = _unitService.GetMissingAuthorityUnitToSystemUnitTranslationCount();
             }
 
