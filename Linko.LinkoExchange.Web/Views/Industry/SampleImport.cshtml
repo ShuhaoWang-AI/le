@@ -1149,25 +1149,24 @@
                 stepper.removeClass("sticky");
                 stepper.width(setpperWidth);
             }
+            console.log("window.onscroll done");
         };
 
-        $(document).ready(function() {
-            var windowScrollTopOffset = $(window).scrollTop();
-            var visibleTopOffset = $("#SelectDataSource").position().top - 25;
-            var dataTranslations = $('#DataTranslations');
-            var preview = $('#ShowPreImportOutput');
-            if (preview.length === 1) {
-                var expectedPreviewTop = preview.position().top - visibleTopOffset;
-                if (windowScrollTopOffset > expectedPreviewTop) {
-                    $(window).scrollTop(expectedPreviewTop);
-                }
-            } else if (dataTranslations.length === 1) {
-                var expectedTranslationsTop = dataTranslations.position().top - visibleTopOffset;
-                if (windowScrollTopOffset > expectedTranslationsTop) {
-                    $(window).scrollTop(expectedTranslationsTop);
-                }
-            }
-        });
+        $(document)
+            .ready(function() {
+                setTimeout(function() {
+                    var windowScrollTopOffset = $(window).scrollTop();
+                    var visibleTopOffset = $("#SelectDataSource").position().top - 25;
+                    var dataTranslations = $('#DataTranslations');
+                    var preview = $('#ShowPreImportOutput');
+                    if (preview.length !== 1 && dataTranslations.length === 1) {
+                        var expectedTranslationsTop = dataTranslations.position().top - visibleTopOffset;
+                        if (windowScrollTopOffset > expectedTranslationsTop) {
+                            $(window).scrollTop(expectedTranslationsTop);
+                        }
+                    }
+                }, 50);
+            });
 
         switchDataTranslationGrid = function(gridName, isUntranslatedSwitchOn, untranslatedNoResultsDescription, translatedNoResultsDescription, isParameter) {
             var translationsGrid = $("#" + gridName).data("kendoGrid");
@@ -1224,12 +1223,13 @@
                     e.preventDefault(); // cancel grid rebind if error occurs
                 });
 
-                $(".k-button").click(function () {
-                    console.log('validationSummary: ', validationSummary);
-                    validationSummary.addClass("validation-summary-valid");
-                    validationSummary.removeClass("validation-summary-errors");
-                    validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
-                });
+                $(".k-button")
+                    .click(function() {
+                        console.log('validationSummary: ', validationSummary);
+                        validationSummary.addClass("validation-summary-valid");
+                        validationSummary.removeClass("validation-summary-errors");
+                        validationSummary.find("ul").empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                    });
             }
         }
     </script>
