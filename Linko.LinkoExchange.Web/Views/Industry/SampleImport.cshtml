@@ -126,13 +126,6 @@
                                 You can import sample data from an .xlsx file, but you must Create a Data Provider first. Click the Create New Data Provider button to be taken to the Industry Account - Data Providers screen to create one.
                             </h5>
                         </div>
-                        <div class="box-footer">
-                            <div class="form-group pull-right">
-                                <a href="#" class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
-                                    Create New Data Provider
-                                </a>
-                            </div>
-                        </div>
                     }
                     else
                     {
@@ -141,12 +134,6 @@
                             <div class="col-md-4">
                                 @Html.DropDownList(name:"SelectedDataSourceId", selectList:Model.StepSelectDataSource.AvailableDataSources,
                                     htmlAttributes:new {@class = "form-control"})
-                            </div>
-                        </div>
-
-                        <div class="box-footer">
-                            <div class="form-group pull-right">
-                                <input class="btn btn-primary btn-sm" type="submit" value="Next" />
                             </div>
                         </div>
                     }
@@ -163,6 +150,24 @@
                     </div>
                 }
             </div>
+        @if (isStepSelectDataProvider)
+        {
+            <div class="box-footer">
+                <div class="form-group pull-right">
+
+                    @if (Model.StepSelectDataSource.AvailableDataSources.Count <= 1)
+                    {
+                        <a href="#" class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewDataSourceDetails", controllerName:"Industry")'">
+                            Create New Data Provider
+                        </a>
+                    }
+                    else
+                    {
+                        <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                    }
+                </div>
+            </div>
+        }
         </section>
     }
 
@@ -300,6 +305,7 @@
                     </div>
                 }
             </div>
+            
             @if (Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.SelectFile || Model.CurrentSampleImportStep == SampleImportViewModel.SampleImportStep.FileValidation)
             {
                 <div class="box-footer">
@@ -316,7 +322,6 @@
                 @Scripts.Render(paths:"~/bundles/jqueryval")
 
                 <script>
-
                     function onFileUpload(e) {
                         var validationSummary = $("#validationSummarySelectFile");
 
@@ -433,7 +438,7 @@
                     if (requiredDefaultMonitoringPoint != null)
                     {
                         <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes:new {@class = "control-label col-md-2"})
+                            @Html.LabelFor(model => model.SelectedDefaultMonitoringPointId, htmlAttributes:new {@class = "control-label col-md-2 required"})
                             <div class="col-md-4">
                                 @Html.HiddenFor(model => model.SelectedDefaultMonitoringPointName)
                                 @Html.DropDownList(name:"SelectedDefaultMonitoringPointId",
@@ -450,7 +455,7 @@
                     if (requiredDefaultCollectionMethod != null)
                     {
                         <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes:new {@class = "control-label col-md-2"})
+                            @Html.LabelFor(model => model.SelectedDefaultCollectionMethodId, htmlAttributes:new {@class = "control-label col-md-2 required"})
                             <div class="col-md-4">
                                 @Html.HiddenFor(model => model.SelectedDefaultCollectionMethodName)
                                 @Html.DropDownList(name:"SelectedDefaultCollectionMethodId",
@@ -467,7 +472,7 @@
                     if (requiredDefaultSampleType != null)
                     {
                         <div class="form-group">
-                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes:new {@class = "control-label col-md-2"})
+                            @Html.LabelFor(model => model.SelectedDefaultSampleTypeId, htmlAttributes:new {@class = "control-label col-md-2 required"})
                             <div class="col-md-4">
                                 @Html.HiddenFor(model => model.SelectedDefaultSampleTypeName)
                                 @Html.DropDownList(name:"SelectedDefaultSampleTypeId",
@@ -503,15 +508,6 @@
                                     });
                             });
                     </script>
-                    <div class="box-footer">
-                        <div class="form-group pull-right">
-                            <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
-                                                                                            SampleImportHelpers.GetBackRouteValues(model:Model))'">
-                                Back
-                            </a>
-                            <input class="btn btn-primary btn-sm" type="submit" value="Next" />
-                        </div>
-                    </div>
                 }
                 else
                 {
@@ -572,6 +568,17 @@
                     }
                 }
             </div>
+        @if (isStepSelectDataDefault) { 
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                    SampleImportHelpers.GetBackRouteValues(model:Model))'">
+                        Back
+                    </a>
+                    <input class="btn btn-primary btn-sm" type="submit" value="Next" />
+                </div>
+            </div>
+        }
         </section>
     }
 
@@ -762,16 +769,16 @@
                         }
                     </div>
                 </div>
-                <div class="box-footer">
-                    <div class="form-group pull-right">
-                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
-                                                                                        SampleImportHelpers.GetBackRouteValues(model:Model))#@(SampleImportViewModel.SampleImportStep.SelectDataDefault.ToString())'">
-                            Back
-                        </a>
-                        <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
-                            Import Another File
-                        </a>
-                    </div>
+            </div>
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry", routeValues:
+                                                                                    SampleImportHelpers.GetBackRouteValues(model:Model))#@(SampleImportViewModel.SampleImportStep.SelectDataDefault.ToString())'">
+                        Back
+                    </a>
+                    <a class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"SampleImport", controllerName:"Industry")'">
+                        Import Another File
+                    </a>
                 </div>
             </div>
         </section>
