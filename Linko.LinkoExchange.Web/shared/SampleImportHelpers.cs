@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Web.Routing;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 
 namespace Linko.LinkoExchange.Web.Shared
@@ -39,17 +41,6 @@ namespace Linko.LinkoExchange.Web.Shared
 			var importSummary = new ImportSummaryViewModel();
 			foreach (var sample in samples)
 			{
-				var sampleComplianceSummaries = samples.Select(i => i.SampleComplianceSummary).ToList(); 
-
-				importSummary.SampleComplianceSummary.BadConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.BadConcentrationComplianceCount);
-				importSummary.SampleComplianceSummary.BadMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.BadMassLoadingComplianceCount);
-
-				importSummary.SampleComplianceSummary.GoodConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.GoodConcentrationComplianceCount);
-				importSummary.SampleComplianceSummary.GoodMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.GoodMassLoadingComplianceCount);
-				
-				importSummary.SampleComplianceSummary.UnknownConcentrationComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownConcentrationComplianceCount);
-				importSummary.SampleComplianceSummary.UnknownMassLoadingComplianceCount = sampleComplianceSummaries.Sum(a => a.UnknownMassLoadingComplianceCount);
-
 				if (sample.ImportStatus == ImportStatus.Update)
 				{
 					importSummary.UpdateDraftSampleCont++;
@@ -61,26 +52,74 @@ namespace Linko.LinkoExchange.Web.Shared
 
 				foreach (var sampleResult in sample.SampleResults)
 				{
-					if (sampleResult.ImportStatus == ImportStatus.Update)
-					{
-						importSummary.UpdateSampleResultCount++;
-						if (!string.IsNullOrWhiteSpace(sampleResult.MassLoadingValue))
-						{
+                    switch (sampleResult.ImportStatus) {
+						case ImportStatus.Update:
 							importSummary.UpdateSampleResultCount++;
-						}
-					}
-					else if(sampleResult.ImportStatus == ImportStatus.New)
-					{
-						importSummary.NewSampleResultCount++;
-						if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
-						{
+							if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
+							{
+								importSummary.UpdateSampleResultCount++;
+							}
+							AggregateComplianceSummary(complianceSummary:importSummary.SampleComplianceSummary, sampleResult:sampleResult);
+                            break;
+						case ImportStatus.New:
 							importSummary.NewSampleResultCount++;
-						}
-                    }
+							if (!string.IsNullOrWhiteSpace(value:sampleResult.MassLoadingValue))
+							{
+								importSummary.NewSampleResultCount++;
+							}
+							AggregateComplianceSummary(complianceSummary:importSummary.SampleComplianceSummary, sampleResult: sampleResult);
+                            break;
+						case ImportStatus.ExistingUnchanged: break;
+						default: throw new ArgumentOutOfRangeException();
+					}
 				}
 			}
 
 			return importSummary;
+		}
+
+		private static void AggregateComplianceSummary(SampleComplianceSummaryViewModel complianceSummary, 
+													   SampleResultViewModel sampleResult)
+		{
+			ResultComplianceType concentrationResultCompliance;
+			if (!sampleResult.Value.IsNullOrWhiteSpace() && 
+			    Enum.TryParse(value:sampleResult.ConcentrationResultCompliance, result:out concentrationResultCompliance))
+			{
+				switch (concentrationResultCompliance)
+				{
+					case ResultComplianceType.Good:
+						complianceSummary.GoodConcentrationComplianceCount++;
+						break;
+					case ResultComplianceType.Bad:
+						complianceSummary.BadConcentrationComplianceCount++;
+						break;
+					case ResultComplianceType.Unknown:
+						complianceSummary.UnknownConcentrationComplianceCount++;
+						break;
+					default: throw new ArgumentOutOfRangeException();
+				}
+			}
+
+			ResultComplianceType massResultCompliance;
+			if (sampleResult.MassLoadingValue.IsNullOrWhiteSpace() || 
+			    !Enum.TryParse(value:sampleResult.MassResultCompliance, result:out massResultCompliance))
+			{
+				return;
+			}
+
+			switch (massResultCompliance)
+			{
+				case ResultComplianceType.Good:
+					complianceSummary.GoodMassLoadingComplianceCount++;
+					break;
+				case ResultComplianceType.Bad:
+					complianceSummary.BadMassLoadingComplianceCount++;
+					break;
+				case ResultComplianceType.Unknown:
+					complianceSummary.UnknownMassLoadingComplianceCount++;
+					break;
+				default: throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		public static SampleImportViewModel FromImportJobId(string importJobId)
