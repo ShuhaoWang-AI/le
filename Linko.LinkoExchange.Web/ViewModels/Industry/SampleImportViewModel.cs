@@ -208,18 +208,18 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [JsonIgnore]
 		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
 		[JsonIgnore]
-		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples were imported" : "Draft Sample was imported";
+		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples are imported" : "Draft Sample is imported";
 		[JsonIgnore]
-		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples will be imported" : "Draft Sample will be imported";
+		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples are ready to import" : "Draft Sample is ready to import";
         public int NewSampleResultCount { get; set; }
         public int UpdateSampleResultCount { get; set; }
 		public string UpdateSampleResultCountDescription => UpdateSampleResultCount > 1 ? "updates" : "update"; 
         [JsonIgnore]
         public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
 		[JsonIgnore]
-		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results were imported" : "Sample Result was imported";
+		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results are imported" : "Sample Result is imported";
         [JsonIgnore]
-		public string SampleResultCountPreviewDescription => SampleResultCount > 1 ? "Sample Results will be imported" : "Sample Result will be imported";
+		public string SampleResultCountPreviewDescription => SampleResultCount > 1 ? "Sample Results are ready to import" : "Sample Result is ready to import";
         public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; } 
 		#endregion
 	}
@@ -237,12 +237,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		[JsonIgnore]
         public int TotalBadComplianceCount => BadConcentrationComplianceCount + BadMassLoadingComplianceCount;
 		[JsonIgnore]
-		public string TotalBadComplianceDescription => string.Format(format:"{0} {1} not in compliance", 
+		public string TotalBadComplianceDescription => string.Format(format: "{0} ready to import {1} not in compliance", 
 		                                                             arg0:TotalBadComplianceCount,  
 																	 arg1:TotalBadComplianceCount > 1 ? " results are " : " result is");
 
 		[JsonIgnore]
-		public string AllResultsAreInCompliance => "All results are in compliance";
+		public string AllResultsAreInCompliance => "All ready to import results are in compliance";
 
 
         [JsonIgnore]
@@ -259,10 +259,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		[JsonIgnore]
 		public int TotalBadPercentage => 100 - TotalGoodPercentage;
         [JsonIgnore]
-        public string FinalComplianceDescription => string.Format(format:"{0} of {1} {2}", 
+        public string FinalComplianceDescription => string.Format(format: "{0} of {1} imported Sample {2} in compliance", 
                                                                   arg0:TotalGoodComplianceCount, 
                                                                   arg1:TotalComplianceCount, 
-                                                                  arg2: TotalGoodComplianceCount > 1 ? "Sample Results were in compliance" : "Sample Result was in compliance") ;
+                                                                  arg2: TotalGoodComplianceCount > 1 ? "Results are" : "Result is") ;
 
     }
 }
