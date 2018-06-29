@@ -55,7 +55,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Analysis Date & Time")]
         public DateTime? AnalysisDateTimeLocal { get; set; }
 
-        [Display(Name = "Calculate Loading")]
+		[Display(Name = "Analysis Date & Time")]
+		public string AnalysisDateTimeLocalDisplayText => AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt") ?? "";
+
+	    [Display(Name = "Calculate Loading")]
         public bool IsCalcMassLoading { get; set; }
 
         [ScaffoldColumn(scaffold:false)]

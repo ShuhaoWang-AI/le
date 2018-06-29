@@ -855,91 +855,94 @@
                 </div>
                 <div style="padding: 20px 0;">
                     @(Html.Kendo().Grid(dataSource:Model.Samples)
-                          .Name(componentName:"gridImportSamplesPreview")
-                          .Columns(columns =>
-                                   {
-                                       columns.Bound(c => c.Status)
-                                              .ClientTemplate(value:
-                                                  "# if (Status == 'New') { #" +
-                                                  "<i class='fa fa-check text-blue' " +
-                                                  "# } else { #" +
-                                                  "<i class='fa fa-check text-yellow' " +
-                                                  "# } #" +
-                                                  "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= Status #' ></i>"
-                                           )
-                                              .HtmlAttributes(attributes:new
-                                                                         {
-                                                                             align = "center"
-                                                                         })
-                                              .Title(text:" ")
-                                              .Filterable(f => f.Enabled(value:false))
-                                              .Width(pixelWidth:35);
+						  .Name(componentName:"gridImportSamplesPreview")
+						  .Columns(columns =>
+						  {
+							  columns.Bound(c => c.Status)
+									 .ClientTemplate(value:
+										 "# if (Status == 'New') { #" +
+										 "<i class='fa fa-check text-blue' " +
+										 "# } else { #" +
+										 "<i class='fa fa-check text-yellow' " +
+										 "# } #" +
+										 "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= Status #' ></i>"
+								  )
+									 .HtmlAttributes(attributes:new
+									 {
+										 align = "center"
+									 })
+									 .Title(text:" ")
+									 .Filterable(f => f.Enabled(value:false))
+									 .Width(pixelWidth:35);
 
-                                       columns.Bound(c => c.SampleOverallCompliance)
-                                              .ClientTemplate(value:
-                                                  "# if (SampleOverallCompliance == 'Bad') { #" +
-                                                  "<i class='fa fa-lg fa-exclamation-circle text-red' " +
-                                                  "# } else { #" +
-                                                  "<i class='fa fa-lg fa-check-circle text-green' " +
-                                                  "# } #" +
-                                                  "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
-                                           )
-                                              .HtmlAttributes(attributes:new
-                                                                         {
-                                                                             align = "center"
-                                                                         })
-                                              .Title(text:" ")
-                                              .Filterable(f => f.Enabled(value:false))
-                                              .Width(pixelWidth:35);
-                                       columns.Bound(c => c.MonitoringPointName)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.CtsEventTypeName)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.CollectionMethodName)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                       columns.Bound(c => c.StartDateTimeLocal)
-                                              .ClientTemplate(value:"#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                              .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                       columns.Bound(c => c.EndDateTimeLocal)
-                                              .ClientTemplate(value:"#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
-                                              .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                       columns.Bound(c => c.LabSampleIdentifier)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
+							  columns.Bound(c => c.SampleOverallCompliance)
+									 .ClientTemplate(value:
+										 "# if (SampleOverallCompliance == 'Bad') { #" +
+										 "<i class='fa fa-lg fa-exclamation-circle text-red' " +
+										 "# } else { #" +
+										 "<i class='fa fa-lg fa-check-circle text-green' " +
+										 "# } #" +
+										 "aria-hidden='true' data-placement='top' data-toggle='tooltip' title='#= SampleOverallComplianceComment #' />"
+								  )
+									 .HtmlAttributes(attributes:new
+									 {
+										 align = "center"
+									 })
+									 .Title(text:" ")
+									 .Filterable(f => f.Enabled(value:false))
+									 .Width(pixelWidth:35);
+							  columns.Bound(c => c.MonitoringPointName)
+									 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+																			 .SuggestionOperator(filterType:FilterType.Contains)));
+							  columns.Bound(c => c.CtsEventTypeName)
+									 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+																			 .SuggestionOperator(filterType:FilterType.Contains)));
+							  columns.Bound(c => c.CollectionMethodName)
+									 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+																			 .SuggestionOperator(filterType:FilterType.Contains)));
 
-                                       columns.Bound(c => c.FlowValueAndFlow)
-                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                   })
-                          .Pageable(pageable => pageable
-                                                    .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
-                                                    .Refresh(enabled:true)
-                                                    .Input(enabled:true)
-                                                    .Numeric(enabled:false)
-                          )
-                          .ClientDetailTemplateId(id:"template")
-                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                          .Resizable(resizable => resizable.Columns(value:true))
-                          .Scrollable(s => s.Height(value:"auto"))
-                          .NoRecords(text:"No sample exists.")
-                          .Events(e => { e.DetailInit(handler:"detailInit"); })
-                          .DataSource(dataSource => dataSource
-                                                        .Ajax()
-                                                        .PageSize(pageSize:15)
-                                                        .Sort(sort =>
-                                                              {
-                                                                  sort.Add(memberName:"Status").Ascending();
-                                                                  sort.Add(memberName:"StartDateTimeLocal").Ascending();
-                                                                  sort.Add(memberName:"MonitoringPointName").Ascending();
-                                                                  sort.Add(memberName:"CollectionMethodName").Ascending();
-                                                              })
+							  columns.Bound(c => c.StartDateTimeLocal).Format("{0:MM/dd/yyyy hh:mm tt}")
+									 .ClientTemplate(value: "#= StartDateTimeLocalDisplayText #")
+									 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
 
-                                                        //.Group(g => g.Add(c => c.Status))
-                                                        .ServerOperation(enabled:false)
-                          ))
+							  columns.Bound(c => c.EndDateTimeLocal).Format("{0:MM/dd/yyyy hh:mm tt}")
+									 .ClientTemplate(value: "#= EndDateTimeLocalDisplayText #")
+									 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+
+							  columns.Bound(c => c.LabSampleIdentifier)
+									 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+																			 .SuggestionOperator(filterType:FilterType.Contains)));
+
+							  columns.Bound(c => c.FlowValueAndFlow)
+									 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+																			 .SuggestionOperator(filterType:FilterType.Contains)));
+						  })
+						  .Pageable(pageable => pageable
+													.PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+													.Refresh(enabled:true)
+													.Input(enabled:true)
+													.Numeric(enabled:false)
+						  )
+						  .ClientDetailTemplateId(id:"template")
+						  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+						  .Resizable(resizable => resizable.Columns(value:true))
+						  .Scrollable(s => s.Height(value:"auto"))
+						  .NoRecords(text:"No sample exists.")
+						  .Events(e => { e.DetailInit(handler:"detailInit"); })
+						  .DataSource(dataSource => dataSource
+														.Ajax()
+														.PageSize(pageSize:15)
+														.Sort(sort =>
+														{
+															sort.Add(memberName:"Status").Ascending();
+															sort.Add(memberName: "StartDateTimeLocal").Ascending();
+															sort.Add(memberName:"MonitoringPointName").Ascending();
+															sort.Add(memberName:"CollectionMethodName").Ascending();
+														})
+
+														//.Group(g => g.Add(c => c.Status))
+														.ServerOperation(enabled:false)
+						  ))
 
                     <script>
                         function detailInit(e) {
@@ -948,10 +951,11 @@
                             var gridId = "gridSampleResult" + sampleIdentifier;
                             $("#gridSampleResult").attr("id", gridId);
 
-                            var sampleResult = e.data.SampleResults.map(function(item) {
-                                item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
+                            var sampleResult = e.data.SampleResults.map(function(item) { 
+                            	item.AnalysisDateTimeLocal = window.kendo.toString(window.kendo.parseDate(item.AnalysisDateTimeLocal, "yyyy-MM-dd hh:mm:ss"));
                                 return item;
                             });
+                            console.log(sampleResult);
 
                             sampleResult = sampleResult.sort(function(a, b) {
                                 return a.Status > b.Status;
@@ -1072,64 +1076,65 @@
 <script id="template" type="text/kendo-tmpl">
 
     @(Html.Kendo().Grid<SampleResultViewModel>()
-          .Name(componentName:"gridSampleResult")
-          .Columns(columns =>
-                   {
-                       columns.Bound(c => c.Status)
-                              .ClientTemplate(value:
-                                  "\\# if (Status == 'New') { \\#" +
-                                  "<i class='fa fa-check text-blue' data-placement='top' data-toggle='tooltip' title='New'></i>" +
-                                  "\\# } else if (Status == 'Update') { \\#" +
-                                  "<i class='fa fa-check text-yellow' data-placement='top' data-toggle='tooltip' title='Update'></i>" +
-                                  "\\# } \\#"
-                           )
-                              .HtmlAttributes(attributes:new
-                                                         {
-                                                             align = "center"
-                                                         })
-                              .Title(text:" ")
-                              .Filterable(f => f.Enabled(value:false))
-                              .Width(pixelWidth:40);
-                       columns.Bound(c => c.ParameterName);
-                       columns.Bound(c => c.DisplayValue)
-                              .HtmlAttributes(attributes:new {align = "right"})
-                              .ClientTemplate(value:"<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'> \\#=DisplayValue\\#</span> &nbsp;&nbsp;<i "
-                                                    + "\\#if(ConcentrationResultCompliance==\"Bad\") { \\#"
-                                                    + "class='fa fa-lg fa-exclamation-circle text-red' "
-                                                    + "\\# } else {\\#"
-                                                    + "class='fa fa-lg fa-circle fg-transparent' "
-                                                    + "\\# } \\#"
-                                                    + "aria-hidden='true' data-placement='top' "
-                                                    + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
+		  .Name(componentName:"gridSampleResult")
+		  .Columns(columns =>
+		  {
+			  columns.Bound(c => c.Status)
+					 .ClientTemplate(value:
+						 "\\# if (Status == 'New') { \\#" +
+						 "<i class='fa fa-check text-blue' data-placement='top' data-toggle='tooltip' title='New'></i>" +
+						 "\\# } else if (Status == 'Update') { \\#" +
+						 "<i class='fa fa-check text-yellow' data-placement='top' data-toggle='tooltip' title='Update'></i>" +
+						 "\\# } \\#"
+				  )
+					 .HtmlAttributes(attributes:new
+					 {
+						 align = "center"
+					 })
+					 .Title(text:" ")
+					 .Filterable(f => f.Enabled(value:false))
+					 .Width(pixelWidth:40);
+			  columns.Bound(c => c.ParameterName);
+			  columns.Bound(c => c.DisplayValue)
+					 .HtmlAttributes(attributes:new {align = "right"})
+					 .ClientTemplate(value:"<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'> \\#=DisplayValue\\#</span> &nbsp;&nbsp;<i "
+										   + "\\#if(ConcentrationResultCompliance==\"Bad\") { \\#"
+										   + "class='fa fa-lg fa-exclamation-circle text-red' "
+										   + "\\# } else {\\#"
+										   + "class='fa fa-lg fa-circle fg-transparent' "
+										   + "\\# } \\#"
+										   + "aria-hidden='true' data-placement='top' "
+										   + "data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'></i>");
 
-                       columns.Bound(c => c.DisplayMassLoadingValue)
-                              .HtmlAttributes(attributes:new {align = "right"})
-                              .ClientTemplate(value:
-                                  "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
-                                  + "\\# } else { \\#"
-                                  + "<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'>\\#=DisplayMassLoadingValue\\#</span>&nbsp;&nbsp;<i "
-                                  + "\\#if(MassResultCompliance==\"Bad\") { \\#"
-                                  + "class='fa fa-lg fa-exclamation-circle text-red' "
-                                  + "\\# } else {\\#"
-                                  + "class='fa fa-lg fa-circle fg-transparent' "
-                                  + "\\# } \\#"
-                                  + "aria-hidden='true' data-placement='top' "
-                                  + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
-                                  + "\\# } \\#");
+			  columns.Bound(c => c.DisplayMassLoadingValue)
+					 .HtmlAttributes(attributes:new {align = "right"})
+					 .ClientTemplate(value:
+						 "\\#if(MassLoadingValue==\"\" || MassLoadingValue== null ) { \\#"
+						 + "\\# } else { \\#"
+						 + "<span  data-placement='top' data-toggle='tooltip' title='\\#=ConcentrationResultComplianceComment\\#'>\\#=DisplayMassLoadingValue\\#</span>&nbsp;&nbsp;<i "
+						 + "\\#if(MassResultCompliance==\"Bad\") { \\#"
+						 + "class='fa fa-lg fa-exclamation-circle text-red' "
+						 + "\\# } else {\\#"
+						 + "class='fa fa-lg fa-circle fg-transparent' "
+						 + "\\# } \\#"
+						 + "aria-hidden='true' data-placement='top' "
+						 + "data-toggle='tooltip' title='\\#=MassResultComplianceComment\\#'></i>"
+						 + "\\# } \\#");
 
-                       columns.Bound(c => c.AnalysisMethod);
-                       columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
-                       columns.Bound(c => c.AnalysisDateTimeLocal)
-                              .ClientTemplate(value:"\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.parseDate(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
-                   })
-          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-          .Scrollable(s => s.Height(value:"auto"))
-          .NoRecords(text:"No sample result exists.")
-          .DataSource(dataSource => dataSource
-                                        .Ajax()
-                                        .ServerOperation(enabled:false)
-          )
-          .ToClientTemplate()
+			  columns.Bound(c => c.AnalysisMethod);
+			  columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
+			  columns.Bound(c => c.AnalysisDateTimeLocal).Format("{0:MM/dd/yyyy hh:mm tt}")
+					 .ClientTemplate(value: "\\#= AnalysisDateTimeLocalDisplayText \\#")
+					 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+		  })
+		  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+		  .Scrollable(s => s.Height(value:"auto"))
+		  .NoRecords(text:"No sample result exists.")
+		  .DataSource(dataSource => dataSource
+										.Ajax()
+										.ServerOperation(enabled:false)
+		  )
+		  .ToClientTemplate()
           )
 
 </script>

@@ -7,7 +7,7 @@ using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Web.ViewModels.Industry;
+using Linko.LinkoExchange.Web.ViewModels.Industry; 
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -49,10 +49,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Start Date")]
         public DateTime StartDateTimeLocal { get; set; }
 
-        [Display(Name = "End Date")]
+	    [Display(Name = "Start Date")]
+	    public string StartDateTimeLocalDisplayText => StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt");
+
+	    [Display(Name = "End Date")]
         public DateTime EndDateTimeLocal { get; set; }
 
-        [Display(Name = "Is Ready to Report")]
+		[Display(Name = "End Date")]
+		public string EndDateTimeLocalDisplayText => EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt");
+
+	    [Display(Name = "Is Ready to Report")]
         public bool IsReadyToReport { get; set; }
 
         [Display(Name = "Status")]
@@ -143,7 +149,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
 		public string Identifier { get; set; }
 		public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; }
-		#endregion
+
+	    #endregion
 	}
 
 
