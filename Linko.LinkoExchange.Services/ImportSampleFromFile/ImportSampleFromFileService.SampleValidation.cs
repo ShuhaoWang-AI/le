@@ -107,6 +107,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					{
 						if (validMassFlowUnitIds.Contains(importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId))
 						{
+							importingSampleResult.EffectiveUnitResult = result;
 							importingSampleResult.EffectiveUnit = new UnitDto
 							                                      {
 								                                      UnitId = importingSampleResult.ColumnMap[SampleImportColumnName.ResultUnit].TranslatedValueId,
@@ -522,6 +523,9 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			foreach (var importingSample in groupedSampleWrappers)
 			{
+				// check if start date, end date 
+				ValidateParametersDateTime(importSampleWrapper: importingSample, validationResult: validationResult); 
+
 				// check row duplication for each importSampleWrapper
 				ValidateDataDuplicatedParameters(importSampleWrapper:importingSample, validationResult:validationResult);
 
@@ -533,6 +537,30 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			}
 
 			return validationResult;
+		}
+
+		private void ValidateParametersDateTime(ImportSampleWrapper importSampleWrapper, ImportSampleFromFileValidationResultDto validationResult)
+		{
+			var startDateTime = DateTime.Parse(importSampleWrapper.SampleStartDateTime.OriginalValueString); 
+			var endDateTime = DateTime.Parse(importSampleWrapper.SampleEndDateTime.OriginalValueString);
+			if (startDateTime > endDateTime)
+			{
+				foreach (var importRowObjectForGroupBySample in importSampleWrapper.SampleResults)
+				{
+					AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.EndDateMustBeAfterStartDate, rowNumber: importRowObjectForGroupBySample.RowNumber);
+				} 
+			}
+
+			var orgRegProgramId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId)); 
+			// Determine if start date time or end date time are future based on authority's settings
+			var authorityNow = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(DateTime.UtcNow, orgRegProgramId);
+			if (startDateTime > authorityNow || endDateTime > authorityNow)
+			{
+				foreach (var importRowObjectForGroupBySample in importSampleWrapper.SampleResults)
+				{
+					AddValidationError(validationResult: validationResult, errorMessage: ErrorConstants.SampleImport.DataValidation.SampleDatesCannotBeFutureDates, rowNumber: importRowObjectForGroupBySample.RowNumber);
+				}
+			}
 		}
 
 		private void ValidateDataDuplicatedParameters(ImportSampleWrapper importSampleWrapper, ImportSampleFromFileValidationResultDto validationResult)

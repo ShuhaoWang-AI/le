@@ -68,7 +68,10 @@ namespace Linko.LinkoExchange.Services.Base
                 public const string TranslatedUnitDoesNotSupportUnitConversion =
                     "Invalid unit translation. Cannot convert {0} to {1}.  Check the unit translation selected or contact your Authority.";
 
-                #endregion
+	            public const string EndDateMustBeAfterStartDate = "End date must be after Start date.";
+	            public const string SampleDatesCannotBeFutureDates = "Sample dates cannot be future dates";
+
+	            #endregion
             }
         }
 
