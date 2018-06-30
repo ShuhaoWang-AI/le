@@ -208,7 +208,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [JsonIgnore]
 		public int SampleCount => NewDraftSampleCount + UpdateDraftSampleCont;
 		[JsonIgnore]
-		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples were imported" : "Draft Sample was imported";
+		public string SampleCountImportDescription => SampleCount > 1 ? "Draft Samples are imported" : "Draft Sample is imported";
 		[JsonIgnore]
 		public string SampleCountPreviewDescription => SampleCount > 1 ? "Draft Samples are ready to import" : "Draft Sample is ready to import";
         public int NewSampleResultCount { get; set; }
@@ -217,7 +217,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         [JsonIgnore]
         public int SampleResultCount => NewSampleResultCount + UpdateSampleResultCount;
 		[JsonIgnore]
-		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results were imported" : "Sample Result was imported";
+		public string SampleResultCountImportDescription => SampleResultCount > 1 ? "Sample Results are imported" : "Sample Result is imported";
         [JsonIgnore]
 		public string SampleResultCountPreviewDescription => SampleResultCount > 1 ? "Sample Results are ready to import" : "Sample Result is ready to import";
         public SampleComplianceSummaryViewModel SampleComplianceSummary { get; set; } 
@@ -262,7 +262,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public string FinalComplianceDescription => string.Format(format: "{0} of {1} imported Sample {2} in compliance", 
                                                                   arg0:TotalGoodComplianceCount, 
                                                                   arg1:TotalComplianceCount, 
-                                                                  arg2: TotalGoodComplianceCount > 1 ? "Results were" : "Result was") ;
+                                                                  arg2: TotalGoodComplianceCount > 1 ? "Results are" : "Result is") ;
 
     }
 }

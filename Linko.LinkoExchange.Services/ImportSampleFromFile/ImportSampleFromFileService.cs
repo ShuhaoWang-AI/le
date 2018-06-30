@@ -1043,7 +1043,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                             }
                             else
                             {
-                                _logger.Error(message:$"#NewSampleImportFileColumn - Column header '{resultAsString}' is not belongs the authority's file template."
+                                _logger.Warn(message:$"#NewSampleImportFileColumn - Column header '{resultAsString}' is not belongs the authority's file template."
                                                       + $" Current OrgRegProgramId:{currentOrgRegProgramId}. DataScource: {sampleImportDto.DataSource.Name} ");
                             }
                         }
