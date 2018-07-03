@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			// Create a list of validate importSampleWrappers, and return the validation results
 			ImportSampleFromFileValidationResultDto validationResult;
 
-			using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"DoDataValidation"))
+			using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"DoDataValidation"))
 			{
 				List<ImportSampleWrapper> importingSamples;
 				validationResult = GetValidImportingSamples(sampleImportDto:sampleImportDto, groupedSampleWrappers:out importingSamples);

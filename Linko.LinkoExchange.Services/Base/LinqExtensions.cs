@@ -4,24 +4,23 @@ using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Base
 {
-
-    public static partial class LinqExtensions
+    public static class LinqExtensions
     {
         public static IEnumerable<string> ExceptStringsCaseInsensitive
             (this IEnumerable<string> source, IEnumerable<string> value)
         {
-            return source.Except(second: value, comparer:new StringCaseInsensitiveEqualityComparer());
+            return source.Except(second:value, comparer:new StringCaseInsensitiveEqualityComparer());
         }
 
         public static IEnumerable<string> IntersectStringsCaseInsensitive
             (this IEnumerable<string> source, IEnumerable<string> value)
         {
-            return source.Intersect(second: value, comparer: new StringCaseInsensitiveEqualityComparer());
+            return source.Intersect(second:value, comparer:new StringCaseInsensitiveEqualityComparer());
         }
 
         public static bool CaseInsensitiveContains(this IEnumerable<string> source, string value)
         {
-            return source.Contains(value, new StringCaseInsensitiveEqualityComparer());
+            return source.Contains(value:value, comparer:new StringCaseInsensitiveEqualityComparer());
         }
 
         public static Dictionary<string, TElement> ToCaseInsensitiveDictionary<TSource, TElement>
@@ -51,7 +50,7 @@ namespace Linko.LinkoExchange.Services.Base
         /// <inheritdoc />
         public int GetHashCode(string value)
         {
-            return StringComparer.OrdinalIgnoreCase.GetHashCode(obj: value);
+            return StringComparer.OrdinalIgnoreCase.GetHashCode(obj:value);
         }
 
         #endregion

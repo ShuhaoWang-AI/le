@@ -16,9 +16,9 @@ namespace Linko.LinkoExchange.Services.Dto
 
         #region public properties
 
-	    public bool Success => !Errors.Any();
+        public bool Success => !Errors.Any();
 
-	    /// <summary>
+        /// <summary>
         /// If success is equal to false then "Errors" will have value, otherwise empty string
         /// </summary>
         public List<ErrorWithRowNumberDto> Errors { get; set; }

@@ -227,7 +227,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <inheritdoc />
         public ImportTempFileDto GetImportTempFileById(int importTempFileId)
         {
-            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"importTempFileId={importTempFileId}"))
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"importTempFileId={importTempFileId}"))
             {
                 if (!CanUserExecuteApi(id:importTempFileId))
                 {
@@ -255,7 +255,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         public int CreateImportTempFile(ImportTempFileDto importTempFileDto)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"importTempFileId={importTempFileDto.ImportTempFileId?.ToString() ?? "null"}"))
+                                    description:$"importTempFileId={importTempFileDto.ImportTempFileId?.ToString() ?? "null"}"))
             {
                 var maxFileSize = _fileStoreService.GetMaxFileSize();
                 if (importTempFileDto.RawFile == null || importTempFileDto.RawFile.Length < 1)
@@ -324,7 +324,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
             }
 
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"importTempFileId={sampleImportDto.TempFile.ImportTempFileId}"))
+                                    description:$"importTempFileId={sampleImportDto.TempFile.ImportTempFileId}"))
             {
                 var validationResult = new ImportSampleFromFileValidationResultDto();
 
@@ -391,7 +391,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         public List<ImportDataTranslationDto> PopulateExistingTranslationDataAndReturnMissingTranslationSet(SampleImportDto sampleImportDto, int dataSourceId)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:sampleImportDto.ImportId.ToString()))
+                                    description:sampleImportDto.ImportId.ToString()))
             {
                 //TODO: Should add audit log events to indicate system deleted they are no longer available data translations
                 _dataSourceService.DeleteInvalidDataSourceTranslations(dataSourceId:dataSourceId);
@@ -717,7 +717,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         /// <inheritdoc />
         public void RemoveImportTempFile(int importTempFileId)
         {
-            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"importTempFileId={importTempFileId}"))
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"importTempFileId={importTempFileId}"))
             {
                 if (!CanUserExecuteApi(id:importTempFileId))
                 {
@@ -741,7 +741,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
         private Workbook GetWorkbook(ImportTempFileDto importTempFileDto)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"importTempFileId={importTempFileDto?.ImportTempFileId?.ToString() ?? "null"}"))
+                                    description:$"importTempFileId={importTempFileDto?.ImportTempFileId?.ToString() ?? "null"}"))
             {
                 Workbook workbook = null;
 

@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Services.Unit
         /// <inheritdoc />
         public UnitDto GetUnit(int unitId)
         {
-            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"unitId={unitId}"))
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"unitId={unitId}"))
             {
                 var currentOrgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var authOrganizationId = _orgService.GetAuthority(orgRegProgramId:currentOrgRegProgramId).OrganizationId;
@@ -349,7 +349,7 @@ namespace Linko.LinkoExchange.Services.Unit
         public double? ConvertResultToTargetUnit(double? result, Core.Domain.Unit currentAuthorityUnit, Core.Domain.Unit targetAuthorityUnit)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
+                                    description:$"current unitId:{currentAuthorityUnit}, target unitId:{targetAuthorityUnit}"))
             {
                 return ConvertResultToTargetUnit(result:result, currentAuthorityUnit:_mapHelper.ToDto(fromDomainObject:currentAuthorityUnit),
                                                  targetAuthorityUnit:_mapHelper.ToDto(fromDomainObject:targetAuthorityUnit));
@@ -360,7 +360,7 @@ namespace Linko.LinkoExchange.Services.Unit
         public double? ConvertResultToTargetUnit(double? result, UnitDto currentAuthorityUnit, UnitDto targetAuthorityUnit)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"current unit:{currentAuthorityUnit?.UnitId.ToString() ?? "null"}, target unit:{targetAuthorityUnit?.UnitId.ToString() ?? "null"}"))
+                                    description:$"current unit:{currentAuthorityUnit?.UnitId.ToString() ?? "null"}, target unit:{targetAuthorityUnit?.UnitId.ToString() ?? "null"}"))
             {
                 var currentSystemUnit = currentAuthorityUnit?.SystemUnit;
                 var targetSystemUnit = targetAuthorityUnit?.SystemUnit;
@@ -389,7 +389,7 @@ namespace Linko.LinkoExchange.Services.Unit
                                                   double targetUnitAdditiveFactor)
         {
             using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(),
-                                    descripition:$"currentUnitConversionFactor:{currentUnitConversionFactor}, "
+                                    description:$"currentUnitConversionFactor:{currentUnitConversionFactor}, "
                                                  + $"currentUnitAdditiveFactor:{currentUnitAdditiveFactor}, "
                                                  + $"targetUnitConversionFactor:{targetUnitConversionFactor}, "
                                                  + $"targetUnitAdditiveFactor:{targetUnitAdditiveFactor}")

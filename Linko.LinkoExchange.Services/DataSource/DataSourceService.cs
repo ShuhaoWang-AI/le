@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Services.DataSource
         public int SaveDataSource(DataSourceDto dataSourceDto)
         {
             var dataSourceIdString = dataSourceDto.DataSourceId?.ToString() ?? "null";
-            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"dataSourceId={dataSourceIdString}"))
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"dataSourceId={dataSourceIdString}"))
             {
                 var currentOrgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                 var currentUserProfileId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.UserProfileId));
@@ -131,7 +131,7 @@ namespace Linko.LinkoExchange.Services.DataSource
 
         public void DeleteDataSource(int dataSourceId)
         {
-            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), descripition:$"dataSourceId={dataSourceId}"))
+            using (new MethodLogger(logger:_logger, methodBase:MethodBase.GetCurrentMethod(), description:$"dataSourceId={dataSourceId}"))
             {
                 using (_dbContext.BeginTransactionScope(from:MethodBase.GetCurrentMethod()))
                 {

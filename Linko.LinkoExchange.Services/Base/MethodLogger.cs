@@ -10,12 +10,12 @@ namespace Linko.LinkoExchange.Services.Base
         private readonly ILogger _logger;
         private readonly string _methodName;
 
-        public MethodLogger(ILogger logger, MethodBase methodBase, string descripition = "")
+        public MethodLogger(ILogger logger, MethodBase methodBase, string description = "")
         {
             _logger = logger;
             _methodName = methodBase.DeclaringType?.Name + "." + methodBase.Name;
 
-            _logger.Info(message: $"Start: {_methodName}. {descripition}");
+            _logger.Info(message: $"Start: {_methodName}. {description}");
         }
 
         public void Dispose()
