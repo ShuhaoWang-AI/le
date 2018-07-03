@@ -7,6 +7,7 @@ using System.Text;
 using System.Web.Routing;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Base;
 using Linko.LinkoExchange.Services.ImportSampleFromFile;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -99,6 +100,10 @@ namespace Linko.LinkoExchange.Web.Shared
 					default: throw new ArgumentOutOfRangeException();
 				}
 			}
+			else if (sampleResult.Value.IsNullOrWhiteSpace() && new[] {"ND", "NF"}.CaseInsensitiveContains(value:sampleResult.Qualifier))
+			{
+				complianceSummary.GoodConcentrationComplianceCount++;
+            }
 
 			ResultComplianceType massResultCompliance;
 			if (sampleResult.MassLoadingValue.IsNullOrWhiteSpace() || 
