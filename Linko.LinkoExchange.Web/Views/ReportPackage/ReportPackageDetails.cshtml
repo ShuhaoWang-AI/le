@@ -415,6 +415,10 @@
                                   .NoRecords(text:"No sample result exists.")
                                   .DataSource(dataSource => dataSource
                                                                 .Ajax()
+                                                                .Sort(sort =>
+                                                                      {
+                                                                          sort.Add(memberName: "ParameterName").Ascending();
+                                                                      })
                                                                 .ServerOperation(enabled:true)
                                                                 .Read(read => read.Action(actionName:"SampleResults_Read", controllerName:"ReportPackage", routeValues:new
                                                                 {

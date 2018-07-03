@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using FluentValidation;
 using FluentValidation.Attributes;
+using Linko.LinkoExchange.Services.Base;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -27,18 +29,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string Value { get; set; }
 
 	    [Display(Name = "Result")]
-	    public string DisplayValue
-	    {
-		    get
-		    {
-			    if (!string.IsNullOrWhiteSpace(Qualifier) && (Qualifier.Equals("ND", StringComparison.OrdinalIgnoreCase) || Qualifier.Equals("NF", StringComparison.OrdinalIgnoreCase)))
-			    {
-				    return $"{Qualifier}";
-			    }
+	    public string DisplayValue => GetDisplayValue(qualifier:Qualifier, value:Value, unit:UnitName);
 
-				return $"{Qualifier} {Value} {UnitName}";
-			}
-	    }
+	    private static string GetDisplayValue(string qualifier, string value, string unit)
+	    {
+		    if (!string.IsNullOrWhiteSpace(value: qualifier) && new[] { "ND", "NF" }.ToList().CaseInsensitiveContains(value: qualifier))
+		    {
+			    return $"{qualifier}";
+		    }
+
+		    return string.IsNullOrWhiteSpace(value: value) ? "" : $"{qualifier} {value} {unit}";
+        }
 
 	    [Display(Name = "Unit")]
         public int UnitId { get; set; }
@@ -74,18 +75,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string MassLoadingUnitName { get; set; }
 
 	    [Display(Name = "Mass Loading Result")]
-	    public string DisplayMassLoadingValue
-	    {
-		    get
-		    {
-			    if (!string.IsNullOrWhiteSpace(MassLoadingQualifier) && (MassLoadingQualifier.Equals("ND", StringComparison.OrdinalIgnoreCase) || MassLoadingQualifier.Equals("NF", StringComparison.OrdinalIgnoreCase)))
-			    {
-				     return $"{MassLoadingQualifier}";
-			    }
-
-			    return $"{ MassLoadingQualifier} { MassLoadingValue} { MassLoadingUnitName}";
-		    }
-	    }
+	    public string DisplayMassLoadingValue => GetDisplayValue(qualifier:MassLoadingQualifier, value:MassLoadingValue, unit:MassLoadingUnitName);
 
 		public string ConcentrationResultCompliance { get; set; }
         public string ConcentrationResultComplianceComment { get; set; }

@@ -325,26 +325,30 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 			{
 				var importingSampleResults = importingSample.Sample.SampleResults.ToList(); 
 				// Sample results are in an existing draft sample, then update that draft
-				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:existingDraftSamples, searchFor:importingSample.Sample);
-				if (drftSamplesToUpdate.Any())
+				var draftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:existingDraftSamples, searchFor:importingSample.Sample);
+				if (draftSamplesToUpdate.Any())
 				{
 					var importingSampleResultParameterIds = importingSampleResults.Select(k => k.ParameterId);
 
 					//Update all the drafts
-					foreach (var draftSample in drftSamplesToUpdate)
+					foreach (var draftSample in draftSamplesToUpdate)
 					{
 						// Parameters only exist in existing draft. 
-						var draftParameters = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
-						var draftSampleParameterIds = draftSample.SampleResults.Select(i => i.ParameterId).ToList(); 
+						var existingResultsOtherFromImport = draftSample.SampleResults.Where(i => !importingSampleResultParameterIds.Contains(value:i.ParameterId)).ToList();
+						var draftSampleParameterIds = draftSample.SampleResults.Select(i => i.ParameterId).ToList();
 
-						// Mark sample results that only exist in existing draft as "Existing and Unchanged"
-						// If there is no flow in importing file,
-						if (importingSample.FlowRow == null)
+                        // Mark sample results that only exist in existing draft as "Existing and Unchanged"
+                        // If there is no flow in importing file,
+						foreach (var existingResultOtherFromImport in existingResultsOtherFromImport)
 						{
-							foreach (var parameter in draftParameters)
+                            if (importingSample.FlowRow == null)
 							{
-								parameter.ExistingUnchanged = true;
+								existingResultOtherFromImport.ExistingUnchanged = true;
 							}
+							else if (!existingResultOtherFromImport.Value.HasValue)
+							{
+							 	existingResultOtherFromImport.ExistingUnchanged = true;
+                            }
 						}
 
 						var commonParameters = importingSampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
@@ -356,7 +360,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 						}
 
 						var resultSamples = importingSampleResults.ToList();
-						resultSamples.AddRange(collection:draftParameters);
+						resultSamples.AddRange(collection:existingResultsOtherFromImport);
 
 						draftSample.SampleResults = resultSamples;
 
@@ -399,7 +403,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 						}
 					}
 
-					sampleDtos.AddRange(collection:drftSamplesToUpdate);
+					sampleDtos.AddRange(collection:draftSamplesToUpdate);
 				}
 				else // this sample is a new sample
 				{
@@ -486,7 +490,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 		private void CreateMassLoadingSampleResult(FlowRow importFlowRow, SampleResultDto sampleResultDto, SampleDto sampleDto, UnitDto massLoadingUnitDto)
 		{
-			if (importFlowRow == null)
+			if (importFlowRow == null || !sampleResultDto.Value.HasValue)
 			{
 				return;
 			}
