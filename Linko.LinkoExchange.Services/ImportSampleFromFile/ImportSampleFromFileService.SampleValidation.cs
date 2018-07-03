@@ -495,6 +495,16 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				return;
 			}
 
+			if (new[] {"ND", "NF"}.ToList().CaseInsensitiveContains(sampleResultDto.Qualifier))
+			{
+				sampleResultDto.IsCalcMassLoading = true;
+				sampleResultDto.Value = null;
+				sampleResultDto.EnteredValue = "";
+                sampleResultDto.MassLoadingValue = null;
+				sampleResultDto.MassLoadingQualifier = null;
+				return;
+			}
+
 			var massLoadingBaseUnit = "mgd";
 			var resultBaseUnit = "mg/l";
 
