@@ -323,11 +323,12 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 			foreach (var importingSample in importingSamples)
 			{
+				var importingSampleResults = importingSample.Sample.SampleResults.ToList(); 
 				// Sample results are in an existing draft sample, then update that draft
 				var drftSamplesToUpdate = SearchSamplesInCategorySamples(searchIn:existingDraftSamples, searchFor:importingSample.Sample);
 				if (drftSamplesToUpdate.Any())
 				{
-					var importingSampleResultParameterIds = importingSample.Sample.SampleResults.Select(k => k.ParameterId);
+					var importingSampleResultParameterIds = importingSampleResults.Select(k => k.ParameterId);
 
 					//Update all the drafts
 					foreach (var draftSample in drftSamplesToUpdate)
@@ -346,7 +347,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							}
 						}
 
-						var commonParameters = importingSample.Sample.SampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
+						var commonParameters = importingSampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
 						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.SampleResultId);
 
 						foreach (var parameter in commonParameters)
@@ -354,7 +355,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							parameter.SampleResultId = draftSampleResultDict[key:parameter.ParameterId];
 						}
 
-						var resultSamples = importingSample.Sample.SampleResults.ToList();
+						var resultSamples = importingSampleResults.ToList();
 						resultSamples.AddRange(collection:draftParameters);
 
 						draftSample.SampleResults = resultSamples;
