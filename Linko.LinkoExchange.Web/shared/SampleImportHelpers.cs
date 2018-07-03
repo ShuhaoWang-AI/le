@@ -83,8 +83,7 @@ namespace Linko.LinkoExchange.Web.Shared
 													   SampleResultViewModel sampleResult)
 		{
 			ResultComplianceType concentrationResultCompliance;
-			if (!sampleResult.Value.IsNullOrWhiteSpace() && 
-			    Enum.TryParse(value:sampleResult.ConcentrationResultCompliance, result:out concentrationResultCompliance))
+			if (Enum.TryParse(value:sampleResult.ConcentrationResultCompliance, result:out concentrationResultCompliance))
 			{
 				switch (concentrationResultCompliance)
 				{
@@ -100,10 +99,6 @@ namespace Linko.LinkoExchange.Web.Shared
 					default: throw new ArgumentOutOfRangeException();
 				}
 			}
-			else if (sampleResult.Value.IsNullOrWhiteSpace() && new[] {"ND", "NF"}.CaseInsensitiveContains(value:sampleResult.Qualifier))
-			{
-				complianceSummary.GoodConcentrationComplianceCount++;
-            }
 
 			ResultComplianceType massResultCompliance;
 			if (sampleResult.MassLoadingValue.IsNullOrWhiteSpace() || 
