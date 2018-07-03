@@ -254,7 +254,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
 		[JsonIgnore]
 		private int TotalComplianceCount => TotalGoodComplianceCount + TotalBadComplianceCount;
 		[JsonIgnore]
-		public int TotalGoodPercentage => TotalGoodComplianceCount > 0 ?
+		public int TotalGoodPercentage => TotalComplianceCount > 0 ?
 			                                  Convert.ToInt32(value: Convert.ToDecimal(value: TotalGoodComplianceCount) / Convert.ToDecimal(value: TotalComplianceCount) * 100) : 100;
 		[JsonIgnore]
 		public int TotalBadPercentage => 100 - TotalGoodPercentage;
