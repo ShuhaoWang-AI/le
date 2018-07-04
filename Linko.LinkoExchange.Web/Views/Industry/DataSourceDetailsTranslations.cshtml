@@ -85,7 +85,6 @@
                                                         }))
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceMonitoringPointTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceMonitoringPointTranslation", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceMonitoringPointTranslation', errorDivId: '#validationSummaryMonitoringPoint'})"))
                                                         .Model(model =>
                                                         {
@@ -157,7 +156,6 @@
                                                         }))
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceCollectionMethodTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceCollectionMethodTranslation", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceCollectionMethodTranslation', errorDivId: '#validationSummaryCollectionMethod'})"))
                                                         .Model(model =>
                                                         {
@@ -229,7 +227,6 @@
                                                         }))
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceSampleTypeTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceSampleTypeTranslation", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceSampleTypeTranslation', errorDivId: '#validationSummarySampleType'})"))
                                                         .Model(model =>
                                                         {
@@ -301,7 +298,6 @@
                                                         }))
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceUnitTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourcUnitTranslation", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceUnitTranslation', errorDivId: '#validationSummaryUnit'})"))
                                                         .Model(model =>
                                                         {
@@ -376,7 +372,6 @@
                                                         }))
                                                         .Update(update => update.Action(actionName: "UpdateDataSourceParameterTranslation", controllerName: "Industry"))
                                                         .Destroy(destroy => destroy.Action(actionName: "DestroyDataSourceParameterTranslation", controllerName: "Industry"))
-                                                        .PageSize(pageSize: 100)
                                                         .Events(events => events.Error(handler: "dataSourceManipulatingErrorHandler.bind({gridId: '#gridDataSourceParameterTranslation', errorDivId: '#validationSummaryParameter'})"))
                                                         .Model(model =>
                                                         {

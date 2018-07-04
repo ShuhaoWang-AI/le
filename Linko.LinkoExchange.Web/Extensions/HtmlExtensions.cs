@@ -163,7 +163,6 @@ namespace Linko.LinkoExchange.Web.Extensions
                                                   sort.Add(memberName:"IsTranslated").Ascending();
                                                   sort.Add(memberName:"DataSourceTerm").Ascending();
                                               })
-                                        .PageSize(pageSize:100)
                                         .Filter(f => f.Add(p => p.IsTranslated).IsEqualTo(value:!isUntranslatedSwitchOn))
                                         .Events(events => events.Error(handler:string.Format(format:"dataSourceManipulatingErrorHandler.bind({{gridId: '#grid{0}', errorDivId: '#validationSummary{0}'}})", arg0:translationType.ToString())))
                                         .Model(model =>
