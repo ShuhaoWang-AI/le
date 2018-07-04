@@ -6,6 +6,7 @@ using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
+	[Serializable]
     public class SampleResultDto
     {
         #region public properties

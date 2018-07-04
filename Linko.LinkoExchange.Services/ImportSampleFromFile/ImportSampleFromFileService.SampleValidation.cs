@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -91,7 +93,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					AddValidationError(validationResult:validationResult, errorMessage:ErrorConstants.SampleImport.DefaultSampleTypeIsRequired, rowNumber:importingSampleResult.RowNumber);
 				}
 
-				double result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue?? 0;
+				double? result = importingSampleResult.ColumnMap[key:SampleImportColumnName.Result].TranslatedValue;
 
 				if (_massLoadingFlowParameter == null)
 				{
@@ -351,7 +353,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
                             }
 						}
 
-						var commonParameters = importingSampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
+						var copyOfImportingSampleResults = DeepCopy<List<SampleResultDto>>(item: importingSampleResults);
+						var commonParameters = copyOfImportingSampleResults.Where(i => draftSampleParameterIds.Contains(item: i.ParameterId)).ToList();
 						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.ConcentrationSampleResultId);
 
 						foreach (var parameter in commonParameters)
@@ -359,7 +362,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 							parameter.ConcentrationSampleResultId = draftSampleResultDict[key:parameter.ParameterId];
 						}
 
-						var resultSamples = importingSampleResults.ToList();
+						var resultSamples = copyOfImportingSampleResults;
 						resultSamples.AddRange(collection:existingResultsOtherFromImport);
 
 						draftSample.SampleResults = resultSamples;
@@ -458,7 +461,7 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 				                      UnitName = resultRow.EffectiveUnit.Name,
 				                      UnitId = resultRow.EffectiveUnit.UnitId,
 				                      Value = resultRow.EffectiveUnitResult,
-				                      EnteredValue = resultRow.EffectiveUnitResult.ToString()
+				                      EnteredValue = resultRow.EffectiveUnitResult.HasValue? resultRow.EffectiveUnitResult.ToString() : ""
 			                      };
 
 			if (resultRow.ColumnMap.ContainsKey(key:SampleImportColumnName.ResultQualifier))
@@ -492,15 +495,8 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 		{
 			if (importFlowRow == null || !sampleResultDto.Value.HasValue)
 			{
-				return;
-			}
-
-			if (new[] {"ND", "NF"}.ToList().CaseInsensitiveContains(sampleResultDto.Qualifier))
-			{
 				sampleResultDto.IsCalcMassLoading = true;
-				sampleResultDto.Value = null;
-				sampleResultDto.EnteredValue = "";
-                sampleResultDto.MassLoadingValue = null;
+				sampleResultDto.MassLoadingValue = null;
 				sampleResultDto.MassLoadingQualifier = null;
 				return;
 			}
@@ -779,6 +775,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 					importSampleResultRow.ParameterName = sampleResultDto.ParameterName;
 				}
 			}
+		}
+
+		private static T DeepCopy<T>(T item)
+		{
+			BinaryFormatter formatter = new BinaryFormatter();
+			MemoryStream stream = new MemoryStream();
+			formatter.Serialize(stream, item);
+			stream.Seek(0, SeekOrigin.Begin);
+			T result = (T)formatter.Deserialize(stream);
+			stream.Close();
+			return result;
 		}
 
 		private static void AddValidationError(ImportSampleFromFileValidationResultDto validationResult, string errorMessage, int? rowNumber = default(int?))
