@@ -140,7 +140,7 @@ namespace Linko.LinkoExchange.Web.Mapping
 
 			var sampleResult = new SampleResultViewModel
 			                   {
-				                   Id = sampleResultDto.SampleResultId,
+				                   Id = sampleResultDto.ConcentrationSampleResultId,
 				                   ParameterId = sampleResultDto.ParameterId,
 				                   ParameterName = sampleResultDto.ParameterName,
 				                   Qualifier = sampleResultDto.Qualifier,

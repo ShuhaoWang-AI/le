@@ -455,7 +455,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     //
                     //Remember that the items in this collection are unordered.
 
-	                var resultDto = new SampleResultDto {SampleResultId = sampleResult.SampleResultId};
+	                var resultDto = new SampleResultDto();
 
 	                if (sampleResult.LimitBasisId == flowLimitBasisId)
                     {

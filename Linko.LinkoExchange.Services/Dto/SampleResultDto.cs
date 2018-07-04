@@ -9,7 +9,6 @@ namespace Linko.LinkoExchange.Services.Dto
     public class SampleResultDto
     {
         #region public properties
-		public int? SampleResultId { get; set; }
         public int? ConcentrationSampleResultId { get; set; }
         public int ParameterId { get; set; }
         public string ParameterName { get; set; }

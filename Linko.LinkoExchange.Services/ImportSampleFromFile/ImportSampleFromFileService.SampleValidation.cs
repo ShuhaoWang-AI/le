@@ -352,11 +352,11 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 						}
 
 						var commonParameters = importingSampleResults.Where(i => draftSampleParameterIds.Contains(item:i.ParameterId)).ToList();
-						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.SampleResultId);
+						var draftSampleResultDict = draftSample.SampleResults.ToDictionary(i => i.ParameterId, i => i.ConcentrationSampleResultId);
 
 						foreach (var parameter in commonParameters)
 						{
-							parameter.SampleResultId = draftSampleResultDict[key:parameter.ParameterId];
+							parameter.ConcentrationSampleResultId = draftSampleResultDict[key:parameter.ParameterId];
 						}
 
 						var resultSamples = importingSampleResults.ToList();
