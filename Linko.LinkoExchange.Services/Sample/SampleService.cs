@@ -537,16 +537,14 @@ namespace Linko.LinkoExchange.Services.Sample
 
 	    public void SampleComplianceCheck(List<SampleDto> sampleDtos)
 	    {
-		    var orgRegProgramId = int.Parse(s:_httpContext.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
 		    var monitoringPointParameters = _dbContext.MonitoringPointParameters
 		                                              .Include(mppl => mppl.DefaultUnit)
 		                                              .Include(a => a.MonitoringPoint)
-		                                              .Where(b => b.MonitoringPoint.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId == orgRegProgramId).ToList();
+													  .ToList();
 
 		    var monitoringPointParameterLimits = _dbContext.MonitoringPointParameterLimits
 		                                                   .Include(mppl => mppl.LimitBasis)
 		                                                   .Include(mppl => mppl.LimitType)
-		                                                   .Where(a => a.MonitoringPointParameter.MonitoringPoint.OrganizationRegulatoryProgramId == orgRegProgramId)
 		                                                   .ToList();
 			
 		    foreach (var sampleDto in sampleDtos)
