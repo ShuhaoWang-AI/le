@@ -93,9 +93,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 				limitReportParameterLimit.AverageType = GetAverageType(limits:limitGroup.limits);
 
-				limitReportParameterLimit.ConcentrationDailyLimit = concentrationDailyLimit.MinimumValue.HasValue
+				limitReportParameterLimit.ConcentrationDailyLimit = concentrationDailyLimit != null ? (concentrationDailyLimit.MinimumValue.HasValue
 					                                                    ? $"{concentrationDailyLimit.MinimumValue.Value}-{concentrationDailyLimit.MaximumValue}"
-					                                                    : $"{concentrationDailyLimit.MaximumValue}";
+					                                                    : $"{concentrationDailyLimit.MaximumValue}"): "--";
 
 				limitReportParameterLimit.MassDailyLimit = massLoadingDailyLimit != null
 					                                           ? $"{massLoadingDailyLimit.MaximumValue}"
@@ -108,7 +108,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 					                                             ? $"{massLoadingAverageLimit.MaximumValue}"
 					                                             : "--";
 
-				limitReportParameterLimit.ConcentrationUnits = concentrationDailyLimit.BaseUnit.Name;
+				limitReportParameterLimit.ConcentrationUnits = concentrationDailyLimit == null ? string.Empty : concentrationDailyLimit.BaseUnit.Name;
 				 
 				limitReportParameterLimit.MassUnits = massLoadingDailyLimit == null
 					                                      ? (massLoadingAverageLimit == null ? string.Empty : massLoadingAverageLimit.BaseUnit.Name)
@@ -120,7 +120,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 		private MonitoringPointParameterLimit GetConcentrationDailyLimit(ICollection<MonitoringPointParameterLimit> limits)
 		{
-			return limits.Single(i => i.LimitBasis.Name.Equals(value:LimitBasisName.Concentration.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase)
+			return limits.SingleOrDefault(i => i.LimitBasis.Name.Equals(value:LimitBasisName.Concentration.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase)
 			                          && i.LimitType.Name.Equals(value:LimitTypeName.Daily.ToString(), comparisonType:StringComparison.OrdinalIgnoreCase));
 		}
 

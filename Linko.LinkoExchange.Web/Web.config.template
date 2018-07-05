@@ -77,10 +77,10 @@ For more information on how to configure your ASP.NET application, please visit 
             <logger name="*"
                     writeTo="default"
                     minlevel="Info">
-                <filters>
+                <!--<filters>
                     <when condition="starts-with('${message}','#LogToEmailLogFile')"
                           action="Ignore" />
-                </filters>
+                </filters>-->
             </logger>
             <logger name="*"
                     writeTo="errorMail"
