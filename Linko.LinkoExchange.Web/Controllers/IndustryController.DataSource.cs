@@ -144,7 +144,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                              Description = model.Description
                                                                          });
                 TempData[key: "ShowSuccessMessage"] = true;
-                TempData[key: "SuccessMessage"] = "Sample created successfully!";
+                TempData[key: "SuccessMessage"] = "Data Provider created successfully!";
                 ModelState.Clear();
 
                 return RedirectToAction(actionName: "DataSourceDetails", controllerName: "Industry", routeValues: new { id });
