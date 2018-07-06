@@ -187,6 +187,17 @@ namespace Linko.LinkoExchange.Services.ImportSampleFromFile
 
 					var mppl = mp.MonitoringPointParameterLimits.FirstOrDefault();
 
+					if (mp.Parameter.IsFlowForMassLoadingCalculation)
+					{
+						mppl = mp.MonitoringPointParameterLimits.FirstOrDefault(i => i.LimitBasis.Name.Equals(value:LimitBasisName.VolumeFlowRate.ToString(),
+						                                                                                      comparisonType:StringComparison.OrdinalIgnoreCase));
+					}
+					else
+					{ //massloading calculate outside
+						mppl = mp.MonitoringPointParameterLimits.FirstOrDefault(i => i.LimitBasis.Name.Equals(value:LimitBasisName.Concentration.ToString(),
+						                                                                                      comparisonType:StringComparison.OrdinalIgnoreCase));
+					}
+
 					if (mppl?.BaseUnit != null)
 					{
 						return _mapHelper.ToDto(fromDomainObject:mppl.BaseUnit);
