@@ -1038,11 +1038,11 @@ BEGIN
                     -- If it is not included in the file, the LinkoExchange user will be prompted to choose this data during the import process.  
                     -- If the data can be included in the file, then the file can contain sample results for multiple Monitoring Points, Collection Methods and Sample Types.  
                     -- If the data cannot be included in the file, then the file must only contain data for a single Monitoring Point, Collection Method and Sample Type.
-                    WHEN fvtf.FileVersionTemplateFieldId = @FileVersionTemplateId_SampleImport AND sf.Name = 'MonitoringPoint' THEN 
+                    WHEN fvtf.FileVersionTemplateId = @FileVersionTemplateId_SampleImport AND sf.Name = 'MonitoringPoint' THEN 
                         @DataOptionalityId_Recommended
-                    WHEN fvtf.FileVersionTemplateFieldId = @FileVersionTemplateId_SampleImport AND sf.Name = 'SampleType' THEN 
+                    WHEN fvtf.FileVersionTemplateId = @FileVersionTemplateId_SampleImport AND sf.Name = 'SampleType' THEN 
                         @DataOptionalityId_Recommended
-                    WHEN fvtf.FileVersionTemplateFieldId = @FileVersionTemplateId_SampleImport AND sf.Name = 'CollectionMethod' THEN 
+                    WHEN fvtf.FileVersionTemplateId = @FileVersionTemplateId_SampleImport AND sf.Name = 'CollectionMethod' THEN 
                         @DataOptionalityId_Recommended
                     ELSE
                         @DataOptionalityId_Required
